@@ -61,7 +61,7 @@ Same story with arrays:
 ```
 
 ### API
-```
+```c++
 /// Returns const reference to a field with index `I` in flattened `T`.
 /// Example usage: flat_get<0>(my_structure());
 template <std::size_t I, class T>
@@ -106,7 +106,7 @@ constexpr std::size_t flat_tuple_size_v = flat_tuple_size<T>::value;
 ///     std::tuple<int, short> t = flat_to_tuple(s);
 ///     assert(get<0>(t) == 10);
 template <class T>
-auto flat_to_tuple(const T& val) noexcept;
+auto flat_make_tuple(const T& val) noexcept;
 
 
 /// Creates an `std::tuple` with lvalue references to fields of a flattened T.
