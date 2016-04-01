@@ -4,7 +4,7 @@ This C++14 library is meant for accessing structure elements by index and provid
 
 
 ### Motivating example
-```
+```c++
 #include <iostream>
 #include "magic_get.hpp"
 
@@ -29,7 +29,7 @@ my_struct has 3 fields: { 100, H, 3.14159 }
 ### Flattening
 All the methods with prefix `flat_` represent a template parameter type as flat structure without static members:
 
-```
+```c++
 // Helper structure.
 struct my_struct_nested { short a1; int a2; };
 
@@ -55,7 +55,7 @@ So that
 * `flat_get<3>(my_struct{})` will return `my_struct::a3_a4[0]` field
 
 Same story with arrays:
-```
+```c++
     int i[2][2] = {{10, 11}, {12, 13} };
     assert(flat_get<1>(i) == 11);
 ```
