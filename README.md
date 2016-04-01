@@ -22,9 +22,10 @@ int main() {
 
 ```
 
-Output:
+Outputs:
+```
 my_struct has 3 fields: { 100, H, 3.14159 }
-
+```
 
 ### Flattening
 All the methods with prefix `flat_` represent a template parameter type as flat structure without static members:
