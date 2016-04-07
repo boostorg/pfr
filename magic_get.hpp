@@ -8,12 +8,12 @@
 #include <type_traits>
 #include <utility>
 #include <memory>
-#include <functional>
 
 #ifdef __clang__
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wmissing-braces"
 #   pragma clang diagnostic ignored "-Wundefined-inline"
+#   pragma clang diagnostic ignored "-Wundefined-internal"
 #   pragma clang diagnostic ignored "-Wmissing-field-initializers"
 #endif
 
@@ -78,52 +78,66 @@ constexpr const T& get_impl(const base_from_member<N, T>& t) noexcept {
     return t.value;
 }
 
+template <std::size_t N, class T>
+constexpr volatile T& get_impl(volatile base_from_member<N, T>& t) noexcept {
+    return t.value;
+}
+
+template <std::size_t N, class T>
+constexpr const volatile T& get_impl(const volatile base_from_member<N, T>& t) noexcept {
+    return t.value;
+}
+
 template <class ...Values>
 struct tuple: tuple_base< 
         std::make_index_sequence<sizeof...(Values)>, 
         Values...
     >
-{};
+{
+    static constexpr std::size_t size_v = sizeof...(Values);
+};
 
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(tuple<T...>& t) noexcept {
+    static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
     return get_impl<N>(t);
 }
 
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(const tuple<T...>& t) noexcept {
+    static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
+    return get_impl<N>(t);
+}
+
+template <std::size_t N, class ...T>
+constexpr decltype(auto) get(const volatile tuple<T...>& t) noexcept {
+    static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
+    return get_impl<N>(t);
+}
+
+template <std::size_t N, class ...T>
+constexpr decltype(auto) get(volatile tuple<T...>& t) noexcept {
+    static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
     return get_impl<N>(t);
 }
 
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(tuple<T...>&& t) noexcept {
+    static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
     return std::move(
         get_impl<N>(t)
     );
 }
 
-
-template <class T> class tuple_size;
-template <class T> class tuple_size<const T> 
-    : public tuple_size<T>
-{};
-
-template <class T> class tuple_size<volatile T>
-    : public tuple_size<T>
-{};
-template <class T> class tuple_size<const volatile T>
-    : public tuple_size<T>
-{};
-
-template <class... Types> class tuple_size<tuple<Types...> >
-    : public size_t_<sizeof...(Types)>
-{};
+template <size_t I, class T> 
+using tuple_element = std::remove_reference< decltype(
+        ::detail::sequence_tuple::get<I>( std::declval<T>() )
+    ) >;
 
 } // namespace sequence_tuple
 
 using sequence_tuple::get;
 using sequence_tuple::tuple;
-using sequence_tuple::tuple_size;
 
 
 ///////////////////// Array that has the constexpr
@@ -214,12 +228,13 @@ constexpr auto remove_1_ext() noexcept {
 
 ///////////////////// Forward declarations
 
-template <class Type> constexpr auto type_to_id(identity<Type*>) noexcept;
-template <class Type> constexpr auto type_to_id(identity<const Type*>) noexcept;
-template <class Type> constexpr auto type_to_id(identity<const volatile Type*>) noexcept;
-template <class Type> constexpr auto type_to_id(identity<volatile Type*>) noexcept;
-template <class Type> constexpr auto type_to_id(identity<Type&>) noexcept;
-template <class Type> constexpr auto type_to_id(identity<Type>) noexcept;
+template <class Type> constexpr std::size_t type_to_id(identity<Type*>) noexcept;
+template <class Type> constexpr std::size_t type_to_id(identity<const Type*>) noexcept;
+template <class Type> constexpr std::size_t type_to_id(identity<const volatile Type*>) noexcept;
+template <class Type> constexpr std::size_t type_to_id(identity<volatile Type*>) noexcept;
+template <class Type> constexpr std::size_t type_to_id(identity<Type&>) noexcept;
+template <class Type> constexpr std::size_t type_to_id(identity<Type>, typename std::enable_if<std::is_enum<Type>::value>::type* = 0) noexcept;
+template <class Type> constexpr auto type_to_id(identity<Type>, typename std::enable_if<!std::is_enum<Type>::value>::type* = 0) noexcept;
     
 template <std::size_t Index> constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_const_ptr_type> = 0) noexcept;
 template <std::size_t Index> constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_ptr_type> = 0) noexcept;
@@ -267,39 +282,66 @@ REGISTER_TYPE(std::nullptr_t        , 23)
 
 ///////////////////// Definitions of type_to_id and id_to_type for types with extensions and nested types
 template <class Type>
-constexpr auto type_to_id(identity<Type*>) noexcept {
+constexpr std::size_t type_to_id(identity<Type*>) noexcept {
     constexpr auto unptr = type_to_id(identity<Type>{});
+    static_assert(
+        std::is_same<const std::size_t, decltype(unptr)>::value,
+        "Pointers to user defined types are not supported."
+    );
     return type_to_id_extension_apply<unptr>(native_ptr_type);
 }
 
 template <class Type>
-constexpr auto type_to_id(identity<const Type*>) noexcept {
+constexpr std::size_t type_to_id(identity<const Type*>) noexcept {
     constexpr auto unptr = type_to_id(identity<Type>{});
+    static_assert(
+        std::is_same<const std::size_t, decltype(unptr)>::value,
+        "Const pointers to user defined types are not supported."
+    );
     return type_to_id_extension_apply<unptr>(native_const_ptr_type);
 }
 
 template <class Type>
-constexpr auto type_to_id(identity<const volatile Type*>) noexcept {
+constexpr std::size_t type_to_id(identity<const volatile Type*>) noexcept {
     constexpr auto unptr = type_to_id(identity<Type>{});
+    static_assert(
+        std::is_same<const std::size_t, decltype(unptr)>::value,
+        "Const volatile pointers to user defined types are not supported."
+    );
     return type_to_id_extension_apply<unptr>(native_const_volatile_ptr_type);
 }
 
 template <class Type>
-constexpr auto type_to_id(identity<volatile Type*>) noexcept {
+constexpr std::size_t type_to_id(identity<volatile Type*>) noexcept {
     constexpr auto unptr = type_to_id(identity<Type>{});
+    static_assert(
+        std::is_same<const std::size_t, decltype(unptr)>::value,
+        "Volatile pointers to user defined types are not supported."
+    );
     return type_to_id_extension_apply<unptr>(native_volatile_ptr_type);
 }
 
 template <class Type>
-constexpr auto type_to_id(identity<Type&>) noexcept {
+constexpr std::size_t type_to_id(identity<Type&>) noexcept {
     constexpr auto unptr = type_to_id(identity<Type>{});
+    static_assert(
+        std::is_same<const std::size_t, decltype(unptr)>::value,
+        "References to user defined types are not supported."
+    );
     return type_to_id_extension_apply<unptr>(native_ref_type);
 }
 
 template <class Type>
-constexpr auto type_to_id(identity<Type>) noexcept {
+constexpr std::size_t type_to_id(identity<Type>, typename std::enable_if<std::is_enum<Type>::value>::type*) noexcept {
+    return type_to_id(identity<typename std::underlying_type<Type>::type >{});
+}
+
+
+template <class Type>
+constexpr auto type_to_id(identity<Type>, typename std::enable_if<!std::is_enum<Type>::value>::type*) noexcept {
     return fields_count_and_type_ids_with_zeros<Type>();
 }
+
 
 
 template <std::size_t Index>
@@ -504,19 +546,59 @@ constexpr auto as_tuple_impl(std::index_sequence<I...>) noexcept {
 
 template <class T>
 constexpr auto as_tuple() noexcept {
-    static_assert(std::is_pod<T>::value, "Not applyable");
-    constexpr auto res = as_tuple_impl<T>(
-        std::make_index_sequence< decltype(array_of_type_ids<T>())::size() >()
+    typedef typename std::remove_cv<T>::type type;
+
+    static_assert(std::is_pod<type>::value, "Not applyable");
+    static_assert(!std::is_reference<type>::value, "Not applyable");
+    constexpr auto res = as_tuple_impl<type>(
+        std::make_index_sequence< decltype(array_of_type_ids<type>())::size() >()
     );
     
-    static_assert(sizeof(res) == sizeof(T), "size check failed");
+    static_assert(sizeof(res) == sizeof(type), "size check failed");
     static_assert(
-        std::alignment_of<decltype(res)>::value == std::alignment_of<T>::value,
+        std::alignment_of<decltype(res)>::value == std::alignment_of<type>::value,
         "alignment check failed"
     );
 
     return res;
 }
+
+template <class T>
+using as_tuple_t = decltype( as_tuple<T>() );
+
+template <class T, std::size_t... I>
+auto flat_make_tuple_impl(const T& t, std::index_sequence<I...>) noexcept {
+    return std::make_tuple(
+        sequence_tuple::get<I>(t)...
+    );
+}
+
+template <class T, std::size_t... I>
+auto flat_tie_impl(T& t, std::index_sequence<I...>) noexcept {
+    return std::tie(
+        sequence_tuple::get<I>(t)...
+    );
+}
+
+template <class From, class To>
+struct teleport_extents {
+    typedef To type;
+};
+
+template <class From, class To>
+struct teleport_extents<const From, To> {
+    typedef const To type;
+};
+
+template <class From, class To>
+struct teleport_extents<const volatile From, To> {
+    typedef const volatile To type;
+};
+
+template <class From, class To>
+struct teleport_extents<volatile From, To> {
+    typedef volatile To type;
+};
 
 } // namespace detail
 
@@ -524,25 +606,81 @@ constexpr auto as_tuple() noexcept {
 #   pragma clang diagnostic pop
 #endif
 
-
+/// Returns const reference to a field with index `I` in flattened `T`.
+/// Example usage: flat_get<0>(my_structure());
 template <std::size_t I, class T>
 decltype(auto) flat_get(const T& val) noexcept {
-    const auto* const t = reinterpret_cast<const decltype(detail::as_tuple<T>())*>( std::addressof(val) );
+    const auto* const t = reinterpret_cast<const detail::as_tuple_t<T>*>( std::addressof(val) );
     return detail::sequence_tuple::get<I>(*t);
 }
 
+
+/// Returns reference to a field with index `I` in flattened `T`.
+/// Requires: `T` must not have const fields.
+/// Example usage: flat_get<0>(my_structure());
 template <std::size_t I, class T>
-using flat_tuple_element 
-    = detail::identity< decltype( flat_get<I>(std::declval<T>()) ) >;
-    
+decltype(auto) flat_get(T& val, typename std::enable_if< std::is_trivially_assignable<T, T>::value>::type* = 0) noexcept {
+    auto* const t = reinterpret_cast<detail::as_tuple_t<T>*>( std::addressof(val) );
+    return detail::sequence_tuple::get<I>(*t);
+}
+
+
+/// `flat_tuple_element` has a `typedef type-of-a-field-with-index-I-in-flattened-T type;`
+/// Example usage: std::vector<  flat_tuple_element<0, my_structure>::type  > v;
 template <std::size_t I, class T>
-using flat_tuple_element_t
-    = typename flat_tuple_element<I, T>::type;
+using flat_tuple_element = detail::teleport_extents<
+        T, 
+        typename detail::sequence_tuple::tuple_element<I, detail::as_tuple_t<T> >::type
+    >;
+            
 
+/// Type of a field with index `I` in flattened `T`
+/// Example usage: std::vector<  flat_tuple_element_t<0, my_structure>  > v;
+template <std::size_t I, class T>
+using flat_tuple_element_t = typename flat_tuple_element<I, T>::type;
+
+
+/// `flat_tuple_size` has a member `value` that constins fields count in a flattened `T`.
+/// Example usage: std::array<int, flat_tuple_size<my_structure>::value > a;
 template <class T>
-using flat_tuple_size = detail::tuple_size< decltype(detail::as_tuple<T>()) >;
+using flat_tuple_size = detail::size_t_< detail::as_tuple_t<T>::size_v >;
 
+
+/// `flat_tuple_size_v` is a template variable that constins fields count in a flattened `T`.
+/// Example usage: std::array<int, flat_tuple_size_v<my_structure> > a;
 template <class T>
-constexpr std::size_t flat_tuple_size_v { flat_tuple_size<T>::value };
+constexpr std::size_t flat_tuple_size_v = flat_tuple_size<T>::value;
 
 
+/// Creates an `std::tuple` from a flattened T.
+/// Example usage: 
+///     struct my_struct { int i, short s; };
+///     my_struct s {10, 11};
+///     std::tuple<int, short> t = flat_make_tuple(s);
+///     assert(get<0>(t) == 10);
+template <class T>
+auto flat_make_tuple(const T& val) noexcept {
+    typedef detail::as_tuple_t<T> internal_tuple_t;
+    const internal_tuple_t& t = *reinterpret_cast<const internal_tuple_t*>( std::addressof(val) );
+    return detail::flat_make_tuple_impl(
+        t,
+        std::make_index_sequence< internal_tuple_t::size_v >()
+    );
+}
+
+
+/// Creates an `std::tuple` with lvalue references to fields of a flattened T.
+/// Example usage: 
+///     struct my_struct { int i, short s; };
+///     my_struct s;
+///     flat_tie(s) = std::tuple<int, short>{10, 11};
+///     assert(s.s == 11);
+template <class T>
+auto flat_tie(T& val, typename std::enable_if< std::is_trivially_assignable<T, T>::value>::type* = 0 ) noexcept {
+    typedef detail::as_tuple_t<T> internal_tuple_t;
+    internal_tuple_t& t = *reinterpret_cast<internal_tuple_t*>( std::addressof(val) );
+    return detail::flat_tie_impl(
+        t,
+        std::make_index_sequence< internal_tuple_t::size_v >()
+    );
+}
