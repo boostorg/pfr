@@ -133,7 +133,7 @@ auto flat_tie(T& val, typename std::enable_if< std::is_trivially_assignable<T, T
 
 * Auto generate comparisons:
 ```c++
-namespace pod_ops {
+namespace pod_ops { // Contains comparisons suitable for any POD type
 
 template <class T1, class T2>
 inline bool operator==(const T1& lhs, const T2& rhs) {
@@ -161,13 +161,14 @@ inline bool operator>(const T1& lhs, const T2& rhs) {
 
 struct comparable_struct {
     int i; short s; char data[7]; bool bl; int a,b,c,d,e,f;
-};
+}; // No `operator ==` or `operator<` defined for the structure
+
 using namespace pod_ops;
 
 comparable_struct s1 {0, 1, "Hello", false, 6,7,8,9,10,11};
 comparable_struct s2 {0, 1, "Hello", false, 6,7,8,9,10,11111};
-assert(s1 == s1);
-assert(s1 < sq);
+assert(s1 == s1);   // uses pod_ops::operator==
+assert(s1 < sq);    // uses pod_ops::operator<
 
 ```
 
@@ -188,8 +189,9 @@ struct print_impl<I, I> {
     template <class T> static void print (std::ostream&, const T&) {}
 };
 
+// Universal `operator <<` for all POD types
 template <class Ostreamable, class T>
-typename std::enable_if<std::is_pod<T>::value, Ostreamable& >::type
+typename std::enable_if<std::is_pod<T>::value && std::is_class<T>::value, Ostreamable& >::type
     operator<<(Ostreamable& out, const T& value)
 {
     out << boost::typeindex::type_id<T>().pretty_name() << " { ";
@@ -200,7 +202,10 @@ typename std::enable_if<std::is_pod<T>::value, Ostreamable& >::type
 
 // ...
 
+ // No `operator<<` defined for that structure:
 comparable_struct s1 {0, 1, "Hello", false, 6,7,8,9,10,11};
+
+// Using universal operator<<
 std::cout << s1  << std::endl; // Outputs: { 0, 1, H, e, l, l, o, , , 0, 6, 7, 8, 9, 10, 11 }
 ```
 
