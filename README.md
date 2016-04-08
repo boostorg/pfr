@@ -118,6 +118,42 @@ auto flat_make_tuple(const T& val) noexcept;
 ///     assert(s.s == 11);
 template <class T>
 auto flat_tie(T& val, typename std::enable_if< std::is_trivially_assignable<T, T>::value>::type* = 0 ) noexcept;
+
+
+/// Writes to `out` POD `value`
+/// Example usage: 
+///     struct my_struct { int i, short s; };
+///     my_struct s{12, 13};
+///     flat_write(std::cout, s); // outputs '{ 12, 13 }'
+template <class Char, class Traits, class T>
+void flat_write(std::basic_ostream<Char, Traits>& out, const T& value);
+
+
+/// Reads POD `value` from stream `in`
+/// Example usage: 
+///     struct my_struct { int i, short s; };
+///     my_struct s;
+///     std::stringstream ss;
+///     ss << "{ 12, 13 }";
+///     ss >> s;
+///     assert(s.i == 12);
+///     assert(s.i == 13);
+template <class Char, class Traits, class T>
+void flat_read(std::basic_istream<Char, Traits>& in, T& value);
+
+
+/// Contains comparison operators and stream operators for any POD types
+/// Example usage:
+///     struct comparable_struct {
+///         int i; short s; char data[7]; bool bl; int a,b,c,d,e,f;
+///     }; // No operators defined for that structure
+///     using namespace pod_ops;
+///
+///     comparable_struct s1 {0, 1, "Hello", false, 6,7,8,9,10,11};
+///     comparable_struct s2 {0, 1, "Hello", false, 6,7,8,9,10,11111};
+///     assert(s1 < s2);
+///     std::cout << s1 << std::endl;   // Outputs: { 0, 1, H, e, l, l, o, , , 0, 6, 7, 8, 9, 10, 11 }
+namespace pod_ops;
 ```
 
 ### Requirements and Limitations

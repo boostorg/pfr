@@ -6,6 +6,7 @@
 #include <iostream>
 #include <boost/type_index.hpp>
 #include <tuple>
+#include <sstream>
 #include "magic_get.hpp"
 
 template <std::size_t I, class T>
@@ -191,75 +192,37 @@ void test_with_enums() {
     );
 }
 
-namespace pod_ops {
-
-template <class T1, class T2>
-inline bool operator==(const T1& lhs, const T2& rhs) {
-    return flat_make_tuple(lhs) == flat_make_tuple(rhs);
-}
-
-template <class T1, class T2>
-inline bool operator!=(const T1& lhs, const T2& rhs) {
-    return flat_make_tuple(lhs) != flat_make_tuple(rhs);
-}
-
-template <class T1, class T2>
-inline bool operator<(const T1& lhs, const T2& rhs) {
-    return flat_make_tuple(lhs) < flat_make_tuple(rhs);
-}
-
-template <class T1, class T2>
-inline bool operator>(const T1& lhs, const T2& rhs) {
-    return flat_make_tuple(lhs) > flat_make_tuple(rhs);
-}
-
-} // pod_ops
-
-// ...
-
-template <std::size_t I, std::size_t N>
-struct print_impl {
-    template <class T>
-    static void print (std::ostream& out, const T& value) {
-        if (!!I) out << ", ";
-        out << flat_get<I>(value);
-        print_impl<I + 1, N>::print(out, value);
-    }
-};
-
-template <std::size_t I>
-struct print_impl<I, I> {
-    template <class T> static void print (std::ostream&, const T&) {}
-};
-
-template <class Ostreamable, class T>
-typename std::enable_if<std::is_pod<T>::value && std::is_class<T>::value , Ostreamable& >::type
-    operator<<(Ostreamable& out, const T& value)
-{
-    out << "{ ";
-    print_impl<0, flat_tuple_size_v<T> >::print(out, value);
-    out << " }";
-    return out;
-}
-
-
 void test_comparable_struct() {
-    using namespace pod_ops;
     struct comparable_struct {
         int i; short s; char data[50]; bool bl; int a,b,c,d,e,f;
     };
+    using namespace pod_ops;
 
     comparable_struct s1 {0, 1, "Hello", false, 6,7,8,9,10,11};
     comparable_struct s2 = s1;
     comparable_struct s3 {0, 1, "Hello", false, 6,7,8,9,10,11111};
     assert(s1 == s2);
+    assert(s1 <= s2);
+    assert(s1 >= s2);
     assert(!(s1 != s2));
     assert(!(s1 == s3));
     assert(s1 != s3);
     assert(s1 < s3);
     assert(s3 > s2);
+    assert(s1 <= s3);
+    assert(s3 >= s2);
 
     std::cout << s1 << std::endl;
+
+    comparable_struct s4;
+    std::stringstream ss;
+    ss.exceptions ( std::ios::failbit);
+    ss << s1;
+    ss >> s4;
+    std::cout << s4 << std::endl;
+    assert(s1 == s4);
+    int i = 1, j = 2;
+    assert(i != j);
 }
 
 int main() {
