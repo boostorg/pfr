@@ -52,7 +52,6 @@ addons:
     - llvm-toolchain-precise-3.7
     packages:
     - valgrind
-    - python-yaml
     - gcc-5
     - g++-5
     - lcov
@@ -60,4 +59,4 @@ addons:
 
 script:
     # `--coverage` flags required to generate coverage info for Coveralls
-    - $TOOLSET -std=$CXX_STANDARD --coverage && ./a.out
+    - $TOOLSET -std=$CXX_STANDARD --coverage main.cpp && valgrind ./a.out
