@@ -8,29 +8,13 @@
 # See https://svn.boost.org/trac/boost/wiki/TravisCoverals for description of this file
 # and how it can be used with Boost libraries.
 #
-# File revision #6
+# File revision #6 modified
 
 env:
-    global:
-        # Autodetect Boost branch by using the following code: - BRANCH_TO_TEST=$TRAVIS_BRANCH
-        # or just directly specify it
-        - BRANCH_TO_TEST=$TRAVIS_BRANCH
-
-        # Files, which coverage results must be ignored (files from other projects).
-        # Example: - IGNORE_COVERAGE='*/boost/progress.hpp */filesystem/src/*'
-        - IGNORE_COVERAGE='*/detail/pe_info.hpp */detail/macho_info.hpp */boost/progress.hpp */src/unique_path.cpp */src/codecvt_error_category.cpp */src/portability.cpp */src/operations.cpp */src/path.cpp */src/path_traits.cpp'
-
-        # Explicitly remove the following library from Boost. This may be usefull, if you're for example running Travis
-        # from `Boost.DLL` repo, while Boost already has `dll`.
-        #
-        # By default is eaual to - BOOST_REMOVE=`basename $TRAVIS_BUILD_DIR`
-        # This will force to use local repo content, instead of the Boost's default
-        - BOOST_REMOVE=dll
-
     matrix:
-        - CXX_STANDARD=c++14 TOOLSET=gcc-5
-        - CXX_STANDARD=c++1z TOOLSET=gcc-5
-        - CXX_STANDARD=c++14 TOOLSET=clang++
+        - CXX_STANDARD=c++14 TOOLSET=g++-5
+        - CXX_STANDARD=c++1z TOOLSET=g++-5
+        - CXX_STANDARD=c++14 TOOLSET=clang++-3.7
 
 
 ###############################################################################################################
@@ -54,7 +38,6 @@ addons:
     - valgrind
     - gcc-5
     - g++-5
-    - lcov
     - clang-3.7
 
 script:
