@@ -1,4 +1,4 @@
-#Magic Get
+#Magic Get [![Build Status](https://travis-ci.org/apolukhin/magic_get.svg?branch=master)](https://travis-ci.org/apolukhin/magic_get)
 
 This C++14 library is meant for accessing structure elements by index and providing other std::tuple like methods for user defined POD types.
 
