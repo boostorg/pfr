@@ -4,7 +4,7 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <iostream>
-#include <boost/type_index.hpp>
+#include <typeinfo>
 #include <tuple>
 #include <sstream>
 #include "magic_get.hpp"
@@ -12,7 +12,7 @@
 template <std::size_t I, class T>
 void print(T& f) {
     std::cout << flat_get<I>(f) << "\t\t" 
-        << boost::typeindex::type_id< flat_tuple_element_t<I, T> >()
+        << typeid(flat_tuple_element_t<I, T>).name()
         << std::endl;
 }
 
