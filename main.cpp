@@ -225,6 +225,15 @@ void test_comparable_struct() {
     assert(i != j);
 }
 
+void test_empty_struct() {
+    struct empty {};
+    using namespace pod_ops;
+
+    std::cout << empty{} << std::endl;
+
+    assert(empty{} == empty{});
+}
+
 int main() {
     test_compiletime<foo>();
     test_compiletime_array<int>();
@@ -251,6 +260,7 @@ int main() {
 
     test_with_enums();
     test_comparable_struct();
+    test_empty_struct();
 
     test_print();
 }

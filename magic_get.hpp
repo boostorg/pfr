@@ -164,6 +164,18 @@ struct size_array {                         // libc++ misses constexpr on operat
     }
 };
 
+template <>
+struct size_array<0> {                         // libc++ misses constexpr on operator[]
+    typedef std::size_t type;
+    std::size_t data[1];
+    
+    static constexpr std::size_t size() noexcept { return 0; }
+
+    constexpr std::size_t count_nonzeros() const noexcept {
+        return 0;
+    }
+};
+
 template <std::size_t I, std::size_t N>
 constexpr std::size_t get(const size_array<N>& a) noexcept {
     static_assert(I < N, "Array index out of bounds");
@@ -171,7 +183,8 @@ constexpr std::size_t get(const size_array<N>& a) noexcept {
 }
 
 
-template <class T> constexpr size_array<sizeof(T)> fields_count_and_type_ids_with_zeros() noexcept;
+template <class T> constexpr size_array<sizeof(T)> fields_count_and_type_ids_with_zeros(std::enable_if_t<!std::is_empty<T>::value>* = 0) noexcept;
+template <class T> constexpr size_array<0> fields_count_and_type_ids_with_zeros(std::enable_if_t<std::is_empty<T>::value>* = 0) noexcept;
 
 ///////////////////// All the stuff for representing Type as integer and converting integer back to type
 namespace typeid_conversions {
@@ -522,10 +535,15 @@ constexpr void detect_fields_count_and_type_ids(std::size_t*, std::index_sequenc
 
 ///////////////////// Returns array of typeids and zeros
 template <class T>
-constexpr size_array<sizeof(T)> fields_count_and_type_ids_with_zeros() noexcept {
+constexpr size_array<sizeof(T)> fields_count_and_type_ids_with_zeros(std::enable_if_t<!std::is_empty<T>::value>*) noexcept {
     size_array<sizeof(T)> types{};
     detect_fields_count_and_type_ids<T, sizeof(T)>(types.data, std::make_index_sequence<sizeof(T)>{});
     return types;
+}
+
+template <class T>
+constexpr size_array<0> fields_count_and_type_ids_with_zeros(std::enable_if_t<std::is_empty<T>::value>*) noexcept {
+    return size_array<0>{0};
 }
 
 ///////////////////// Returns array of typeids without zeros
@@ -554,6 +572,11 @@ constexpr auto as_tuple_impl(std::index_sequence<I...>) noexcept {
             size_t_<get<I>(a)>{}
         ))...
     >{};
+}
+
+template <class T>
+constexpr tuple<> as_tuple_impl(std::index_sequence<>) noexcept {
+    return tuple<>{};
 }
 
 template <class T>
@@ -727,12 +750,12 @@ namespace detail {
 /// Example usage: 
 ///     struct my_struct { int i, short s; };
 ///     my_struct s{12, 13};
-///     flat_write(std::cout, s); // outputs '{ 12, 13 }'
+///     flat_write(std::cout, s); // outputs '{12, 13}'
 template <class Char, class Traits, class T>
 void flat_write(std::basic_ostream<Char, Traits>& out, const T& value) {
-    out << "{ ";
+    out << '{';
     detail::flat_print_impl<0, flat_tuple_size_v<T> >::print(out, value);
-    out << " }";
+    out << '}';
 }
 
 
@@ -745,9 +768,9 @@ namespace detail {
             if (!!I) {
                 in >> ignore;
                 if (ignore != ',') in.setstate(Stream::failbit);
+                in >> ignore;
+                if (ignore != ' ')  in.setstate(Stream::failbit);
             }
-            in >> ignore;
-            if (ignore != ' ')  in.setstate(Stream::failbit);
             in >> flat_get<I>(value);
             flat_read_impl<I + 1, N>::read(in, value);
         }
@@ -780,8 +803,6 @@ void flat_read(std::basic_istream<Char, Traits>& in, T& value) {
     detail::flat_read_impl<0, flat_tuple_size_v<T> >::read(in, value);
     
     in >> parenthis;
-    if (parenthis != ' ') in.setstate(std::basic_istream<Char, Traits>::failbit);
-    in >> parenthis;
     if (parenthis != '}') in.setstate(std::basic_istream<Char, Traits>::failbit);
 
     in.flags(prev_flags);
@@ -792,7 +813,7 @@ void flat_read(std::basic_istream<Char, Traits>& in, T& value) {
 namespace detail {
     template <class T1, class T2>
     using same_pods_enable = typename std::enable_if< 
-        std::is_same<T1, T2>::value && std::is_pod<T1>::value && std::is_pod<T2>::value,
+        std::is_same<T1, T2>::value && std::is_pod<T1>::value && std::is_class<T1>::value,
         bool
     >::type;
     
