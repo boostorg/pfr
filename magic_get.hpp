@@ -746,7 +746,7 @@ namespace detail {
     };
 }
 
-/// Writes to `out` POD `value`
+/// Writes to `out` the POD `value`
 /// Example usage: 
 ///     struct my_struct { int i, short s; };
 ///     my_struct s{12, 13};
@@ -811,12 +811,6 @@ void flat_read(std::basic_istream<Char, Traits>& in, T& value) {
 
 
 namespace detail {
-    template <class T1, class T2>
-    using same_pods_enable = typename std::enable_if< 
-        std::is_same<T1, T2>::value && std::is_pod<T1>::value && std::is_class<T1>::value,
-        bool
-    >::type;
-    
     template <std::size_t I, std::size_t N>
     struct equal_impl {
         template <class T>
@@ -825,7 +819,7 @@ namespace detail {
                 && equal_impl<I + 1, N>::cmp(v1, v2);
         }
     };
-    
+
     template <std::size_t N>
     struct equal_impl<N, N> {
         template <class T>
@@ -833,7 +827,7 @@ namespace detail {
             return true;
         }
     };
-    
+
     template <std::size_t I, std::size_t N>
     struct less_impl {
         template <class T>
@@ -842,7 +836,7 @@ namespace detail {
                 || (flat_get<I>(v1) == flat_get<I>(v2) && less_impl<I + 1, N>::cmp(v1, v2));
         }
     };
-    
+
     template <std::size_t N>
     struct less_impl<N, N> {
         template <class T>
@@ -850,11 +844,63 @@ namespace detail {
             return false;
         }
     };
+
+///////////////////// `value` is true if Detector<Tleft, Tright> does not compile (SFINAE)
+    template <template <class, class> class Detector, class Tleft, class Tright>
+    struct not_appliable {
+        struct success{};
+        template <class Tl, class Tr> static Detector<Tl, Tr> detector_impl(long) noexcept;
+        template <class Tl, class Tr> static success detector_impl(int) noexcept;
+        
+        static constexpr bool value = std::is_same<
+            decltype(detector_impl<Tleft, Tright>(1L)),
+            success 
+        >::value;
+    };
+
+///////////////////// Detectors for different operators
+    template <class T1, class T2> using comp_eq_detector = decltype(std::declval<T1>() == std::declval<T2>());
+    template <class T1, class T2> using comp_ne_detector = decltype(std::declval<T1>() != std::declval<T2>());
+    template <class T1, class T2> using comp_lt_detector = decltype(std::declval<T1>() <  std::declval<T2>());
+    template <class T1, class T2> using comp_le_detector = decltype(std::declval<T1>() <= std::declval<T2>());
+    template <class T1, class T2> using comp_gt_detector = decltype(std::declval<T1>() >  std::declval<T2>());
+    template <class T1, class T2> using comp_ge_detector = decltype(std::declval<T1>() >= std::declval<T2>());
+    template <class S, class T> using ostreamable_detector = decltype(std::declval<S>() << std::declval<T>());
+    template <class S, class T> using istreamable_detector = decltype(std::declval<S>() >> std::declval<T>());
+
+///////////////////// Helper typedef that it used by all the enable_not_*_comp_t
+    template <template <class, class> class Detector, class T>
+    using enable_not_comp_base_t = typename std::enable_if<
+        not_appliable<Detector, T const&, T const&>::value && std::is_pod<T>::value,
+        bool
+    >::type;
+
+///////////////////// std::enable_if_t like functions that enable only if types do not support operation and are PODs
+    template <class T> using enable_not_eq_comp_t = enable_not_comp_base_t<comp_eq_detector, T>;
+    template <class T> using enable_not_ne_comp_t = enable_not_comp_base_t<comp_ne_detector, T>;
+    template <class T> using enable_not_lt_comp_t = enable_not_comp_base_t<comp_lt_detector, T>;
+    template <class T> using enable_not_le_comp_t = enable_not_comp_base_t<comp_le_detector, T>;
+    template <class T> using enable_not_gt_comp_t = enable_not_comp_base_t<comp_gt_detector, T>;
+    template <class T> using enable_not_ge_comp_t = enable_not_comp_base_t<comp_ge_detector, T>;
+
+    template <class Stream, class Type>
+    using enable_not_ostreamable_t = typename std::enable_if<
+        not_appliable<ostreamable_detector, Stream&, Type const&>::value && std::is_pod<Type>::value,
+        Stream&
+    >::type;
+
+    template <class Stream, class Type>
+    using enable_not_istreamable_t = typename std::enable_if<
+        not_appliable<istreamable_detector, Stream&, Type&>::value && std::is_pod<Type>::value,
+        Stream&
+    >::type;
 }
 
-/// Contains comparison operators and stream operators for any POD types
+/// Contains comparison operators and stream operators for any POD types that does not have it's own operators.
+/// If POD is comparable or streamable using it's own operator or it's conversion operator, then the original operator is be used.
+///
 /// Example usage:
-///     struct comparable_struct {
+///     struct comparable_struct {      // No operators defined for that structure
 ///         int i; short s; char data[7]; bool bl; int a,b,c,d,e,f;
 ///     };
 ///     using namespace pod_ops;
@@ -862,44 +908,42 @@ namespace detail {
 ///     comparable_struct s1 {0, 1, "Hello", false, 6,7,8,9,10,11};
 ///     comparable_struct s2 {0, 1, "Hello", false, 6,7,8,9,10,11111};
 ///     assert(s1 < s2);
-///     std::cout << s1 << std::endl; // Outputs: { 0, 1, H, e, l, l, o, , , 0, 6, 7, 8, 9, 10, 11 }
-    
+///     std::cout << s1 << std::endl; // Outputs: {0, 1, H, e, l, l, o, , , 0, 6, 7, 8, 9, 10, 11}
 namespace pod_ops {
     ///////////////////// Comparisons
-    template <class T1, class T2>
-    inline detail::same_pods_enable<T1, T2> operator==(const T1& lhs, const T2& rhs) noexcept {
-        return detail::equal_impl<0, flat_tuple_size_v<T1> >::cmp(lhs, rhs);
+    template <class T>
+    inline detail::enable_not_eq_comp_t<T> operator==(const T& lhs, const T& rhs) noexcept {
+        return detail::equal_impl<0, flat_tuple_size_v<T> >::cmp(lhs, rhs);
     }
-
-    template <class T1, class T2>
-    inline detail::same_pods_enable<T1, T2> operator!=(const T1& lhs, const T2& rhs) noexcept {
+    
+    template <class T>
+    inline detail::enable_not_ne_comp_t<T> operator!=(const T& lhs, const T& rhs) noexcept {
         return !(lhs == rhs);
     }
 
-    template <class T1, class T2>
-    inline detail::same_pods_enable<T1, T2> operator<(const T1& lhs, const T2& rhs) noexcept {
-        return detail::less_impl<0, flat_tuple_size_v<T1> >::cmp(lhs, rhs);
+    template <class T>
+    inline detail::enable_not_lt_comp_t<T> operator<(const T& lhs, const T& rhs) noexcept {
+        return detail::less_impl<0, flat_tuple_size_v<T> >::cmp(lhs, rhs);
     }
 
-    template <class T1, class T2>
-    inline detail::same_pods_enable<T1, T2> operator>(const T1& lhs, const T2& rhs) noexcept {
+    template <class T>
+    inline detail::enable_not_gt_comp_t<T> operator>(const T& lhs, const T& rhs) noexcept {
         return rhs < lhs;
     }
 
-    template <class T1, class T2>
-    inline detail::same_pods_enable<T1, T2> operator<=(const T1& lhs, const T2& rhs) noexcept {
+    template <class T>
+    inline detail::enable_not_le_comp_t<T> operator<=(const T& lhs, const T& rhs) noexcept {
         return !(lhs > rhs);
     }
 
-    template <class T1, class T2>
-    inline detail::same_pods_enable<T1, T2> operator>=(const T1& lhs, const T2& rhs) noexcept {
+    template <class T>
+    inline detail::enable_not_ge_comp_t<T> operator>=(const T& lhs, const T& rhs) noexcept {
         return !(lhs < rhs);
     }
 
     ///////////////////// basic_ostream operator <<
     template <class Char, class Traits, class T>
-    typename std::enable_if<std::is_pod<T>::value && std::is_class<T>::value, std::basic_ostream<Char, Traits>& >::type
-        operator<<(std::basic_ostream<Char, Traits>& out, const T& value)
+    detail::enable_not_ostreamable_t<std::basic_ostream<Char, Traits>, T> operator<<(std::basic_ostream<Char, Traits>& out, const T& value)
     {
         flat_write(out, value);
         return out;
@@ -907,8 +951,7 @@ namespace pod_ops {
 
     ///////////////////// basic_istream operator >>
     template <class Char, class Traits, class T>
-    typename std::enable_if<std::is_pod<T>::value && std::is_class<T>::value, std::basic_istream<Char, Traits>& >::type
-        operator>>(std::basic_istream<Char, Traits>& in, T& value)
+    detail::enable_not_istreamable_t<std::basic_istream<Char, Traits>, T> operator>>(std::basic_istream<Char, Traits>& in, T& value)
     {
         flat_read(in, value);
         return in;

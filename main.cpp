@@ -234,6 +234,40 @@ void test_empty_struct() {
     assert(empty{} == empty{});
 }
 
+
+void test_pods_with_int_operators() {
+    using namespace pod_ops;
+
+    std::stringstream ss;
+    ss << std::is_pod<int>{};
+    int i = 0;
+    ss >> i;
+    assert(i == 1);
+    std::cout << i << std::endl;
+}
+
+
+void test_struct_with_single_field() {
+    struct f1 { int i; };
+    using namespace pod_ops;
+
+    std::stringstream ss;
+    ss << f1{ 777 };
+    f1 var{};
+    ss >> var;
+    assert(var.i == 777);
+    assert(var == f1{ 777 });
+    assert(var != f1{ 778 });
+
+    assert(var <= f1{ 777 });
+    assert(var <= f1{ 778 });
+    assert(var < f1{ 778 });
+
+    assert(var >= f1{ 777 });
+    assert(var >= f1{ 776 });
+    assert(var > f1{ 776 });
+}
+
 int main() {
     test_compiletime<foo>();
     test_compiletime_array<int>();
@@ -261,7 +295,8 @@ int main() {
     test_with_enums();
     test_comparable_struct();
     test_empty_struct();
-
+    test_pods_with_int_operators();
+    test_struct_with_single_field();
     test_print();
 }
 

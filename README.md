@@ -142,17 +142,19 @@ template <class Char, class Traits, class T>
 void flat_read(std::basic_istream<Char, Traits>& in, T& value);
 
 
-/// Contains comparison operators and stream operators for any POD types
+/// Contains comparison operators and stream operators for any POD types that does not have it's own operators.
+/// If POD is comparable or streamable using it's own operator or it's conversion operator, then the original operator is be used.
+///
 /// Example usage:
-///     struct comparable_struct {
+///     struct comparable_struct {      // No operators defined for that structure
 ///         int i; short s; char data[7]; bool bl; int a,b,c,d,e,f;
-///     }; // No operators defined for that structure
+///     };
 ///     using namespace pod_ops;
 ///
 ///     comparable_struct s1 {0, 1, "Hello", false, 6,7,8,9,10,11};
 ///     comparable_struct s2 {0, 1, "Hello", false, 6,7,8,9,10,11111};
 ///     assert(s1 < s2);
-///     std::cout << s1 << std::endl;   // Outputs: {0, 1, H, e, l, l, o, , , 0, 6, 7, 8, 9, 10, 11}
+///     std::cout << s1 << std::endl; // Outputs: {0, 1, H, e, l, l, o, , , 0, 6, 7, 8, 9, 10, 11}
 namespace pod_ops;
 ```
 
