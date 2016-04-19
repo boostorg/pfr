@@ -3,11 +3,16 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include "magic_get.hpp"
+
 #include <iostream>
 #include <typeinfo>
 #include <tuple>
 #include <sstream>
-#include "magic_get.hpp"
+#include <set>
+#include <vector>
+#include <cassert>
+#include <algorithm>
 
 template <std::size_t I, class T>
 void print(T& f) {
@@ -59,7 +64,6 @@ void test_print() {
     std::cout << flat_get<0>(i) << std::endl;
 }
 
-#include <cassert>
 void test_runtime(const foo& f) {
     assert( flat_get<0>(f) == f.v0);
     assert( flat_get<1>(f) == f.v1);
@@ -268,6 +272,38 @@ void test_struct_with_single_field() {
     assert(var > f1{ 776 });
 }
 
+template <class Comparator>
+void test_with_contatiners() {
+    struct testing { bool b1, b2; int i; };
+    struct testing2 { bool b1, b2; int i; };
+    std::set<testing, Comparator > t{
+        {true, true, 100},
+        {false, true, 100},
+        {true, false, 100},
+        {true, true, 101}
+    };
+    
+    assert(t.find({true, true, 100}) != t.end());
+    assert(t.count({true, true, 100}) == 1);
+    assert(t.find(testing2{true, true, 100}) != t.end());
+    
+    std::set<testing2, Comparator > t2{
+        {true, true, 101},
+        {true, true, 100},
+        {true, false, 100},
+        {false, true, 100}
+    };
+    
+    assert(std::equal(t.begin(), t.end(), t2.begin(), t2.end(), flat_equal_to<>{}));
+    assert(!std::equal(t.begin(), t.end(), t2.begin(), t2.end(), flat_not_equal<>{}));
+    
+    std::vector<testing> res;
+    std::set_intersection(t.begin(), t.end(), t2.begin(), t2.end(),
+        std::back_inserter(res), Comparator{});
+        
+    assert(res.size() == 4);
+}
+
 int main() {
     test_compiletime<foo>();
     test_compiletime_array<int>();
@@ -297,6 +333,10 @@ int main() {
     test_empty_struct();
     test_pods_with_int_operators();
     test_struct_with_single_field();
+    
+    test_with_contatiners<flat_less<>>();
+    test_with_contatiners<flat_greater<>>();
+    
     test_print();
 }
 

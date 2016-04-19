@@ -10,9 +10,9 @@
 #endif
 
 #include <type_traits>
-#include <utility>
-#include <memory>
-#include <iosfwd>
+#include <utility>      // metaprogramming stuff
+#include <tuple>
+#include <iosfwd>       // stream operators
 
 #ifdef __clang__
 #   pragma clang diagnostic push
@@ -813,8 +813,8 @@ void flat_read(std::basic_istream<Char, Traits>& in, T& value) {
 namespace detail {
     template <std::size_t I, std::size_t N>
     struct equal_impl {
-        template <class T>
-        static bool cmp(const T& v1, const T& v2) noexcept {
+        template <class T, class U>
+        static bool cmp(const T& v1, const U& v2) noexcept {
             return flat_get<I>(v1) == flat_get<I>(v2)
                 && equal_impl<I + 1, N>::cmp(v1, v2);
         }
@@ -822,16 +822,16 @@ namespace detail {
 
     template <std::size_t N>
     struct equal_impl<N, N> {
-        template <class T>
-        static bool cmp(const T&, const T&) noexcept {
-            return true;
+        template <class T, class U>
+        static bool cmp(const T&, const U&) noexcept {
+            return flat_tuple_size_v<T> == flat_tuple_size_v<U>;
         }
     };
 
     template <std::size_t I, std::size_t N>
     struct less_impl {
-        template <class T>
-        static bool cmp(const T& v1, const T& v2) noexcept {
+        template <class T, class U>
+        static bool cmp(const T& v1, const U& v2) noexcept {
             return flat_get<I>(v1) < flat_get<I>(v2)
                 || (flat_get<I>(v1) == flat_get<I>(v2) && less_impl<I + 1, N>::cmp(v1, v2));
         }
@@ -839,9 +839,9 @@ namespace detail {
 
     template <std::size_t N>
     struct less_impl<N, N> {
-        template <class T>
-        static bool cmp(const T&, const T&) noexcept {
-            return false;
+        template <class T, class U>
+        static bool cmp(const T&, const U&) noexcept {
+            return flat_tuple_size_v<T> < flat_tuple_size_v<U>;
         }
     };
 
@@ -894,7 +894,120 @@ namespace detail {
         not_appliable<istreamable_detector, Stream&, Type&>::value && std::is_pod<Type>::value,
         Stream&
     >::type;
+    
+///////////////////// Define min_element and to avoid inclusion of <algorithm>
+    constexpr std::size_t min_size(std::size_t x, std::size_t y) noexcept {
+        return x < y ? x : y;
+    }
 }
+
+///////////////////// Comparisons
+
+/// flat_equal_to<>
+template <class T = void> struct flat_equal_to {
+    bool operator()(const T& x, const T& y) const noexcept {
+        return detail::equal_impl<0, flat_tuple_size_v<T> >::cmp(x, y);
+    }
+};
+
+template <> struct flat_equal_to<void> {
+    template <class T, class U>
+    bool operator()(const T& x, const U& y) const noexcept {
+        return detail::equal_impl<
+            0, 
+            detail::min_size(flat_tuple_size_v<T>, flat_tuple_size_v<U>)
+        >::cmp(x, y);
+    }
+
+    typedef std::true_type is_transparent;
+};
+
+/// flat_not_equal<>
+template <class T = void> struct flat_not_equal {
+    bool operator()(const T& x, const T& y) const noexcept {
+        return !flat_equal_to<T>{}(x, y);
+    }
+};
+
+template <> struct flat_not_equal<void> {
+    template <class T, class U>
+    bool operator()(const T& x, const U& y) const noexcept {
+        return !flat_equal_to<void>{}(x, y);
+    }
+
+    typedef std::true_type is_transparent;
+};
+
+/// flat_greater<>
+template <class T = void> struct flat_greater {
+    bool operator()(const T& x, const T& y) const noexcept {
+        return detail::less_impl<0, flat_tuple_size_v<T> >::cmp(y, x);
+    }
+};
+
+template <> struct flat_greater<void> {
+    template <class T, class U>
+    bool operator()(const T& x, const U& y) const noexcept {
+        return detail::less_impl<
+            0, 
+            detail::min_size(flat_tuple_size_v<T>, flat_tuple_size_v<U>)
+        >::cmp(y, x);
+    }
+
+    typedef std::true_type is_transparent;
+};
+
+/// flat_less<>
+template <class T = void> struct flat_less {
+    bool operator()(const T& x, const T& y) const noexcept {
+        return detail::less_impl<0, flat_tuple_size_v<T> >::cmp(x, y);
+    }
+};
+
+template <> struct flat_less<void> {
+    template <class T, class U>
+    bool operator()(const T& x, const U& y) const noexcept {
+        return detail::less_impl<
+            0, 
+            detail::min_size(flat_tuple_size_v<T>, flat_tuple_size_v<U>)
+        >::cmp(x, y);
+    }
+
+    typedef std::true_type is_transparent;
+};
+
+/// flat_greater_equal<>
+template <class T = void> struct flat_greater_equal {
+    bool operator()(const T& x, const T& y) const noexcept {
+        return !flat_less<T>{}(x, y);
+    }
+};
+
+template <> struct flat_greater_equal<void> {
+    template <class T, class U>
+    bool operator()(const T& x, const U& y) const noexcept {
+        return !flat_less<>{}(x, y);
+    }
+
+    typedef std::true_type is_transparent;
+};
+
+/// flat_less_equal<>
+template <class T = void> struct flat_less_equal {
+    bool operator()(const T& x, const T& y) const noexcept {
+        return !flat_greater<T>{}(x, y);
+    }
+};
+
+template <> struct flat_less_equal<void> {
+    template <class T, class U>
+    bool operator()(const T& x, const U& y) const noexcept {
+        return !flat_greater<>{}(x, y);
+    }
+
+    typedef std::true_type is_transparent;
+};
+
 
 /// Contains comparison operators and stream operators for any POD types that does not have it's own operators.
 /// If POD is comparable or streamable using it's own operator or it's conversion operator, then the original operator is be used.
@@ -913,32 +1026,32 @@ namespace pod_ops {
     ///////////////////// Comparisons
     template <class T>
     inline detail::enable_not_eq_comp_t<T> operator==(const T& lhs, const T& rhs) noexcept {
-        return detail::equal_impl<0, flat_tuple_size_v<T> >::cmp(lhs, rhs);
+        return flat_equal_to<T>{}(lhs, rhs);
     }
     
     template <class T>
     inline detail::enable_not_ne_comp_t<T> operator!=(const T& lhs, const T& rhs) noexcept {
-        return !(lhs == rhs);
+        return flat_not_equal<T>{}(lhs, rhs);
     }
 
     template <class T>
     inline detail::enable_not_lt_comp_t<T> operator<(const T& lhs, const T& rhs) noexcept {
-        return detail::less_impl<0, flat_tuple_size_v<T> >::cmp(lhs, rhs);
+        return flat_less<T>{}(lhs, rhs);
     }
 
     template <class T>
     inline detail::enable_not_gt_comp_t<T> operator>(const T& lhs, const T& rhs) noexcept {
-        return rhs < lhs;
+        return flat_greater<T>{}(lhs, rhs);
     }
 
     template <class T>
     inline detail::enable_not_le_comp_t<T> operator<=(const T& lhs, const T& rhs) noexcept {
-        return !(lhs > rhs);
+        return flat_less_equal<T>{}(lhs, rhs);
     }
 
     template <class T>
     inline detail::enable_not_ge_comp_t<T> operator>=(const T& lhs, const T& rhs) noexcept {
-        return !(lhs < rhs);
+        return flat_greater_equal<T>{}(lhs, rhs);
     }
 
     ///////////////////// basic_ostream operator <<
