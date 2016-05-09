@@ -304,6 +304,24 @@ void test_with_contatiners() {
     assert(res.size() == 4);
 }
 
+void test_with_user_defined_constructor() {
+    struct pr {
+        int i;
+        short s;
+        
+        pr() = default;
+        pr(const pr&) = default;
+        pr(pr&&) = default;
+        pr(int ii, short is) noexcept
+            : i(ii), s(is)
+        {}
+    };
+    
+    pr p{1, 2};
+    
+    //assert(flat_get<1>(p) == 2);
+}
+
 int main() {
     test_compiletime<foo>();
     test_compiletime_array<int>();
@@ -338,5 +356,7 @@ int main() {
     test_with_contatiners<flat_greater<>>();
     
     test_print();
+    
+    test_with_user_defined_constructor();
 }
 

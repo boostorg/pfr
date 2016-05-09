@@ -237,11 +237,9 @@ constexpr std::size_t type_to_id_extension_apply(std::size_t ext) noexcept {
 }
 
 template <std::size_t Index>
-constexpr auto remove_1_ext() noexcept {
-    return size_t_<
-        ((Index & ~native_types_mask) << bits_per_extension) | (Index & native_types_mask) 
-    >{};
-}
+using remove_1_ext = size_t_<
+    ((Index & ~native_types_mask) << bits_per_extension) | (Index & native_types_mask) 
+>;
 
 
 ///////////////////// Forward declarations
@@ -253,7 +251,7 @@ template <class Type> constexpr std::size_t type_to_id(identity<volatile Type*>)
 template <class Type> constexpr std::size_t type_to_id(identity<Type&>) noexcept;
 template <class Type> constexpr std::size_t type_to_id(identity<Type>, typename std::enable_if<std::is_enum<Type>::value>::type* = 0) noexcept;
 template <class Type> constexpr std::size_t type_to_id(identity<Type>, typename std::enable_if<std::is_empty<Type>::value>::type* = 0) noexcept;
-template <class Type> constexpr auto type_to_id(identity<Type>, typename std::enable_if<!std::is_enum<Type>::value && !std::is_empty<Type>::value>::type* = 0) noexcept;
+template <class Type> constexpr size_array<sizeof(Type)> type_to_id(identity<Type>, typename std::enable_if<!std::is_enum<Type>::value && !std::is_empty<Type>::value>::type* = 0) noexcept;
     
 template <std::size_t Index> constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_const_ptr_type> = 0) noexcept;
 template <std::size_t Index> constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_ptr_type> = 0) noexcept;
@@ -363,7 +361,7 @@ constexpr std::size_t type_to_id(identity<Type>, typename std::enable_if<std::is
 }
 
 template <class Type>
-constexpr auto type_to_id(identity<Type>, typename std::enable_if<!std::is_enum<Type>::value && !std::is_empty<Type>::value>::type*) noexcept {
+constexpr size_array<sizeof(Type)> type_to_id(identity<Type>, typename std::enable_if<!std::is_enum<Type>::value && !std::is_empty<Type>::value>::type*) noexcept {
     return fields_count_and_type_ids_with_zeros<Type>();
 }
 
@@ -404,18 +402,17 @@ constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_ref_type>)
 } // namespace typeid_conversions
 
 ///////////////////// Structure that remembers types as integers on a `constexpr operator Type()` call
-template <std::size_t I>
 struct ubiq_val {
     std::size_t* ref_;
-    
+
     template <class T>
     constexpr void assign(const T& typeids) const noexcept {
         for (std::size_t i = 0; i < T::size(); ++i)
-            ref_[I + i] = typeids.data[i];        
+            ref_[i] = typeids.data[i];
     }
 
     constexpr void assign(std::size_t val) const noexcept {
-        ref_[I] = val;
+        ref_[0] = val;
     }
 
     template <class Type>
@@ -428,19 +425,18 @@ struct ubiq_val {
 
 ///////////////////// Structure that remembers types as integers on a `constexpr operator Type&()` call
 // Not used right now
-template <std::size_t I>
 struct ubiq_ref {
     std::size_t* ref_;
-    
+
     template <class T>
     constexpr void assign(const T& ) const noexcept {
         static_assert(!sizeof(T), "References to structures are not allowed");
     }
 
     constexpr void assign(std::size_t val) const noexcept {
-        ref_[I] = val;
+        ref_[0] = val;
     }
-    
+
     template <class Type>
     constexpr operator Type&() const noexcept {
         constexpr auto typeids = typeid_conversions::type_to_id(identity<Type&>{});
@@ -451,19 +447,18 @@ struct ubiq_ref {
 };
 
 ///////////////////// Structure that can be converted to reference to anything
-template <std::size_t I>
-struct ubiq_constructor {    
+struct ubiq_constructor {
+    std::size_t ignore;
     template <class Type> constexpr operator Type&() const noexcept; // Undefined
 };
 
 ///////////////////// Structure that remembers size of the type on a `constexpr operator Type()` call
-template <std::size_t I>
 struct ubiq_sizes {
-    std::size_t* ref_;
+    std::size_t& ref_;
 
     template <class Type>
     constexpr operator Type() const noexcept {
-        ref_[I] = sizeof(Type);
+        ref_ = sizeof(Type);
         return Type{};
     }
 };
@@ -473,44 +468,38 @@ template <class T, std::size_t N, std::size_t... I>
 constexpr size_array<N> get_type_offsets() noexcept {
     typedef size_array<N> array_t;
     array_t sizes{};
-    T tmp{ ubiq_sizes<I>{sizes.data}... };
+    T tmp{ ubiq_sizes{sizes.data[I]}... };
     (void)tmp;
 
     array_t offsets{{0}};
-    for (std::size_t i = 1; i < array_t::size(); ++i)
+    for (std::size_t i = 1; i < N; ++i)
         offsets.data[i] = offsets.data[i - 1] + sizes.data[i - 1];
 
     return offsets;
 }
 
-template <class T, std::size_t N, std::size_t... I>
+template <class T, std::size_t... I>
 constexpr std::false_type has_reference_members(
         std::size_t* misc,
-        decltype(T{ ubiq_sizes<I>{misc}... })* = 0
-    ) noexcept 
-{
-    return std::false_type{};
-}
+        decltype(T{ ubiq_sizes{misc[I]}... })* = 0
+    ) noexcept;
 
 
-template <class T, std::size_t N, std::size_t... I>
-constexpr std::true_type has_reference_members(void*) noexcept {
-    return std::true_type{};
-}
+template <class T, std::size_t... I>
+constexpr std::true_type has_reference_members(void*) noexcept;
 
 ///////////////////// Returns array of typeids and zeros if construtor of a type accepts sizeof...(I) parameters, substitution failure otherwise
 template <class T, std::size_t N, std::size_t... I>
 constexpr auto type_to_array_of_type_ids(std::size_t* types) noexcept
-    -> typename std::add_pointer<decltype(T{ ubiq_constructor<I>{}... })>::type
+    -> typename std::add_pointer<decltype(T{ ubiq_constructor{I}... })>::type
 {
-    constexpr std::size_t* misc = nullptr;
     static_assert(
-        !decltype(has_reference_members<T, I...>(misc))::value,
+        !decltype(has_reference_members<T, I...>(types))::value,
         "Reference members are not supported."
     );
 
     constexpr auto offsets = get_type_offsets<T, N, I...>();
-    T tmp{ ubiq_val< get<I>(offsets) >{types}... };
+    T tmp{ ubiq_val{types + get<I>(offsets)}... };
     (void)tmp;
     return nullptr;
 }
@@ -518,7 +507,7 @@ constexpr auto type_to_array_of_type_ids(std::size_t* types) noexcept
 ///////////////////// Methods for detecting max parameters for construction of T, return array of typeids and zeros
 template <class T, std::size_t N, std::size_t I0, std::size_t... I>
 constexpr auto detect_fields_count_and_type_ids(std::size_t* types, std::index_sequence<I0, I...>) noexcept
-    -> decltype( type_to_array_of_type_ids<T, N, I0, I...>(types) ) 
+    -> decltype( type_to_array_of_type_ids<T, N, I0, I...>(types) )
 {
     return type_to_array_of_type_ids<T, N, I0, I...>(types);
 }
@@ -588,7 +577,7 @@ constexpr auto as_tuple() noexcept {
     constexpr auto res = as_tuple_impl<type>(
         std::make_index_sequence< decltype(array_of_type_ids<type>())::size() >()
     );
-    
+
     static_assert(sizeof(res) == sizeof(type), "size check failed");
     static_assert(
         std::alignment_of<decltype(res)>::value == std::alignment_of<type>::value,
@@ -670,7 +659,7 @@ decltype(auto) flat_get(T& val, typename std::enable_if< std::is_trivially_assig
 /// Example usage: std::vector<  flat_tuple_element<0, my_structure>::type  > v;
 template <std::size_t I, class T>
 using flat_tuple_element = detail::teleport_extents<
-        T, 
+        T,
         typename detail::sequence_tuple::tuple_element<I, detail::as_tuple_t<T> >::type
     >;
 
@@ -780,7 +769,7 @@ namespace detail {
     struct flat_read_impl<I, I> {
         template <class Stream, class T> static void read (Stream&, const T&) {}
     };
-} 
+}
 
 /// Reads POD `value` from stream `in`
 /// Example usage: 
