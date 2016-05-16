@@ -517,14 +517,14 @@ template <class T, std::size_t Begin, std::size_t Middle, std::size_t... I>
 constexpr auto detect_fields_count_and_type_ids(std::size_t* types, size_t_<Begin>, size_t_<Middle>, std::index_sequence<I...>, long) noexcept
     -> decltype( type_to_array_of_type_ids<T, Middle, I...>(types) )
 {
-    constexpr std::size_t next = Middle + (Middle - Begin);
+    constexpr std::size_t next = Middle + (Middle - Begin + 1) / 2;
     detect_fields_count_and_type_ids<T>(types, size_t_<Middle>{}, size_t_<next>{}, std::make_index_sequence<next>(), 1L);
     return nullptr;
 }
 
 template <class T, std::size_t Begin, std::size_t Middle, std::size_t... I>
 constexpr void detect_fields_count_and_type_ids(std::size_t* types, size_t_<Begin>, size_t_<Middle>, std::index_sequence<I...>, int) noexcept {
-    constexpr std::size_t next = Begin + (Middle - Begin == 1 ? 0 : Middle - Begin + 1) / 2;
+    constexpr std::size_t next = Begin + (Middle - Begin) / 2;
     detect_fields_count_and_type_ids<T>(types, size_t_<Begin>{}, size_t_<next>{}, std::make_index_sequence<next>(), 1L);
 }
 
