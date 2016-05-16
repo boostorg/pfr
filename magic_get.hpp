@@ -505,28 +505,37 @@ constexpr auto type_to_array_of_type_ids(std::size_t* types) noexcept
 }
 
 ///////////////////// Methods for detecting max parameters for construction of T, return array of typeids and zeros
-template <class T, std::size_t N, std::size_t I0, std::size_t... I>
-constexpr auto detect_fields_count_and_type_ids(std::size_t* types, std::index_sequence<I0, I...>) noexcept
-    -> decltype( type_to_array_of_type_ids<T, N, I0, I...>(types) )
-{
-    return type_to_array_of_type_ids<T, N, I0, I...>(types);
-}
-
 template <class T, std::size_t N, std::size_t... I>
-constexpr void detect_fields_count_and_type_ids(std::size_t* types, std::index_sequence<I...>) noexcept {
-    detect_fields_count_and_type_ids<T, N - 1>(types, std::make_index_sequence<N - 1>{});
+constexpr void detect_fields_count_and_type_ids(std::size_t* types, size_t_<N>, size_t_<N>, std::index_sequence<I...>, long) noexcept {
+    type_to_array_of_type_ids<T, N, I...>(types);
 }
 
-template <class T, std::size_t N>
-constexpr void detect_fields_count_and_type_ids(std::size_t*, std::index_sequence<>) noexcept {
-    static_assert(!!sizeof(T), "Failed for unknown reason.");
+template <class T, std::size_t Begin, std::size_t Middle, std::size_t... I>
+constexpr void detect_fields_count_and_type_ids(std::size_t* types, size_t_<Begin>, size_t_<Middle>, std::index_sequence<I...>, int) noexcept;
+
+template <class T, std::size_t Begin, std::size_t Middle, std::size_t... I>
+constexpr auto detect_fields_count_and_type_ids(std::size_t* types, size_t_<Begin>, size_t_<Middle>, std::index_sequence<I...>, long) noexcept
+    -> decltype( type_to_array_of_type_ids<T, Middle, I...>(types) )
+{
+    constexpr std::size_t next = Middle + (Middle - Begin);
+    detect_fields_count_and_type_ids<T>(types, size_t_<Middle>{}, size_t_<next>{}, std::make_index_sequence<next>(), 1L);
+    return nullptr;
 }
+
+template <class T, std::size_t Begin, std::size_t Middle, std::size_t... I>
+constexpr void detect_fields_count_and_type_ids(std::size_t* types, size_t_<Begin>, size_t_<Middle>, std::index_sequence<I...>, int) noexcept {
+    constexpr std::size_t next = Begin + (Middle - Begin == 1 ? 0 : Middle - Begin + 1) / 2;
+    detect_fields_count_and_type_ids<T>(types, size_t_<Begin>{}, size_t_<next>{}, std::make_index_sequence<next>(), 1L);
+}
+
+
 
 ///////////////////// Returns array of typeids and zeros
 template <class T>
 constexpr size_array<sizeof(T)> fields_count_and_type_ids_with_zeros(std::enable_if_t<!std::is_empty<T>::value>*) noexcept {
     size_array<sizeof(T)> types{};
-    detect_fields_count_and_type_ids<T, sizeof(T)>(types.data, std::make_index_sequence<sizeof(T)>{});
+    constexpr std::size_t next = sizeof(T) / 2  + 1;
+    detect_fields_count_and_type_ids<T>(types.data, size_t_<1>{}, size_t_<next>{}, std::make_index_sequence<next>{}, 1L);
     return types;
 }
 
