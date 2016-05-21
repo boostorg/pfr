@@ -356,7 +356,7 @@ constexpr std::size_t type_to_id(identity<Type>, typename std::enable_if<std::is
 
 template <class Type>
 constexpr std::size_t type_to_id(identity<Type>, typename std::enable_if<std::is_empty<Type>::value>::type*) noexcept {
-    static_assert(!std::is_empty<Type>::value, "Empty classes/structures as POD members are not supported.");
+    static_assert(!std::is_empty<Type>::value, "Empty classes/structures as members are not supported.");
     return 0;
 }
 
@@ -370,33 +370,33 @@ constexpr size_array<sizeof(Type)> type_to_id(identity<Type>, typename std::enab
 template <std::size_t Index>
 constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_ptr_type>) noexcept {
     typedef decltype( id_to_type(remove_1_ext<Index>()) )* res_t;
-    return res_t{}; 
+    return res_t{};
 }
 
 template <std::size_t Index>
 constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_const_ptr_type>) noexcept {
     typedef const decltype( id_to_type(remove_1_ext<Index>()) )* res_t;
-    return res_t{}; 
+    return res_t{};
 }
 
 template <std::size_t Index>
 constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_const_volatile_ptr_type>) noexcept {
     typedef const volatile decltype( id_to_type(remove_1_ext<Index>()) )* res_t;
-    return res_t{}; 
+    return res_t{};
 }
 
 
 template <std::size_t Index>
 constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_volatile_ptr_type>) noexcept {
     typedef volatile decltype( id_to_type(remove_1_ext<Index>()) )* res_t;
-    return res_t{}; 
+    return res_t{};
 }
 
 
 template <std::size_t Index>
 constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_ref_type>) noexcept {
     typedef reference_wrapper<decltype( id_to_type(remove_1_ext<Index>()) )> res_t;
-    return res_t{}; 
+    return res_t{};
 }
 
 } // namespace typeid_conversions
@@ -452,6 +452,14 @@ struct ubiq_constructor {
     template <class Type> constexpr operator Type&() const noexcept; // Undefined
 };
 
+///////////////////// Structure that can be converted to reference to anything except reference to T
+template <class T>
+struct ubiq_constructor_except {
+    std::size_t ignore;
+
+    template <class Type> constexpr operator std::enable_if_t<!std::is_same<T, Type>::value, Type&> () const noexcept; // Undefined
+};
+
 ///////////////////// Structure that remembers size of the type on a `constexpr operator Type()` call
 struct ubiq_sizes {
     std::size_t& ref_;
@@ -488,14 +496,33 @@ constexpr std::false_type has_reference_members(
 template <class T, std::size_t... I>
 constexpr std::true_type has_reference_members(void*) noexcept;
 
+// `std::is_constructible<T, ubiq_constructor_except<T>>` consumes a lot of time, so we made a separate lazy trait for it.
+template <std::size_t N, class T> struct is_single_field_aggregate_uninitializable: std::false_type {};
+template <class T> struct is_single_field_aggregate_uninitializable<1, T>: std::is_constructible<T, ubiq_constructor_except<T>> {};
+
 ///////////////////// Returns array of typeids and zeros if construtor of a type accepts sizeof...(I) parameters, substitution failure otherwise
 template <class T, std::size_t N, std::size_t... I>
-constexpr auto type_to_array_of_type_ids(std::size_t* types) noexcept
+constexpr auto type_to_array_of_type_ids(std::size_t* types, std::index_sequence<I...>) noexcept
     -> typename std::add_pointer<decltype(T{ ubiq_constructor{I}... })>::type
 {
     static_assert(
         !decltype(has_reference_members<T, I...>(types))::value,
         "Reference members are not supported."
+    );
+
+    static_assert(
+        N <= sizeof(T),
+        "Bit fields are not supported."
+    );
+
+    // Hand-made is_aggregate<T> trait:
+    // Aggregates could be constructed from `decltype(ubiq_constructor{I})...` but report that there's no constructor from `decltype(ubiq_constructor{I})...`
+    // Special case for N == 1: `std::is_constructible<T, ubiq_constructor>` returns true if N == 1 and T is copy/move constructible.
+    static_assert(
+        std::is_array<T>::value || std::is_fundamental<T>::value
+                || !std::is_constructible<T, decltype(ubiq_constructor{I})...>::value
+                || !is_single_field_aggregate_uninitializable<N, T>::value,
+        "Types with user specified constructors (non-aggregate types) are not supported."
     );
 
     constexpr auto offsets = get_type_offsets<T, N, I...>();
@@ -505,27 +532,27 @@ constexpr auto type_to_array_of_type_ids(std::size_t* types) noexcept
 }
 
 ///////////////////// Methods for detecting max parameters for construction of T, return array of typeids and zeros
-template <class T, std::size_t N, std::size_t... I>
-constexpr void detect_fields_count_and_type_ids(std::size_t* types, size_t_<N>, size_t_<N>, std::index_sequence<I...>, long) noexcept {
-    type_to_array_of_type_ids<T, N, I...>(types);
+template <class T, std::size_t N>
+constexpr void detect_fields_count_and_type_ids(std::size_t* types, size_t_<N>, size_t_<N>, long) noexcept {
+    type_to_array_of_type_ids<T, N>(types, std::make_index_sequence<N>());
 }
 
-template <class T, std::size_t Begin, std::size_t Middle, std::size_t... I>
-constexpr void detect_fields_count_and_type_ids(std::size_t* types, size_t_<Begin>, size_t_<Middle>, std::index_sequence<I...>, int) noexcept;
+template <class T, std::size_t Begin, std::size_t Middle>
+constexpr void detect_fields_count_and_type_ids(std::size_t* types, size_t_<Begin>, size_t_<Middle>, int) noexcept;
 
-template <class T, std::size_t Begin, std::size_t Middle, std::size_t... I>
-constexpr auto detect_fields_count_and_type_ids(std::size_t* types, size_t_<Begin>, size_t_<Middle>, std::index_sequence<I...>, long) noexcept
-    -> decltype( type_to_array_of_type_ids<T, Middle, I...>(types) )
+template <class T, std::size_t Begin, std::size_t Middle>
+constexpr auto detect_fields_count_and_type_ids(std::size_t* types, size_t_<Begin>, size_t_<Middle>, long) noexcept
+    -> decltype( type_to_array_of_type_ids<T, Middle>(types, std::make_index_sequence<Middle>()) )
 {
     constexpr std::size_t next = Middle + (Middle - Begin + 1) / 2;
-    detect_fields_count_and_type_ids<T>(types, size_t_<Middle>{}, size_t_<next>{}, std::make_index_sequence<next>(), 1L);
+    detect_fields_count_and_type_ids<T>(types, size_t_<Middle>{}, size_t_<next>{}, 1L);
     return nullptr;
 }
 
-template <class T, std::size_t Begin, std::size_t Middle, std::size_t... I>
-constexpr void detect_fields_count_and_type_ids(std::size_t* types, size_t_<Begin>, size_t_<Middle>, std::index_sequence<I...>, int) noexcept {
-    constexpr std::size_t next = Begin + (Middle - Begin) / 2;
-    detect_fields_count_and_type_ids<T>(types, size_t_<Begin>{}, size_t_<next>{}, std::make_index_sequence<next>(), 1L);
+template <class T, std::size_t Begin, std::size_t Middle>
+constexpr void detect_fields_count_and_type_ids(std::size_t* types, size_t_<Begin>, size_t_<Middle>, int) noexcept {
+    constexpr std::size_t next = (Begin + Middle) / 2;
+    detect_fields_count_and_type_ids<T>(types, size_t_<Begin>{}, size_t_<next>{}, 1L);
 }
 
 
@@ -534,8 +561,8 @@ constexpr void detect_fields_count_and_type_ids(std::size_t* types, size_t_<Begi
 template <class T>
 constexpr size_array<sizeof(T)> fields_count_and_type_ids_with_zeros(std::enable_if_t<!std::is_empty<T>::value>*) noexcept {
     size_array<sizeof(T)> types{};
-    constexpr std::size_t next = sizeof(T) / 2  + 1;
-    detect_fields_count_and_type_ids<T>(types.data, size_t_<1>{}, size_t_<next>{}, std::make_index_sequence<next>{}, 1L);
+    constexpr std::size_t next = sizeof(T) / 2 + 1;
+    detect_fields_count_and_type_ids<T>(types.data, size_t_<1>{}, size_t_<next>{}, 1L);
     return types;
 }
 
@@ -587,11 +614,11 @@ constexpr auto as_tuple() noexcept {
         std::make_index_sequence< decltype(array_of_type_ids<type>())::size() >()
     );
 
-    static_assert(sizeof(res) == sizeof(type), "size check failed");
     static_assert(
         std::alignment_of<decltype(res)>::value == std::alignment_of<type>::value,
-        "alignment check failed"
+        "Alignment check failed, probably your structure has user-defined alignment for the whole structure or for some of the fields."
     );
+    static_assert(sizeof(res) == sizeof(type), "Size check failed, probably your structure has bitfields or user-defined alignment.");
 
     return res;
 }
