@@ -13,10 +13,11 @@
 #include <vector>
 #include <cassert>
 #include <algorithm>
+#include <unordered_set>
 
 template <std::size_t I, class T>
 void print(T& f) {
-    std::cout << flat_get<I>(f) << "\t\t" 
+    std::cout << flat_get<I>(f) << "\t\t"
         << typeid(flat_tuple_element_t<I, T>).name()
         << std::endl;
 }
@@ -53,13 +54,13 @@ void test_print() {
     print<12>(f); print<13>(f); print<14>(f);
     print<15>(f); print<16>(f); print<17>(f);
     static_assert(flat_tuple_size_v<foo> == 18, "failed tuple size check");
-    
+
     int a[] = {0, 1, 2, 3};
     std::cout << '\n' << flat_get<1>(a) << std::endl;
-    
+
     int b[2][4] = {{0, 1, 2, 3}, {4, 5, 6, 7}};
     std::cout << flat_get<4>(b) << std::endl;
-     
+
     int i = 777;
     std::cout << flat_get<0>(i) << std::endl;
 }
@@ -155,12 +156,12 @@ void test_with_enums() {
     assert(std::get<0>(t) == 17);
     assert(std::get<1>(t) == 10);
     assert(std::get<2>(t) == 11);
-    
+
     flat_get<1>(s) = 101;
     assert(flat_get<1>(s) == 101);
     flat_get<2>(s) = 111;
     assert(flat_get<2>(s) == 111);
-    
+
     assert(flat_tie(s) == flat_tie(s));
     assert(flat_tie(s) == flat_make_tuple(s));
     assert(flat_tie(s) != t);
@@ -168,24 +169,24 @@ void test_with_enums() {
     assert(flat_get<0>(s) == 17);
     assert(flat_get<1>(s) == 10);
     assert(flat_get<2>(s) == 11);
-    
+
     static_assert(std::is_same<
         int, flat_tuple_element_t<1, my_struct>
     >::value, "");
-    
+
     static_assert(std::is_same<
         short, flat_tuple_element_t<2, my_struct>
     >::value, "");
-    
-    
+
+
     static_assert(std::is_same<
         const int, flat_tuple_element_t<1, const my_struct>
     >::value, "");
-    
+
     static_assert(std::is_same<
         volatile short, flat_tuple_element_t<2, volatile my_struct>
     >::value, "");
-    
+
     static_assert(std::is_same<
         const volatile short, flat_tuple_element_t<2, const volatile my_struct>
     >::value, "");
@@ -282,25 +283,25 @@ void test_with_contatiners() {
         {true, false, 100},
         {true, true, 101}
     };
-    
+
     assert(t.find({true, true, 100}) != t.end());
     assert(t.count({true, true, 100}) == 1);
     assert(t.find(testing2{true, true, 100}) != t.end());
-    
+
     std::set<testing2, Comparator > t2{
         {true, true, 101},
         {true, true, 100},
         {true, false, 100},
         {false, true, 100}
     };
-    
+
     assert(std::equal(t.begin(), t.end(), t2.begin(), t2.end(), flat_equal_to<>{}));
     assert(!std::equal(t.begin(), t.end(), t2.begin(), t2.end(), flat_not_equal<>{}));
-    
+
     std::vector<testing> res;
     std::set_intersection(t.begin(), t.end(), t2.begin(), t2.end(),
         std::back_inserter(res), Comparator{});
-        
+
     assert(res.size() == 4);
 }
 
@@ -308,7 +309,7 @@ void test_with_user_defined_constructor() {
     struct pr {
         int i;
         short s;
-        
+
         pr() = default;
         pr(const pr&) = default;
         pr(pr&&) = default;
@@ -316,9 +317,9 @@ void test_with_user_defined_constructor() {
             : i(ii), s(is)
         {}
     };
-    
+
     pr p{1, 2};
-    
+
     //assert(flat_get<1>(p) == 2); // Compilation error
 }
 
@@ -365,7 +366,7 @@ void test_counts_on_multiple_chars_impl() {
 
 
     static_assert(flat_tuple_size_v<T1[5]> == CountInT*5, "");
-    
+
     test_counts_on_multiple_chars_impl_1<T1, CountInT, 1>();
     test_counts_on_multiple_chars_impl_1<T1, CountInT, 2>();
     test_counts_on_multiple_chars_impl_1<T1, CountInT, 3>();
@@ -403,6 +404,25 @@ void test_counts_on_multiple_chars() {
     test_counts_on_multiple_chars_impl<t8, 8>();
 }
 
+void test_hash() {
+    struct almost_pair { int i; short s; };
+    std::unordered_set<almost_pair, flat_hash<almost_pair>, flat_equal_to<> > s;
+    s.insert({0, 1});
+    s.insert({1, 0});
+    s.insert({1, 1});
+
+    assert(s.size() == 3);
+    flat_hash<almost_pair> hs;
+    assert(hs({0, 1}) != hs({1, 0}));
+    assert(hs({0, 1}) == hs({0, 1}));
+    assert(hs({1, 1}) == hs({1, 1}));
+    assert(hs({0, 0}) != hs({1, 1}));
+
+    struct single_field { int i; };
+    assert(flat_hash<single_field>()({1}) != std::hash<int>()(1));
+    assert(flat_hash<single_field>()({199}) != std::hash<int>()(199));
+}
+
 int main() {
     test_compiletime<foo>();
     test_compiletime_array<int>();
@@ -432,12 +452,12 @@ int main() {
     test_empty_struct();
     test_pods_with_int_operators();
     test_struct_with_single_field();
-    
+
     test_with_contatiners<flat_less<>>();
     test_with_contatiners<flat_greater<>>();
-    
+
     test_print();
-    
+
     test_with_user_defined_constructor();
 
     test_counts_on_multiple_chars<char>();
@@ -445,5 +465,7 @@ int main() {
     test_counts_on_multiple_chars<int>();
     test_counts_on_multiple_chars<void*>();
     test_counts_on_multiple_chars<long long>();
+    test_hash();
 }
+
 

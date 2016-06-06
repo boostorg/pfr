@@ -41,16 +41,16 @@ class reference_wrapper {
 public:
   // types
   typedef T type;
- 
+
   // construct/copy/destroy
   constexpr reference_wrapper() noexcept;   // Must be undefined
   reference_wrapper(T& ref) noexcept : ptr(std::addressof(ref)) {}
   reference_wrapper(T&&) = delete;
   constexpr reference_wrapper(const reference_wrapper&) noexcept = default;
- 
+
   // assignment
   constexpr reference_wrapper& operator=(const reference_wrapper& x) noexcept = default;
- 
+
   // access
   constexpr operator const T& () const noexcept { return *ptr; }
 
@@ -64,10 +64,10 @@ template <std::size_t N, class T>
 struct base_from_member {
     T value;
 };
- 
+
 template <class I, class ...Tail>
 struct tuple_base;
- 
+
 template <std::size_t... I, class ...Tail>
 struct tuple_base< std::index_sequence<I...>, Tail... >
     : base_from_member<I , Tail>...
@@ -94,8 +94,8 @@ constexpr const volatile T& get_impl(const volatile base_from_member<N, T>& t) n
 }
 
 template <class ...Values>
-struct tuple: tuple_base< 
-        std::make_index_sequence<sizeof...(Values)>, 
+struct tuple: tuple_base<
+        std::make_index_sequence<sizeof...(Values)>,
         Values...
     >
 {
@@ -134,7 +134,7 @@ constexpr decltype(auto) get(tuple<T...>&& t) noexcept {
     );
 }
 
-template <size_t I, class T> 
+template <size_t I, class T>
 using tuple_element = std::remove_reference< decltype(
         ::detail::sequence_tuple::get<I>( std::declval<T>() )
     ) >;
@@ -150,7 +150,7 @@ template <std::size_t N>
 struct size_array {                         // libc++ misses constexpr on operator[]
     typedef std::size_t type;
     std::size_t data[N];
-    
+
     static constexpr std::size_t size() noexcept { return N; }
 
     constexpr std::size_t count_nonzeros() const noexcept {
@@ -168,7 +168,7 @@ template <>
 struct size_array<0> {                         // libc++ misses constexpr on operator[]
     typedef std::size_t type;
     std::size_t data[1];
-    
+
     static constexpr std::size_t size() noexcept { return 0; }
 
     constexpr std::size_t count_nonzeros() const noexcept {
@@ -238,7 +238,7 @@ constexpr std::size_t type_to_id_extension_apply(std::size_t ext) noexcept {
 
 template <std::size_t Index>
 using remove_1_ext = size_t_<
-    ((Index & ~native_types_mask) << bits_per_extension) | (Index & native_types_mask) 
+    ((Index & ~native_types_mask) << bits_per_extension) | (Index & native_types_mask)
 >;
 
 
@@ -252,7 +252,7 @@ template <class Type> constexpr std::size_t type_to_id(identity<Type&>) noexcept
 template <class Type> constexpr std::size_t type_to_id(identity<Type>, typename std::enable_if<std::is_enum<Type>::value>::type* = 0) noexcept;
 template <class Type> constexpr std::size_t type_to_id(identity<Type>, typename std::enable_if<std::is_empty<Type>::value>::type* = 0) noexcept;
 template <class Type> constexpr size_array<sizeof(Type)> type_to_id(identity<Type>, typename std::enable_if<!std::is_enum<Type>::value && !std::is_empty<Type>::value>::type* = 0) noexcept;
-    
+
 template <std::size_t Index> constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_const_ptr_type> = 0) noexcept;
 template <std::size_t Index> constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_ptr_type> = 0) noexcept;
 template <std::size_t Index> constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_const_volatile_ptr_type> = 0) noexcept;
@@ -719,7 +719,7 @@ constexpr std::size_t flat_tuple_size_v = flat_tuple_size<T>::value;
 
 
 /// Creates an `std::tuple` from a flattened T.
-/// Example usage: 
+/// Example usage:
 ///     struct my_struct { int i, short s; };
 ///     my_struct s {10, 11};
 ///     std::tuple<int, short> t = flat_make_tuple(s);
@@ -736,7 +736,7 @@ auto flat_make_tuple(const T& val) noexcept {
 
 
 /// Creates an `std::tuple` with lvalue references to fields of a flattened T.
-/// Example usage: 
+/// Example usage:
 ///     struct my_struct { int i, short s; };
 ///     my_struct s;
 ///     flat_tie(s) = std::tuple<int, short>{10, 11};
@@ -772,7 +772,7 @@ namespace detail {
 }
 
 /// Writes to `out` the POD `value`
-/// Example usage: 
+/// Example usage:
 ///     struct my_struct { int i, short s; };
 ///     my_struct s{12, 13};
 ///     flat_write(std::cout, s); // outputs '{12, 13}'
@@ -800,7 +800,7 @@ namespace detail {
             flat_read_impl<I + 1, N>::read(in, value);
         }
     };
-    
+
     template <std::size_t I>
     struct flat_read_impl<I, I> {
         template <class Stream, class T> static void read (Stream&, const T&) {}
@@ -808,7 +808,7 @@ namespace detail {
 }
 
 /// Reads POD `value` from stream `in`
-/// Example usage: 
+/// Example usage:
 ///     struct my_struct { int i, short s; };
 ///     my_struct s;
 ///     std::stringstream ss;
@@ -821,12 +821,12 @@ void flat_read(std::basic_istream<Char, Traits>& in, T& value) {
     const auto prev_exceptions = in.exceptions();
     in.exceptions( typename std::basic_istream<Char, Traits>::iostate(0) );
     const auto prev_flags = in.flags( typename std::basic_istream<Char, Traits>::fmtflags(0) );
-    
+
     char parenthis = {};
     in >> parenthis;
     if (parenthis != '{') in.setstate(std::basic_istream<Char, Traits>::failbit);
     detail::flat_read_impl<0, flat_tuple_size_v<T> >::read(in, value);
-    
+
     in >> parenthis;
     if (parenthis != '}') in.setstate(std::basic_istream<Char, Traits>::failbit);
 
@@ -870,16 +870,39 @@ namespace detail {
         }
     };
 
+    template <typename SizeT>
+    inline void hash_combine(SizeT& seed, SizeT value) noexcept {
+        seed ^= value + 0x9e3779b9 + (seed<<6) + (seed>>2);
+    }
+
+    template <std::size_t I, std::size_t N>
+    struct hash_impl {
+        template <class T>
+        static std::size_t compute(const T& val) noexcept {
+            std::size_t h = std::hash< flat_tuple_element_t<I, T> >()( flat_get<I>(val) );
+            hash_combine(h, hash_impl<I + 1, N>::compute(val) );
+            return h;
+        }
+    };
+
+    template <std::size_t N>
+    struct hash_impl<N, N> {
+        template <class T>
+        static std::size_t compute(const T&) noexcept {
+            return 0;
+        }
+    };
+
 ///////////////////// `value` is true if Detector<Tleft, Tright> does not compile (SFINAE)
     template <template <class, class> class Detector, class Tleft, class Tright>
     struct not_appliable {
         struct success{};
         template <class Tl, class Tr> static Detector<Tl, Tr> detector_impl(long) noexcept;
         template <class Tl, class Tr> static success detector_impl(int) noexcept;
-        
+
         static constexpr bool value = std::is_same<
             decltype(detector_impl<Tleft, Tright>(1L)),
-            success 
+            success
         >::value;
     };
 
@@ -919,7 +942,7 @@ namespace detail {
         not_appliable<istreamable_detector, Stream&, Type&>::value && std::is_pod<Type>::value,
         Stream&
     >::type;
-    
+
 ///////////////////// Define min_element and to avoid inclusion of <algorithm>
     constexpr std::size_t min_size(std::size_t x, std::size_t y) noexcept {
         return x < y ? x : y;
@@ -939,7 +962,7 @@ template <> struct flat_equal_to<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const noexcept {
         return detail::equal_impl<
-            0, 
+            0,
             detail::min_size(flat_tuple_size_v<T>, flat_tuple_size_v<U>)
         >::cmp(x, y);
     }
@@ -974,7 +997,7 @@ template <> struct flat_greater<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const noexcept {
         return detail::less_impl<
-            0, 
+            0,
             detail::min_size(flat_tuple_size_v<T>, flat_tuple_size_v<U>)
         >::cmp(y, x);
     }
@@ -993,7 +1016,7 @@ template <> struct flat_less<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const noexcept {
         return detail::less_impl<
-            0, 
+            0,
             detail::min_size(flat_tuple_size_v<T>, flat_tuple_size_v<U>)
         >::cmp(x, y);
     }
@@ -1033,6 +1056,13 @@ template <> struct flat_less_equal<void> {
     typedef std::true_type is_transparent;
 };
 
+/// flat_hash
+template <class T> struct flat_hash {
+    std::size_t operator()(const T& x) const noexcept {
+        return detail::hash_impl<0, flat_tuple_size_v<T> >::compute(x);
+    }
+};
+
 
 /// Contains comparison operators and stream operators for any POD types that does not have it's own operators.
 /// If POD is comparable or streamable using it's own operator or it's conversion operator, then the original operator is be used.
@@ -1053,7 +1083,7 @@ namespace pod_ops {
     inline detail::enable_not_eq_comp_t<T> operator==(const T& lhs, const T& rhs) noexcept {
         return flat_equal_to<T>{}(lhs, rhs);
     }
-    
+
     template <class T>
     inline detail::enable_not_ne_comp_t<T> operator!=(const T& lhs, const T& rhs) noexcept {
         return flat_not_equal<T>{}(lhs, rhs);
