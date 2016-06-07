@@ -22,6 +22,8 @@
 #   pragma clang diagnostic ignored "-Wmissing-field-initializers"
 #endif
 
+namespace boost { namespace pfr {
+
 namespace detail {
 
 ///////////////////// General utility stuff
@@ -136,7 +138,7 @@ constexpr decltype(auto) get(tuple<T...>&& t) noexcept {
 
 template <size_t I, class T>
 using tuple_element = std::remove_reference< decltype(
-        ::detail::sequence_tuple::get<I>( std::declval<T>() )
+        ::boost::pfr::detail::sequence_tuple::get<I>( std::declval<T>() )
     ) >;
 
 } // namespace sequence_tuple
@@ -261,6 +263,7 @@ template <std::size_t Index> constexpr auto id_to_type(size_t_<Index >, if_exten
 
 
 ///////////////////// Definitions of type_to_id and id_to_type for fundamental types
+/// @cond
 #define BOOST_MAGIC_GET_REGISTER_TYPE(Type, Index)              \
     constexpr std::size_t type_to_id(identity<Type>) noexcept { \
         return Index;                                           \
@@ -270,6 +273,7 @@ template <std::size_t Index> constexpr auto id_to_type(size_t_<Index >, if_exten
         return res;                                             \
     }                                                           \
     /**/
+/// @endcond
 
 
 // Register all base types here
@@ -297,6 +301,7 @@ BOOST_MAGIC_GET_REGISTER_TYPE(volatile void*        , 21)
 BOOST_MAGIC_GET_REGISTER_TYPE(const volatile void*  , 22)
 BOOST_MAGIC_GET_REGISTER_TYPE(std::nullptr_t        , 23)
 
+#undef BOOST_MAGIC_GET_REGISTER_TYPE
 
 ///////////////////// Definitions of type_to_id and id_to_type for types with extensions and nested types
 template <class Type>
@@ -666,33 +671,48 @@ struct teleport_extents<volatile From, To> {
 #   pragma clang diagnostic pop
 #endif
 
+/// @cond
 #ifdef __GNUC__
 #define MAY_ALIAS __attribute__((__may_alias__))
 #else
 #define MAY_ALIAS
 #endif
+/// @endcond
 
-/// Returns const reference to a field with index `I` in flattened `T`.
-/// Example usage: flat_get<0>(my_structure());
+/// \brief Returns const reference to a field with index `I` in flattened `T`.
+///
+/// \b Example:
+/// \code
+///     get<0>(my_structure());
+/// \endcode
 template <std::size_t I, class T>
-decltype(auto) flat_get(const T& val) noexcept {
+decltype(auto) get(const T& val) noexcept {
     MAY_ALIAS const auto* const t = reinterpret_cast<const detail::as_tuple_t<T>*>( std::addressof(val) );
     return detail::sequence_tuple::get<I>(*t);
 }
 
 
-/// Returns reference to a field with index `I` in flattened `T`.
-/// Requires: `T` must not have const fields.
-/// Example usage: flat_get<0>(my_structure());
+/// \brief Returns reference to a field with index `I` in flattened `T`.
+///
+/// \b Requires: `T` must not have const fields.
+///
+/// \b Example:
+/// \code
+///     get<0>(my_structure());
+/// \endcode
 template <std::size_t I, class T>
-decltype(auto) flat_get(T& val, typename std::enable_if< std::is_trivially_assignable<T, T>::value>::type* = 0) noexcept {
+decltype(auto) get(T& val /* @cond */, typename std::enable_if< std::is_trivially_assignable<T, T>::value>::type* = 0/* @endcond */ ) noexcept {
     MAY_ALIAS auto* const t = reinterpret_cast<detail::as_tuple_t<T>*>( std::addressof(val) );
     return detail::sequence_tuple::get<I>(*t);
 }
 
 
-/// `flat_tuple_element` has a `typedef type-of-a-field-with-index-I-in-flattened-T type;`
-/// Example usage: std::vector<  flat_tuple_element<0, my_structure>::type  > v;
+/// \brief `flat_tuple_element` has a `typedef type-of-a-field-with-index-I-in-flattened-T type;`
+///
+/// \b Example:
+/// \code
+///     std::vector<  flat_tuple_element<0, my_structure>::type  > v;
+/// \endcode
 template <std::size_t I, class T>
 using flat_tuple_element = detail::teleport_extents<
         T,
@@ -700,30 +720,45 @@ using flat_tuple_element = detail::teleport_extents<
     >;
 
 
-/// Type of a field with index `I` in flattened `T`
-/// Example usage: std::vector<  flat_tuple_element_t<0, my_structure>  > v;
+/// \brief Type of a field with index `I` in flattened `T`
+///
+/// \b Example:
+/// \code
+///     std::vector<  flat_tuple_element_t<0, my_structure>  > v;
+/// \endcode
 template <std::size_t I, class T>
 using flat_tuple_element_t = typename flat_tuple_element<I, T>::type;
 
 
-/// `flat_tuple_size` has a member `value` that constins fields count in a flattened `T`.
-/// Example usage: std::array<int, flat_tuple_size<my_structure>::value > a;
+/// \brief `flat_tuple_size` has a member `value` that constins fields count in a flattened `T`.
+///
+/// \b Example:
+/// \code
+///     std::array<int, flat_tuple_size<my_structure>::value > a;
+/// \endcode
 template <class T>
 using flat_tuple_size = detail::size_t_< detail::as_tuple_t<T>::size_v >;
 
 
-/// `flat_tuple_size_v` is a template variable that constins fields count in a flattened `T`.
-/// Example usage: std::array<int, flat_tuple_size_v<my_structure> > a;
+/// \brief `flat_tuple_size_v` is a template variable that constins fields count in a flattened `T`.
+///
+/// \b Example:
+/// \code
+///     std::array<int, flat_tuple_size_v<my_structure> > a;
+/// \endcode
 template <class T>
 constexpr std::size_t flat_tuple_size_v = flat_tuple_size<T>::value;
 
 
-/// Creates an `std::tuple` from a flattened T.
-/// Example usage:
+/// \brief Creates an `std::tuple` from a flattened T.
+///
+/// \b Example:
+/// \code
 ///     struct my_struct { int i, short s; };
 ///     my_struct s {10, 11};
 ///     std::tuple<int, short> t = flat_make_tuple(s);
 ///     assert(get<0>(t) == 10);
+/// \endcode
 template <class T>
 auto flat_make_tuple(const T& val) noexcept {
     typedef detail::as_tuple_t<T> internal_tuple_t;
@@ -735,14 +770,19 @@ auto flat_make_tuple(const T& val) noexcept {
 }
 
 
-/// Creates an `std::tuple` with lvalue references to fields of a flattened T.
-/// Example usage:
+/// \brief Creates an `std::tuple` with lvalue references to fields of a flattened T.
+///
+/// \b Requires: `T` must not have const fields.
+///
+/// \b Example:
+/// \code
 ///     struct my_struct { int i, short s; };
 ///     my_struct s;
 ///     flat_tie(s) = std::tuple<int, short>{10, 11};
 ///     assert(s.s == 11);
+/// \endcode
 template <class T>
-auto flat_tie(T& val, typename std::enable_if< std::is_trivially_assignable<T, T>::value>::type* = 0 ) noexcept {
+auto flat_tie(T& val /* @cond */, typename std::enable_if< std::is_trivially_assignable<T, T>::value>::type* = 0 /* @endcond */) noexcept {
     typedef detail::as_tuple_t<T> internal_tuple_t;
     MAY_ALIAS internal_tuple_t& t = *reinterpret_cast<internal_tuple_t*>( std::addressof(val) );
     return detail::flat_tie_impl(
@@ -760,7 +800,7 @@ namespace detail {
         template <class Stream, class T>
         static void print (Stream& out, const T& value) {
             if (!!I) out << ", ";
-            out << flat_get<I>(value);
+            out << ::boost::pfr::get<I>(value);
             flat_print_impl<I + 1, N>::print(out, value);
         }
     };
@@ -771,11 +811,14 @@ namespace detail {
     };
 }
 
-/// Writes to `out` the POD `value`
-/// Example usage:
+/// \brief Writes to `out` the POD `value`
+///
+/// \b Example:
+/// \code
 ///     struct my_struct { int i, short s; };
 ///     my_struct s{12, 13};
 ///     flat_write(std::cout, s); // outputs '{12, 13}'
+/// \endcode
 template <class Char, class Traits, class T>
 void flat_write(std::basic_ostream<Char, Traits>& out, const T& value) {
     out << '{';
@@ -796,7 +839,7 @@ namespace detail {
                 in >> ignore;
                 if (ignore != ' ')  in.setstate(Stream::failbit);
             }
-            in >> flat_get<I>(value);
+            in >> ::boost::pfr::get<I>(value);
             flat_read_impl<I + 1, N>::read(in, value);
         }
     };
@@ -808,7 +851,9 @@ namespace detail {
 }
 
 /// Reads POD `value` from stream `in`
-/// Example usage:
+///
+/// \b Example:
+/// \code
 ///     struct my_struct { int i, short s; };
 ///     my_struct s;
 ///     std::stringstream ss;
@@ -816,6 +861,7 @@ namespace detail {
 ///     ss >> s;
 ///     assert(s.i == 12);
 ///     assert(s.i == 13);
+/// \endcode
 template <class Char, class Traits, class T>
 void flat_read(std::basic_istream<Char, Traits>& in, T& value) {
     const auto prev_exceptions = in.exceptions();
@@ -834,13 +880,12 @@ void flat_read(std::basic_istream<Char, Traits>& in, T& value) {
     in.exceptions(prev_exceptions);
 }
 
-
 namespace detail {
     template <std::size_t I, std::size_t N>
     struct equal_impl {
         template <class T, class U>
         static bool cmp(const T& v1, const U& v2) noexcept {
-            return flat_get<I>(v1) == flat_get<I>(v2)
+            return ::boost::pfr::get<I>(v1) == ::boost::pfr::get<I>(v2)
                 && equal_impl<I + 1, N>::cmp(v1, v2);
         }
     };
@@ -857,8 +902,8 @@ namespace detail {
     struct less_impl {
         template <class T, class U>
         static bool cmp(const T& v1, const U& v2) noexcept {
-            return flat_get<I>(v1) < flat_get<I>(v2)
-                || (flat_get<I>(v1) == flat_get<I>(v2) && less_impl<I + 1, N>::cmp(v1, v2));
+            return ::boost::pfr::get<I>(v1) < ::boost::pfr::get<I>(v2)
+                || (::boost::pfr::get<I>(v1) == ::boost::pfr::get<I>(v2) && less_impl<I + 1, N>::cmp(v1, v2));
         }
     };
 
@@ -879,7 +924,7 @@ namespace detail {
     struct hash_impl {
         template <class T>
         static std::size_t compute(const T& val) noexcept {
-            std::size_t h = std::hash< flat_tuple_element_t<I, T> >()( flat_get<I>(val) );
+            std::size_t h = std::hash< flat_tuple_element_t<I, T> >()( ::boost::pfr::get<I>(val) );
             hash_combine(h, hash_impl<I + 1, N>::compute(val) );
             return h;
         }
@@ -1064,10 +1109,12 @@ template <class T> struct flat_hash {
 };
 
 
+/// \namespace pod_ops
 /// Contains comparison operators and stream operators for any POD types that does not have it's own operators.
 /// If POD is comparable or streamable using it's own operator or it's conversion operator, then the original operator is be used.
 ///
-/// Example usage:
+/// \b Example:
+/// \code
 ///     struct comparable_struct {      // No operators defined for that structure
 ///         int i; short s; char data[7]; bool bl; int a,b,c,d,e,f;
 ///     };
@@ -1077,6 +1124,7 @@ template <class T> struct flat_hash {
 ///     comparable_struct s2 {0, 1, "Hello", false, 6,7,8,9,10,11111};
 ///     assert(s1 < s2);
 ///     std::cout << s1 << std::endl; // Outputs: {0, 1, H, e, l, l, o, , , 0, 6, 7, 8, 9, 10, 11}
+/// \endcode
 namespace pod_ops {
     ///////////////////// Comparisons
     template <class T>
@@ -1125,3 +1173,6 @@ namespace pod_ops {
         return in;
     }
 } // pod_ops
+
+
+}} // namespace boost::pfr

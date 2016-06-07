@@ -1,0 +1,19 @@
+#  Copyright (C) 2016, Antony Polukhin.
+#
+# Use, modification and distribution is subject to the Boost Software License,
+# Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt)
+#
+
+test-suite pfr
+  :
+    [ run core.cpp ]
+    [ run minimal.cpp ]
+    [ run count_fields_on_chars.cpp ]
+#    [ run count_fields_on_ints.cpp ]
+#    [ run count_fields_on_long_longs.cpp ]
+#    [ run count_fields_on_shorts.cpp ]
+    [ run count_fields_on_void_ptrs.cpp ]
+  ;
+
+
