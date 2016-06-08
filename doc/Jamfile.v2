@@ -10,6 +10,10 @@ using doxygen ;
 doxygen autodoc
    :
       [ glob ../../../boost/pfr.hpp ]
+      [ glob ../../../boost/pfr/core.hpp ]
+      [ glob ../../../boost/pfr/functors.hpp ]
+      [ glob ../../../boost/pfr/pod_ops.hpp ]
+      [ glob ../../../boost/pfr/define_functions_for.hpp ]
    :
         <doxygen:param>EXTRACT_ALL=NO
         <doxygen:param>HIDE_UNDOC_MEMBERS=YES
@@ -19,8 +23,7 @@ doxygen autodoc
         <doxygen:param>MACRO_EXPANSION=YES
         <doxygen:param>INLINE_SIMPLE_STRUCTS=YES
         <doxygen:param>SORT_MEMBER_DOCS=NO
-        <doxygen:param>"PREDEFINED=\"stl_type_info=std::type_info\" \\
-                                   \"BOOST_TYPE_INDEX_DOXYGEN_INVOKED\" \\
+        <doxygen:param>"PREDEFINED=\"BOOST_PFR_DOXYGEN_INVOKED\" \\
                                    \"detail::stl_type_info=std::type_info\""
         <xsl:param>"boost.doxygen.reftitle=Boost.PFR Header Reference"
    ;

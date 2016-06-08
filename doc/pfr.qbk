@@ -1,6 +1,6 @@
-[library Boost.PFR
+[library Boost.POD Flat Reflection
     [quickbook 1.6]
-    [version 4.0]
+    [version 1.0]
     [copyright 2016 Antony Polukhin]
     [category Language Features Emulation]
     [license
@@ -11,9 +11,55 @@
 ]
 
 [section Motivation]
-Boost.PFR.
+
+In C++ we have:
+
+* tuples - types that provide access to members by index. Those are useful for generic programming.
+* PODs - types with named fields that do not provide access to members by index. Those are just easy to use.
+
+This library provides tuple like methods for POD types, making PODs usable in contexts were only tuples were useful.
+
+[note All you have to do is to add `#include <boost/pfr.hpp>`.
+
+No macro or other type/member registrations required.]
+
+Boost.POD Flat Reflection (Boost.PFR) adds following out-of-the-box functionality to PODs:
+
+* comparison operators
+* heterogeneous comparators
+* hash
+* stream operators
+* access to members by index
+* member reflections
+* methods for cooperation with `std::tuple`
+
+[warning This is not an official Boost library! It wasn't reviewed and can't be downloaded from www.boost.org. This library is available to the community to know real interest and get comments for refinement. The intention is to submit library to formal review, if community think that it is interesting!]
+
+[warning This is a C++14 library! C++11, C++03, C++98 compilers are not supported]
 
 [endsect]
 
+[section Getting Started]
+
+[import ../example/examples.cpp]
+
+[section Accessing POD member by index] [pfr_example_get] [endsect]
+[section Flattening] [pfr_example_flattening] [pfr_example_flattening_2] [endsect]
+[section Counting fields] [pfr_example_flat_tuple_size] [endsect]
+
+[endsect]
+
+
+[section Requirements and Limitations]
+
+[note Boost.PFR does not depend on any Boost library. You may use it's headers even without Boost. ]
+
+* Boost.PFR *requires C++14 compatible compiler* (GCC-5.0+, Clang, ...)
+* PODs must not contain references nor bitfields
+* PODs must not contain pointers to user defined types
+* Fields of enum type will be returned as their underlying type
+* Static variables are ignored
+
+[endsect]
 
 [xinclude autodoc.xml]

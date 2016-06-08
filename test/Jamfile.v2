@@ -14,6 +14,9 @@ test-suite pfr
 #    [ run count_fields_on_long_longs.cpp ]
 #    [ run count_fields_on_shorts.cpp ]
     [ run count_fields_on_void_ptrs.cpp ]
+    [ run std_interactions.cpp ]
+    [ run define_functions_for.cpp ]
+    [ run ../example/examples.cpp ]
   ;
 
 
