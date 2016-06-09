@@ -14,6 +14,7 @@ doxygen autodoc
       [ glob ../../../boost/pfr/functors.hpp ]
       [ glob ../../../boost/pfr/pod_ops.hpp ]
       [ glob ../../../boost/pfr/define_functions_for.hpp ]
+      [ glob ../../../boost/pfr/global_pod_ops.hpp ]
    :
         <doxygen:param>EXTRACT_ALL=NO
         <doxygen:param>HIDE_UNDOC_MEMBERS=YES

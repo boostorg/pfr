@@ -104,49 +104,49 @@ namespace pod_ops {
     template <class T> std::size_t hash_value(const T& value) noexcept;
 #else
     template <class T>
-    inline detail::enable_not_eq_comp_t<T> operator==(const T& lhs, const T& rhs) noexcept {
+    static detail::enable_not_eq_comp_t<T> operator==(const T& lhs, const T& rhs) noexcept {
         return flat_equal_to<T>{}(lhs, rhs);
     }
 
     template <class T>
-    inline detail::enable_not_ne_comp_t<T> operator!=(const T& lhs, const T& rhs) noexcept {
+    static detail::enable_not_ne_comp_t<T> operator!=(const T& lhs, const T& rhs) noexcept {
         return flat_not_equal<T>{}(lhs, rhs);
     }
 
     template <class T>
-    inline detail::enable_not_lt_comp_t<T> operator<(const T& lhs, const T& rhs) noexcept {
+    static detail::enable_not_lt_comp_t<T> operator<(const T& lhs, const T& rhs) noexcept {
         return flat_less<T>{}(lhs, rhs);
     }
 
     template <class T>
-    inline detail::enable_not_gt_comp_t<T> operator>(const T& lhs, const T& rhs) noexcept {
+    static detail::enable_not_gt_comp_t<T> operator>(const T& lhs, const T& rhs) noexcept {
         return flat_greater<T>{}(lhs, rhs);
     }
 
     template <class T>
-    inline detail::enable_not_le_comp_t<T> operator<=(const T& lhs, const T& rhs) noexcept {
+    static detail::enable_not_le_comp_t<T> operator<=(const T& lhs, const T& rhs) noexcept {
         return flat_less_equal<T>{}(lhs, rhs);
     }
 
     template <class T>
-    inline detail::enable_not_ge_comp_t<T> operator>=(const T& lhs, const T& rhs) noexcept {
+    static detail::enable_not_ge_comp_t<T> operator>=(const T& lhs, const T& rhs) noexcept {
         return flat_greater_equal<T>{}(lhs, rhs);
     }
 
     template <class Char, class Traits, class T>
-    detail::enable_not_ostreamable_t<std::basic_ostream<Char, Traits>, T> operator<<(std::basic_ostream<Char, Traits>& out, const T& value) {
+    static detail::enable_not_ostreamable_t<std::basic_ostream<Char, Traits>, T> operator<<(std::basic_ostream<Char, Traits>& out, const T& value) {
         flat_write(out, value);
         return out;
     }
 
     template <class Char, class Traits, class T>
-    detail::enable_not_istreamable_t<std::basic_istream<Char, Traits>, T> operator>>(std::basic_istream<Char, Traits>& in, T& value) {
+    static detail::enable_not_istreamable_t<std::basic_istream<Char, Traits>, T> operator>>(std::basic_istream<Char, Traits>& in, T& value) {
         flat_read(in, value);
         return in;
     }
 
     template <class T>
-    std::enable_if_t<std::is_pod<T>::value, std::size_t> hash_value(const T& value) noexcept {
+    static std::enable_if_t<std::is_pod<T>::value, std::size_t> hash_value(const T& value) noexcept {
         return flat_hash<T>{}(value);
     }
 
