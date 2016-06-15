@@ -14,7 +14,7 @@ env:
     matrix:
         - CXX_STANDARD=c++14 TOOLSET=g++-5
         - CXX_STANDARD=c++1z TOOLSET=g++-5
-        - CXX_STANDARD=c++14 TOOLSET=clang++-3.7
+        #- CXX_STANDARD=c++14 TOOLSET=clang++-3.7
 
 
 ###############################################################################################################
@@ -33,13 +33,13 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
-    - llvm-toolchain-precise-3.7
+    #- llvm-toolchain-precise-3.7
     packages:
     - valgrind
     - gcc-5
     - g++-5
-    - clang-3.7
+    #- clang-3.7
 
 script:
     # `--coverage` flags required to generate coverage info for Coveralls
-    - $TOOLSET -std=$CXX_STANDARD --coverage main.cpp && valgrind ./a.out
+    - for f in test/*.cpp; do $TOOLSET -std=$CXX_STANDARD --coverage $f && valgrind ./a.out && rm ./a.out; done
