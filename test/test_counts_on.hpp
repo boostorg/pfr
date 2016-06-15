@@ -6,7 +6,7 @@
 #ifndef BOOST_PFR_TEST_TEST_COUNTS_ON_HPP
 #define BOOST_PFR_TEST_TEST_COUNTS_ON_HPP
 
-#include <boost/pfr.hpp>
+#include <boost/pfr/core.hpp>
 
 template <class T1, std::size_t CountInT, std::size_t CountHelpers>
 void test_counts_on_multiple_chars_impl_1() {

@@ -11,6 +11,10 @@
 
 #include <boost/pfr/core.hpp>
 
+/// \file boost/pfr/functors.hpp
+/// Contains functors that can work with PODs and are close to the Standard Library ones.
+/// Each functor \flattening{flattens} the POD type and iterates over its fields.
+
 namespace boost { namespace pfr {
 
 namespace detail {
@@ -49,7 +53,7 @@ namespace detail {
     };
 
     template <typename SizeT>
-    inline void hash_combine(SizeT& seed, SizeT value) noexcept {
+    constexpr void hash_combine(SizeT& seed, SizeT value) noexcept {
         seed ^= value + 0x9e3779b9 + (seed<<6) + (seed>>2);
     }
 
@@ -75,17 +79,28 @@ namespace detail {
     constexpr std::size_t min_size(std::size_t x, std::size_t y) noexcept {
         return x < y ? x : y;
     }
-}
+} // namespace detail
 
 ///////////////////// Comparisons
 
-/// flat_equal_to<>
+/// \brief std::equal_to like flattening comparator
 template <class T = void> struct flat_equal_to {
+    /// \return \b true if each field of \b x equals the field with same index of \b y
     bool operator()(const T& x, const T& y) const noexcept {
         return detail::equal_impl<0, flat_tuple_size_v<T> >::cmp(x, y);
     }
+
+#ifdef BOOST_PFR_DOXYGEN_INVOKED
+    /// This typedef exists only if T \b is void
+    typedef std::true_type is_transparent;
+
+    /// This operator allows comparison of \b x and \b y that have different type.
+    /// \pre Exists only if T \b is void.
+    template <class V, class U> bool operator()(const V& x, const U& y) const noexcept;
+#endif
 };
 
+/// @cond
 template <> struct flat_equal_to<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const noexcept {
@@ -95,16 +110,27 @@ template <> struct flat_equal_to<void> {
         >::cmp(x, y);
     }
 
-    typedef std::true_type is_transparent;
 };
+/// @endcond
 
-/// flat_not_equal<>
+/// \brief std::not_equal like flattening comparator
 template <class T = void> struct flat_not_equal {
+    /// \return \b true if at least one field \b x not equals the field with same index of \b y
     bool operator()(const T& x, const T& y) const noexcept {
         return !flat_equal_to<T>{}(x, y);
     }
+
+#ifdef BOOST_PFR_DOXYGEN_INVOKED
+    /// This typedef exists only if T \b is void
+    typedef std::true_type is_transparent;
+
+    /// This operator allows comparison of \b x and \b y that have different type.
+    /// \pre Exists only if T \b is void.
+    template <class V, class U> bool operator()(const V& x, const U& y) const noexcept;
+#endif
 };
 
+/// @cond
 template <> struct flat_not_equal<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const noexcept {
@@ -113,14 +139,26 @@ template <> struct flat_not_equal<void> {
 
     typedef std::true_type is_transparent;
 };
+/// @endcond
 
-/// flat_greater<>
+/// \brief std::greater like flattening comparator
 template <class T = void> struct flat_greater {
+    /// \return \b true if field of \b x greater than the field with same index of \b y and all previous fields of \b x eqeal to the same fields of \b y
     bool operator()(const T& x, const T& y) const noexcept {
         return detail::less_impl<0, flat_tuple_size_v<T> >::cmp(y, x);
     }
+
+#ifdef BOOST_PFR_DOXYGEN_INVOKED
+    /// This typedef exists only if T \b is void
+    typedef std::true_type is_transparent;
+
+    /// This operator allows comparison of \b x and \b y that have different type.
+    /// \pre Exists only if T \b is void.
+    template <class V, class U> bool operator()(const V& x, const U& y) const noexcept;
+#endif
 };
 
+/// @cond
 template <> struct flat_greater<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const noexcept {
@@ -132,14 +170,26 @@ template <> struct flat_greater<void> {
 
     typedef std::true_type is_transparent;
 };
+/// @endcond
 
-/// flat_less<>
+/// \brief std::less like flattening comparator
 template <class T = void> struct flat_less {
+    /// \return \b true if field of \b x less than the field with same index of \b y and all previous fields of \b x eqeal to the same fields of \b y
     bool operator()(const T& x, const T& y) const noexcept {
         return detail::less_impl<0, flat_tuple_size_v<T> >::cmp(x, y);
     }
+
+#ifdef BOOST_PFR_DOXYGEN_INVOKED
+    /// This typedef exists only if T \b is void
+    typedef std::true_type is_transparent;
+
+    /// This operator allows comparison of \b x and \b y that have different type.
+    /// \pre Exists only if T \b is void.
+    template <class V, class U> bool operator()(const V& x, const U& y) const noexcept;
+#endif
 };
 
+/// @cond
 template <> struct flat_less<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const noexcept {
@@ -151,14 +201,27 @@ template <> struct flat_less<void> {
 
     typedef std::true_type is_transparent;
 };
+/// @endcond
 
-/// flat_greater_equal<>
+/// \brief std::greater_equal like flattening comparator
 template <class T = void> struct flat_greater_equal {
+    /// \return \b true if field of \b x greater than the field with same index of \b y and all previous fields of \b x eqeal to the same fields of \b y;
+    /// or if each field of \b x equals the field with same index of \b y .
     bool operator()(const T& x, const T& y) const noexcept {
         return !flat_less<T>{}(x, y);
     }
+
+#ifdef BOOST_PFR_DOXYGEN_INVOKED
+    /// This typedef exists only if T \b is void
+    typedef std::true_type is_transparent;
+
+    /// This operator allows comparison of \b x and \b y that have different type.
+    /// \pre Exists only if T \b is void.
+    template <class V, class U> bool operator()(const V& x, const U& y) const noexcept;
+#endif
 };
 
+/// @cond
 template <> struct flat_greater_equal<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const noexcept {
@@ -167,14 +230,27 @@ template <> struct flat_greater_equal<void> {
 
     typedef std::true_type is_transparent;
 };
+/// @endcond
 
-/// flat_less_equal<>
+/// \brief std::less_equal like flattening comparator
 template <class T = void> struct flat_less_equal {
+    /// \return \b true if field of \b x less than the field with same index of \b y and all previous fields of \b x eqeal to the same fields of \b y;
+    /// or if each field of \b x equals the field with same index of \b y .
     bool operator()(const T& x, const T& y) const noexcept {
         return !flat_greater<T>{}(x, y);
     }
+
+#ifdef BOOST_PFR_DOXYGEN_INVOKED
+    /// This typedef exists only if T \b is void
+    typedef std::true_type is_transparent;
+
+    /// This operator allows comparison of \b x and \b y that have different type.
+    /// \pre Exists only if T \b is void.
+    template <class V, class U> bool operator()(const V& x, const U& y) const noexcept;
+#endif
 };
 
+/// @cond
 template <> struct flat_less_equal<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const noexcept {
@@ -183,9 +259,12 @@ template <> struct flat_less_equal<void> {
 
     typedef std::true_type is_transparent;
 };
+/// @endcond
 
-/// flat_hash
+
+/// \brief std::hash like flattening functor
 template <class T> struct flat_hash {
+    /// \return hash value of \b x
     std::size_t operator()(const T& x) const noexcept {
         return detail::hash_impl<0, flat_tuple_size_v<T> >::compute(x);
     }

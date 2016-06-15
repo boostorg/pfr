@@ -11,6 +11,28 @@
 
 #include <boost/pfr/functors.hpp>
 
+/// \file boost/pfr/global_pod_ops.hpp
+/// Contains comparison operators and stream operators for any POD types that do not have their own operators.
+/// If POD is comparable or streamable using it's own operator (but not it's conversion operator), then the original operator is used.
+///
+/// \b Example:
+/// \code
+///     #include <boost/pfr/global_pod_ops.hpp>
+///     struct comparable_struct {      // No operators defined for that structure
+///         int i; short s; char data[7]; bool bl; int a,b,c,d,e,f;
+///     };
+///     // ...
+///
+///     comparable_struct s1 {0, 1, "Hello", false, 6,7,8,9,10,11};
+///     comparable_struct s2 {0, 1, "Hello", false, 6,7,8,9,10,11111};
+///     assert(s1 < s2);
+///     std::cout << s1 << std::endl; // Outputs: {0, 1, H, e, l, l, o, , , 0, 6, 7, 8, 9, 10, 11}
+/// \endcode
+///
+/// \podops for other ways to define operators and more details.
+///
+/// \b This \b header \b defines:
+/// @cond
 namespace boost { namespace pfr { namespace detail {
 
     template <class T, class U>
@@ -20,6 +42,7 @@ namespace boost { namespace pfr { namespace detail {
     >;
 
 }}} // namespace boost::pfr::detail
+/// @endcond
 
 #ifdef BOOST_PFR_DOXYGEN_INVOKED
     template <class T> bool operator==(const T& lhs, const T& rhs) noexcept;
@@ -35,7 +58,7 @@ namespace boost { namespace pfr { namespace detail {
     template <class Char, class Traits, class T>
     std::basic_istream<Char, Traits>& operator>>(std::basic_istream<Char, Traits>& in, T& value);
 
-    /// \brief helper function for Boost
+    /// \brief helper function for Boost unordered containers and boost::hash<>.
     template <class T> std::size_t hash_value(const T& value) noexcept;
 #else
     template <class T, class U>

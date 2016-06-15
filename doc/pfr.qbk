@@ -35,23 +35,36 @@ Boost.POD Flat Reflection (Boost.PFR) adds following out-of-the-box functionalit
 
 [warning This is not an official Boost library! It wasn't reviewed and can't be downloaded from www.boost.org. This library is available to the community to know real interest and get comments for refinement. The intention is to submit library to formal review, if community think that it is interesting!]
 
-[warning This is a C++14 library! C++11, C++03, C++98 compilers are not supported]
+[caution This is a C++14 library! Pre C++14 compilers (C++11, C++03...) are not supported]
 
 [endsect]
 
-[section Getting Started]
+[section Quick Start]
 
 [import ../example/examples.cpp]
 
 [section Accessing POD member by index] [pfr_example_get] [endsect]
 [section Flattening] [pfr_example_flattening] [pfr_example_flattening_2] [endsect]
-[section Counting fields] [pfr_example_flat_tuple_size] [endsect]
-
+[/ [section Counting fields] [pfr_example_flat_tuple_size] [endsect] ]
 [section Three ways of getting operators ]
 
-There are three ways to start using operators for type T in your code. Each method has it's own drawbacks and suits own cases.
+There are three ways to start using Boost.PFR hashing, comparison and streaming operators for type `T` in your code. Each method has it's own drawbacks and suits own cases.
 
-[*1) Approach with namespace pod_ops]
+[table:pod_ops_comp Different approaches for operators
+    [[ Approach ]                                       [ Defines operators in global namespace ]
+                                                                                [ Defined operators could be found by ADL ]
+                                                                                            [ Works for local types ]
+                                                                                                        [ Usable localy, without affecting code from other scopes ]
+                                                                                                                            [ Ignores implicit conversion operators ]  
+                                                                                                                                                            [ Respects user defined operators ] ]
+    [[ [headerref boost/pfr/pod_ops.hpp] ]              [ no ]                  [ no ]      [ yes ]     [ yes ]                                             [ no ]          [ yes ]                     ]
+    [[ [headerref boost/pfr/define_functions_for.hpp] ] [ yes if T is in it ]   [ yes ]     [ no ]      [ no, but could be limited to translation unit ]    [ yes for T ]   [ no (compile time error) ] ]
+    [[ [headerref boost/pfr/global_pod_ops.hpp] ]       [ yes ]                 [ yes ]     [ yes ]     [ no, but could be limited to translation unit ]    [ yes all ]     [ yes ]                     ]
+]
+
+More detailed description:
+
+[*1) [headerref boost/pfr/pod_ops.hpp] approach]
 
 This method is good if you're writing generic algorithms and need to use operators from Boost.PFR only if there's no operators defined for the type:
 
@@ -61,12 +74,12 @@ This method is good if you're writing generic algorithms and need to use operato
 template <class T>
 struct uniform_comparator_less {
     bool operator()(const T& lhs, const T& rhs) const noexcept {
-        using namespace pod_ops;
-        return lhs < rhs;   // if T has operator< or conversion operator then will use it, otherwise will use boost::pfr::flat_less<T>
+        using namespace pod_ops;    // Enables Boost.PFR operators usage in this scope.
+        return lhs < rhs;           // If T has operator< or conversion operator then will use it, otherwise will use boost::pfr::flat_less<T>.
     }
 };
 ```
-This method does not change other code, it's effects are local to the function. It works even fro local types, like structures defined in functions.
+This method's effects are local to the function. It works even for local types, like structures defined in functions.
 However *Argument Dependant Lookup* does not work with it:
 
 ```
@@ -75,12 +88,12 @@ template <class T>
 struct uniform_comparator_less {
     bool operator()(const T& lhs, const T& rhs) const noexcept {
         using namespace pod_ops;
-        return std::less{}(lhs, rhs);   // compile time error if T has neither operator< nor conversion operator to comparable type.
+        return std::less{}(lhs, rhs);   // Compile time error if T has neither operator< nor conversion operator to comparable type.
     }
 };
 ```
 
-[*2) Approach with [macroref BOOST_PFR_DEFINE_FUNCTIONS_FOR] ]
+[*2) [headerref boost/pfr/define_functions_for.hpp] approach]
 
 This method is good if you're writing POD structure and wish to define operators for that structure.
 ```
@@ -91,7 +104,7 @@ struct pair_like {
     short second;
 };
 
-BOOST_PFR_DEFINE_FUNCTIONS_FOR(pair_like)
+BOOST_PFR_DEFINE_FUNCTIONS_FOR(pair_like)   // Defines operators
 
 // ...
 
@@ -113,9 +126,12 @@ struct empty {
 std::cout << empty{}; // Outputs `empty{}` if BOOST_PFR_DEFINE_FUNCTIONS_FOR(empty) is commented out, '{}' otherwise.
 ```
 
-[*3) Approach with [headerref boost/pfr/global_pod_ops.hpp] ]
+[*3) [headerref boost/pfr/global_pod_ops.hpp] approach]
+
+This approach is for those, who wish to have comparisong/streaming/hashing for all their types.
+
 ```
-#include <boost/pfr/define_functions_for.hpp>
+#include <boost/pfr/global_pod_ops.hpp>
 
 struct pair_like {
     int first;
@@ -127,19 +143,7 @@ struct pair_like {
 assert(pair_like{1, 2} < pair_like{1, 3});
 ```
 Argument Dependant Lookup works well, `std::less` will find the operators for `struct pair_like`. Operators for local types will be also defined.
-*All conversion operators of all POD types won't be used during comparisons/streamin/hashing.*
-
-This approach is for those, who wish to have comparisong/streaming/hashing for all their types
-
-[section Table of approach differences ]
-[table:pod_ops_comp Different approaches for operators
-    [[ Approach ]                           [ In Global namespace ] [ ADL works ]   [ Works for local types ]   [ Usable localy ]   [ Breaks implicit conversion ]  [ Respects defined operators ]  ]
-    [[ `using namespace pod_ops;` ]         [ no ]                  [ no ]          [ yes ]                     [ yes ]             [ no ]                          [ strongly ]                    ]
-    [[ BOOST_PFR_DEFINE_FUNCTIONS_FOR(T) ]  [ yes if T in it ]      [ yes ]         [ no ]                      [ no ]              [ yes for T ]                   [ no ]                          ]
-    [[ `global_pod_ops.hpp` ]               [ yes ]                 [ yes ]         [ yes ]                     [ no ]              [ yes all ]                     [ yes ]                         ]
-]
-[endsect]
-
+*All conversion operators of all POD types won't be used during comparisons/streaming/hashing.*
 
 [endsect]
 
@@ -158,6 +162,10 @@ This approach is for those, who wish to have comparisong/streaming/hashing for a
 * PODs must not contain pointers to user defined types
 * Fields of enum type will be returned as their underlying type
 * Static variables are ignored
+
+[caution All the methods that provide access to filds have a `reinterpret_cast` to an unrelated type. All the possible efforts and compiler scpecific tricks were used to avoid issues.
+
+But strictly speaking *this is an Undefined Behavior.* ]
 
 [endsect]
 

@@ -679,11 +679,14 @@ struct teleport_extents<volatile From, To> {
 #endif
 /// @endcond
 
-/// \brief Returns const reference to a field with index `I` in flattened `T`.
+/// \brief Returns reference or const reference to a field with index `I` in \flattening{flattened} T.
 ///
 /// \b Example:
 /// \code
-///     boost::pfr::get<0>(my_structure());
+///     struct my_struct { int i, short s; };
+///     my_struct s {10, 11};
+///     assert(boost::pfr::get<0>(s) == 10);
+///     boost::pfr::get<1>(s) = 0;
 /// \endcode
 template <std::size_t I, class T>
 decltype(auto) get(const T& val) noexcept {
@@ -700,7 +703,7 @@ decltype(auto) get(T& val /* @cond */, std::enable_if_t< std::is_trivially_assig
 }
 
 
-/// \brief `flat_tuple_element` has a `typedef type-of-a-field-with-index-I-in-flattened-T type;`
+/// \brief `flat_tuple_element` has a `typedef type-of-a-field-with-index-I-in-\flattening{flattened}-T type;`
 ///
 /// \b Example:
 /// \code
@@ -713,7 +716,7 @@ using flat_tuple_element = detail::teleport_extents<
     >;
 
 
-/// \brief Type of a field with index `I` in flattened `T`
+/// \brief Type of a field with index `I` in \flattening{flattened} `T`
 ///
 /// \b Example:
 /// \code
@@ -723,7 +726,7 @@ template <std::size_t I, class T>
 using flat_tuple_element_t = typename flat_tuple_element<I, T>::type;
 
 
-/// \brief has a member `value` that constins fields count in a flattened `T`.
+/// \brief has a member `value` that constins fields count in a \flattening{flattened} T.
 ///
 /// \b Example:
 /// \code
@@ -733,7 +736,7 @@ template <class T>
 using flat_tuple_size = detail::size_t_< detail::as_tuple_t<T>::size_v >;
 
 
-/// \brief `flat_tuple_size_v` is a template variable that constins fields count in a flattened `T`.
+/// \brief `flat_tuple_size_v` is a template variable that constins fields count in a \flattening{flattened} T.
 ///
 /// \b Example:
 /// \code
@@ -743,7 +746,7 @@ template <class T>
 constexpr std::size_t flat_tuple_size_v = flat_tuple_size<T>::value;
 
 
-/// \brief Creates an `std::tuple` from a flattened T.
+/// \brief Creates an `std::tuple` from a \flattening{flattened} T.
 ///
 /// \b Example:
 /// \code
@@ -763,7 +766,7 @@ auto flat_make_tuple(const T& val) noexcept {
 }
 
 
-/// \brief Creates an `std::tuple` with lvalue references to fields of a flattened T.
+/// \brief Creates an `std::tuple` with lvalue references to fields of a \flattening{flattened} T.
 ///
 /// \b Requires: `T` must not have const fields.
 ///
@@ -804,7 +807,7 @@ namespace detail {
     };
 }
 
-/// \brief Writes to `out` the POD `value`
+/// \brief Writes \flattening{flattened} POD `value` to `out`
 ///
 /// \b Example:
 /// \code
@@ -843,7 +846,7 @@ namespace detail {
     };
 }
 
-/// Reads POD `value` from stream `in`
+/// Reads \flattening{flattened} POD `value` from stream `in`
 ///
 /// \b Example:
 /// \code
