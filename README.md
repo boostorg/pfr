@@ -4,6 +4,7 @@ This C++14 library is meant for accessing structure elements by index and provid
 
 
 [Latest documentation](http://apolukhin.github.com/magic_get/index.html)
+
 [Pre Boost version](https://github.com/apolukhin/magic_get/tree/pre_boost)
 
 
