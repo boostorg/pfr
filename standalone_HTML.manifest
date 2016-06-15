@@ -1,5 +1,5 @@
 index.html
-boost_pod_flat_reflection/getting_started.html
+boost_pod_flat_reflection/quick_start.html
 boost_pod_flat_reflection/requirements_and_limitations.html
 boost_pfr_header_reference.html
 boost/pfr/flat_tuple_element.html
@@ -13,15 +13,9 @@ boost/pfr/flat_write.html
 boost/pfr/flat_read.html
 BOOST_PFR_DEFINE_FUNCTIONS_FOR.html
 boost/pfr/flat_equal_to.html
-boost/pfr/flat_equ_idm44853951081344.html
-boost/pfr/flat_not_equal.html
-boost/pfr/flat_not_idm44853951070976.html
 boost/pfr/flat_greater.html
-boost/pfr/flat_gre_idm44853951060608.html
-boost/pfr/flat_less.html
-boost/pfr/flat_les_idm44853951050240.html
 boost/pfr/flat_greater_equal.html
-boost/pfr/flat_gre_idm44853951039872.html
-boost/pfr/flat_less_equal.html
-boost/pfr/flat_les_idm44853951029504.html
 boost/pfr/flat_hash.html
+boost/pfr/flat_less.html
+boost/pfr/flat_less_equal.html
+boost/pfr/flat_not_equal.html

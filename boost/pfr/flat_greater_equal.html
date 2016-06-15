@@ -3,11 +3,11 @@
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
 <title>Struct template flat_greater_equal</title>
 <link rel="stylesheet" href="http://www.boost.org/doc/libs/1_61_0/doc/src/boostbook.css" type="text/css">
-<meta name="generator" content="DocBook XSL Stylesheets V1.78.1">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
 <link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.POD Flat Reflection 1.0">
 <link rel="up" href="../../boost_pfr_header_reference.html#header.boost.pfr.functors_hpp" title="Header &lt;boost/pfr/functors.hpp&gt;">
-<link rel="prev" href="flat_les_idm44853951050240.html" title="Struct flat_less&lt;void&gt;">
-<link rel="next" href="flat_gre_idm44853951039872.html" title="Struct flat_greater_equal&lt;void&gt;">
+<link rel="prev" href="flat_greater.html" title="Struct template flat_greater">
+<link rel="next" href="flat_hash.html" title="Struct template flat_hash">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -20,29 +20,59 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="flat_les_idm44853951050240.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_pfr_header_reference.html#header.boost.pfr.functors_hpp"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="flat_gre_idm44853951039872.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="flat_greater.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_pfr_header_reference.html#header.boost.pfr.functors_hpp"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="flat_hash.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="refentry">
 <a name="boost.pfr.flat_greater_equal"></a><div class="titlepage"></div>
 <div class="refnamediv">
 <h2><span class="refentrytitle">Struct template flat_greater_equal</span></h2>
-<p>boost::pfr::flat_greater_equal &#8212; flat_greater_equal&lt;&gt; </p>
+<p>boost::pfr::flat_greater_equal &#8212; std::greater_equal like flattening comparator </p>
 </div>
 <h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
 <div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../../boost_pfr_header_reference.html#header.boost.pfr.functors_hpp" title="Header &lt;boost/pfr/functors.hpp&gt;">boost/pfr/functors.hpp</a>&gt;
 
 </span><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> T <span class="special">=</span> <span class="keyword">void</span><span class="special">&gt;</span> 
 <span class="keyword">struct</span> <a class="link" href="flat_greater_equal.html" title="Struct template flat_greater_equal">flat_greater_equal</a> <span class="special">{</span>
+  <span class="comment">// types</span>
+  <span class="keyword">typedef</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">true_type</span> <a name="boost.pfr.flat_greater_equal.is_transparent"></a><span class="identifier">is_transparent</span><span class="special">;</span>  <span class="comment">// This typedef exists only if T <span class="bold"><strong>is</strong></span> void. </span>
 
-  <span class="comment">// <a class="link" href="flat_greater_equal.html#idm44853951042736-bb">public member functions</a></span>
-  <span class="keyword">bool</span> <a class="link" href="flat_greater_equal.html#idm44853951042240-bb"><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span></a><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span>
+  <span class="comment">// <a class="link" href="flat_greater_equal.html#idm46287455752608-bb">public member functions</a></span>
+  <span class="keyword">bool</span> <a class="link" href="flat_greater_equal.html#idm46287455752112-bb"><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span></a><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span>
+  <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> V<span class="special">,</span> <span class="keyword">typename</span> U<span class="special">&gt;</span> 
+    <span class="keyword">bool</span> <a class="link" href="flat_greater_equal.html#idm46287455744864-bb"><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span></a><span class="special">(</span><span class="keyword">const</span> <span class="identifier">V</span> <span class="special">&amp;</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">U</span> <span class="special">&amp;</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span>
 <span class="special">}</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idm45921560481680"></a><h2>Description</h2>
+<a name="idm46098028750304"></a><h2>Description</h2>
 <div class="refsect2">
-<a name="idm45921560481264"></a><h3>
-<a name="idm44853951042736-bb"></a><code class="computeroutput">flat_greater_equal</code> public member functions</h3>
-<div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem"><pre class="literallayout"><span class="keyword">bool</span> <a name="idm44853951042240-bb"></a><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span> x<span class="special">,</span> <span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span> y<span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span></pre></li></ol></div>
+<a name="idm46098028749920"></a><h3>
+<a name="idm46287455752608-bb"></a><code class="computeroutput">flat_greater_equal</code> public member functions</h3>
+<div class="orderedlist"><ol class="orderedlist" type="1">
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">bool</span> <a name="idm46287455752112-bb"></a><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span> x<span class="special">,</span> <span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span> y<span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span></pre>
+<p>
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><p><span class="term">Returns:</span></p></td>
+<td><p><span class="bold"><strong>true</strong></span> if field of <span class="bold"><strong>x</strong></span> greater than the field with same index of <span class="bold"><strong>y</strong></span> and all previous fields of <span class="bold"><strong>x</strong></span> eqeal to the same fields of <span class="bold"><strong>y</strong></span>; or if each field of <span class="bold"><strong>x</strong></span> equals the field with same index of <span class="bold"><strong>y</strong></span> . </p></td>
+</tr></tbody>
+</table></div>
+</li>
+<li class="listitem">
+<pre class="literallayout"><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> V<span class="special">,</span> <span class="keyword">typename</span> U<span class="special">&gt;</span> 
+  <span class="keyword">bool</span> <a name="idm46287455744864-bb"></a><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">V</span> <span class="special">&amp;</span> x<span class="special">,</span> <span class="keyword">const</span> <span class="identifier">U</span> <span class="special">&amp;</span> y<span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span></pre>
+<p>This operator allows comparison of <span class="bold"><strong>x</strong></span> and <span class="bold"><strong>y</strong></span> that have different type. 
+</p>
+<div class="variablelist"><table border="0">
+<col align="left" valign="top">
+<tbody><tr>
+<td><p><span class="term">Requires:</span></p></td>
+<td><p>Exists only if T <span class="bold"><strong>is</strong></span> void. </p></td>
+</tr></tbody>
+</table></div>
+</li>
+</ol></div>
 </div>
 </div>
 </div>
@@ -56,7 +86,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="flat_les_idm44853951050240.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_pfr_header_reference.html#header.boost.pfr.functors_hpp"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="flat_gre_idm44853951039872.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="flat_greater.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_pfr_header_reference.html#header.boost.pfr.functors_hpp"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="flat_hash.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>
