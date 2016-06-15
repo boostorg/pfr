@@ -41,5 +41,6 @@ addons:
     #- clang-3.7
 
 script:
+    - git clone git@github.com:boostorg/core.git boost_core
     # `--coverage` flags required to generate coverage info for Coveralls
-    - for f in test/*.cpp; do $TOOLSET -std=$CXX_STANDARD --coverage -I./include/ $f && valgrind ./a.out && rm ./a.out; done
+    - for f in test/*.cpp; do $TOOLSET -std=$CXX_STANDARD --coverage -I./boost_core/include/ -I./include/ $f && valgrind ./a.out && rm ./a.out; done
