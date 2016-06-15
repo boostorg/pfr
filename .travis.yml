@@ -42,4 +42,4 @@ addons:
 
 script:
     # `--coverage` flags required to generate coverage info for Coveralls
-    - for f in test/*.cpp; do $TOOLSET -std=$CXX_STANDARD --coverage $f && valgrind ./a.out && rm ./a.out; done
+    - for f in test/*.cpp; do $TOOLSET -std=$CXX_STANDARD --coverage -I./include/ $f && valgrind ./a.out && rm ./a.out; done
