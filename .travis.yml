@@ -42,5 +42,6 @@ addons:
 
 script:
     - git clone https://github.com/boostorg/core.git ../boost_core
+    - git clone https://github.com/boostorg/assert.git ../boost_assert
     # `--coverage` flags required to generate coverage info for Coveralls
-    - for f in test/*.cpp; do $TOOLSET -std=$CXX_STANDARD --coverage -I../boost_core/include/ -I./include/ $f && valgrind ./a.out && rm ./a.out; done
+    - for f in test/*.cpp; do $TOOLSET -std=$CXX_STANDARD --coverage -I../boost_core/include/ -I../boost_core/assert/ -I./include/ $f && valgrind ./a.out && rm ./a.out; done
