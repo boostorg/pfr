@@ -11,7 +11,6 @@
 #include <tuple>
 #include <sstream>
 #include <set>
-#include <boost/unordered_set.hpp>
 #include <string>
 
 template <class T>

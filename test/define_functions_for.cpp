@@ -11,8 +11,18 @@
 #include <tuple>
 #include <sstream>
 #include <set>
-#include <boost/unordered_set.hpp>
 #include <string>
+
+#include <boost/functional/hash.hpp>
+#include <unordered_set>
+
+struct adl_hash {
+    template <class T>
+    std::size_t operator()(const T& val) const {
+        using namespace boost;
+        return hash_value(val);
+    }
+};
 
 struct comparable_struct {
     int i; short s; char data[50]; bool bl; int a,b,c,d,e,f;
@@ -72,7 +82,7 @@ void test_with_contatiners() {
     BOOST_TEST(t.find({true, true, 100}) != t.end());
     BOOST_TEST_EQ(t.count({true, true, 100}), 1u);
 
-    boost::unordered_set<foo::testing> us(t.begin(), t.end());
+    std::unordered_set<foo::testing, adl_hash> us(t.begin(), t.end());
     BOOST_TEST_EQ(us.size(), t.size());
 }
 

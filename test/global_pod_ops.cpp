@@ -11,8 +11,10 @@
 #include <tuple>
 #include <sstream>
 #include <set>
-#include <boost/unordered_set.hpp>
 #include <string>
+
+#include <boost/functional/hash.hpp>
+#include <unordered_set>
 
 template <class T>
 void test_comparable_struct() {
@@ -50,6 +52,14 @@ void test_empty_struct() {
     BOOST_TEST(empty{} == empty{});
 }
 
+struct adl_hash {
+    template <class T>
+    std::size_t operator()(const T& val) const {
+        using namespace boost;
+        return hash_value(val);
+    }
+};
+
 template <class Comparator>
 void test_with_contatiners() {
     struct testing { bool b1, b2; int i; };
@@ -64,7 +74,7 @@ void test_with_contatiners() {
     BOOST_TEST(t.find({true, true, 100}) != t.end());
     BOOST_TEST_EQ(t.count({true, true, 100}), 1u);
 
-    boost::unordered_set<testing> us(t.begin(), t.end());
+    std::unordered_set<testing, adl_hash> us(t.begin(), t.end());
     BOOST_TEST_EQ(us.size(), t.size());
 }
 
