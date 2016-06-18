@@ -45,7 +45,8 @@ script:
     - git clone https://github.com/boostorg/assert.git ../boost_assert
     - git clone https://github.com/boostorg/config.git ../boost_config
     - git clone https://github.com/boostorg/functional.git ../boost_functional
-    - INCLUDES="-I../boost_core/include/ -I../boost_config/include/ -I../boost_assert/include/ -I../boost_functional/include/ -I./include/"
+    - git clone https://github.com/boostorg/integer.git ../boost_integer
+    - INCLUDES="-I../boost_core/include/ -I../boost_config/include/ -I../boost_assert/include/ -I../boost_functional/include/ -I../boost_integer/include/ -I./include/"
     # `--coverage` flags required to generate coverage info for Coveralls
     - $TOOLSET -std=$CXX_STANDARD --coverage $INCLUDES test/core.cpp && valgrind ./a.out && rm ./a.out
     - $TOOLSET -std=$CXX_STANDARD --coverage $INCLUDES test/count_fields_on_chars.cpp && valgrind ./a.out && rm ./a.out
