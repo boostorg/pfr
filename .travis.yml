@@ -48,7 +48,8 @@ script:
     - git clone https://github.com/boostorg/integer.git ../boost_integer
     - git clone https://github.com/boostorg/type_traits.git ../boost_tt
     - git clone https://github.com/boostorg/mpl.git ../boost_mpl
-    - INCLUDES="-I../boost_core/include/ -I../boost_config/include/ -I../boost_assert/include/ -I../boost_functional/include/ -I../boost_integer/include/ -I../boost_tt/include/ -I../boost_mpl/include/ -I./include/"
+    - git clone https://github.com/boostorg/detail.git ../boost_detail
+    - INCLUDES="-I../boost_core/include/ -I../boost_config/include/ -I../boost_assert/include/ -I../boost_functional/include/ -I../boost_detail/include/ -I../boost_integer/include/ -I../boost_tt/include/ -I../boost_mpl/include/ -I./include/"
     # `--coverage` flags required to generate coverage info for Coveralls
     - $TOOLSET -std=$CXX_STANDARD --coverage $INCLUDES test/core.cpp && valgrind ./a.out && rm ./a.out
     - $TOOLSET -std=$CXX_STANDARD --coverage $INCLUDES test/count_fields_on_chars.cpp && valgrind ./a.out && rm ./a.out
