@@ -50,7 +50,8 @@ script:
     - git clone https://github.com/boostorg/mpl.git ../boost_mpl
     - git clone https://github.com/boostorg/detail.git ../boost_detail
     - git clone https://github.com/boostorg/static_assert.git ../boost_sa
-    - INCLUDES="-I../boost_core/include/ -I../boost_config/include/ -I../boost_assert/include/ -I../boost_sa/include/ -I../boost_functional/include/ -I../boost_detail/include/ -I../boost_integer/include/ -I../boost_tt/include/ -I../boost_mpl/include/ -I./include/"
+    - git clone https://github.com/boostorg/preprocessor.git ../boost_preprocessor
+    - INCLUDES="-I../boost_core/include/ -I../boost_config/include/ -I../boost_assert/include/ -I../boost_preprocessor/include/ -I../boost_sa/include/ -I../boost_functional/include/ -I../boost_detail/include/ -I../boost_integer/include/ -I../boost_tt/include/ -I../boost_mpl/include/ -I./include/"
     # `--coverage` flags required to generate coverage info for Coveralls
     - $TOOLSET -std=$CXX_STANDARD --coverage $INCLUDES test/core.cpp && valgrind ./a.out && rm ./a.out
     - $TOOLSET -std=$CXX_STANDARD --coverage $INCLUDES test/count_fields_on_chars.cpp && valgrind ./a.out && rm ./a.out
