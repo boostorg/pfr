@@ -592,7 +592,7 @@ constexpr auto array_of_type_ids() noexcept {
 
 ///////////////////// Convert array of typeids into sequence_tuple::tuple
 template <class T, std::size_t... I>
-constexpr auto as_tuple_impl(std::index_sequence<I...>) noexcept {
+constexpr auto as_flat_tuple_impl(std::index_sequence<I...>) noexcept {
     constexpr auto a = array_of_type_ids<T>();
     return sequence_tuple::tuple<
         decltype(typeid_conversions::id_to_type(
@@ -602,17 +602,17 @@ constexpr auto as_tuple_impl(std::index_sequence<I...>) noexcept {
 }
 
 template <class T>
-constexpr sequence_tuple::tuple<> as_tuple_impl(std::index_sequence<>) noexcept {
+constexpr sequence_tuple::tuple<> as_flat_tuple_impl(std::index_sequence<>) noexcept {
     return sequence_tuple::tuple<>{};
 }
 
 template <class T>
-constexpr auto as_tuple_pure() noexcept {
+constexpr auto as_flat_tuple_pure() noexcept {
     typedef typename std::remove_cv<T>::type type;
 
     static_assert(std::is_pod<type>::value, "Not applyable");
     static_assert(!std::is_reference<type>::value, "Not applyable");
-    constexpr auto res = as_tuple_impl<type>(
+    constexpr auto res = as_flat_tuple_impl<type>(
         std::make_index_sequence< decltype(array_of_type_ids<type>())::size() >()
     );
 
@@ -626,7 +626,7 @@ constexpr auto as_tuple_pure() noexcept {
 }
 
 template <class T>
-using as_tuple_t = decltype( as_tuple_pure<T>() );
+using as_flat_tuple_t = decltype( as_flat_tuple_pure<T>() );
 
 /// @cond
 #ifdef __GNUC__
@@ -637,14 +637,14 @@ using as_tuple_t = decltype( as_tuple_pure<T>() );
 /// @endcond
 
 template <class T>
-constexpr decltype(auto) as_tuple(const T& val) noexcept {
-    MAY_ALIAS const auto* const t = reinterpret_cast<const detail::as_tuple_t<T>*>( std::addressof(val) );
+constexpr decltype(auto) as_flat_tuple(const T& val) noexcept {
+    MAY_ALIAS const auto* const t = reinterpret_cast<const detail::as_flat_tuple_t<T>*>( std::addressof(val) );
     return *t;
 }
 
 template <class T>
-constexpr decltype(auto) as_tuple(T& val) noexcept {
-    MAY_ALIAS auto* const t = reinterpret_cast<detail::as_tuple_t<T>*>( std::addressof(val) );
+constexpr decltype(auto) as_flat_tuple(T& val) noexcept {
+    MAY_ALIAS auto* const t = reinterpret_cast<detail::as_flat_tuple_t<T>*>( std::addressof(val) );
     return *t;
 }
 
@@ -703,14 +703,14 @@ struct teleport_extents<volatile From, To> {
 /// \endcode
 template <std::size_t I, class T>
 decltype(auto) flat_get(const T& val) noexcept {
-    return detail::sequence_tuple::get<I>( detail::as_tuple(val) );
+    return detail::sequence_tuple::get<I>( detail::as_flat_tuple(val) );
 }
 
 
 /// \overload flat_get
 template <std::size_t I, class T>
 decltype(auto) flat_get(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable<T, T>::value>* = 0/* @endcond */ ) noexcept {
-    return detail::sequence_tuple::get<I>( detail::as_tuple(val) );
+    return detail::sequence_tuple::get<I>( detail::as_flat_tuple(val) );
 }
 
 
@@ -723,7 +723,7 @@ decltype(auto) flat_get(T& val /* @cond */, std::enable_if_t< std::is_trivially_
 template <std::size_t I, class T>
 using flat_tuple_element = detail::teleport_extents<
         T,
-        typename detail::sequence_tuple::tuple_element<I, detail::as_tuple_t<T> >::type
+        typename detail::sequence_tuple::tuple_element<I, detail::as_flat_tuple_t<T> >::type
     >;
 
 
@@ -744,7 +744,7 @@ using flat_tuple_element_t = typename flat_tuple_element<I, T>::type;
 ///     std::array<int, boost::pfr::flat_tuple_size<my_structure>::value > a;
 /// \endcode
 template <class T>
-using flat_tuple_size = detail::size_t_< detail::as_tuple_t<T>::size_v >;
+using flat_tuple_size = detail::size_t_< detail::as_flat_tuple_t<T>::size_v >;
 
 
 /// \brief `flat_tuple_size_v` is a template variable that constins fields count in a \flattening{flattened} T.
@@ -768,10 +768,10 @@ constexpr std::size_t flat_tuple_size_v = flat_tuple_size<T>::value;
 /// \endcode
 template <class T>
 auto flat_make_tuple(const T& val) noexcept {
-    typedef detail::as_tuple_t<T> internal_tuple_t;
+    typedef detail::as_flat_tuple_t<T> internal_tuple_t;
 
     return detail::flat_make_tuple_impl(
-        detail::as_tuple(val),
+        detail::as_flat_tuple(val),
         std::make_index_sequence< internal_tuple_t::size_v >()
     );
 }
@@ -790,10 +790,10 @@ auto flat_make_tuple(const T& val) noexcept {
 /// \endcode
 template <class T>
 auto flat_tie(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable<T, T>::value>* = 0 /* @endcond */) noexcept {
-    typedef detail::as_tuple_t<T> internal_tuple_t;
+    typedef detail::as_flat_tuple_t<T> internal_tuple_t;
 
     return detail::flat_tie_impl(
-        detail::as_tuple(val),
+        detail::as_flat_tuple(val),
         std::make_index_sequence< internal_tuple_t::size_v >()
     );
 }
