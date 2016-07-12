@@ -8,7 +8,7 @@
 
 //[pfr_example_get
 /*`
-    The following example shows how to access structure fields by index using [funcref boost::pfr::get].
+    The following example shows how to access structure fields by index using [funcref boost::pfr::flat_get].
 
     Let's define some structure:
 */
@@ -23,8 +23,8 @@ struct foo {            // defining structure
     We can access fields of that structure by index:
 */
 foo f {777, '!'};
-auto& r1 = boost::pfr::get<0>(f); // accessing field with index 0, returns reference to `foo::some_integer`
-auto& r2 = boost::pfr::get<1>(f); // accessing field with index 1, returns reference to `foo::c`
+auto& r1 = boost::pfr::flat_get<0>(f); // accessing field with index 0, returns reference to `foo::some_integer`
+auto& r2 = boost::pfr::flat_get<1>(f); // accessing field with index 1, returns reference to `foo::c`
 //] [/pfr_example_get]
 
 //[pfr_example_flat_tuple_size
@@ -85,13 +85,13 @@ void example_get() {
 /*`
 It means, that:
 */
-boost::pfr::get<2>(my_struct{});   // ... will return `my_struct::my_struct_nested::a2` field.
-boost::pfr::get<3>(my_struct{});   // ... will return `my_struct::a3_a4[0]` field.
+boost::pfr::flat_get<2>(my_struct{});   // ... will return `my_struct::my_struct_nested::a2` field.
+boost::pfr::flat_get<3>(my_struct{});   // ... will return `my_struct::a3_a4[0]` field.
 
 /*` Exactly the same story with arrays: */
 
 int i[2][2] = {{10, 11}, {12, 13} };
-const int& r = boost::pfr::get<1>(i);
+const int& r = boost::pfr::flat_get<1>(i);
 assert(r == 11);
 //] [/pfr_example_flattening_2]
 (void)r;

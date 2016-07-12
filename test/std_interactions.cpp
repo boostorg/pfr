@@ -6,9 +6,16 @@
 #include <boost/pfr/core.hpp>
 #include <boost/core/lightweight_test.hpp>
 
+namespace helper {
+    template <std::size_t I, class T>
+    decltype(auto) get(T&& v) {
+        return boost::pfr::flat_get<I>(std::forward<T>(v));
+    }
+}
+
 int main() {
     using namespace std;
-    using namespace boost::pfr;
+    using namespace helper;
     struct foo { int i; short s;};
 
     foo f{1, 2};

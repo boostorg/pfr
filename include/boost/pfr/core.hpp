@@ -143,9 +143,6 @@ using tuple_element = std::remove_reference< decltype(
 
 } // namespace sequence_tuple
 
-using sequence_tuple::get;
-using sequence_tuple::tuple;
-
 
 ///////////////////// Array that has the constexpr
 template <std::size_t N>
@@ -597,7 +594,7 @@ constexpr auto array_of_type_ids() noexcept {
 template <class T, std::size_t... I>
 constexpr auto as_tuple_impl(std::index_sequence<I...>) noexcept {
     constexpr auto a = array_of_type_ids<T>();
-    return tuple<
+    return sequence_tuple::tuple<
         decltype(typeid_conversions::id_to_type(
             size_t_<get<I>(a)>{}
         ))...
@@ -605,8 +602,8 @@ constexpr auto as_tuple_impl(std::index_sequence<I...>) noexcept {
 }
 
 template <class T>
-constexpr tuple<> as_tuple_impl(std::index_sequence<>) noexcept {
-    return tuple<>{};
+constexpr sequence_tuple::tuple<> as_tuple_impl(std::index_sequence<>) noexcept {
+    return sequence_tuple::tuple<>{};
 }
 
 template <class T>
@@ -685,19 +682,19 @@ struct teleport_extents<volatile From, To> {
 /// \code
 ///     struct my_struct { int i, short s; };
 ///     my_struct s {10, 11};
-///     assert(boost::pfr::get<0>(s) == 10);
-///     boost::pfr::get<1>(s) = 0;
+///     assert(boost::pfr::flat_get<0>(s) == 10);
+///     boost::pfr::flat_get<1>(s) = 0;
 /// \endcode
 template <std::size_t I, class T>
-decltype(auto) get(const T& val) noexcept {
+decltype(auto) flat_get(const T& val) noexcept {
     MAY_ALIAS const auto* const t = reinterpret_cast<const detail::as_tuple_t<T>*>( std::addressof(val) );
     return detail::sequence_tuple::get<I>(*t);
 }
 
 
-/// \overload get
+/// \overload flat_get
 template <std::size_t I, class T>
-decltype(auto) get(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable<T, T>::value>* = 0/* @endcond */ ) noexcept {
+decltype(auto) flat_get(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable<T, T>::value>* = 0/* @endcond */ ) noexcept {
     MAY_ALIAS auto* const t = reinterpret_cast<detail::as_tuple_t<T>*>( std::addressof(val) );
     return detail::sequence_tuple::get<I>(*t);
 }
@@ -753,7 +750,7 @@ constexpr std::size_t flat_tuple_size_v = flat_tuple_size<T>::value;
 ///     struct my_struct { int i, short s; };
 ///     my_struct s {10, 11};
 ///     std::tuple<int, short> t = flat_make_tuple(s);
-///     assert(get<0>(t) == 10);
+///     assert(flat_get<0>(t) == 10);
 /// \endcode
 template <class T>
 auto flat_make_tuple(const T& val) noexcept {
@@ -796,7 +793,7 @@ namespace detail {
         template <class Stream, class T>
         static void print (Stream& out, const T& value) {
             if (!!I) out << ", ";
-            out << ::boost::pfr::get<I>(value);
+            out << ::boost::pfr::flat_get<I>(value);
             flat_print_impl<I + 1, N>::print(out, value);
         }
     };
@@ -835,7 +832,7 @@ namespace detail {
                 in >> ignore;
                 if (ignore != ' ')  in.setstate(Stream::failbit);
             }
-            in >> ::boost::pfr::get<I>(value);
+            in >> ::boost::pfr::flat_get<I>(value);
             flat_read_impl<I + 1, N>::read(in, value);
         }
     };

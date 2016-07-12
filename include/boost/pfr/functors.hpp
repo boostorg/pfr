@@ -22,7 +22,7 @@ namespace detail {
     struct equal_impl {
         template <class T, class U>
         static bool cmp(const T& v1, const U& v2) noexcept {
-            return ::boost::pfr::get<I>(v1) == ::boost::pfr::get<I>(v2)
+            return ::boost::pfr::flat_get<I>(v1) == ::boost::pfr::flat_get<I>(v2)
                 && equal_impl<I + 1, N>::cmp(v1, v2);
         }
     };
@@ -39,8 +39,8 @@ namespace detail {
     struct less_impl {
         template <class T, class U>
         static bool cmp(const T& v1, const U& v2) noexcept {
-            return ::boost::pfr::get<I>(v1) < ::boost::pfr::get<I>(v2)
-                || (::boost::pfr::get<I>(v1) == ::boost::pfr::get<I>(v2) && less_impl<I + 1, N>::cmp(v1, v2));
+            return ::boost::pfr::flat_get<I>(v1) < ::boost::pfr::flat_get<I>(v2)
+                || (::boost::pfr::flat_get<I>(v1) == ::boost::pfr::flat_get<I>(v2) && less_impl<I + 1, N>::cmp(v1, v2));
         }
     };
 
@@ -61,7 +61,7 @@ namespace detail {
     struct hash_impl {
         template <class T>
         static std::size_t compute(const T& val) noexcept {
-            std::size_t h = std::hash< flat_tuple_element_t<I, T> >()( ::boost::pfr::get<I>(val) );
+            std::size_t h = std::hash< flat_tuple_element_t<I, T> >()( ::boost::pfr::flat_get<I>(val) );
             hash_combine(h, hash_impl<I + 1, N>::compute(val) );
             return h;
         }

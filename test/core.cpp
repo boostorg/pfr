@@ -19,7 +19,7 @@ using namespace boost::pfr;
 
 template <std::size_t I, class T>
 void print(T& f) {
-    std::cout << get<I>(f) << "\t\t"
+    std::cout << flat_get<I>(f) << "\t\t"
         << typeid(flat_tuple_element_t<I, T>).name()
         << std::endl;
 }
@@ -58,58 +58,58 @@ void test_print() {
     static_assert(flat_tuple_size_v<foo> == 18, "failed tuple size check");
 
     int a[] = {0, 1, 2, 3};
-    std::cout << '\n' << get<1>(a) << std::endl;
+    std::cout << '\n' << flat_get<1>(a) << std::endl;
 
     int b[2][4] = {{0, 1, 2, 3}, {4, 5, 6, 7}};
-    std::cout << get<4>(b) << std::endl;
+    std::cout << flat_get<4>(b) << std::endl;
 
     int i = 777;
-    std::cout << get<0>(i) << std::endl;
+    std::cout << flat_get<0>(i) << std::endl;
 }
 
 void test_runtime(const foo& f) {
-    BOOST_TEST_EQ( get<0>(f), f.v0);
-    BOOST_TEST_EQ( get<1>(f), f.v1);
-    BOOST_TEST_EQ( get<2>(f), f.v2);
-    BOOST_TEST_EQ( get<3>(f), f.v3);
-    BOOST_TEST_EQ( get<4>(f), f.v4and5[0]);
-    BOOST_TEST_EQ( get<5>(f), f.v4and5[1]);
-    BOOST_TEST_EQ( get<6>(f), f.v6);
-    BOOST_TEST_EQ( get<7>(f), f.v7);
-    BOOST_TEST_EQ( get<8>(f), f.v8);
-    BOOST_TEST_EQ( get<9>(f), f.v9);
-    BOOST_TEST_EQ( get<10>(f), f.v10);
-    BOOST_TEST( get<11>(f) < f.v11 + 0.001); BOOST_TEST( get<11>(f) > f.v11 - 0.001);
-    BOOST_TEST_EQ( get<12>(f), f.v12and13.a0);
-    BOOST_TEST_EQ( get<13>(f), f.v12and13.a1);
-    BOOST_TEST_EQ( get<14>(f), f.v14and15andv16and17.b0);
-    BOOST_TEST_EQ( get<15>(f), f.v14and15andv16and17.b1);
-    BOOST_TEST_EQ( get<16>(f), f.v14and15andv16and17.cr.a0);
-    BOOST_TEST_EQ( get<17>(f), f.v14and15andv16and17.cr.a1);
+    BOOST_TEST_EQ( flat_get<0>(f), f.v0);
+    BOOST_TEST_EQ( flat_get<1>(f), f.v1);
+    BOOST_TEST_EQ( flat_get<2>(f), f.v2);
+    BOOST_TEST_EQ( flat_get<3>(f), f.v3);
+    BOOST_TEST_EQ( flat_get<4>(f), f.v4and5[0]);
+    BOOST_TEST_EQ( flat_get<5>(f), f.v4and5[1]);
+    BOOST_TEST_EQ( flat_get<6>(f), f.v6);
+    BOOST_TEST_EQ( flat_get<7>(f), f.v7);
+    BOOST_TEST_EQ( flat_get<8>(f), f.v8);
+    BOOST_TEST_EQ( flat_get<9>(f), f.v9);
+    BOOST_TEST_EQ( flat_get<10>(f), f.v10);
+    BOOST_TEST( flat_get<11>(f) < f.v11 + 0.001); BOOST_TEST( flat_get<11>(f) > f.v11 - 0.001);
+    BOOST_TEST_EQ( flat_get<12>(f), f.v12and13.a0);
+    BOOST_TEST_EQ( flat_get<13>(f), f.v12and13.a1);
+    BOOST_TEST_EQ( flat_get<14>(f), f.v14and15andv16and17.b0);
+    BOOST_TEST_EQ( flat_get<15>(f), f.v14and15andv16and17.b1);
+    BOOST_TEST_EQ( flat_get<16>(f), f.v14and15andv16and17.cr.a0);
+    BOOST_TEST_EQ( flat_get<17>(f), f.v14and15andv16and17.cr.a1);
 }
 
 template <class T>
 void test_compiletime() {
     constexpr T f{};
     static_assert(flat_tuple_size_v<foo> == 18, "failed tuple size check");
-    static_assert( std::is_same< decltype(get<0>(f)), decltype((f.v0))>::value, "types missmatch");
-    static_assert( std::is_same< decltype(get<1>(f)), decltype((f.v1))>::value, "types missmatch");
-    static_assert( std::is_same< decltype(get<2>(f)), decltype((f.v2))>::value, "types missmatch");
-    static_assert( std::is_same< decltype(get<3>(f)), decltype((f.v3))>::value, "types missmatch");
-    static_assert( std::is_same< decltype(get<4>(f)), decltype((f.v4and5[0]))>::value, "types missmatch");
-    static_assert( std::is_same< decltype(get<5>(f)), decltype((f.v4and5[1]))>::value, "types missmatch");
-    static_assert( std::is_same< decltype(get<6>(f)), decltype((f.v6))>::value, "types missmatch");
-    static_assert( std::is_same< decltype(get<7>(f)), decltype((f.v7))>::value, "types missmatch");
-    static_assert( std::is_same< decltype(get<8>(f)), decltype((f.v8))>::value, "types missmatch");
-    static_assert( std::is_same< decltype(get<9>(f)), decltype((f.v9))>::value, "types missmatch");
-    static_assert( std::is_same< decltype(get<10>(f)), decltype((f.v10))>::value, "types missmatch");
-    static_assert( std::is_same< decltype(get<11>(f)), decltype((f.v11))>::value, "types missmatch");
-    static_assert( std::is_same< decltype(get<12>(f)), decltype((f.v12and13.a0))>::value, "types missmatch");
-    static_assert( std::is_same< decltype(get<13>(f)), decltype((f.v12and13.a1))>::value, "types missmatch");
-    static_assert( std::is_same< decltype(get<14>(f)), decltype((f.v14and15andv16and17.b0))>::value, "types missmatch");
-    static_assert( std::is_same< decltype(get<15>(f)), decltype((f.v14and15andv16and17.b1))>::value, "types missmatch");
-    static_assert( std::is_same< decltype(get<16>(f)), decltype((f.v14and15andv16and17.cr.a0))>::value, "types missmatch");
-    static_assert( std::is_same< decltype(get<17>(f)), decltype((f.v14and15andv16and17.cr.a1))>::value, "types missmatch");
+    static_assert( std::is_same< decltype(flat_get<0>(f)), decltype((f.v0))>::value, "types missmatch");
+    static_assert( std::is_same< decltype(flat_get<1>(f)), decltype((f.v1))>::value, "types missmatch");
+    static_assert( std::is_same< decltype(flat_get<2>(f)), decltype((f.v2))>::value, "types missmatch");
+    static_assert( std::is_same< decltype(flat_get<3>(f)), decltype((f.v3))>::value, "types missmatch");
+    static_assert( std::is_same< decltype(flat_get<4>(f)), decltype((f.v4and5[0]))>::value, "types missmatch");
+    static_assert( std::is_same< decltype(flat_get<5>(f)), decltype((f.v4and5[1]))>::value, "types missmatch");
+    static_assert( std::is_same< decltype(flat_get<6>(f)), decltype((f.v6))>::value, "types missmatch");
+    static_assert( std::is_same< decltype(flat_get<7>(f)), decltype((f.v7))>::value, "types missmatch");
+    static_assert( std::is_same< decltype(flat_get<8>(f)), decltype((f.v8))>::value, "types missmatch");
+    static_assert( std::is_same< decltype(flat_get<9>(f)), decltype((f.v9))>::value, "types missmatch");
+    static_assert( std::is_same< decltype(flat_get<10>(f)), decltype((f.v10))>::value, "types missmatch");
+    static_assert( std::is_same< decltype(flat_get<11>(f)), decltype((f.v11))>::value, "types missmatch");
+    static_assert( std::is_same< decltype(flat_get<12>(f)), decltype((f.v12and13.a0))>::value, "types missmatch");
+    static_assert( std::is_same< decltype(flat_get<13>(f)), decltype((f.v12and13.a1))>::value, "types missmatch");
+    static_assert( std::is_same< decltype(flat_get<14>(f)), decltype((f.v14and15andv16and17.b0))>::value, "types missmatch");
+    static_assert( std::is_same< decltype(flat_get<15>(f)), decltype((f.v14and15andv16and17.b1))>::value, "types missmatch");
+    static_assert( std::is_same< decltype(flat_get<16>(f)), decltype((f.v14and15andv16and17.cr.a0))>::value, "types missmatch");
+    static_assert( std::is_same< decltype(flat_get<17>(f)), decltype((f.v14and15andv16and17.cr.a1))>::value, "types missmatch");
 }
 
 template <class T>
@@ -117,20 +117,20 @@ constexpr void test_compiletime_array() {
     {
         constexpr T f[20] = {0};
         static_assert(flat_tuple_size_v<decltype(f)> == 20, "failed tuple size check for array");
-        static_assert( std::is_same< decltype(get<0>(f)), T const&>::value, "types missmatch");
-        static_assert( std::is_same< decltype(get<19>(f)), T const&>::value, "types missmatch");
+        static_assert( std::is_same< decltype(flat_get<0>(f)), T const&>::value, "types missmatch");
+        static_assert( std::is_same< decltype(flat_get<19>(f)), T const&>::value, "types missmatch");
     }
     {
         constexpr T f[2][10] = {0};
         static_assert(flat_tuple_size_v<decltype(f)> == 20, "failed tuple size check for array");
-        static_assert( std::is_same< decltype(get<0>(f)), T const&>::value, "types missmatch");
-        static_assert( std::is_same< decltype(get<19>(f)), T const&>::value, "types missmatch");
+        static_assert( std::is_same< decltype(flat_get<0>(f)), T const&>::value, "types missmatch");
+        static_assert( std::is_same< decltype(flat_get<19>(f)), T const&>::value, "types missmatch");
     }
     {
         constexpr T f[2][5][2] = {0};
         static_assert(flat_tuple_size_v<decltype(f)> == 20, "failed tuple size check for array");
-        static_assert( std::is_same< decltype(get<0>(f)), T const&>::value, "types missmatch");
-        static_assert( std::is_same< decltype(get<19>(f)), T const&>::value, "types missmatch");
+        static_assert( std::is_same< decltype(flat_get<0>(f)), T const&>::value, "types missmatch");
+        static_assert( std::is_same< decltype(flat_get<19>(f)), T const&>::value, "types missmatch");
     }
 }
 
@@ -145,18 +145,18 @@ void test_with_enums() {
     BOOST_TEST_EQ(std::get<1>(t), 10);
     BOOST_TEST_EQ(std::get<2>(t), 11);
 
-    get<1>(s) = 101;
-    BOOST_TEST_EQ(get<1>(s), 101);
-    get<2>(s) = 111;
-    BOOST_TEST_EQ(get<2>(s), 111);
+    flat_get<1>(s) = 101;
+    BOOST_TEST_EQ(flat_get<1>(s), 101);
+    flat_get<2>(s) = 111;
+    BOOST_TEST_EQ(flat_get<2>(s), 111);
 
     BOOST_TEST(flat_tie(s) == flat_tie(s));
     BOOST_TEST(flat_tie(s) == flat_make_tuple(s));
     BOOST_TEST(flat_tie(s) != t);
     flat_tie(s) = t;
-    BOOST_TEST_EQ(get<0>(s), 17u);
-    BOOST_TEST_EQ(get<1>(s), 10);
-    BOOST_TEST_EQ(get<2>(s), 11);
+    BOOST_TEST_EQ(flat_get<0>(s), 17u);
+    BOOST_TEST_EQ(flat_get<1>(s), 10);
+    BOOST_TEST_EQ(flat_get<2>(s), 11);
 
     static_assert(std::is_same<
         int, flat_tuple_element_t<1, my_struct>
@@ -308,7 +308,7 @@ void test_with_user_defined_constructor() {
 
     pr p{1, 2};
 
-    //assert(get<1>(p) == 2); // Compilation error
+    //assert(flat_get<1>(p) == 2); // Compilation error
 }
 
 void test_hash() {
