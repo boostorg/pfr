@@ -40,7 +40,7 @@
 </h3></div></div></div>
 <p>
         The following example shows how to access structure fields by index using
-        <code class="computeroutput"><a class="link" href="../boost/pfr/get.html" title="Function get">boost::pfr::get</a></code>.
+        <code class="computeroutput"><a class="link" href="../boost/pfr/flat_get.html" title="Function flat_get">boost::pfr::flat_get</a></code>.
       </p>
 <p>
         Let's define some structure:
@@ -56,8 +56,8 @@
         We can access fields of that structure by index:
       </p>
 <pre class="programlisting"><span class="identifier">foo</span> <span class="identifier">f</span> <span class="special">{</span><span class="number">777</span><span class="special">,</span> <span class="char">'!'</span><span class="special">};</span>
-<span class="keyword">auto</span><span class="special">&amp;</span> <span class="identifier">r1</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">0</span><span class="special">&gt;(</span><span class="identifier">f</span><span class="special">);</span> <span class="comment">// accessing field with index 0, returns reference to `foo::some_integer`</span>
-<span class="keyword">auto</span><span class="special">&amp;</span> <span class="identifier">r2</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">f</span><span class="special">);</span> <span class="comment">// accessing field with index 1, returns reference to `foo::c`</span>
+<span class="keyword">auto</span><span class="special">&amp;</span> <span class="identifier">r1</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_get</span><span class="special">&lt;</span><span class="number">0</span><span class="special">&gt;(</span><span class="identifier">f</span><span class="special">);</span> <span class="comment">// accessing field with index 0, returns reference to `foo::some_integer`</span>
+<span class="keyword">auto</span><span class="special">&amp;</span> <span class="identifier">r2</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">f</span><span class="special">);</span> <span class="comment">// accessing field with index 1, returns reference to `foo::c`</span>
 </pre>
 </div>
 <div class="section">
@@ -100,14 +100,14 @@
 <p>
         It means, that:
       </p>
-<pre class="programlisting"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">2</span><span class="special">&gt;(</span><span class="identifier">my_struct</span><span class="special">{});</span>   <span class="comment">// ... will return `my_struct::my_struct_nested::a2` field.</span>
-<span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">3</span><span class="special">&gt;(</span><span class="identifier">my_struct</span><span class="special">{});</span>   <span class="comment">// ... will return `my_struct::a3_a4[0]` field.</span>
+<pre class="programlisting"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_get</span><span class="special">&lt;</span><span class="number">2</span><span class="special">&gt;(</span><span class="identifier">my_struct</span><span class="special">{});</span>   <span class="comment">// ... will return `my_struct::my_struct_nested::a2` field.</span>
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_get</span><span class="special">&lt;</span><span class="number">3</span><span class="special">&gt;(</span><span class="identifier">my_struct</span><span class="special">{});</span>   <span class="comment">// ... will return `my_struct::a3_a4[0]` field.</span>
 </pre>
 <p>
         Exactly the same story with arrays:
       </p>
 <pre class="programlisting"><span class="keyword">int</span> <span class="identifier">i</span><span class="special">[</span><span class="number">2</span><span class="special">][</span><span class="number">2</span><span class="special">]</span> <span class="special">=</span> <span class="special">{{</span><span class="number">10</span><span class="special">,</span> <span class="number">11</span><span class="special">},</span> <span class="special">{</span><span class="number">12</span><span class="special">,</span> <span class="number">13</span><span class="special">}</span> <span class="special">};</span>
-<span class="keyword">const</span> <span class="keyword">int</span><span class="special">&amp;</span> <span class="identifier">r</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">i</span><span class="special">);</span>
+<span class="keyword">const</span> <span class="keyword">int</span><span class="special">&amp;</span> <span class="identifier">r</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">i</span><span class="special">);</span>
 <span class="identifier">assert</span><span class="special">(</span><span class="identifier">r</span> <span class="special">==</span> <span class="number">11</span><span class="special">);</span>
 </pre>
 </div>

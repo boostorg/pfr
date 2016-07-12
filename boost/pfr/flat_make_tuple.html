@@ -6,7 +6,7 @@
 <meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
 <link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.POD Flat Reflection 1.0">
 <link rel="up" href="../../boost_pfr_header_reference.html#header.boost.pfr.core_hpp" title="Header &lt;boost/pfr/core.hpp&gt;">
-<link rel="prev" href="get.html" title="Function get">
+<link rel="prev" href="flat_get.html" title="Function flat_get">
 <link rel="next" href="flat_tie.html" title="Function template flat_tie">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -20,7 +20,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="get.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_pfr_header_reference.html#header.boost.pfr.core_hpp"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="flat_tie.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="flat_get.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_pfr_header_reference.html#header.boost.pfr.core_hpp"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="flat_tie.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="refentry">
 <a name="boost.pfr.flat_make_tuple"></a><div class="titlepage"></div>
@@ -34,12 +34,12 @@
 </span>
 <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> T<span class="special">&gt;</span> <span class="keyword">auto</span> <span class="identifier">flat_make_tuple</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span> val<span class="special">)</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idm46098029301872"></a><h2>Description</h2>
+<a name="idm45969411350880"></a><h2>Description</h2>
 <p><span class="bold"><strong>Example:</strong></span> </p>
 <pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">my_struct</span> <span class="special">{</span> <span class="keyword">int</span> <span class="identifier">i</span><span class="special">,</span> <span class="keyword">short</span> <span class="identifier">s</span><span class="special">;</span> <span class="special">}</span><span class="special">;</span>
 <span class="identifier">my_struct</span> <span class="identifier">s</span> <span class="special">{</span><span class="number">10</span><span class="special">,</span> <span class="number">11</span><span class="special">}</span><span class="special">;</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">,</span> <span class="keyword">short</span><span class="special">&gt;</span> <span class="identifier">t</span> <span class="special">=</span> <span class="identifier">flat_make_tuple</span><span class="special">(</span><span class="identifier">s</span><span class="special">)</span><span class="special">;</span>
-<span class="identifier">assert</span><span class="special">(</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">0</span><span class="special">&gt;</span><span class="special">(</span><span class="identifier">t</span><span class="special">)</span> <span class="special">==</span> <span class="number">10</span><span class="special">)</span><span class="special">;</span>
+<span class="identifier">assert</span><span class="special">(</span><span class="identifier">flat_get</span><span class="special">&lt;</span><span class="number">0</span><span class="special">&gt;</span><span class="special">(</span><span class="identifier">t</span><span class="special">)</span> <span class="special">==</span> <span class="number">10</span><span class="special">)</span><span class="special">;</span>
 </pre>
 <p> </p>
 </div>
@@ -54,7 +54,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="get.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_pfr_header_reference.html#header.boost.pfr.core_hpp"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="flat_tie.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="flat_get.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_pfr_header_reference.html#header.boost.pfr.core_hpp"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="flat_tie.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>
