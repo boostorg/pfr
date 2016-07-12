@@ -607,7 +607,7 @@ constexpr sequence_tuple::tuple<> as_tuple_impl(std::index_sequence<>) noexcept 
 }
 
 template <class T>
-constexpr auto as_tuple() noexcept {
+constexpr auto as_tuple_pure() noexcept {
     typedef typename std::remove_cv<T>::type type;
 
     static_assert(std::is_pod<type>::value, "Not applyable");
@@ -626,7 +626,29 @@ constexpr auto as_tuple() noexcept {
 }
 
 template <class T>
-using as_tuple_t = decltype( as_tuple<T>() );
+using as_tuple_t = decltype( as_tuple_pure<T>() );
+
+/// @cond
+#ifdef __GNUC__
+#define MAY_ALIAS __attribute__((__may_alias__))
+#else
+#define MAY_ALIAS
+#endif
+/// @endcond
+
+template <class T>
+constexpr decltype(auto) as_tuple(const T& val) noexcept {
+    MAY_ALIAS const auto* const t = reinterpret_cast<const detail::as_tuple_t<T>*>( std::addressof(val) );
+    return *t;
+}
+
+template <class T>
+constexpr decltype(auto) as_tuple(T& val) noexcept {
+    MAY_ALIAS auto* const t = reinterpret_cast<detail::as_tuple_t<T>*>( std::addressof(val) );
+    return *t;
+}
+
+#undef MAY_ALIAS
 
 template <class T, std::size_t... I>
 auto flat_make_tuple_impl(const T& t, std::index_sequence<I...>) noexcept {
@@ -668,13 +690,7 @@ struct teleport_extents<volatile From, To> {
 #   pragma clang diagnostic pop
 #endif
 
-/// @cond
-#ifdef __GNUC__
-#define MAY_ALIAS __attribute__((__may_alias__))
-#else
-#define MAY_ALIAS
-#endif
-/// @endcond
+
 
 /// \brief Returns reference or const reference to a field with index `I` in \flattening{flattened} T.
 ///
@@ -687,16 +703,14 @@ struct teleport_extents<volatile From, To> {
 /// \endcode
 template <std::size_t I, class T>
 decltype(auto) flat_get(const T& val) noexcept {
-    MAY_ALIAS const auto* const t = reinterpret_cast<const detail::as_tuple_t<T>*>( std::addressof(val) );
-    return detail::sequence_tuple::get<I>(*t);
+    return detail::sequence_tuple::get<I>( detail::as_tuple(val) );
 }
 
 
 /// \overload flat_get
 template <std::size_t I, class T>
 decltype(auto) flat_get(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable<T, T>::value>* = 0/* @endcond */ ) noexcept {
-    MAY_ALIAS auto* const t = reinterpret_cast<detail::as_tuple_t<T>*>( std::addressof(val) );
-    return detail::sequence_tuple::get<I>(*t);
+    return detail::sequence_tuple::get<I>( detail::as_tuple(val) );
 }
 
 
@@ -755,9 +769,9 @@ constexpr std::size_t flat_tuple_size_v = flat_tuple_size<T>::value;
 template <class T>
 auto flat_make_tuple(const T& val) noexcept {
     typedef detail::as_tuple_t<T> internal_tuple_t;
-    MAY_ALIAS const internal_tuple_t& t = *reinterpret_cast<const internal_tuple_t*>( std::addressof(val) );
+
     return detail::flat_make_tuple_impl(
-        t,
+        detail::as_tuple(val),
         std::make_index_sequence< internal_tuple_t::size_v >()
     );
 }
@@ -777,14 +791,13 @@ auto flat_make_tuple(const T& val) noexcept {
 template <class T>
 auto flat_tie(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable<T, T>::value>* = 0 /* @endcond */) noexcept {
     typedef detail::as_tuple_t<T> internal_tuple_t;
-    MAY_ALIAS internal_tuple_t& t = *reinterpret_cast<internal_tuple_t*>( std::addressof(val) );
+
     return detail::flat_tie_impl(
-        t,
+        detail::as_tuple(val),
         std::make_index_sequence< internal_tuple_t::size_v >()
     );
 }
 
-#undef MAY_ALIAS
 
 
 namespace detail {
