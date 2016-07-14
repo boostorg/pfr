@@ -182,8 +182,7 @@ constexpr std::size_t get(const size_array<N>& a) noexcept {
 }
 
 
-template <class T> constexpr size_array<sizeof(T)> fields_count_and_type_ids_with_zeros(std::enable_if_t<!std::is_empty<T>::value>* = 0) noexcept;
-template <class T> constexpr size_array<0> fields_count_and_type_ids_with_zeros(std::enable_if_t<std::is_empty<T>::value>* = 0) noexcept;
+template <class T> constexpr size_array<sizeof(T)> fields_count_and_type_ids_with_zeros() noexcept;
 
 ///////////////////// All the stuff for representing Type as integer and converting integer back to type
 namespace typeid_conversions {
@@ -457,8 +456,6 @@ struct ubiq_constructor {
 ///////////////////// Structure that can be converted to reference to anything except reference to T
 template <class T>
 struct ubiq_constructor_except {
-    std::size_t ignore;
-
     template <class Type> constexpr operator std::enable_if_t<!std::is_same<T, Type>::value, Type&> () const noexcept; // Undefined
 };
 
@@ -499,83 +496,103 @@ template <class T, std::size_t... I>
 constexpr std::true_type has_reference_members(void*) noexcept;
 
 // `std::is_constructible<T, ubiq_constructor_except<T>>` consumes a lot of time, so we made a separate lazy trait for it.
-template <std::size_t N, class T> struct is_single_field_aggregate_uninitializable: std::false_type {};
-template <class T> struct is_single_field_aggregate_uninitializable<1, T>: std::is_constructible<T, ubiq_constructor_except<T>> {};
+template <std::size_t N, class T> struct is_single_field_and_aggregate_initializable: std::false_type {};
+template <class T> struct is_single_field_and_aggregate_initializable<1, T>: std::integral_constant<
+    bool, !std::is_constructible<T, ubiq_constructor_except<T>>::value
+> {};
+
+
+///////////////////// Hand-made is_aggregate_initializable_n<T> trait:
+template <class T, std::size_t N>
+struct is_aggregate_initializable_n {
+    template <std::size_t ...I>
+    static constexpr bool is_not_constructible_n(std::index_sequence<I...>) noexcept {
+        return !std::is_constructible<T, decltype(ubiq_constructor{I})...>::value
+            || is_single_field_and_aggregate_initializable<N, T>::value
+        ;
+    }
+
+    static constexpr bool value =
+           std::is_empty<T>::value
+        || std::is_fundamental<T>::value
+        || is_not_constructible_n(std::make_index_sequence<N>{})
+    ;
+};
 
 ///////////////////// Returns array of typeids and zeros if construtor of a type accepts sizeof...(I) parameters, substitution failure otherwise
 template <class T, std::size_t N, std::size_t... I>
-constexpr auto type_to_array_of_type_ids(std::size_t* types, std::index_sequence<I...>) noexcept
+constexpr auto flat_type_to_array_of_type_ids(std::size_t* types, std::index_sequence<I...>) noexcept
     -> typename std::add_pointer<decltype(T{ ubiq_constructor{I}... })>::type
 {
     static_assert(
         !decltype(has_reference_members<T, I...>(types))::value,
         "Reference members are not supported."
     );
-
     static_assert(
         N <= sizeof(T),
         "Bit fields are not supported."
     );
 
+    constexpr auto offsets = get_type_offsets<T, N, I...>();
+    T tmp{ ubiq_val{types + get<I>(offsets)}... };
+    (void)tmp;
+    (void)offsets; // If type is empty offsets are not used
+    return nullptr;
+}
+
+///////////////////// Methods for detecting max parameters for construction of T
+template <class T, std::size_t N>
+constexpr void detect_fields_count(std::size_t& count, size_t_<N>, size_t_<N>, long) noexcept {
     // Hand-made is_aggregate<T> trait:
     // Aggregates could be constructed from `decltype(ubiq_constructor{I})...` but report that there's no constructor from `decltype(ubiq_constructor{I})...`
     // Special case for N == 1: `std::is_constructible<T, ubiq_constructor>` returns true if N == 1 and T is copy/move constructible.
     static_assert(
-        std::is_array<T>::value || std::is_fundamental<T>::value
-                || !std::is_constructible<T, decltype(ubiq_constructor{I})...>::value
-                || !is_single_field_aggregate_uninitializable<N, T>::value,
+        is_aggregate_initializable_n<T, N>::value,
         "Types with user specified constructors (non-aggregate types) are not supported."
     );
 
-    constexpr auto offsets = get_type_offsets<T, N, I...>();
-    T tmp{ ubiq_val{types + get<I>(offsets)}... };
-    (void)tmp;
-    return nullptr;
-}
-
-///////////////////// Methods for detecting max parameters for construction of T, return array of typeids and zeros
-template <class T, std::size_t N>
-constexpr void detect_fields_count_and_type_ids(std::size_t* types, size_t_<N>, size_t_<N>, long) noexcept {
-    type_to_array_of_type_ids<T, N>(types, std::make_index_sequence<N>());
+    count = N;
 }
 
 template <class T, std::size_t Begin, std::size_t Middle>
-constexpr void detect_fields_count_and_type_ids(std::size_t* types, size_t_<Begin>, size_t_<Middle>, int) noexcept;
+constexpr void detect_fields_count(std::size_t& count, size_t_<Begin>, size_t_<Middle>, int) noexcept;
 
 template <class T, std::size_t Begin, std::size_t Middle>
-constexpr auto detect_fields_count_and_type_ids(std::size_t* types, size_t_<Begin>, size_t_<Middle>, long) noexcept
-    -> decltype( type_to_array_of_type_ids<T, Middle>(types, std::make_index_sequence<Middle>()) )
+constexpr auto detect_fields_count(std::size_t& count, size_t_<Begin>, size_t_<Middle>, long) noexcept
+    -> decltype( flat_type_to_array_of_type_ids<T, Middle>(nullptr, std::make_index_sequence<Middle>()) )
 {
     constexpr std::size_t next = Middle + (Middle - Begin + 1) / 2;
-    detect_fields_count_and_type_ids<T>(types, size_t_<Middle>{}, size_t_<next>{}, 1L);
+    detect_fields_count<T>(count, size_t_<Middle>{}, size_t_<next>{}, 1L);
     return nullptr;
 }
 
 template <class T, std::size_t Begin, std::size_t Middle>
-constexpr void detect_fields_count_and_type_ids(std::size_t* types, size_t_<Begin>, size_t_<Middle>, int) noexcept {
+constexpr void detect_fields_count(std::size_t& count, size_t_<Begin>, size_t_<Middle>, int) noexcept {
     constexpr std::size_t next = (Begin + Middle) / 2;
-    detect_fields_count_and_type_ids<T>(types, size_t_<Begin>{}, size_t_<next>{}, 1L);
+    detect_fields_count<T>(count, size_t_<Begin>{}, size_t_<next>{}, 1L);
 }
 
-
+///////////////////// Returns non-flattened fields count
+template <class T>
+constexpr std::size_t fields_count() noexcept {
+    std::size_t res = 0u;
+    constexpr std::size_t next = sizeof(T) / 2 + 1;
+    detect_fields_count<T>(res, size_t_<0>{}, size_t_<next>{}, 1L);
+    return res;
+}
 
 ///////////////////// Returns array of typeids and zeros
 template <class T>
-constexpr size_array<sizeof(T)> fields_count_and_type_ids_with_zeros(std::enable_if_t<!std::is_empty<T>::value>*) noexcept {
+constexpr size_array<sizeof(T)> fields_count_and_type_ids_with_zeros() noexcept {
     size_array<sizeof(T)> types{};
-    constexpr std::size_t next = sizeof(T) / 2 + 1;
-    detect_fields_count_and_type_ids<T>(types.data, size_t_<1>{}, size_t_<next>{}, 1L);
+    constexpr std::size_t N = fields_count<T>();
+    flat_type_to_array_of_type_ids<T, N>(types.data, std::make_index_sequence<N>());
     return types;
-}
-
-template <class T>
-constexpr size_array<0> fields_count_and_type_ids_with_zeros(std::enable_if_t<std::is_empty<T>::value>*) noexcept {
-    return size_array<0>{0};
 }
 
 ///////////////////// Returns array of typeids without zeros
 template <class T>
-constexpr auto array_of_type_ids() noexcept {
+constexpr auto flat_array_of_type_ids() noexcept {
     constexpr auto types = fields_count_and_type_ids_with_zeros<T>();
     constexpr std::size_t count = types.count_nonzeros();
     size_array<count> res{};
@@ -593,17 +610,13 @@ constexpr auto array_of_type_ids() noexcept {
 ///////////////////// Convert array of typeids into sequence_tuple::tuple
 template <class T, std::size_t... I>
 constexpr auto as_flat_tuple_impl(std::index_sequence<I...>) noexcept {
-    constexpr auto a = array_of_type_ids<T>();
+    constexpr auto a = flat_array_of_type_ids<T>();
+    (void)a; // `a` is unused if T is an empty type
     return sequence_tuple::tuple<
         decltype(typeid_conversions::id_to_type(
             size_t_<get<I>(a)>{}
         ))...
     >{};
-}
-
-template <class T>
-constexpr sequence_tuple::tuple<> as_flat_tuple_impl(std::index_sequence<>) noexcept {
-    return sequence_tuple::tuple<>{};
 }
 
 template <class T>
@@ -613,7 +626,7 @@ constexpr auto as_flat_tuple_pure() noexcept {
     static_assert(std::is_pod<type>::value, "Not applyable");
     static_assert(!std::is_reference<type>::value, "Not applyable");
     constexpr auto res = as_flat_tuple_impl<type>(
-        std::make_index_sequence< decltype(array_of_type_ids<type>())::size() >()
+        std::make_index_sequence< decltype(flat_array_of_type_ids<type>())::size() >()
     );
 
     static_assert(
@@ -747,7 +760,7 @@ template <class T>
 using flat_tuple_size = detail::size_t_< detail::as_flat_tuple_t<T>::size_v >;
 
 
-/// \brief `flat_tuple_size_v` is a template variable that constins fields count in a \flattening{flattened} T.
+/// \brief `flat_tuple_size_v` is a template variable that contains fields count in a \flattening{flattened} T.
 ///
 /// \b Example:
 /// \code
@@ -755,6 +768,29 @@ using flat_tuple_size = detail::size_t_< detail::as_flat_tuple_t<T>::size_v >;
 /// \endcode
 template <class T>
 constexpr std::size_t flat_tuple_size_v = flat_tuple_size<T>::value;
+
+/// \brief has a member `value` that constins fields count in a T .
+/// works for any T that supports aggregate initialization even if T is not POD.
+/// \flattening{Flattens} only multidimensional arrays.
+///
+/// \b Example:
+/// \code
+///     std::array<int, boost::pfr::tuple_size<my_structure>::value > a;
+/// \endcode
+template <class T>
+using tuple_size = detail::size_t_< detail::fields_count<T>() >;
+
+
+/// \brief `tuple_size_v` is a template variable that contains fields count in a T and
+/// works for any T that supports aggregate initialization even if T is not POD.
+/// \flattening{Flattens} only multidimensional arrays.
+///
+/// \b Example:
+/// \code
+///     std::array<int, boost::pfr::tuple_size_v<my_structure> > a;
+/// \endcode
+template <class T>
+constexpr std::size_t tuple_size_v = tuple_size<T>::value;
 
 
 /// \brief Creates an `std::tuple` from a \flattening{flattened} T.

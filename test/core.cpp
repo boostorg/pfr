@@ -368,6 +368,36 @@ int main() {
     test_with_user_defined_constructor();
     test_hash();
 
+    struct non_pod1 {
+        std::string s;
+        std::vector<int> v;
+        int i;
+
+        struct foo {
+            std::string s2;
+        } f;
+    };
+    static_assert(tuple_size<non_pod1>::value == 4, "Must not be a compile error");
+
+
+    struct non_pod2 {
+        unsigned ui1: 1;
+        unsigned ui2: 2;
+
+        std::string s;
+        std::vector<int> v;
+        int i;
+
+        struct foo {
+            std::string s2;
+        } f;
+    };
+    static_assert(tuple_size<non_pod2>::value == 6, "Must not be a compile error even with bitfields");
+
+    int i_2dimens[2][2] = {{10, 11}, {12, 13} };
+    static_assert(tuple_size<decltype(i_2dimens)>::value == 4, "");
+    static_assert(flat_tuple_size<decltype(i_2dimens)>::value == 4, "");
+
     return boost::report_errors();
 }
 

@@ -55,7 +55,7 @@ static_assert(
 
 //[pfr_example_flattening
 /*`
-[warning All the functions and metafunctions in Boost.PFR represent template parameter type as flat structure without static members! ]
+[warning All the functions and metafunctions in Boost.PFR that start with `flat_` represent template parameter type as flat structure without static members! ]
 
 Take a look at the `struct my_struct`:
 */
