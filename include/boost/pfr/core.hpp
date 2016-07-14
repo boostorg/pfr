@@ -842,7 +842,7 @@ namespace detail {
         template <class Stream, class T>
         static void print (Stream& out, const T& value) {
             if (!!I) out << ", ";
-            out << ::boost::pfr::flat_get<I>(value);
+            out << ::boost::pfr::detail::sequence_tuple::get<I>(value);
             flat_print_impl<I + 1, N>::print(out, value);
         }
     };
@@ -864,7 +864,7 @@ namespace detail {
 template <class Char, class Traits, class T>
 void flat_write(std::basic_ostream<Char, Traits>& out, const T& value) {
     out << '{';
-    detail::flat_print_impl<0, flat_tuple_size_v<T> >::print(out, value);
+    detail::flat_print_impl<0, flat_tuple_size_v<T> >::print(out, detail::as_flat_tuple(value));
     out << '}';
 }
 
@@ -881,7 +881,7 @@ namespace detail {
                 in >> ignore;
                 if (ignore != ' ')  in.setstate(Stream::failbit);
             }
-            in >> ::boost::pfr::flat_get<I>(value);
+            in >> ::boost::pfr::detail::sequence_tuple::get<I>(value);
             flat_read_impl<I + 1, N>::read(in, value);
         }
     };
@@ -913,7 +913,7 @@ void flat_read(std::basic_istream<Char, Traits>& in, T& value) {
     char parenthis = {};
     in >> parenthis;
     if (parenthis != '{') in.setstate(std::basic_istream<Char, Traits>::failbit);
-    detail::flat_read_impl<0, flat_tuple_size_v<T> >::read(in, value);
+    detail::flat_read_impl<0, flat_tuple_size_v<T> >::read(in, detail::as_flat_tuple(value));
 
     in >> parenthis;
     if (parenthis != '}') in.setstate(std::basic_istream<Char, Traits>::failbit);
