@@ -3,6 +3,9 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#ifndef BOOST_PFR_CORE_HPP
+#define BOOST_PFR_CORE_HPP
+
 #pragma once
 
 #if __cplusplus < 201402L
@@ -664,14 +667,14 @@ constexpr decltype(auto) as_flat_tuple(T& val) noexcept {
 #undef MAY_ALIAS
 
 template <class T, std::size_t... I>
-auto flat_make_tuple_impl(const T& t, std::index_sequence<I...>) noexcept {
+constexpr auto flat_make_tuple_impl(const T& t, std::index_sequence<I...>) noexcept {
     return std::make_tuple(
         sequence_tuple::get<I>(t)...
     );
 }
 
 template <class T, std::size_t... I>
-auto flat_tie_impl(T& t, std::index_sequence<I...>) noexcept {
+constexpr auto flat_tie_impl(T& t, std::index_sequence<I...>) noexcept {
     return std::tie(
         sequence_tuple::get<I>(t)...
     );
@@ -923,3 +926,5 @@ void flat_read(std::basic_istream<Char, Traits>& in, T& value) {
 }
 
 }} // namespace boost::pfr
+
+#endif // BOOST_PFR_CORE_HPP
