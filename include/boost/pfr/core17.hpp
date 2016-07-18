@@ -92,7 +92,7 @@ template <class T>
 constexpr auto make_tuple(const T& val) noexcept {                  // TODO: Bad name :(
     typedef detail::as_tuple_t<T> internal_tuple_t;
 
-    return detail::flat_make_tuple_impl(
+    return detail::make_stdtuple_from_seqtuple(
         detail::as_tuple(val),
         std::make_index_sequence< internal_tuple_t::size_v >()
     );
@@ -114,7 +114,7 @@ template <class T>
 constexpr auto tie(T& val) noexcept {                  // TODO: Bad name :(
     typedef detail::as_tuple_t<T> internal_tuple_t;
 
-    return detail::flat_tie_impl(
+    return detail::tie_seqtuple_impl(
         detail::as_tuple(val),
         std::make_index_sequence< internal_tuple_t::size_v >()
     );
@@ -134,7 +134,7 @@ constexpr auto tie(T& val) noexcept {                  // TODO: Bad name :(
 template <class Char, class Traits, class T>
 void write(std::basic_ostream<Char, Traits>& out, const T& value) {
     out << '{';
-    detail::flat_print_impl<0, tuple_size_v<T> >::print(out, detail::as_tuple(value));
+    detail::seqtuple_print_impl<0, tuple_size_v<T> >::print(out, detail::as_tuple(value));
     out << '}';
 }
 
@@ -161,7 +161,7 @@ void read(std::basic_istream<Char, Traits>& in, T& value) {
     char parenthis = {};
     in >> parenthis;
     if (parenthis != '{') in.setstate(std::basic_istream<Char, Traits>::failbit);
-    detail::flat_read_impl<0, flat_tuple_size_v<T> >::read(in, detail::as_flat_tuple(value));
+    detail::seqtuple_read_impl<0, tuple_size_v<T> >::read(in, detail::as_tuple(value));
 
     in >> parenthis;
     if (parenthis != '}') in.setstate(std::basic_istream<Char, Traits>::failbit);

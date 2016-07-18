@@ -667,14 +667,14 @@ constexpr decltype(auto) as_flat_tuple(T& val) noexcept {
 #undef MAY_ALIAS
 
 template <class T, std::size_t... I>
-constexpr auto flat_make_tuple_impl(const T& t, std::index_sequence<I...>) noexcept {
+constexpr auto make_stdtuple_from_seqtuple(const T& t, std::index_sequence<I...>) noexcept {
     return std::make_tuple(
         sequence_tuple::get<I>(t)...
     );
 }
 
 template <class T, std::size_t... I>
-constexpr auto flat_tie_impl(T& t, std::index_sequence<I...>) noexcept {
+constexpr auto tie_seqtuple_impl(T& t, std::index_sequence<I...>) noexcept {
     return std::tie(
         sequence_tuple::get<I>(t)...
     );
@@ -809,7 +809,7 @@ template <class T>
 auto flat_make_tuple(const T& val) noexcept {
     typedef detail::as_flat_tuple_t<T> internal_tuple_t;
 
-    return detail::flat_make_tuple_impl(
+    return detail::make_stdtuple_from_seqtuple(
         detail::as_flat_tuple(val),
         std::make_index_sequence< internal_tuple_t::size_v >()
     );
@@ -831,7 +831,7 @@ template <class T>
 auto flat_tie(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable<T, T>::value>* = 0 /* @endcond */) noexcept {
     typedef detail::as_flat_tuple_t<T> internal_tuple_t;
 
-    return detail::flat_tie_impl(
+    return detail::tie_seqtuple_impl(
         detail::as_flat_tuple(val),
         std::make_index_sequence< internal_tuple_t::size_v >()
     );
@@ -841,17 +841,17 @@ auto flat_tie(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable
 
 namespace detail {
     template <std::size_t I, std::size_t N>
-    struct flat_print_impl {
+    struct seqtuple_print_impl {
         template <class Stream, class T>
         static void print (Stream& out, const T& value) {
             if (!!I) out << ", ";
             out << ::boost::pfr::detail::sequence_tuple::get<I>(value);
-            flat_print_impl<I + 1, N>::print(out, value);
+            seqtuple_print_impl<I + 1, N>::print(out, value);
         }
     };
 
     template <std::size_t I>
-    struct flat_print_impl<I, I> {
+    struct seqtuple_print_impl<I, I> {
         template <class Stream, class T> static void print (Stream&, const T&) noexcept {}
     };
 }
@@ -867,14 +867,14 @@ namespace detail {
 template <class Char, class Traits, class T>
 void flat_write(std::basic_ostream<Char, Traits>& out, const T& value) {
     out << '{';
-    detail::flat_print_impl<0, flat_tuple_size_v<T> >::print(out, detail::as_flat_tuple(value));
+    detail::seqtuple_print_impl<0, flat_tuple_size_v<T> >::print(out, detail::as_flat_tuple(value));
     out << '}';
 }
 
 
 namespace detail {
     template <std::size_t I, std::size_t N>
-    struct flat_read_impl {
+    struct seqtuple_read_impl {
         template <class Stream, class T>
         static void read (Stream& in, T& value) {
             char ignore = {};
@@ -885,12 +885,12 @@ namespace detail {
                 if (ignore != ' ')  in.setstate(Stream::failbit);
             }
             in >> ::boost::pfr::detail::sequence_tuple::get<I>(value);
-            flat_read_impl<I + 1, N>::read(in, value);
+            seqtuple_read_impl<I + 1, N>::read(in, value);
         }
     };
 
     template <std::size_t I>
-    struct flat_read_impl<I, I> {
+    struct seqtuple_read_impl<I, I> {
         template <class Stream, class T> static void read (Stream&, const T&) {}
     };
 }
@@ -916,7 +916,7 @@ void flat_read(std::basic_istream<Char, Traits>& in, T& value) {
     char parenthis = {};
     in >> parenthis;
     if (parenthis != '{') in.setstate(std::basic_istream<Char, Traits>::failbit);
-    detail::flat_read_impl<0, flat_tuple_size_v<T> >::read(in, detail::as_flat_tuple(value));
+    detail::seqtuple_read_impl<0, flat_tuple_size_v<T> >::read(in, detail::as_flat_tuple(value));
 
     in >> parenthis;
     if (parenthis != '}') in.setstate(std::basic_istream<Char, Traits>::failbit);
