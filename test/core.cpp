@@ -140,7 +140,7 @@ void test_with_enums() {
     };
     struct my_struct { my_enum e; int i; short s; };
     my_struct s {my_enum::VALUE1, 10, 11};
-    std::tuple<unsigned, int, short> t = flat_make_tuple(s);
+    std::tuple<unsigned, int, short> t = flat_structure_to_tuple(s);
     BOOST_TEST_EQ(std::get<0>(t), 17u);
     BOOST_TEST_EQ(std::get<1>(t), 10);
     BOOST_TEST_EQ(std::get<2>(t), 11);
@@ -150,10 +150,10 @@ void test_with_enums() {
     flat_get<2>(s) = 111;
     BOOST_TEST_EQ(flat_get<2>(s), 111);
 
-    BOOST_TEST(flat_tie(s) == flat_tie(s));
-    BOOST_TEST(flat_tie(s) == flat_make_tuple(s));
-    BOOST_TEST(flat_tie(s) != t);
-    flat_tie(s) = t;
+    BOOST_TEST(flat_structure_tie(s) == flat_structure_tie(s));
+    BOOST_TEST(flat_structure_tie(s) == flat_structure_to_tuple(s));
+    BOOST_TEST(flat_structure_tie(s) != t);
+    flat_structure_tie(s) = t;
     BOOST_TEST_EQ(flat_get<0>(s), 17u);
     BOOST_TEST_EQ(flat_get<1>(s), 10);
     BOOST_TEST_EQ(flat_get<2>(s), 11);
@@ -189,7 +189,7 @@ void test_comparable_struct() {
     struct comparable_struct {
         int i; short s; char data[50]; bool bl; int a,b,c,d,e,f;
     };
-    using namespace pod_ops;
+    using namespace flat_ops;
 
     comparable_struct s1 {0, 1, "Hello", false, 6,7,8,9,10,11};
     comparable_struct s2 = s1;
@@ -220,7 +220,7 @@ void test_comparable_struct() {
 
 void test_empty_struct() {
     struct empty {};
-    using namespace pod_ops;
+    using namespace flat_ops;
 
     std::cout << empty{} << std::endl;
 
@@ -229,7 +229,7 @@ void test_empty_struct() {
 
 
 void test_pods_with_int_operators() {
-    using namespace pod_ops;
+    using namespace flat_ops;
 
     std::stringstream ss;
     ss << std::is_pod<int>{};
@@ -242,7 +242,7 @@ void test_pods_with_int_operators() {
 
 void test_struct_with_single_field() {
     struct f1 { int i; };
-    using namespace pod_ops;
+    using namespace flat_ops;
 
     std::stringstream ss;
     ss << f1{ 777 };

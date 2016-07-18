@@ -50,31 +50,31 @@ Boost.POD Flat Reflection (Boost.PFR) adds following out-of-the-box functionalit
 
 There are three ways to start using Boost.PFR hashing, comparison and streaming operators for type `T` in your code. Each method has it's own drawbacks and suits own cases.
 
-[table:pod_ops_comp Different approaches for operators
+[table:flat_ops_comp Different approaches for operators
     [[ Approach ]                                       [ Defines operators in global namespace ]
                                                                                 [ Defined operators could be found by ADL ]
                                                                                             [ Works for local types ]
                                                                                                         [ Usable localy, without affecting code from other scopes ]
                                                                                                                             [ Ignores implicit conversion operators ]  
                                                                                                                                                             [ Respects user defined operators ] ]
-    [[ [headerref boost/pfr/pod_ops.hpp] ]              [ no ]                  [ no ]      [ yes ]     [ yes ]                                             [ no ]          [ yes ]                     ]
-    [[ [headerref boost/pfr/define_functions_for.hpp] ] [ yes if T is in it ]   [ yes ]     [ no ]      [ no, but could be limited to translation unit ]    [ yes for T ]   [ no (compile time error) ] ]
-    [[ [headerref boost/pfr/global_pod_ops.hpp] ]       [ yes ]                 [ yes ]     [ yes ]     [ no, but could be limited to translation unit ]    [ yes all ]     [ yes ]                     ]
+    [[ [headerref boost/pfr/flat_ops.hpp] ]              [ no ]                  [ no ]      [ yes ]     [ yes ]                                             [ no ]          [ yes ]                     ]
+    [[ [headerref boost/pfr/flat_functions_for.hpp] ] [ yes if T is in it ]   [ yes ]     [ no ]      [ no, but could be limited to translation unit ]    [ yes for T ]   [ no (compile time error) ] ]
+    [[ [headerref boost/pfr/global_flat_ops.hpp] ]       [ yes ]                 [ yes ]     [ yes ]     [ no, but could be limited to translation unit ]    [ yes all ]     [ yes ]                     ]
 ]
 
 More detailed description:
 
-[*1) [headerref boost/pfr/pod_ops.hpp] approach]
+[*1) [headerref boost/pfr/flat_ops.hpp] approach]
 
 This method is good if you're writing generic algorithms and need to use operators from Boost.PFR only if there's no operators defined for the type:
 
 ```
-#include <boost/pfr/pod_ops.hpp>
+#include <boost/pfr/flat_ops.hpp>
 
 template <class T>
 struct uniform_comparator_less {
     bool operator()(const T& lhs, const T& rhs) const noexcept {
-        using namespace pod_ops;    // Enables Boost.PFR operators usage in this scope.
+        using namespace flat_ops;    // Enables Boost.PFR operators usage in this scope.
         return lhs < rhs;           // If T has operator< or conversion operator then will use it, otherwise will use boost::pfr::flat_less<T>.
     }
 };
@@ -83,55 +83,55 @@ This method's effects are local to the function. It works even for local types, 
 However *Argument Dependant Lookup* does not work with it:
 
 ```
-#include <boost/pfr/pod_ops.hpp>
+#include <boost/pfr/flat_ops.hpp>
 template <class T>
 struct uniform_comparator_less {
     bool operator()(const T& lhs, const T& rhs) const noexcept {
-        using namespace pod_ops;
+        using namespace flat_ops;
         return std::less{}(lhs, rhs);   // Compile time error if T has neither operator< nor conversion operator to comparable type.
     }
 };
 ```
 
-[*2) [headerref boost/pfr/define_functions_for.hpp] approach]
+[*2) [headerref boost/pfr/flat_functions_for.hpp] approach]
 
 This method is good if you're writing POD structure and wish to define operators for that structure.
 ```
-#include <boost/pfr/define_functions_for.hpp>
+#include <boost/pfr/flat_functions_for.hpp>
 
 struct pair_like {
     int first;
     short second;
 };
 
-BOOST_PFR_DEFINE_FUNCTIONS_FOR(pair_like)   // Defines operators
+BOOST_PFR_FLAT_FUNCTIONS_FOR(pair_like)   // Defines operators
 
 // ...
 
 assert(pair_like{1, 2} < pair_like{1, 3});
 ```
-Argument Dependant Lookup works well, `std::less` will find the operators for `struct pair_like`. [macroref BOOST_PFR_DEFINE_FUNCTIONS_FOR BOOST_PFR_DEFINE_FUNCTIONS_FOR(T)]
+Argument Dependant Lookup works well, `std::less` will find the operators for `struct pair_like`. [macroref BOOST_PFR_FLAT_FUNCTIONS_FOR BOOST_PFR_FLAT_FUNCTIONS_FOR(T)]
 can not be used for local types, it must be called only once in namespace of `T`. It does not respect conversion operators of `T`, so for example the following code
 will output different values:
 ```
-#include <boost/pfr/define_functions_for.hpp>
+#include <boost/pfr/flat_functions_for.hpp>
 
 struct empty {
     operator std::string() { return "empty{}"; }
 };
 // Uncomment to get different output:
-// BOOST_PFR_DEFINE_FUNCTIONS_FOR(empty)
+// BOOST_PFR_FLAT_FUNCTIONS_FOR(empty)
 
 // ...
-std::cout << empty{}; // Outputs `empty{}` if BOOST_PFR_DEFINE_FUNCTIONS_FOR(empty) is commented out, '{}' otherwise.
+std::cout << empty{}; // Outputs `empty{}` if BOOST_PFR_FLAT_FUNCTIONS_FOR(empty) is commented out, '{}' otherwise.
 ```
 
-[*3) [headerref boost/pfr/global_pod_ops.hpp] approach]
+[*3) [headerref boost/pfr/global_flat_ops.hpp] approach]
 
 This approach is for those, who wish to have comparisong/streaming/hashing for all their types.
 
 ```
-#include <boost/pfr/global_pod_ops.hpp>
+#include <boost/pfr/global_flat_ops.hpp>
 
 struct pair_like {
     int first;

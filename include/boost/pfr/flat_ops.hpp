@@ -11,21 +11,21 @@
 
 #include <boost/pfr/functors.hpp>
 
-/// \file boost/pfr/pod_ops.hpp
+/// \file boost/pfr/flat_ops.hpp
 /// Contains comparison operators and stream operators for any POD types that do not have their own operators.
 /// If POD is comparable or streamable using it's own operator or it's conversion operator, then the original operator is used.
 ///
-/// Just write \b using \b namespace \b pod_ops; and operators will be available in scope.
+/// Just write \b using \b namespace \b flat_ops; and operators will be available in scope.
 ///
 /// \b Example:
 /// \code
-///     #include <boost/pfr/pod_ops.hpp>
+///     #include <boost/pfr/flat_ops.hpp>
 ///     struct comparable_struct {      // No operators defined for that structure
 ///         int i; short s; char data[7]; bool bl; int a,b,c,d,e,f;
 ///     };
 ///     // ...
 ///
-///     using namespace pod_ops;
+///     using namespace flat_ops;
 ///
 ///     comparable_struct s1 {0, 1, "Hello", false, 6,7,8,9,10,11};
 ///     comparable_struct s2 {0, 1, "Hello", false, 6,7,8,9,10,11111};
@@ -91,7 +91,7 @@ namespace detail {
     >::type;
 } // namespace detail
 
-namespace pod_ops {
+namespace flat_ops {
 #ifdef BOOST_PFR_DOXYGEN_INVOKED
     template <class T> bool operator==(const T& lhs, const T& rhs) noexcept;
     template <class T> bool operator!=(const T& lhs, const T& rhs) noexcept;
@@ -157,6 +157,6 @@ namespace pod_ops {
     }
 
 #endif
-} // namespace pod_ops
+} // namespace flat_ops
 
 }} // namespace boost::pfr

@@ -11,17 +11,17 @@
 
 #include <boost/pfr/functors.hpp>
 
-/// \def BOOST_PFR_DEFINE_FUNCTIONS_FOR(T)
+/// \def BOOST_PFR_FLAT_FUNCTIONS_FOR(T)
 /// Defines comparison operators and stream operators for T.
 /// If POD is comparable or streamable using it's own operator (but not it's conversion operator), then the original operator is used.
 ///
 /// \b Example:
 /// \code
-///     #include <boost/pfr/define_functions_for.hpp>
+///     #include <boost/pfr/flat_functions_for.hpp>
 ///     struct comparable_struct {      // No operators defined for that structure
 ///         int i; short s; char data[7]; bool bl; int a,b,c,d,e,f;
 ///     };
-///     BOOST_PFR_DEFINE_FUNCTIONS_FOR(comparable_struct)
+///     BOOST_PFR_FLAT_FUNCTIONS_FOR(comparable_struct)
 ///     // ...
 ///
 ///     comparable_struct s1 {0, 1, "Hello", false, 6,7,8,9,10,11};
@@ -51,7 +51,7 @@
 /// std::size_t hash_value(const T& value) noexcept;
 /// \endcode
 
-#define BOOST_PFR_DEFINE_FUNCTIONS_FOR(T)                                                                                           \
+#define BOOST_PFR_FLAT_FUNCTIONS_FOR(T)                                                                                           \
     static inline bool operator==(const T& lhs, const T& rhs) noexcept { return ::boost::pfr::flat_equal_to<T>{}(lhs, rhs);      }  \
     static inline bool operator!=(const T& lhs, const T& rhs) noexcept { return ::boost::pfr::flat_not_equal<T>{}(lhs, rhs);     }  \
     static inline bool operator< (const T& lhs, const T& rhs) noexcept { return ::boost::pfr::flat_less<T>{}(lhs, rhs);          }  \

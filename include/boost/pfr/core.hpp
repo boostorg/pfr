@@ -846,7 +846,7 @@ constexpr std::size_t tuple_size_v = tuple_size<T>::value;
 ///     assert(flat_get<0>(t) == 10);
 /// \endcode
 template <class T>
-auto flat_make_tuple(const T& val) noexcept {
+auto flat_structure_to_tuple(const T& val) noexcept {
     typedef detail::as_flat_tuple_t<T> internal_tuple_t;
 
     return detail::make_stdtuple_from_seqtuple(
@@ -864,11 +864,11 @@ auto flat_make_tuple(const T& val) noexcept {
 /// \code
 ///     struct my_struct { int i, short s; };
 ///     my_struct s;
-///     flat_tie(s) = std::tuple<int, short>{10, 11};
+///     flat_structure_tie(s) = std::tuple<int, short>{10, 11};
 ///     assert(s.s == 11);
 /// \endcode
 template <class T>
-auto flat_tie(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable<T, T>::value>* = 0 /* @endcond */) noexcept {
+auto flat_structure_tie(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable<T, T>::value>* = 0 /* @endcond */) noexcept {
     typedef detail::as_flat_tuple_t<T> internal_tuple_t;
 
     return detail::tie_sequence_tuple_impl(

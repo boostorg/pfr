@@ -89,7 +89,7 @@ using tuple_element_t = typename tuple_element<I, T>::type;
 ///     assert(get<0>(t) == 10);
 /// \endcode
 template <class T>
-constexpr auto make_tuple(const T& val) noexcept {                  // TODO: Bad name :(
+constexpr auto structure_to_tuple(const T& val) noexcept {
     typedef detail::as_tuple_t<T> internal_tuple_t;
 
     return detail::make_stdtuple_from_seqtuple(
@@ -111,7 +111,7 @@ constexpr auto make_tuple(const T& val) noexcept {                  // TODO: Bad
 ///     assert(s.s == 11);
 /// \endcode
 template <class T>
-constexpr auto tie(T& val) noexcept {                  // TODO: Bad name :(
+constexpr auto structure_tie(T& val) noexcept {
     typedef detail::as_tuple_t<T> internal_tuple_t;
 
     return detail::tie_sequence_tuple_impl(

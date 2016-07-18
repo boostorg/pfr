@@ -59,9 +59,9 @@ script:
     - $TOOLSET -std=$CXX_STANDARD --coverage $INCLUDES test/count_fields_on_long_longs.cpp && valgrind ./a.out && rm ./a.out
     - $TOOLSET -std=$CXX_STANDARD --coverage $INCLUDES test/count_fields_on_shorts.cpp && valgrind ./a.out && rm ./a.out
     - $TOOLSET -std=$CXX_STANDARD --coverage $INCLUDES test/count_fields_on_void_ptrs.cpp && valgrind ./a.out && rm ./a.out
-    - $TOOLSET -std=$CXX_STANDARD --coverage $INCLUDES test/define_functions_for.cpp && valgrind ./a.out && rm ./a.out
-    - $TOOLSET -std=$CXX_STANDARD --coverage $INCLUDES test/global_pod_ops.cpp && valgrind ./a.out && rm ./a.out
+    - $TOOLSET -std=$CXX_STANDARD --coverage $INCLUDES test/flat_functions_for.cpp && valgrind ./a.out && rm ./a.out
+    - $TOOLSET -std=$CXX_STANDARD --coverage $INCLUDES test/global_flat_ops.cpp && valgrind ./a.out && rm ./a.out
     - $TOOLSET -std=$CXX_STANDARD --coverage $INCLUDES test/minimal.cpp && valgrind ./a.out && rm ./a.out
-    - $TOOLSET -std=$CXX_STANDARD --coverage $INCLUDES test/pod_ops.cpp && valgrind ./a.out && rm ./a.out
+    - $TOOLSET -std=$CXX_STANDARD --coverage $INCLUDES test/flat_ops.cpp && valgrind ./a.out && rm ./a.out
     - $TOOLSET -std=$CXX_STANDARD --coverage $INCLUDES test/std_interactions.cpp && valgrind ./a.out && rm ./a.out
 

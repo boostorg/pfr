@@ -15,7 +15,7 @@
 
 template <class T>
 void test_comparable_struct() {
-    using namespace boost::pfr::pod_ops;
+    using namespace boost::pfr::flat_ops;
 
     T s1 {0, 1, "Hello", false, 6,7,8,9,10,11};
     T s2 = s1;
@@ -46,7 +46,7 @@ void test_comparable_struct() {
 
 void test_empty_struct() {
     struct empty {};
-    using namespace boost::pfr::pod_ops;
+    using namespace boost::pfr::flat_ops;
 
     std::cout << empty{};
     BOOST_TEST(empty{} == empty{});

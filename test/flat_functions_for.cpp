@@ -3,7 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/pfr/define_functions_for.hpp>
+#include <boost/pfr/flat_functions_for.hpp>
 #include <boost/core/lightweight_test.hpp>
 
 #include <iostream>
@@ -28,7 +28,7 @@ struct comparable_struct {
     int i; short s; char data[50]; bool bl; int a,b,c,d,e,f;
 };
 
-BOOST_PFR_DEFINE_FUNCTIONS_FOR(comparable_struct)
+BOOST_PFR_FLAT_FUNCTIONS_FOR(comparable_struct)
 
 void test_comparable_struct() {
     comparable_struct s1 {0, 1, "Hello", false, 6,7,8,9,10,11};
@@ -59,7 +59,7 @@ void test_comparable_struct() {
 }
 
 struct empty { operator std::string() { return "empty{}"; } };
-BOOST_PFR_DEFINE_FUNCTIONS_FOR(empty)
+BOOST_PFR_FLAT_FUNCTIONS_FOR(empty)
 
 void test_empty_struct() {
     BOOST_TEST_EQ(empty{}, empty{});
@@ -67,7 +67,7 @@ void test_empty_struct() {
 
 namespace foo {
     struct testing { bool b1, b2; int i; };
-    BOOST_PFR_DEFINE_FUNCTIONS_FOR(testing);
+    BOOST_PFR_FLAT_FUNCTIONS_FOR(testing);
 }
 
 template <class Comparator>
@@ -93,7 +93,7 @@ void test_implicit_conversions() {
 
     ss.str("");
     ss << empty{};
-    BOOST_TEST_EQ(ss.str(), "{}"); // Breaks implicit conversion for types marked with BOOST_PFR_DEFINE_FUNCTIONS_FOR
+    BOOST_TEST_EQ(ss.str(), "{}"); // Breaks implicit conversion for types marked with BOOST_PFR_FLAT_FUNCTIONS_FOR
 }
 
 int main() {

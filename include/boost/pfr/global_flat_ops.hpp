@@ -11,13 +11,13 @@
 
 #include <boost/pfr/functors.hpp>
 
-/// \file boost/pfr/global_pod_ops.hpp
+/// \file boost/pfr/global_flat_ops.hpp
 /// Contains comparison operators and stream operators for any POD types that do not have their own operators.
 /// If POD is comparable or streamable using it's own operator (but not it's conversion operator), then the original operator is used.
 ///
 /// \b Example:
 /// \code
-///     #include <boost/pfr/global_pod_ops.hpp>
+///     #include <boost/pfr/global_flat_ops.hpp>
 ///     struct comparable_struct {      // No operators defined for that structure
 ///         int i; short s; char data[7]; bool bl; int a,b,c,d,e,f;
 ///     };
