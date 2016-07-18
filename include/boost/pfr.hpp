@@ -6,9 +6,10 @@
 #pragma once
 
 /// \file boost/pfr.hpp
-/// Includes all the Boost.PFR headers, except \xmlonly<link linkend='header.boost.pfr.global_pod_ops_hpp'>boost/pfr/global_pod_ops.hpp</link>\endxmlonly
+/// Includes all the Boost.PFR headers, except \xmlonly<link linkend='header.boost.pfr.global_pod_ops_hpp'>boost/pfr/global_flat_ops.hpp</link>\endxmlonly
 
 #include <boost/pfr/core.hpp>
+#include <boost/pfr/core17.hpp>
 #include <boost/pfr/functors.hpp>
 #include <boost/pfr/flat_ops.hpp>
 #include <boost/pfr/flat_functions_for.hpp>
