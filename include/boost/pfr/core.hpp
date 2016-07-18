@@ -144,6 +144,46 @@ using tuple_element = std::remove_reference< decltype(
         ::boost::pfr::detail::sequence_tuple::get<I>( std::declval<T>() )
     ) >;
 
+
+
+
+template <std::size_t I, std::size_t N>
+struct print_impl {
+    template <class Stream, class T>
+    static void print (Stream& out, const T& value) {
+        if (!!I) out << ", ";
+        out << ::boost::pfr::detail::sequence_tuple::get<I>(value);
+        print_impl<I + 1, N>::print(out, value);
+    }
+};
+
+template <std::size_t I>
+struct print_impl<I, I> {
+    template <class Stream, class T> static void print (Stream&, const T&) noexcept {}
+};
+
+
+template <std::size_t I, std::size_t N>
+struct read_impl {
+    template <class Stream, class T>
+    static void read (Stream& in, T& value) {
+        char ignore = {};
+        if (!!I) {
+            in >> ignore;
+            if (ignore != ',') in.setstate(Stream::failbit);
+            in >> ignore;
+            if (ignore != ' ')  in.setstate(Stream::failbit);
+        }
+        in >> ::boost::pfr::detail::sequence_tuple::get<I>(value);
+        read_impl<I + 1, N>::read(in, value);
+    }
+};
+
+template <std::size_t I>
+struct read_impl<I, I> {
+    template <class Stream, class T> static void read (Stream&, const T&) {}
+};
+
 } // namespace sequence_tuple
 
 
@@ -674,7 +714,7 @@ constexpr auto make_stdtuple_from_seqtuple(const T& t, std::index_sequence<I...>
 }
 
 template <class T, std::size_t... I>
-constexpr auto tie_seqtuple_impl(T& t, std::index_sequence<I...>) noexcept {
+constexpr auto tie_sequence_tuple_impl(T& t, std::index_sequence<I...>) noexcept {
     return std::tie(
         sequence_tuple::get<I>(t)...
     );
@@ -831,29 +871,10 @@ template <class T>
 auto flat_tie(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable<T, T>::value>* = 0 /* @endcond */) noexcept {
     typedef detail::as_flat_tuple_t<T> internal_tuple_t;
 
-    return detail::tie_seqtuple_impl(
+    return detail::tie_sequence_tuple_impl(
         detail::as_flat_tuple(val),
         std::make_index_sequence< internal_tuple_t::size_v >()
     );
-}
-
-
-
-namespace detail {
-    template <std::size_t I, std::size_t N>
-    struct seqtuple_print_impl {
-        template <class Stream, class T>
-        static void print (Stream& out, const T& value) {
-            if (!!I) out << ", ";
-            out << ::boost::pfr::detail::sequence_tuple::get<I>(value);
-            seqtuple_print_impl<I + 1, N>::print(out, value);
-        }
-    };
-
-    template <std::size_t I>
-    struct seqtuple_print_impl<I, I> {
-        template <class Stream, class T> static void print (Stream&, const T&) noexcept {}
-    };
 }
 
 /// \brief Writes \flattening{flattened} POD `value` to `out`
@@ -867,32 +888,8 @@ namespace detail {
 template <class Char, class Traits, class T>
 void flat_write(std::basic_ostream<Char, Traits>& out, const T& value) {
     out << '{';
-    detail::seqtuple_print_impl<0, flat_tuple_size_v<T> >::print(out, detail::as_flat_tuple(value));
+    detail::sequence_tuple::print_impl<0, flat_tuple_size_v<T> >::print(out, detail::as_flat_tuple(value));
     out << '}';
-}
-
-
-namespace detail {
-    template <std::size_t I, std::size_t N>
-    struct seqtuple_read_impl {
-        template <class Stream, class T>
-        static void read (Stream& in, T& value) {
-            char ignore = {};
-            if (!!I) {
-                in >> ignore;
-                if (ignore != ',') in.setstate(Stream::failbit);
-                in >> ignore;
-                if (ignore != ' ')  in.setstate(Stream::failbit);
-            }
-            in >> ::boost::pfr::detail::sequence_tuple::get<I>(value);
-            seqtuple_read_impl<I + 1, N>::read(in, value);
-        }
-    };
-
-    template <std::size_t I>
-    struct seqtuple_read_impl<I, I> {
-        template <class Stream, class T> static void read (Stream&, const T&) {}
-    };
 }
 
 /// Reads \flattening{flattened} POD `value` from stream `in`
@@ -916,7 +913,7 @@ void flat_read(std::basic_istream<Char, Traits>& in, T& value) {
     char parenthis = {};
     in >> parenthis;
     if (parenthis != '{') in.setstate(std::basic_istream<Char, Traits>::failbit);
-    detail::seqtuple_read_impl<0, flat_tuple_size_v<T> >::read(in, detail::as_flat_tuple(value));
+    detail::sequence_tuple::read_impl<0, flat_tuple_size_v<T> >::read(in, detail::as_flat_tuple(value));
 
     in >> parenthis;
     if (parenthis != '}') in.setstate(std::basic_istream<Char, Traits>::failbit);
