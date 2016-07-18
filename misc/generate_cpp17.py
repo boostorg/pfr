@@ -60,7 +60,10 @@ constexpr auto as_tuple(T& val) noexcept {
   return detail::as_tuple_impl(val, fields_count_tag{});
 }
 
-}}} // namespace boost::pfr
+template <class T>
+using as_tuple_t = decltype( ::boost::pfr::detail::as_tuple(std::declval<T&>()) );
+
+}}} // namespace boost::pfr::detail
 
 #endif // BOOST_PFR_CORE17_GENERATED_HPP
 """

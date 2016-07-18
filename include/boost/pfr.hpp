@@ -10,6 +10,6 @@
 
 #include <boost/pfr/core.hpp>
 #include <boost/pfr/functors.hpp>
-#include <boost/pfr/pod_ops.hpp>
-#include <boost/pfr/define_functions_for.hpp>
+#include <boost/pfr/flat_ops.hpp>
+#include <boost/pfr/flat_functions_for.hpp>
 
