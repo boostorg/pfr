@@ -8,6 +8,7 @@
 ############################################################################################################################
 
 import sys
+from string import ascii_letters
 
 PROLOGUE = """// Copyright (c) 2016 Antony Polukhin
 //
@@ -73,15 +74,16 @@ using as_tuple_t = decltype( ::boost::pfr::detail::as_tuple(std::declval<T&>()) 
 indexes = ""
 print PROLOGUE
 funcs_count = 100 if len(sys.argv) == 1 else int(sys.argv[1])
+max_args_on_a_line = len(ascii_letters)
 for i in xrange(funcs_count):
     if i == 0:
         indexes = "    "
-    elif i % 30 == 0:
+    elif i % max_args_on_a_line == 0:
         indexes += ",\n    "
     else:
         indexes += ","
 
-    indexes += ("a" + str(i)).rjust(3 if funcs_count < 101 else 4, ' ')
+    indexes += ascii_letters[i % max_args_on_a_line] + str(i / len(ascii_letters))
 
     print "template <class T>"
     print "constexpr auto as_tuple_impl(T&& val, size_t_<" + str(i + 1) + ">) noexcept {"
