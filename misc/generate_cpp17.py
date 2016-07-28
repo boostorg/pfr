@@ -8,7 +8,10 @@
 ############################################################################################################################
 
 import sys
-from string import ascii_letters
+import string
+
+# Skipping some letters that mey produce keywords or are hard to read 
+ascii_letters = string.ascii_letters.replace("o", "").replace("O", "").replace("i", "").replace("I", "")
 
 PROLOGUE = """// Copyright (c) 2016 Antony Polukhin
 //
@@ -83,17 +86,24 @@ for i in xrange(funcs_count):
     else:
         indexes += ","
 
-    indexes += ascii_letters[i % max_args_on_a_line] + str(i / len(ascii_letters))
+    if i >= max_args_on_a_line:
+        indexes += ascii_letters[i / max_args_on_a_line - 1] 
+    indexes += ascii_letters[i % max_args_on_a_line]
 
     print "template <class T>"
     print "constexpr auto as_tuple_impl(T&& val, size_t_<" + str(i + 1) + ">) noexcept {"
-    print "  auto& ["
-    print indexes
-    print "  ] = std::forward<T>(val);"
-    print ""
-    print "  return ::boost::pfr::detail::make_tuple_of_references("
-    print indexes
-    print "  );"
+    if i < max_args_on_a_line:
+        print "  auto& [" + indexes.strip() + "] = std::forward<T>(val);"
+        print "  return ::boost::pfr::detail::make_tuple_of_references(" + indexes.strip() + ");"
+    else:
+        print "  auto& ["
+        print indexes
+        print "  ] = std::forward<T>(val);"
+        print ""
+        print "  return ::boost::pfr::detail::make_tuple_of_references("
+        print indexes
+        print "  );"
+
     print "}\n"
 
 print EPILOGUE
