@@ -10,7 +10,7 @@
 #pragma once
 
 #if __cplusplus >= 201606L /* Oulu meeting, not the exact value */
-#   include <boost/pfr/core17_generated.hpp>
+#   include <boost/pfr/detail/core17_generated.hpp>
 #else
 namespace boost { namespace pfr { namespace detail {
     template <class T>

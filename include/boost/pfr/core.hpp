@@ -38,30 +38,6 @@ template <class T> struct identity{
 };
 
 
-
-// TODO: this is a helper class for binding to references,
-// and it is neither tested nor used...
-template <class T>
-class reference_wrapper {
-public:
-  // types
-  typedef T type;
-
-  // construct/copy/destroy
-  constexpr reference_wrapper() noexcept;   // Must be undefined
-  reference_wrapper(T& ref) noexcept : ptr(std::addressof(ref)) {}
-  reference_wrapper(T&&) = delete;
-  constexpr reference_wrapper(const reference_wrapper&) noexcept = default;
-
-  // assignment
-  constexpr reference_wrapper& operator=(const reference_wrapper& x) noexcept = default;
-
-  // access
-  constexpr operator const T& () const noexcept { return *ptr; }
-
-  T* ptr;
-};
-
 ///////////////////// Tuple that holds it's values in the supplied order
 namespace sequence_tuple {
 
@@ -439,8 +415,8 @@ constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_volatile_p
 
 template <std::size_t Index>
 constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_ref_type>) noexcept {
-    typedef reference_wrapper<decltype( id_to_type(remove_1_ext<Index>()) )> res_t;
-    return res_t{};
+    static_assert(!I, "References are not supported");
+    return nullptr;
 }
 
 } // namespace typeid_conversions
@@ -770,7 +746,7 @@ decltype(auto) flat_get(T& val /* @cond */, std::enable_if_t< std::is_trivially_
 }
 
 
-/// \brief `flat_tuple_element` has a `typedef type-of-a-field-with-index-I-in-\flattening{flattened}-T type;`
+/// \brief `flat_tuple_element` has a `typedef type-of-the-field-with-index-I-in-\flattening{flattened}-T type;`
 ///
 /// \b Example:
 /// \code
@@ -793,7 +769,7 @@ template <std::size_t I, class T>
 using flat_tuple_element_t = typename flat_tuple_element<I, T>::type;
 
 
-/// \brief has a member `value` that constins fields count in a \flattening{flattened} T.
+/// \brief Has a static const member variable `value` that contains fields count in a \flattening{flattened} T.
 ///
 /// \b Example:
 /// \code
@@ -812,8 +788,8 @@ using flat_tuple_size = detail::size_t_< detail::as_flat_tuple_t<T>::size_v >;
 template <class T>
 constexpr std::size_t flat_tuple_size_v = flat_tuple_size<T>::value;
 
-/// \brief has a member `value` that constins fields count in a T .
-/// works for any T that supports aggregate initialization even if T is not POD.
+/// \brief Has a static const member variable `value` that constins fields count in a T.
+/// Works for any T that supports aggregate initialization even if T is not POD.
 /// \flattening{Flattens} only multidimensional arrays.
 ///
 /// \b Example:
