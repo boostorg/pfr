@@ -415,7 +415,7 @@ constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_volatile_p
 
 template <std::size_t Index>
 constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_ref_type>) noexcept {
-    static_assert(!I, "References are not supported");
+    static_assert(!Index, "References are not supported");
     return nullptr;
 }
 
