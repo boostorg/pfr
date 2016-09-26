@@ -171,6 +171,7 @@ struct size_array {                         // libc++ misses constexpr on operat
 
     static constexpr std::size_t size() noexcept { return N; }
 
+
     constexpr std::size_t count_nonzeros() const noexcept {
         std::size_t count = 0;
         for (std::size_t i = 0; i < size(); ++i) {
@@ -178,6 +179,28 @@ struct size_array {                         // libc++ misses constexpr on operat
                 ++ count;
             }
         }
+        return count;
+    }
+
+    constexpr std::size_t count_from_opening_till_matching_parenthis_seq(std::size_t from, std::size_t opening_parenthis, std::size_t closing_parenthis) const noexcept {
+        if (data[from] != opening_parenthis) {
+            return 0;
+        }
+        std::size_t unclosed_parnthesis = 0;
+        std::size_t count = 0;
+        for (; ; ++from) {
+            if (data[from] == opening_parenthis) {
+                ++ unclosed_parnthesis;
+            } else if (data[from] == closing_parenthis) {
+                -- unclosed_parnthesis;
+            }
+            ++ count;
+
+            if (unclosed_parnthesis == 0) {
+                return count;
+            }
+        }
+
         return count;
     }
 };
@@ -201,7 +224,8 @@ constexpr std::size_t get(const size_array<N>& a) noexcept {
 }
 
 
-template <class T> constexpr size_array<sizeof(T)> fields_count_and_type_ids_with_zeros() noexcept;
+template <class T> constexpr size_array<sizeof(T) * 3> fields_count_and_type_ids_with_zeros() noexcept;
+template <class T> constexpr auto flat_array_of_type_ids() noexcept;
 
 ///////////////////// All the stuff for representing Type as integer and converting integer back to type
 namespace typeid_conversions {
@@ -268,7 +292,7 @@ template <class Type> constexpr std::size_t type_to_id(identity<volatile Type*>)
 template <class Type> constexpr std::size_t type_to_id(identity<Type&>) noexcept;
 template <class Type> constexpr std::size_t type_to_id(identity<Type>, std::enable_if_t<std::is_enum<Type>::value>* = 0) noexcept;
 template <class Type> constexpr std::size_t type_to_id(identity<Type>, std::enable_if_t<std::is_empty<Type>::value>* = 0) noexcept;
-template <class Type> constexpr size_array<sizeof(Type)> type_to_id(identity<Type>, std::enable_if_t<!std::is_enum<Type>::value && !std::is_empty<Type>::value>* = 0) noexcept;
+template <class Type> constexpr size_array<sizeof(Type) * 3> type_to_id(identity<Type>, std::enable_if_t<!std::is_enum<Type>::value && !std::is_empty<Type>::value>* = 0) noexcept;
 
 template <std::size_t Index> constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_const_ptr_type> = 0) noexcept;
 template <std::size_t Index> constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_ptr_type> = 0) noexcept;
@@ -315,6 +339,8 @@ BOOST_MAGIC_GET_REGISTER_TYPE(const void*           , 20)
 BOOST_MAGIC_GET_REGISTER_TYPE(volatile void*        , 21)
 BOOST_MAGIC_GET_REGISTER_TYPE(const volatile void*  , 22)
 BOOST_MAGIC_GET_REGISTER_TYPE(std::nullptr_t        , 23)
+constexpr std::size_t tuple_begin_tag               = 24;
+constexpr std::size_t tuple_end_tag                 = 25;
 
 #undef BOOST_MAGIC_GET_REGISTER_TYPE
 
@@ -381,8 +407,22 @@ constexpr std::size_t type_to_id(identity<Type>, std::enable_if_t<std::is_empty<
 }
 
 template <class Type>
-constexpr size_array<sizeof(Type)> type_to_id(identity<Type>, std::enable_if_t<!std::is_enum<Type>::value && !std::is_empty<Type>::value>*) noexcept {
-    return fields_count_and_type_ids_with_zeros<Type>();
+constexpr size_array<sizeof(Type) * 3> type_to_id(identity<Type>, std::enable_if_t<!std::is_enum<Type>::value && !std::is_empty<Type>::value>*) noexcept {
+    constexpr auto  t = flat_array_of_type_ids<Type>();
+    size_array<sizeof(Type) * 3> result {{tuple_begin_tag}};
+    constexpr bool requires_tuplening = (
+        (t.count_nonzeros() == 1)  || (t.count_nonzeros() == t.count_from_opening_till_matching_parenthis_seq(0, tuple_begin_tag, tuple_end_tag))
+    );
+
+    if (requires_tuplening) {
+        for (std::size_t i = 0; i < t.size(); ++i)
+            result.data[i + 1] = t.data[i];
+        result.data[result.size() - 1] = tuple_end_tag;
+    } else {
+        for (std::size_t i = 0; i < t.size(); ++i)
+            result.data[i] = t.data[i];
+    }
+    return result;
 }
 
 
@@ -553,7 +593,7 @@ constexpr auto flat_type_to_array_of_type_ids(std::size_t* types, std::index_seq
     );
 
     constexpr auto offsets = get_type_offsets<T, N, I...>();
-    T tmp{ ubiq_val{types + get<I>(offsets)}... };
+    T tmp{ ubiq_val{types + get<I>(offsets) * 3}... };
     (void)tmp;
     (void)offsets; // If type is empty offsets are not used
     return nullptr;
@@ -602,8 +642,8 @@ constexpr std::size_t fields_count() noexcept {
 
 ///////////////////// Returns array of typeids and zeros
 template <class T>
-constexpr size_array<sizeof(T)> fields_count_and_type_ids_with_zeros() noexcept {
-    size_array<sizeof(T)> types{};
+constexpr size_array<sizeof(T) * 3> fields_count_and_type_ids_with_zeros() noexcept {
+    size_array<sizeof(T) * 3> types{};
     constexpr std::size_t N = fields_count<T>();
     flat_type_to_array_of_type_ids<T, N>(types.data, std::make_index_sequence<N>());
     return types;
@@ -627,15 +667,71 @@ constexpr auto flat_array_of_type_ids() noexcept {
 }
 
 ///////////////////// Convert array of typeids into sequence_tuple::tuple
+
+template <class T, std::size_t... I>
+constexpr auto as_flat_tuple_impl(std::index_sequence<I...>) noexcept;
+
+template <std::size_t Increment, std::size_t... I>
+constexpr auto increment_index_sequence(std::index_sequence<I...>) noexcept {
+    return std::index_sequence<I + Increment...>{};
+}
+
+template <class T, std::size_t V, std::size_t I>
+constexpr auto prepare_subtuples(size_t_<V>, size_t_<I>) {
+    return typeid_conversions::id_to_type(size_t_<V>{});
+}
+
+struct end_cleanup_tag{};
+
+template <class T, std::size_t I>
+constexpr end_cleanup_tag prepare_subtuples(size_t_<typeid_conversions::tuple_end_tag>, size_t_<I>) noexcept {
+    return end_cleanup_tag{};
+}
+
+template <class T, std::size_t I>
+constexpr auto prepare_subtuples(size_t_<typeid_conversions::tuple_begin_tag>, size_t_<I>) noexcept {
+    constexpr auto a = flat_array_of_type_ids<T>();
+    constexpr std::size_t subtuple_size = a.count_from_opening_till_matching_parenthis_seq(I, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag);
+    static_assert(subtuple_size > 2, "Internal error while representing nested field as tuple");
+    constexpr auto seq = std::make_index_sequence<subtuple_size - 2>{};
+    return as_flat_tuple_impl<T>( increment_index_sequence<I + 1>(seq) );
+}
+
+
+template <std::size_t... I>
+constexpr auto make_array(std::index_sequence<I...>) noexcept {
+    return size_array<sizeof...(I)>{{I...}};
+}
+
+template <std::size_t... I0, std::size_t... I1, class... Others>
+constexpr auto make_array(std::index_sequence<I0...>, std::index_sequence<I1...>, Others... vals) noexcept {
+    return make_array(std::index_sequence<I0..., I1...>{}, vals...);
+}
+
+
+
 template <class T, std::size_t... I>
 constexpr auto as_flat_tuple_impl(std::index_sequence<I...>) noexcept {
     constexpr auto a = flat_array_of_type_ids<T>();
     (void)a; // `a` is unused if T is an empty type
-    return sequence_tuple::tuple<
+
+    typedef sequence_tuple::tuple<decltype(
+        prepare_subtuples<T>(size_t_< get<I>(a) >{}, size_t_<I>{})
+    )...> subtuples_uncleanuped_t;
+
+    /*constexpr auto skips = make_array(
+        increment_index_sequence<I + 1>(
+            std::make_index_sequence<
+                std::min(a.count_from_opening_till_matching_parenthis_seq(I, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag), std::size_t{1}) - 1
+            >{}
+        )...
+    );*/
+
+    return subtuples_uncleanuped_t{}; /* sequence_tuple::tuple<
         decltype(typeid_conversions::id_to_type(
             size_t_<get<I>(a)>{}
         ))...
-    >{};
+    >{};*/
 }
 
 template <class T>

@@ -14,6 +14,7 @@
 #include <vector>
 #include <algorithm>
 #include <unordered_set>
+#include <cstring>
 
 using namespace boost::pfr;
 
@@ -121,13 +122,13 @@ constexpr void test_compiletime_array() {
         static_assert( std::is_same< decltype(flat_get<19>(f)), T const&>::value, "types missmatch");
     }
     {
-        constexpr T f[2][10] = {0};
+        constexpr T f[2][10] = {{0}};
         static_assert(flat_tuple_size_v<decltype(f)> == 20, "failed tuple size check for array");
         static_assert( std::is_same< decltype(flat_get<0>(f)), T const&>::value, "types missmatch");
         static_assert( std::is_same< decltype(flat_get<19>(f)), T const&>::value, "types missmatch");
     }
     {
-        constexpr T f[2][5][2] = {0};
+        constexpr T f[2][5][2] = {{{0}}};
         static_assert(flat_tuple_size_v<decltype(f)> == 20, "failed tuple size check for array");
         static_assert( std::is_same< decltype(flat_get<0>(f)), T const&>::value, "types missmatch");
         static_assert( std::is_same< decltype(flat_get<19>(f)), T const&>::value, "types missmatch");
@@ -330,6 +331,32 @@ void test_hash() {
     BOOST_TEST_NE(flat_hash<single_field>()({199}), std::hash<int>()(199));
 }
 
+// Test case by Lisa Lippincott
+void test_alignment_with_neted_structure() {
+    struct A0 {
+        short s;
+        char c;
+    };
+
+    struct B0 {
+        A0 a;
+        char c1;
+        char c2;
+    };
+
+    B0 test_struct;
+    std::memset(&test_struct, 0, sizeof(test_struct));
+    test_struct.a.s = 0;
+    test_struct.a.c = '1';
+    test_struct.c1 = '2';
+    test_struct.c2 = '3';
+    BOOST_TEST_EQ(flat_get<0>(test_struct), 0);
+    BOOST_TEST_EQ(flat_get<1>(test_struct), '1');
+    BOOST_TEST_EQ(flat_get<2>(test_struct), '2');
+    BOOST_TEST_EQ(flat_get<3>(test_struct), '3');
+
+}
+
 int main() {
     test_compiletime<foo>();
     test_compiletime_array<int>();
@@ -397,6 +424,8 @@ int main() {
     int i_2dimens[2][2] = {{10, 11}, {12, 13} };
     static_assert(tuple_size<decltype(i_2dimens)>::value == 4, "");
     static_assert(flat_tuple_size<decltype(i_2dimens)>::value == 4, "");
+
+    test_alignment_with_neted_structure();
 
     return boost::report_errors();
 }
