@@ -754,54 +754,59 @@ constexpr size_array<N> resize_dropping_zeros_and_decrementing(size_t_<N>, const
     return result;
 }
 
-template <class T, class SubtuplesUncleanupped, std::size_t... I>
-constexpr auto as_flat_tuple_impl_drop_helpers(std::index_sequence<I...>) noexcept {
+template <class T, class SubtuplesUncleanupped, std::size_t First, std::size_t... I, std::size_t... INew>
+constexpr auto as_flat_tuple_impl_drop_helpers(std::index_sequence<First, I...>, std::index_sequence<INew...>) noexcept {
     // TODO: copypasted :-(
     constexpr auto a = flat_array_of_type_ids<T>();
     (void)a; // `a` is unused if T is an empty type
 
     constexpr auto skips = make_array(
         empty_or_sequence(
-            size_t_<a.count_from_opening_till_matching_parenthis_seq(I, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag) >{}, size_t_<I>{}
-        )...
-    );
-
-    constexpr auto indexes_plus_1_uncleanuped = make_array(std::index_sequence<1 + I...>{});
-    constexpr auto indexes_plus_1_and_zeros_as_skips = remove_skips(indexes_plus_1_uncleanuped, skips);
-    constexpr auto new_size = size_t_<indexes_plus_1_and_zeros_as_skips.count_nonzeros()>{};
-    constexpr auto indexes = resize_dropping_zeros_and_decrementing(new_size, indexes_plus_1_and_zeros_as_skips);
-
-    // TODO: end of copypasted code
-    return sequence_tuple::tuple<
-        sequence_tuple::tuple_element<indexes.data[I], SubtuplesUncleanupped>...
-    >{};
-}
-
-template <class T, std::size_t... I>
-constexpr auto as_flat_tuple_impl(std::index_sequence<I...>) noexcept {
-    constexpr auto a = flat_array_of_type_ids<T>();
-    (void)a; // `a` is unused if T is an empty type
-
-    typedef sequence_tuple::tuple<decltype(
-        prepare_subtuples<T>(size_t_< get<I>(a) >{}, size_t_<I>{})
-    )...> subtuples_uncleanuped_t;
-
-    constexpr auto skips = make_array(
+            size_t_<a.count_from_opening_till_matching_parenthis_seq(First, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag) >{}, size_t_<First>{}
+        ),
         empty_or_sequence(
             size_t_<a.count_from_opening_till_matching_parenthis_seq(I, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag) >{}, size_t_<I>{}
         )...
     );
 
-    constexpr auto indexes_uncleanuped = make_array(std::index_sequence<1 + I...>{});
+    constexpr auto indexes_uncleanuped = make_array(std::index_sequence<1, 1 + I - First...>{});
     constexpr auto indexes_plus_1_and_zeros_as_skips = remove_skips(indexes_uncleanuped, skips);
     constexpr auto new_size = size_t_<indexes_plus_1_and_zeros_as_skips.count_nonzeros()>{};
     constexpr auto indexes = resize_dropping_zeros_and_decrementing(new_size, indexes_plus_1_and_zeros_as_skips);
 
-    return as_flat_tuple_impl_drop_helpers<T, subtuples_uncleanuped_t>(std::make_index_sequence<indexes.size()>{}); /* sequence_tuple::tuple<
-        decltype(typeid_conversions::id_to_type(
-            size_t_<get<I>(a)>{}
-        ))...
-    >{};*/
+
+    // TODO: end of copypasted code
+
+    return sequence_tuple::tuple<
+        sequence_tuple::tuple_element<indexes.data[INew], SubtuplesUncleanupped>...
+    >{};
+}
+
+template <class T, std::size_t First, std::size_t... I>
+constexpr auto as_flat_tuple_impl(std::index_sequence<First, I...>) noexcept {
+    constexpr auto a = flat_array_of_type_ids<T>();
+    (void)a; // `a` is unused if T is an empty type
+
+    typedef sequence_tuple::tuple<
+        decltype(prepare_subtuples<T>(size_t_< get<First>(a) >{}, size_t_<First>{})),
+        decltype(prepare_subtuples<T>(size_t_< get<I>(a) >{},     size_t_<I>{}))...
+    > subtuples_uncleanuped_t;
+
+    constexpr auto skips = make_array(
+        empty_or_sequence(
+            size_t_<a.count_from_opening_till_matching_parenthis_seq(First, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag) >{}, size_t_<First>{}
+        ),
+        empty_or_sequence(
+            size_t_<a.count_from_opening_till_matching_parenthis_seq(I, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag) >{}, size_t_<I>{}
+        )...
+    );
+
+    constexpr auto indexes_uncleanuped = make_array(std::index_sequence<1, 1 + I - First...>{});
+    constexpr auto indexes_plus_1_and_zeros_as_skips = remove_skips(indexes_uncleanuped, skips);
+    constexpr auto new_size = size_t_<indexes_plus_1_and_zeros_as_skips.count_nonzeros()>{};
+    constexpr auto indexes = resize_dropping_zeros_and_decrementing(new_size, indexes_plus_1_and_zeros_as_skips);
+
+    return as_flat_tuple_impl_drop_helpers<T, subtuples_uncleanuped_t>(std::index_sequence<First, I...>{}, std::make_index_sequence<indexes.size()>{});
 }
 
 template <class T>
