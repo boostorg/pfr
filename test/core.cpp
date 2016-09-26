@@ -5,6 +5,7 @@
 
 #include <boost/pfr.hpp>
 #include <boost/core/lightweight_test.hpp>
+#include <boost/type_index.hpp>
 
 #include <iostream>
 #include <typeinfo>
@@ -24,7 +25,7 @@ void print(T& f) {
         << typeid(flat_tuple_element_t<I, T>).name()
         << std::endl;
 }
-
+/*
 
 struct make_my_life_harder { int a0; short a1; };
 struct make_my_life_even_more_harder { unsigned int b0; unsigned short b1; make_my_life_harder cr;};
@@ -350,15 +351,68 @@ void test_alignment_with_neted_structure() {
     test_struct.a.c = '1';
     test_struct.c1 = '2';
     test_struct.c2 = '3';
-    BOOST_TEST_EQ(flat_get<0>(test_struct), 0);
-    BOOST_TEST_EQ(flat_get<1>(test_struct), '1');
-    BOOST_TEST_EQ(flat_get<2>(test_struct), '2');
-    BOOST_TEST_EQ(flat_get<3>(test_struct), '3');
+    BOOST_TEST_EQ(flat_get<0>( flat_get<0>(test_struct) ), 0);
+    BOOST_TEST_EQ(flat_get<1>( flat_get<0>(test_struct) ), '1');
+    BOOST_TEST_EQ(flat_get<1>(test_struct), '2');
+    BOOST_TEST_EQ(flat_get<2>(test_struct), '3');
 
+}*/
+
+
+template <std::size_t... I>
+void print(std::index_sequence<I...>) {
+    struct A0 {
+        short s;
+        char c;
+    };
+
+    struct B0 {
+        A0 a;
+        char c1;
+        char c2;
+    };
+
+    typedef B0 type;
+    //constexpr auto res = std::make_index_sequence< decltype(boost::pfr::detail::flat_array_of_type_ids<type>())::size() >();
+
+    //constexpr auto res = boost::pfr::detail::as_flat_tuple_impl<type>(
+    //    std::make_index_sequence< decltype(boost::pfr::detail::flat_array_of_type_ids<type>())::size() >()
+    //);
+
+    //auto a = boost::pfr::detail::flat_array_of_type_ids<type>();
+    typedef type T;
+    using namespace boost::pfr::detail;
+    constexpr auto a = flat_array_of_type_ids<T>();
+    (void)a; // `a` is unused if T is an empty type
+
+
+    for (std::size_t i = 0; i < a.size(); ++i)
+        std::cerr << a.data[i] << ' ';
+
+    std::cerr << "??? " << a.count_from_opening_till_matching_parenthis_seq(0, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag);
+
+    typedef sequence_tuple::tuple<decltype(
+        prepare_subtuples<T>(size_t_< get<I>(a) >{}, size_t_<I>{})
+    )...> subtuples_uncleanuped_t;
+    /*constexpr auto skips = make_array(
+        empty_or_sequence(
+            size_t_<a.count_from_opening_till_matching_parenthis_seq(I, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag) >{}, size_t_<I>{}
+        )...
+    );
+
+    constexpr auto indexes_uncleanuped = make_array(std::index_sequence<1 + I...>{});
+    constexpr auto indexes_plus_1_and_zeros_as_skips = remove_skips(indexes_uncleanuped, skips);
+    constexpr auto new_size = size_t_<indexes_plus_1_and_zeros_as_skips.count_nonzeros()>{};
+    constexpr auto indexes = resize_dropping_zeros_and_decrementing(new_size, indexes_plus_1_and_zeros_as_skips);
+
+    for (std::size_t i = 0; i < indexes.size(); ++i)
+        std::cerr << indexes.data[i] << ' ';
+*/
+    //std::cout << boost::typeindex::type_id<decltype(res)>() << '\n';
 }
 
 int main() {
-    test_compiletime<foo>();
+ /*   test_compiletime<foo>();
     test_compiletime_array<int>();
     test_compiletime_array<void*>();
     test_compiletime_array<const void*>();
@@ -424,8 +478,10 @@ int main() {
     int i_2dimens[2][2] = {{10, 11}, {12, 13} };
     static_assert(tuple_size<decltype(i_2dimens)>::value == 4, "");
     static_assert(flat_tuple_size<decltype(i_2dimens)>::value == 4, "");
+*/
 
-    test_alignment_with_neted_structure();
+    print(std::make_index_sequence<6>{});
+    //test_alignment_with_neted_structure();
 
     return boost::report_errors();
 }

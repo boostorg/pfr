@@ -116,9 +116,9 @@ constexpr decltype(auto) get(tuple<T...>&& t) noexcept {
 }
 
 template <size_t I, class T>
-using tuple_element = std::remove_reference< decltype(
+using tuple_element = typename std::remove_reference< decltype(
         ::boost::pfr::detail::sequence_tuple::get<I>( std::declval<T>() )
-    ) >;
+    ) >::type;
 
 
 
@@ -411,7 +411,7 @@ constexpr size_array<sizeof(Type) * 3> type_to_id(identity<Type>, std::enable_if
     constexpr auto  t = flat_array_of_type_ids<Type>();
     size_array<sizeof(Type) * 3> result {{tuple_begin_tag}};
     constexpr bool requires_tuplening = (
-        (t.count_nonzeros() == 1)  || (t.count_nonzeros() == t.count_from_opening_till_matching_parenthis_seq(0, tuple_begin_tag, tuple_end_tag))
+        (t.count_nonzeros() != 1)  || (t.count_nonzeros() == t.count_from_opening_till_matching_parenthis_seq(0, tuple_begin_tag, tuple_end_tag))
     );
 
     if (requires_tuplening) {
@@ -677,7 +677,7 @@ constexpr auto increment_index_sequence(std::index_sequence<I...>) noexcept {
 }
 
 template <class T, std::size_t V, std::size_t I>
-constexpr auto prepare_subtuples(size_t_<V>, size_t_<I>) {
+constexpr auto prepare_subtuples(size_t_<V>, size_t_<I>) noexcept {
     return typeid_conversions::id_to_type(size_t_<V>{});
 }
 
@@ -698,6 +698,10 @@ constexpr auto prepare_subtuples(size_t_<typeid_conversions::tuple_begin_tag>, s
 }
 
 
+constexpr size_array<0> make_array() noexcept {
+    return {};
+}
+
 template <std::size_t... I>
 constexpr auto make_array(std::index_sequence<I...>) noexcept {
     return size_array<sizeof...(I)>{{I...}};
@@ -708,7 +712,70 @@ constexpr auto make_array(std::index_sequence<I0...>, std::index_sequence<I1...>
     return make_array(std::index_sequence<I0..., I1...>{}, vals...);
 }
 
+template <std::size_t... I0, std::size_t... I1, std::size_t... I2, class... Others>
+constexpr auto make_array(std::index_sequence<I0...>, std::index_sequence<I1...>, std::index_sequence<I2...>, Others... vals) noexcept {
+    return make_array(std::index_sequence<I0..., I1..., I2...>{}, vals...);
+}
 
+template <std::size_t... I0, std::size_t... I1, std::size_t... I2, std::size_t... I3, class... Others>
+constexpr auto make_array(std::index_sequence<I0...>, std::index_sequence<I1...>, std::index_sequence<I2...>, std::index_sequence<I3...>, Others... vals) noexcept {
+    return make_array(std::index_sequence<I0..., I1..., I2..., I3...>{}, vals...);
+}
+
+template <std::size_t N, std::size_t I>
+constexpr auto empty_or_sequence(size_t_<N>, size_t_<I>) noexcept {
+    return std::make_index_sequence<N>{};
+}
+
+template <std::size_t I>
+constexpr std::index_sequence<> empty_or_sequence(size_t_<0>, size_t_<I>) noexcept {
+    return {};
+}
+
+template <class ArrayFrom, class ArraySkips>
+constexpr ArrayFrom remove_skips(ArrayFrom indexes_plus_1, const ArraySkips& skips) noexcept { // TODO: optimize
+    for (std::size_t i = 0; i < skips.size(); ++i) {
+        indexes_plus_1.data[ skips.data[i] ] = 0;
+    }
+    return indexes_plus_1;
+}
+
+template <std::size_t N, class Array>
+constexpr size_array<N> resize_dropping_zeros_and_decrementing(size_t_<N>, const Array& a) noexcept {
+    size_array<N> result{};
+    std::size_t result_indx = 0;
+    for (std::size_t i = 0; i < a.size(); ++i) {
+        if (a.data[i]) {
+            result.data[result_indx] = static_cast<std::size_t>(a.data[i] - 1);
+            ++ result_indx;
+        }
+    }
+
+    return result;
+}
+
+template <class T, class SubtuplesUncleanupped, std::size_t... I>
+constexpr auto as_flat_tuple_impl_drop_helpers(std::index_sequence<I...>) noexcept {
+    // TODO: copypasted :-(
+    constexpr auto a = flat_array_of_type_ids<T>();
+    (void)a; // `a` is unused if T is an empty type
+
+    constexpr auto skips = make_array(
+        empty_or_sequence(
+            size_t_<a.count_from_opening_till_matching_parenthis_seq(I, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag) >{}, size_t_<I>{}
+        )...
+    );
+
+    constexpr auto indexes_plus_1_uncleanuped = make_array(std::index_sequence<1 + I...>{});
+    constexpr auto indexes_plus_1_and_zeros_as_skips = remove_skips(indexes_plus_1_uncleanuped, skips);
+    constexpr auto new_size = size_t_<indexes_plus_1_and_zeros_as_skips.count_nonzeros()>{};
+    constexpr auto indexes = resize_dropping_zeros_and_decrementing(new_size, indexes_plus_1_and_zeros_as_skips);
+
+    // TODO: end of copypasted code
+    return sequence_tuple::tuple<
+        sequence_tuple::tuple_element<indexes.data[I], SubtuplesUncleanupped>...
+    >{};
+}
 
 template <class T, std::size_t... I>
 constexpr auto as_flat_tuple_impl(std::index_sequence<I...>) noexcept {
@@ -719,15 +786,18 @@ constexpr auto as_flat_tuple_impl(std::index_sequence<I...>) noexcept {
         prepare_subtuples<T>(size_t_< get<I>(a) >{}, size_t_<I>{})
     )...> subtuples_uncleanuped_t;
 
-    /*constexpr auto skips = make_array(
-        increment_index_sequence<I + 1>(
-            std::make_index_sequence<
-                std::min(a.count_from_opening_till_matching_parenthis_seq(I, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag), std::size_t{1}) - 1
-            >{}
+    constexpr auto skips = make_array(
+        empty_or_sequence(
+            size_t_<a.count_from_opening_till_matching_parenthis_seq(I, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag) >{}, size_t_<I>{}
         )...
-    );*/
+    );
 
-    return subtuples_uncleanuped_t{}; /* sequence_tuple::tuple<
+    constexpr auto indexes_uncleanuped = make_array(std::index_sequence<1 + I...>{});
+    constexpr auto indexes_plus_1_and_zeros_as_skips = remove_skips(indexes_uncleanuped, skips);
+    constexpr auto new_size = size_t_<indexes_plus_1_and_zeros_as_skips.count_nonzeros()>{};
+    constexpr auto indexes = resize_dropping_zeros_and_decrementing(new_size, indexes_plus_1_and_zeros_as_skips);
+
+    return as_flat_tuple_impl_drop_helpers<T, subtuples_uncleanuped_t>(std::make_index_sequence<indexes.size()>{}); /* sequence_tuple::tuple<
         decltype(typeid_conversions::id_to_type(
             size_t_<get<I>(a)>{}
         ))...
