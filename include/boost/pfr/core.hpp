@@ -146,7 +146,7 @@ struct print_impl<I, I> {
 template <std::size_t I, std::size_t N>
 struct read_impl {
     template <class Stream, class T>
-    static void read (Stream& in, T& value) {
+    static void read (Stream& in, const T& value) {
         char ignore = {};
         if (!!I) {
             in >> ignore;
@@ -672,6 +672,11 @@ constexpr auto flat_array_of_type_ids() noexcept {
 
 template <class T, std::size_t First, std::size_t... I>
 constexpr auto as_flat_tuple_impl(std::index_sequence<First, I...>) noexcept;
+
+template <class T>
+constexpr auto as_flat_tuple_impl(std::index_sequence<>) noexcept {
+    return sequence_tuple::tuple<>{};
+}
 
 template <std::size_t Increment, std::size_t... I>
 constexpr auto increment_index_sequence(std::index_sequence<I...>) noexcept {

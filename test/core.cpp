@@ -25,7 +25,7 @@ void print(T& f) {
         << typeid(flat_tuple_element_t<I, T>).name()
         << std::endl;
 }
-/*
+
 
 struct make_my_life_harder { int a0; short a1; };
 struct make_my_life_even_more_harder { unsigned int b0; unsigned short b1; make_my_life_harder cr;};
@@ -312,7 +312,7 @@ void test_with_user_defined_constructor() {
 
     //assert(flat_get<1>(p) == 2); // Compilation error
 }
-
+/*
 void test_hash() {
     struct almost_pair { int i; short s; };
     std::unordered_set<almost_pair, flat_hash<almost_pair>, flat_equal_to<> > s;
@@ -331,6 +331,7 @@ void test_hash() {
     BOOST_TEST_NE(flat_hash<single_field>()({1}), std::hash<int>()(1));
     BOOST_TEST_NE(flat_hash<single_field>()({199}), std::hash<int>()(199));
 }
+*/
 
 // Test case by Lisa Lippincott
 void test_alignment_with_neted_structure() {
@@ -458,6 +459,7 @@ int main() {
 
     test_with_user_defined_constructor();
     test_hash();
+*/
 
     struct non_pod1 {
         std::string s;
@@ -488,7 +490,6 @@ int main() {
     int i_2dimens[2][2] = {{10, 11}, {12, 13} };
     static_assert(tuple_size<decltype(i_2dimens)>::value == 4, "");
     static_assert(flat_tuple_size<decltype(i_2dimens)>::value == 4, "");
-*/
 
     print(std::make_index_sequence<6>{});
     test_alignment_with_neted_structure();
