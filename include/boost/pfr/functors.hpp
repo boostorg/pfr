@@ -21,112 +21,6 @@
 namespace boost { namespace pfr {
 
 namespace detail {
-    template <std::size_t I, std::size_t N>
-    struct equal_impl {
-        template <class T, class U>
-        constexpr static bool cmp(const T& v1, const U& v2) noexcept {
-            return ::std::get<I>(v1) == ::std::get<I>(v2)
-                && equal_impl<I + 1, N>::cmp(v1, v2);
-        }
-    };
-
-    template <std::size_t N>
-    struct equal_impl<N, N> {
-        template <class T, class U>
-        constexpr static bool cmp(const T&, const U&) noexcept {
-            return T::size_v == U::size_v;
-        }
-    };
-
-    template <std::size_t I, std::size_t N>
-    struct not_equal_impl {
-        template <class T, class U>
-        constexpr static bool cmp(const T& v1, const U& v2) noexcept {
-            return ::boost::pfr::detail::sequence_tuple::get<I>(v1) != ::boost::pfr::detail::sequence_tuple::get<I>(v2)
-                || not_equal_impl<I + 1, N>::cmp(v1, v2);
-        }
-    };
-
-    template <std::size_t N>
-    struct not_equal_impl<N, N> {
-        template <class T, class U>
-        constexpr static bool cmp(const T&, const U&) noexcept {
-            return T::size_v != U::size_v;
-        }
-    };
-
-    template <std::size_t I, std::size_t N>
-    struct less_impl {
-        template <class T, class U>
-        constexpr static bool cmp(const T& v1, const U& v2) noexcept {
-            using ::boost::pfr::detail::sequence_tuple::get;
-            return get<I>(v1) < get<I>(v2)
-                || (get<I>(v1) == get<I>(v2) && less_impl<I + 1, N>::cmp(v1, v2));
-        }
-    };
-
-    template <std::size_t N>
-    struct less_impl<N, N> {
-        template <class T, class U>
-        constexpr static bool cmp(const T&, const U&) noexcept {
-            return T::size_v < U::size_v;
-        }
-    };
-
-    template <std::size_t I, std::size_t N>
-    struct less_equal_impl {
-        template <class T, class U>
-        constexpr static bool cmp(const T& v1, const U& v2) noexcept {
-            using ::boost::pfr::detail::sequence_tuple::get;
-            return get<I>(v1) < get<I>(v2)
-                || (get<I>(v1) == get<I>(v2) && less_equal_impl<I + 1, N>::cmp(v1, v2));
-        }
-    };
-
-    template <std::size_t N>
-    struct less_equal_impl<N, N> {
-        template <class T, class U>
-        constexpr static bool cmp(const T&, const U&) noexcept {
-            return T::size_v <= U::size_v;
-        }
-    };
-
-    template <std::size_t I, std::size_t N>
-    struct greater_impl {
-        template <class T, class U>
-        constexpr static bool cmp(const T& v1, const U& v2) noexcept {
-            using ::boost::pfr::detail::sequence_tuple::get;
-            return get<I>(v1) > get<I>(v2)
-                || (get<I>(v1) == get<I>(v2) && greater_impl<I + 1, N>::cmp(v1, v2));
-        }
-    };
-
-    template <std::size_t N>
-    struct greater_impl<N, N> {
-        template <class T, class U>
-        constexpr static bool cmp(const T&, const U&) noexcept {
-            return std::tuple_size<T>::value > std::tuple_size<U>::value;
-        }
-    };
-
-    template <std::size_t I, std::size_t N>
-    struct greater_equal_impl {
-        template <class T, class U>
-        constexpr static bool cmp(const T& v1, const U& v2) noexcept {
-            using ::boost::pfr::detail::sequence_tuple::get;
-            return get<I>(v1) > get<I>(v2)
-                || (get<I>(v1) == get<I>(v2) && greater_equal_impl<I + 1, N>::cmp(v1, v2));
-        }
-    };
-
-    template <std::size_t N>
-    struct greater_equal_impl<N, N> {
-        template <class T, class U>
-        constexpr static bool cmp(const T&, const U&) noexcept {
-            return std::tuple_size<T>::value >= std::tuple_size<U>::value;
-        }
-    };
-
     template <typename SizeT>
     constexpr void hash_combine(SizeT& seed, SizeT value) noexcept {
         seed ^= value + 0x9e3779b9 + (seed<<6) + (seed>>2);
@@ -136,7 +30,7 @@ namespace detail {
     struct hash_impl {
         template <class T>
         constexpr static std::size_t compute(const T& val) noexcept {
-            typedef typename boost::pfr::flat_tuple_element<I, T>::type elem_t;
+            typedef typename std::decay< ::std::tuple_element_t<I, T> >::type elem_t;
             std::size_t h = std::hash<elem_t>()( ::std::get<I>(val) );
             hash_combine(h, hash_impl<I + 1, N>::compute(val) );
             return h;
@@ -328,7 +222,7 @@ template <> struct flat_less_equal<void> {
 };
 /// @endcond
 
-/*
+
 /// \brief std::hash like flattening functor
 template <class T> struct flat_hash {
     /// \return hash value of \b x
@@ -336,7 +230,7 @@ template <class T> struct flat_hash {
         return detail::hash_impl<0, flat_tuple_size_v<T> >::compute(detail::tie_as_flat_tuple(x));
     }
 };
-*/
+
 }} // namespace boost::pfr
 
 #endif // BOOST_PFR_FUNCTORS_HPP

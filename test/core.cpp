@@ -25,7 +25,7 @@ void print(T& f) {
         << typeid(flat_tuple_element_t<I, T>).name()
         << std::endl;
 }
-
+/*
 
 struct make_my_life_harder { int a0; short a1; };
 struct make_my_life_even_more_harder { unsigned int b0; unsigned short b1; make_my_life_harder cr;};
@@ -112,7 +112,7 @@ void test_compiletime() {
     static_assert( std::is_same< decltype(flat_get<15>(f)), decltype((f.v14and15andv16and17.b1))>::value, "types missmatch");
     static_assert( std::is_same< decltype(flat_get<16>(f)), decltype((f.v14and15andv16and17.cr.a0))>::value, "types missmatch");
     static_assert( std::is_same< decltype(flat_get<17>(f)), decltype((f.v14and15andv16and17.cr.a1))>::value, "types missmatch");
-}
+}*/
 
 template <class T>
 constexpr void test_compiletime_array() {
@@ -135,7 +135,7 @@ constexpr void test_compiletime_array() {
         static_assert( std::is_same< decltype(flat_get<19>(f)), T const&>::value, "types missmatch");
     }
 }
-
+/*
 void test_with_enums() {
     enum class my_enum: unsigned {
         VALUE1 = 17, VALUE2, VALUE3
@@ -185,8 +185,8 @@ void test_with_enums() {
         3 == flat_tuple_size_v<const volatile my_struct>,
         ""
     );
-}*/
-
+}
+*/
 void test_comparable_struct() {
     struct comparable_struct {
         int i; short s; char data[50]; bool bl; int a,b,c,d,e,f;
@@ -312,7 +312,7 @@ void test_with_user_defined_constructor() {
 
     //assert(flat_get<1>(p) == 2); // Compilation error
 }
-/*
+
 void test_hash() {
     struct almost_pair { int i; short s; };
     std::unordered_set<almost_pair, flat_hash<almost_pair>, flat_equal_to<> > s;
@@ -331,7 +331,6 @@ void test_hash() {
     BOOST_TEST_NE(flat_hash<single_field>()({1}), std::hash<int>()(1));
     BOOST_TEST_NE(flat_hash<single_field>()({199}), std::hash<int>()(199));
 }
-*/
 
 // Test case by Lisa Lippincott
 void test_alignment_with_neted_structure() {
@@ -361,7 +360,7 @@ void test_alignment_with_neted_structure() {
 
 
 template <std::size_t... I>
-void print(std::index_sequence<I...>) {
+void test_and_debug_internals(std::index_sequence<I...>) {
     struct A0 {
         short s;
         char c;
@@ -423,13 +422,13 @@ void print(std::index_sequence<I...>) {
 }
 
 int main() {
- /*   test_compiletime<foo>();
+ /*   test_compiletime<foo>();*/
     test_compiletime_array<int>();
     test_compiletime_array<void*>();
     test_compiletime_array<const void*>();
     test_compiletime_array<char>();
     test_compiletime_array<char const volatile*>();
-    {
+/*    {
         foo f {
             'A', 11, 12, 13, {'B', 'C'}, 16, 17, 0, 0, 0, 30.1
             , {18, 19}
@@ -446,7 +445,7 @@ int main() {
         test_runtime(f);
     }
 
-    test_with_enums();
+    test_with_enums(); */
     test_comparable_struct();
     test_empty_struct();
     test_pods_with_int_operators();
@@ -455,11 +454,10 @@ int main() {
     test_with_contatiners<flat_less<>>();
     test_with_contatiners<flat_greater<>>();
 
-    test_print();
+    //test_print();
 
     test_with_user_defined_constructor();
     test_hash();
-*/
 
     struct non_pod1 {
         std::string s;
@@ -491,7 +489,7 @@ int main() {
     static_assert(tuple_size<decltype(i_2dimens)>::value == 4, "");
     static_assert(flat_tuple_size<decltype(i_2dimens)>::value == 4, "");
 
-    print(std::make_index_sequence<6>{});
+    test_and_debug_internals(std::make_index_sequence<6>{});
     test_alignment_with_neted_structure();
 
     return boost::report_errors();

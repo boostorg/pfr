@@ -976,7 +976,7 @@ using flat_tuple_element_t = typename flat_tuple_element<I, T>::type;
 ///     std::array<int, boost::pfr::flat_tuple_size<my_structure>::value > a;
 /// \endcode
 template <class T>
-using flat_tuple_size = detail::size_t_< detail::internal_tuple_with_same_alignment_t<T>::size_v >;
+using flat_tuple_size = std::tuple_size<decltype(detail::tie_as_flat_tuple(std::declval<T&>()))>;
 
 
 /// \brief `flat_tuple_size_v` is a template variable that contains fields count in a \flattening{flattened} T.
@@ -1045,7 +1045,7 @@ auto flat_structure_to_tuple(const T& val) noexcept {
 /// \endcode
 template <class T>
 auto flat_structure_tie(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable<T, T>::value>* = 0 /* @endcond */) noexcept {
-    return tie_as_flat_tuple(val);
+    return detail::tie_as_flat_tuple(val);
 }
 
 /// \brief Writes \flattening{flattened} POD `value` to `out`
