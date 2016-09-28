@@ -185,7 +185,7 @@ void test_with_enums() {
         3 == flat_tuple_size_v<const volatile my_struct>,
         ""
     );
-}
+}*/
 
 void test_comparable_struct() {
     struct comparable_struct {
@@ -351,12 +351,12 @@ void test_alignment_with_neted_structure() {
     test_struct.a.c = '1';
     test_struct.c1 = '2';
     test_struct.c2 = '3';
-    BOOST_TEST_EQ(flat_get<0>( flat_get<0>(test_struct) ), 0);
-    BOOST_TEST_EQ(flat_get<1>( flat_get<0>(test_struct) ), '1');
-    BOOST_TEST_EQ(flat_get<1>(test_struct), '2');
-    BOOST_TEST_EQ(flat_get<2>(test_struct), '3');
+    BOOST_TEST_EQ(flat_get<0>(test_struct), 0);
+    BOOST_TEST_EQ(flat_get<1>(test_struct), '1');
+    BOOST_TEST_EQ(flat_get<2>(test_struct), '2');
+    BOOST_TEST_EQ(flat_get<3>(test_struct), '3');
 
-}*/
+}
 
 
 template <std::size_t... I>
@@ -491,7 +491,7 @@ int main() {
 */
 
     print(std::make_index_sequence<6>{});
-    //test_alignment_with_neted_structure();
+    test_alignment_with_neted_structure();
 
     return boost::report_errors();
 }

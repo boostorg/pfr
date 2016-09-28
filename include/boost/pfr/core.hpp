@@ -121,6 +121,10 @@ using tuple_element = typename std::remove_reference< decltype(
     ) >::type;
 
 
+} // namespace sequence_tuple
+
+
+
 
 
 template <std::size_t I, std::size_t N>
@@ -128,7 +132,7 @@ struct print_impl {
     template <class Stream, class T>
     static void print (Stream& out, const T& value) {
         if (!!I) out << ", ";
-        out << ::boost::pfr::detail::sequence_tuple::get<I>(value);
+        out << ::std::get<I>(value);
         print_impl<I + 1, N>::print(out, value);
     }
 };
@@ -150,7 +154,7 @@ struct read_impl {
             in >> ignore;
             if (ignore != ' ')  in.setstate(Stream::failbit);
         }
-        in >> ::boost::pfr::detail::sequence_tuple::get<I>(value);
+        in >> ::std::get<I>(value);
         read_impl<I + 1, N>::read(in, value);
     }
 };
@@ -159,8 +163,6 @@ template <std::size_t I>
 struct read_impl<I, I> {
     template <class Stream, class T> static void read (Stream&, const T&) {}
 };
-
-} // namespace sequence_tuple
 
 
 ///////////////////// Array that has the constexpr
@@ -810,7 +812,7 @@ constexpr auto as_flat_tuple_impl(std::index_sequence<First, I...>) noexcept {
 }
 
 template <class T>
-constexpr auto as_flat_tuple_pure() noexcept {
+constexpr auto internal_tuple_with_same_alignment() noexcept {
     typedef typename std::remove_cv<T>::type type;
 
     static_assert(std::is_pod<type>::value, "Not applyable");
@@ -829,7 +831,7 @@ constexpr auto as_flat_tuple_pure() noexcept {
 }
 
 template <class T>
-using as_flat_tuple_t = decltype( as_flat_tuple_pure<T>() );
+using internal_tuple_with_same_alignment_t = decltype( internal_tuple_with_same_alignment<T>() );
 
 /// @cond
 #ifdef __GNUC__
@@ -839,23 +841,45 @@ using as_flat_tuple_t = decltype( as_flat_tuple_pure<T>() );
 #endif
 /// @endcond
 
-template <class... TupleTypes>
-auto make_tuple_of_references(detail::sequence_tuple::tuple<TupleTypes...>& t) {
 
+template <class Tuple, std::size_t... I>
+constexpr auto make_flat_tuple_of_references(Tuple&& t, std::index_sequence<I...>) noexcept;
+
+template <class... T>
+constexpr std::tuple<T&...> as_tuple_with_references(T&&... args) noexcept {
+    return std::tuple<T&...>( std::forward<T>(args)... );
+}
+
+template <class... T>
+constexpr decltype(auto) as_tuple_with_references(detail::sequence_tuple::tuple<T...>& t) noexcept {
+    return make_flat_tuple_of_references(t, std::make_index_sequence< detail::sequence_tuple::tuple<T...>::size_v >{});
+}
+
+template <class... T>
+constexpr decltype(auto) as_tuple_with_references(const detail::sequence_tuple::tuple<T...>& t) noexcept {
+    return make_flat_tuple_of_references(t, std::make_index_sequence< detail::sequence_tuple::tuple<T...>::size_v >{});
+}
+
+
+template <class Tuple, std::size_t... I>
+constexpr auto make_flat_tuple_of_references(Tuple&& t, std::index_sequence<I...>) noexcept {
+    return std::tuple_cat(
+        as_tuple_with_references(
+            detail::sequence_tuple::get<I>(std::forward<Tuple>(t))
+        )...
+    );
 }
 
 template <class T>
-constexpr decltype(auto) as_flat_tuple(const T& val) noexcept { // TODO: remove constexpr
-    MAY_ALIAS const auto* const t = reinterpret_cast<const detail::as_flat_tuple_t<T>*>( std::addressof(val) );
-
-    detail::sequence_tuple::get<I>( *t );
-    return *t;
+constexpr decltype(auto) tie_as_flat_tuple(const T& val) noexcept { // TODO: remove constexpr
+    MAY_ALIAS const auto* const t = reinterpret_cast<const detail::internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
+    return make_flat_tuple_of_references(*t, std::make_index_sequence< detail::internal_tuple_with_same_alignment_t<T>::size_v >{});
 }
 
 template <class T>
-constexpr decltype(auto) as_flat_tuple(T& val) noexcept { // TODO: remove constexpr
-    MAY_ALIAS auto* const t = reinterpret_cast<detail::as_flat_tuple_t<T>*>( std::addressof(val) );
-    return *t;
+constexpr decltype(auto) tie_as_flat_tuple(T& val) noexcept { // TODO: remove constexpr
+    MAY_ALIAS auto* const t = reinterpret_cast<detail::internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
+    return make_flat_tuple_of_references(*t, std::make_index_sequence< detail::internal_tuple_with_same_alignment_t<T>::size_v >{});
 }
 
 #undef MAY_ALIAS
@@ -863,13 +887,6 @@ constexpr decltype(auto) as_flat_tuple(T& val) noexcept { // TODO: remove conste
 template <class T, std::size_t... I>
 constexpr auto make_stdtuple_from_seqtuple(const T& t, std::index_sequence<I...>) noexcept {
     return std::make_tuple(
-        sequence_tuple::get<I>(t)...
-    );
-}
-
-template <class T, std::size_t... I>
-constexpr auto tie_sequence_tuple_impl(T& t, std::index_sequence<I...>) noexcept {
-    return std::tie(
         sequence_tuple::get<I>(t)...
     );
 }
@@ -913,14 +930,14 @@ struct teleport_extents<volatile From, To> {
 /// \endcode
 template <std::size_t I, class T>
 decltype(auto) flat_get(const T& val) noexcept {
-    return detail::sequence_tuple::get<I>( detail::as_flat_tuple(val) );
+    return std::get<I>( detail::tie_as_flat_tuple(val) );
 }
 
 
 /// \overload flat_get
 template <std::size_t I, class T>
 decltype(auto) flat_get(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable<T, T>::value>* = 0/* @endcond */ ) noexcept {
-    return detail::sequence_tuple::get<I>( detail::as_flat_tuple(val) );
+    return std::get<I>( detail::tie_as_flat_tuple(val) );
 }
 
 
@@ -933,7 +950,7 @@ decltype(auto) flat_get(T& val /* @cond */, std::enable_if_t< std::is_trivially_
 template <std::size_t I, class T>
 using flat_tuple_element = detail::teleport_extents<
         T,
-        typename detail::sequence_tuple::tuple_element<I, detail::as_flat_tuple_t<T> >::type
+        typename detail::sequence_tuple::tuple_element<I, detail::internal_tuple_with_same_alignment_t<T> >::type
     >;
 
 
@@ -954,7 +971,7 @@ using flat_tuple_element_t = typename flat_tuple_element<I, T>::type;
 ///     std::array<int, boost::pfr::flat_tuple_size<my_structure>::value > a;
 /// \endcode
 template <class T>
-using flat_tuple_size = detail::size_t_< detail::as_flat_tuple_t<T>::size_v >;
+using flat_tuple_size = detail::size_t_< detail::internal_tuple_with_same_alignment_t<T>::size_v >;
 
 
 /// \brief `flat_tuple_size_v` is a template variable that contains fields count in a \flattening{flattened} T.
@@ -989,7 +1006,7 @@ using tuple_size = detail::size_t_< detail::fields_count<T>() >;
 template <class T>
 constexpr std::size_t tuple_size_v = tuple_size<T>::value;
 
-
+/*
 /// \brief Creates an `std::tuple` from a \flattening{flattened} T.
 ///
 /// \b Example:
@@ -1008,7 +1025,7 @@ auto flat_structure_to_tuple(const T& val) noexcept {
         std::make_index_sequence< internal_tuple_t::size_v >()
     );
 }
-
+*/
 
 /// \brief Creates an `std::tuple` with lvalue references to fields of a \flattening{flattened} T.
 ///
@@ -1023,12 +1040,7 @@ auto flat_structure_to_tuple(const T& val) noexcept {
 /// \endcode
 template <class T>
 auto flat_structure_tie(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable<T, T>::value>* = 0 /* @endcond */) noexcept {
-    typedef detail::as_flat_tuple_t<T> internal_tuple_t;
-
-    return detail::tie_sequence_tuple_impl(
-        detail::as_flat_tuple(val),
-        std::make_index_sequence< internal_tuple_t::size_v >()
-    );
+    return tie_as_flat_tuple(val);
 }
 
 /// \brief Writes \flattening{flattened} POD `value` to `out`
@@ -1042,7 +1054,7 @@ auto flat_structure_tie(T& val /* @cond */, std::enable_if_t< std::is_trivially_
 template <class Char, class Traits, class T>
 void flat_write(std::basic_ostream<Char, Traits>& out, const T& value) {
     out << '{';
-    detail::sequence_tuple::print_impl<0, flat_tuple_size_v<T> >::print(out, detail::as_flat_tuple(value));
+    detail::print_impl<0, flat_tuple_size_v<T> >::print(out, detail::tie_as_flat_tuple(value));
     out << '}';
 }
 
@@ -1067,7 +1079,7 @@ void flat_read(std::basic_istream<Char, Traits>& in, T& value) {
     char parenthis = {};
     in >> parenthis;
     if (parenthis != '{') in.setstate(std::basic_istream<Char, Traits>::failbit);
-    detail::sequence_tuple::read_impl<0, flat_tuple_size_v<T> >::read(in, detail::as_flat_tuple(value));
+    detail::read_impl<0, flat_tuple_size_v<T> >::read(in, detail::tie_as_flat_tuple(value));
 
     in >> parenthis;
     if (parenthis != '}') in.setstate(std::basic_istream<Char, Traits>::failbit);

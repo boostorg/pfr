@@ -163,7 +163,7 @@ namespace detail {
 template <class T = void> struct flat_equal_to {
     /// \return \b true if each field of \b x equals the field with same index of \b y
     bool operator()(const T& x, const T& y) const noexcept {
-        return detail::equal_impl<0, flat_tuple_size_v<T> >::cmp(detail::as_flat_tuple(x), detail::as_flat_tuple(y));
+        return detail::equal_impl<0, flat_tuple_size_v<T> >::cmp(detail::tie_as_flat_tuple(x), detail::tie_as_flat_tuple(y));
     }
 
 #ifdef BOOST_PFR_DOXYGEN_INVOKED
@@ -183,7 +183,7 @@ template <> struct flat_equal_to<void> {
         return detail::equal_impl<
             0,
             detail::min_size(flat_tuple_size_v<T>, flat_tuple_size_v<U>)
-        >::cmp(detail::as_flat_tuple(x), detail::as_flat_tuple(y));
+        >::cmp(detail::tie_as_flat_tuple(x), detail::tie_as_flat_tuple(y));
     }
 
 };
@@ -193,7 +193,7 @@ template <> struct flat_equal_to<void> {
 template <class T = void> struct flat_not_equal {
     /// \return \b true if at least one field \b x not equals the field with same index of \b y
     bool operator()(const T& x, const T& y) const noexcept {
-        return detail::not_equal_impl<0, flat_tuple_size_v<T> >::cmp(detail::as_flat_tuple(x), detail::as_flat_tuple(y));
+        return detail::not_equal_impl<0, flat_tuple_size_v<T> >::cmp(detail::tie_as_flat_tuple(x), detail::tie_as_flat_tuple(y));
     }
 
 #ifdef BOOST_PFR_DOXYGEN_INVOKED
