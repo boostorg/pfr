@@ -366,6 +366,23 @@ void print(std::index_sequence<I...>) {
         char c;
     };
 
+    A0 a0 { 3, '4' };
+    BOOST_TEST_EQ(boost::pfr::flat_get<0>(a0), 3);
+    BOOST_TEST_EQ(boost::pfr::flat_get<1>(a0), '4');
+
+    struct A1 {
+        int i;
+    };
+
+    struct B1 {
+        A1 a;
+        int j;
+    };
+
+    B1 b1 { 5, 6 };
+    BOOST_TEST_EQ(boost::pfr::flat_get<0>(b1), 5);
+    BOOST_TEST_EQ(boost::pfr::flat_get<1>(b1), 6);
+
     struct B0 {
         A0 a;
         char c1;
@@ -373,28 +390,13 @@ void print(std::index_sequence<I...>) {
     };
 
     typedef B0 type;
-    //constexpr auto res = std::make_index_sequence< decltype(boost::pfr::detail::flat_array_of_type_ids<type>())::size() >();
+    typedef B0 T;
 
-    //constexpr auto res = boost::pfr::detail::as_flat_tuple_impl<type>(
-    //    std::make_index_sequence< decltype(boost::pfr::detail::flat_array_of_type_ids<type>())::size() >()
-    //);
-
-    //auto a = boost::pfr::detail::flat_array_of_type_ids<type>();
-    typedef type T;
     using namespace boost::pfr::detail;
     constexpr auto a = flat_array_of_type_ids<T>();
     (void)a; // `a` is unused if T is an empty type
 
-
-    for (std::size_t i = 0; i < a.size(); ++i)
-        std::cerr << a.data[i] << ' ';
-
-    std::cerr << "??? " << a.count_from_opening_till_matching_parenthis_seq(0, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag);
-
-    typedef sequence_tuple::tuple<decltype(
-        prepare_subtuples<T>(size_t_< get<I>(a) >{}, size_t_<I>{})
-    )...> subtuples_uncleanuped_t;
-    /*constexpr auto skips = make_array(
+    constexpr auto skips = make_array(
         empty_or_sequence(
             size_t_<a.count_from_opening_till_matching_parenthis_seq(I, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag) >{}, size_t_<I>{}
         )...
@@ -404,11 +406,19 @@ void print(std::index_sequence<I...>) {
     constexpr auto indexes_plus_1_and_zeros_as_skips = remove_skips(indexes_uncleanuped, skips);
     constexpr auto new_size = size_t_<indexes_plus_1_and_zeros_as_skips.count_nonzeros()>{};
     constexpr auto indexes = resize_dropping_zeros_and_decrementing(new_size, indexes_plus_1_and_zeros_as_skips);
+    static_assert(indexes.data[0] == 0, "");
+    static_assert(indexes.data[1] == 4, "");
+    static_assert(indexes.data[2] == 5, "");
 
-    for (std::size_t i = 0; i < indexes.size(); ++i)
-        std::cerr << indexes.data[i] << ' ';
-*/
-    //std::cout << boost::typeindex::type_id<decltype(res)>() << '\n';
+    static_assert(
+        std::is_same<
+            decltype(boost::pfr::detail::as_flat_tuple_impl<type>(
+                std::make_index_sequence< decltype(boost::pfr::detail::flat_array_of_type_ids<type>())::size() >()
+            )),
+            boost::pfr::detail::sequence_tuple::tuple<boost::pfr::detail::sequence_tuple::tuple<short, char>, char, char>
+        >::value,
+        ""
+    );
 }
 
 int main() {

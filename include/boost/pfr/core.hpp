@@ -668,8 +668,8 @@ constexpr auto flat_array_of_type_ids() noexcept {
 
 ///////////////////// Convert array of typeids into sequence_tuple::tuple
 
-template <class T, std::size_t... I>
-constexpr auto as_flat_tuple_impl(std::index_sequence<I...>) noexcept;
+template <class T, std::size_t First, std::size_t... I>
+constexpr auto as_flat_tuple_impl(std::index_sequence<First, I...>) noexcept;
 
 template <std::size_t Increment, std::size_t... I>
 constexpr auto increment_index_sequence(std::index_sequence<I...>) noexcept {
@@ -724,7 +724,7 @@ constexpr auto make_array(std::index_sequence<I0...>, std::index_sequence<I1...>
 
 template <std::size_t N, std::size_t I>
 constexpr auto empty_or_sequence(size_t_<N>, size_t_<I>) noexcept {
-    return std::make_index_sequence<N>{};
+    return increment_index_sequence<1>(std::make_index_sequence<N - 1>{});
 }
 
 template <std::size_t I>
@@ -839,14 +839,21 @@ using as_flat_tuple_t = decltype( as_flat_tuple_pure<T>() );
 #endif
 /// @endcond
 
+template <class... TupleTypes>
+auto make_tuple_of_references(detail::sequence_tuple::tuple<TupleTypes...>& t) {
+
+}
+
 template <class T>
-constexpr decltype(auto) as_flat_tuple(const T& val) noexcept {
+constexpr decltype(auto) as_flat_tuple(const T& val) noexcept { // TODO: remove constexpr
     MAY_ALIAS const auto* const t = reinterpret_cast<const detail::as_flat_tuple_t<T>*>( std::addressof(val) );
+
+    detail::sequence_tuple::get<I>( *t );
     return *t;
 }
 
 template <class T>
-constexpr decltype(auto) as_flat_tuple(T& val) noexcept {
+constexpr decltype(auto) as_flat_tuple(T& val) noexcept { // TODO: remove constexpr
     MAY_ALIAS auto* const t = reinterpret_cast<detail::as_flat_tuple_t<T>*>( std::addressof(val) );
     return *t;
 }
