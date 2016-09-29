@@ -44,7 +44,7 @@ struct foo {
     make_my_life_harder v12and13;
     make_my_life_even_more_harder v14and15andv16and17;
 };
-/*
+
 void test_print() {
     foo f {
         'A', 11, 12, 13, {'B', 'C'}, 16, 17, 0, 0, 0, 30.1
@@ -112,7 +112,7 @@ void test_compiletime() {
     static_assert( std::is_same< decltype(flat_get<15>(f)), decltype((f.v14and15andv16and17.b1))>::value, "types missmatch");
     static_assert( std::is_same< decltype(flat_get<16>(f)), decltype((f.v14and15andv16and17.cr.a0))>::value, "types missmatch");
     static_assert( std::is_same< decltype(flat_get<17>(f)), decltype((f.v14and15andv16and17.cr.a1))>::value, "types missmatch");
-}*/
+}
 
 template <class T>
 constexpr void test_compiletime_array() {
@@ -135,7 +135,7 @@ constexpr void test_compiletime_array() {
         static_assert( std::is_same< decltype(flat_get<19>(f)), T const&>::value, "types missmatch");
     }
 }
-/*
+
 void test_with_enums() {
     enum class my_enum: unsigned {
         VALUE1 = 17, VALUE2, VALUE3
@@ -186,7 +186,7 @@ void test_with_enums() {
         ""
     );
 }
-*/
+
 void test_comparable_struct() {
     struct comparable_struct {
         int i; short s; char data[50]; bool bl; int a,b,c,d,e,f;
@@ -433,13 +433,13 @@ void test_and_debug_internals(std::index_sequence<I...>) {
 }
 
 int main() {
- /*   test_compiletime<foo>();*/
+    test_compiletime<foo>();
     test_compiletime_array<int>();
     test_compiletime_array<void*>();
     test_compiletime_array<const void*>();
     test_compiletime_array<char>();
     test_compiletime_array<char const volatile*>();
-/*    {
+    {
         foo f {
             'A', 11, 12, 13, {'B', 'C'}, 16, 17, 0, 0, 0, 30.1
             , {18, 19}
@@ -456,7 +456,7 @@ int main() {
         test_runtime(f);
     }
 
-    test_with_enums(); */
+    test_with_enums();
     test_comparable_struct();
     test_empty_struct();
     test_pods_with_int_operators();
@@ -465,7 +465,7 @@ int main() {
     test_with_contatiners<flat_less<>>();
     test_with_contatiners<flat_greater<>>();
 
-    //test_print();
+    test_print();
 
     test_with_user_defined_constructor();
     test_hash();

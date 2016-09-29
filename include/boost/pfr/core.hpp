@@ -882,6 +882,18 @@ constexpr decltype(auto) tie_as_flat_tuple(const T& val) noexcept { // TODO: rem
 }
 
 template <class T>
+constexpr decltype(auto) tie_as_flat_tuple(const volatile T& val) noexcept { // TODO: remove constexpr
+    MAY_ALIAS const volatile auto* const t = reinterpret_cast<const volatile detail::internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
+    return make_flat_tuple_of_references(*t, std::make_index_sequence< detail::internal_tuple_with_same_alignment_t<T>::size_v >{});
+}
+
+template <class T>
+constexpr decltype(auto) tie_as_flat_tuple(volatile T& val) noexcept { // TODO: remove constexpr
+    MAY_ALIAS volatile auto* const t = reinterpret_cast<volatile detail::internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
+    return make_flat_tuple_of_references(*t, std::make_index_sequence< detail::internal_tuple_with_same_alignment_t<T>::size_v >{});
+}
+
+template <class T>
 constexpr decltype(auto) tie_as_flat_tuple(T& val) noexcept { // TODO: remove constexpr
     MAY_ALIAS auto* const t = reinterpret_cast<detail::internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
     return make_flat_tuple_of_references(*t, std::make_index_sequence< detail::internal_tuple_with_same_alignment_t<T>::size_v >{});
@@ -890,31 +902,11 @@ constexpr decltype(auto) tie_as_flat_tuple(T& val) noexcept { // TODO: remove co
 #undef MAY_ALIAS
 
 template <class T, std::size_t... I>
-constexpr auto make_stdtuple_from_seqtuple(const T& t, std::index_sequence<I...>) noexcept {
+constexpr auto make_stdtuple_from_tietuple(const T& t, std::index_sequence<I...>) noexcept {
     return std::make_tuple(
-        sequence_tuple::get<I>(t)...
+        ::std::get<I>(t)...
     );
 }
-
-template <class From, class To>
-struct teleport_extents {
-    typedef To type;
-};
-
-template <class From, class To>
-struct teleport_extents<const From, To> {
-    typedef const To type;
-};
-
-template <class From, class To>
-struct teleport_extents<const volatile From, To> {
-    typedef const volatile To type;
-};
-
-template <class From, class To>
-struct teleport_extents<volatile From, To> {
-    typedef volatile To type;
-};
 
 } // namespace detail
 
@@ -953,9 +945,8 @@ decltype(auto) flat_get(T& val /* @cond */, std::enable_if_t< std::is_trivially_
 ///     std::vector<  boost::pfr::flat_tuple_element<0, my_structure>::type  > v;
 /// \endcode
 template <std::size_t I, class T>
-using flat_tuple_element = detail::teleport_extents<
-        T,
-        typename detail::sequence_tuple::tuple_element<I, detail::internal_tuple_with_same_alignment_t<T> >::type
+using flat_tuple_element = std::remove_reference<
+        typename std::tuple_element<I, decltype(detail::tie_as_flat_tuple(std::declval<T&>())) >::type
     >;
 
 
@@ -1011,7 +1002,7 @@ using tuple_size = detail::size_t_< detail::fields_count<T>() >;
 template <class T>
 constexpr std::size_t tuple_size_v = tuple_size<T>::value;
 
-/*
+
 /// \brief Creates an `std::tuple` from a \flattening{flattened} T.
 ///
 /// \b Example:
@@ -1023,14 +1014,12 @@ constexpr std::size_t tuple_size_v = tuple_size<T>::value;
 /// \endcode
 template <class T>
 auto flat_structure_to_tuple(const T& val) noexcept {
-    typedef detail::as_flat_tuple_t<T> internal_tuple_t;
-
-    return detail::make_stdtuple_from_seqtuple(
-        detail::as_flat_tuple(val),
-        std::make_index_sequence< internal_tuple_t::size_v >()
+    return detail::make_stdtuple_from_tietuple(
+        detail::tie_as_flat_tuple(val),
+        std::make_index_sequence< flat_tuple_size_v<T> >()
     );
 }
-*/
+
 
 /// \brief Creates an `std::tuple` with lvalue references to fields of a \flattening{flattened} T.
 ///
