@@ -50,34 +50,32 @@ struct base_from_member {
 template <class I, class ...Tail>
 struct tuple_base;
 
+
+
 template <std::size_t... I, class ...Tail>
 struct tuple_base< std::index_sequence<I...>, Tail... >
     : base_from_member<I , Tail>...
 {
-    template <class... Arg>
-    constexpr tuple_base(Arg&&... v) noexcept
-        : base_from_member<I, Tail>{ std::forward<Arg>(v) }...
-    {}
-
+    static constexpr std::size_t size_v = sizeof...(I);
 
     constexpr tuple_base() noexcept = default;
     constexpr tuple_base(tuple_base&&) noexcept = default;
     constexpr tuple_base(const tuple_base&) noexcept = default;
-
-    static constexpr std::size_t size_v = sizeof...(I);
-};
 /*
-template <class T>
-struct tuple_base< std::index_sequence<0>, T >
-    : base_from_member<0, T>
-{
-    template <class Arg>
-    constexpr tuple_base(Arg&& v)
-        : base_from_member<0, T>{ std::forward<Arg>(v) }
-    {}
+    template <class... Arg>
+    constexpr tuple_base(Arg&&... v) noexcept
+        : base_from_member<I, Tail>{ std::forward<Arg>(v) }...
+    {}*/
 
-    static constexpr std::size_t size_v = 1;
-};*/
+    constexpr tuple_base(Tail... v) noexcept
+        : base_from_member<I, Tail>{ v }...
+    {}
+};
+
+template <>
+struct tuple_base<std::index_sequence<> > {
+    static constexpr std::size_t size_v = 0;
+};
 
 template <std::size_t N, class T>
 constexpr T& get_impl(base_from_member<N, T>& t) noexcept {
@@ -104,41 +102,51 @@ constexpr T&& get_impl(base_from_member<N, T>&& t) noexcept {
     return std::forward<T>(t.value);
 }
 
+
 template <class ...Values>
-using tuple = tuple_base<
+struct tuple: tuple_base<
+    std::make_index_sequence<sizeof...(Values)>,
+    Values...>
+{
+    using tuple_base<
         std::make_index_sequence<sizeof...(Values)>,
         Values...
-    >;
+    >::tuple_base;
+};
+
 
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(tuple<T...>& t) noexcept {
-    static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
+    static_assert(N < sizeof...(T), "Tuple index out of bounds");
     return get_impl<N>(t);
 }
 
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(const tuple<T...>& t) noexcept {
-    static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
+    static_assert(N < sizeof...(T), "Tuple index out of bounds");
     return get_impl<N>(t);
 }
 
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(const volatile tuple<T...>& t) noexcept {
-    static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
+    static_assert(N < sizeof...(T), "Tuple index out of bounds");
     return get_impl<N>(t);
 }
 
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(volatile tuple<T...>& t) noexcept {
-    static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
+    static_assert(N < sizeof...(T), "Tuple index out of bounds");
     return get_impl<N>(t);
 }
 
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(tuple<T...>&& t) noexcept {
-    static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
+    static_assert(N < sizeof...(T), "Tuple index out of bounds");
     return get_impl<N>(std::move(t));
 }
+
+
+
 
 template <size_t I, class T>
 using tuple_element = std::remove_reference< decltype(
@@ -758,7 +766,7 @@ constexpr size_array<N> resize_dropping_zeros_and_decrementing(size_t_<N>, const
     return result;
 }
 
-template <class T, class SubtuplesUncleanupped, std::size_t First, std::size_t... I, std::size_t... INew>
+template <class T, std::size_t First, std::size_t... I, std::size_t... INew>
 constexpr auto as_flat_tuple_impl_drop_helpers(std::index_sequence<First, I...>, std::index_sequence<INew...>) noexcept {
     constexpr auto a = flat_array_of_type_ids<T>();
     (void)a; // `a` is unused if T is an empty type
@@ -773,8 +781,22 @@ constexpr auto as_flat_tuple_impl_drop_helpers(std::index_sequence<First, I...>,
     constexpr auto new_size = size_t_<indexes_plus_1_and_zeros_as_skips_in_subtuples.count_nonzeros()>{};
     constexpr auto indexes_in_subtuples = resize_dropping_zeros_and_decrementing(new_size, indexes_plus_1_and_zeros_as_skips_in_subtuples);
 
+    typedef sequence_tuple::tuple<
+        decltype(prepare_subtuples<T>(size_t_< get<First>(a) >{}, size_t_<First>{})),
+        decltype(prepare_subtuples<T>(size_t_< get<I>(a) >{},     size_t_<I>{}))...
+    > subtuples_uncleanuped_t;
+
+    /*
+    constexpr size_array<sizeof...(INew)> ids_to_deal_with {{ a.data[ indexes_in_subtuples.data[INew] ]... }};
+
+    typedef sequence_tuple::tuple<
+        decltype(prepare_subtuples<T>(size_t_< ids_to_deal_with.data[INew] >{}, size_t_< indexes_in_subtuples.data[INew] >{}))...
+    > subtuples_uncleanuped_t;
+
+    return subtuples_uncleanuped_t{};*/
+
     return sequence_tuple::tuple<
-        typename sequence_tuple::tuple_element<indexes_in_subtuples.data[INew], SubtuplesUncleanupped>::type...
+        typename sequence_tuple::tuple_element<indexes_in_subtuples.data[INew], subtuples_uncleanuped_t>::type...
     >{};
 }
 
@@ -797,12 +819,7 @@ constexpr auto as_flat_tuple_impl(std::index_sequence<First, I...>) noexcept {
     constexpr auto a = flat_array_of_type_ids<T>();
     (void)a; // `a` is unused if T is an empty type
 
-    typedef sequence_tuple::tuple<
-        decltype(prepare_subtuples<T>(size_t_< get<First>(a) >{}, size_t_<First>{})),
-        decltype(prepare_subtuples<T>(size_t_< get<I>(a) >{},     size_t_<I>{}))...
-    > subtuples_uncleanuped_t;
-
-    return as_flat_tuple_impl_drop_helpers<T, subtuples_uncleanuped_t>(
+    return as_flat_tuple_impl_drop_helpers<T>(
         std::index_sequence<First, I...>{},
         std::make_index_sequence< 1 + sizeof...(I) - count_skips_in_array(First, First + sizeof...(I), a) >{}
     );
@@ -830,14 +847,8 @@ constexpr auto internal_tuple_with_same_alignment() noexcept {
 template <class T>
 using internal_tuple_with_same_alignment_t = decltype( internal_tuple_with_same_alignment<T>() );
 
-/// @cond
-#ifdef __GNUC__
-#define MAY_ALIAS __attribute__((__may_alias__))
-#else
-#define MAY_ALIAS
-#endif
-/// @endcond
 
+///////////////////// Flattening
 template <class Tuple, std::size_t Begin, std::size_t Size>
 constexpr auto make_flat_tuple_of_references(Tuple&& t, size_t_<Begin>, size_t_<Size>) noexcept;
 
@@ -861,8 +872,6 @@ template <class... T>
 constexpr decltype(auto) as_tuple_with_references(const detail::sequence_tuple::tuple<T...>& t) noexcept {
     return make_flat_tuple_of_references(t, size_t_<0>{}, size_t_<detail::sequence_tuple::tuple<T...>::size_v>{});
 }
-
-
 
 template <class Tuple1, std::size_t... I1, class Tuple2, std::size_t... I2>
 constexpr auto my_tuple_cat_impl(Tuple1&& t1, std::index_sequence<I1...>, Tuple2&& t2, std::index_sequence<I2...>) noexcept {
@@ -901,6 +910,15 @@ constexpr auto make_flat_tuple_of_references(Tuple&& t, size_t_<Begin>, size_t_<
         detail::sequence_tuple::get<Begin>(std::forward<Tuple>(t))
     );
 }
+
+
+/// @cond
+#ifdef __GNUC__
+#define MAY_ALIAS __attribute__((__may_alias__))
+#else
+#define MAY_ALIAS
+#endif
+/// @endcond
 
 template <class T>
 decltype(auto) tie_as_flat_tuple(const T& val) noexcept {
