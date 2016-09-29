@@ -14,7 +14,7 @@ env:
     matrix:
         - CXX_STANDARD=c++14 TOOLSET=g++-5
         - CXX_STANDARD=c++1z TOOLSET=g++-5
-        - CXX_STANDARD=c++14 TOOLSET=clang++
+        - CXX_STANDARD=c++1y TOOLSET=clang++
         #- CXX_STANDARD=c++14 TOOLSET=clang++-3.7
 
 
