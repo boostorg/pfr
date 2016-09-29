@@ -786,23 +786,12 @@ constexpr auto as_flat_tuple_impl_drop_helpers(std::index_sequence<First, I...>,
     constexpr auto new_size = size_t_<indexes_plus_1_and_zeros_as_skips_in_subtuples.count_nonzeros()>{};
     constexpr auto indexes_in_subtuples = resize_dropping_zeros_and_decrementing(new_size, indexes_plus_1_and_zeros_as_skips_in_subtuples);
 
+    constexpr size_array<sizeof...(INew)> values_to_deal_with {{ a.data[ First + indexes_in_subtuples.data[INew] ]... }};
     typedef sequence_tuple::tuple<
-        decltype(prepare_subtuples<T>(size_t_< get<First>(a) >{}, size_t_<First>{})),
-        decltype(prepare_subtuples<T>(size_t_< get<I>(a) >{},     size_t_<I>{}))...
+        decltype(prepare_subtuples<T>(size_t_< values_to_deal_with.data[INew] >{}, size_t_< First + indexes_in_subtuples.data[INew] >{}))...
     > subtuples_uncleanuped_t;
 
-    /*
-    constexpr size_array<sizeof...(INew)> ids_to_deal_with {{ a.data[ indexes_in_subtuples.data[INew] ]... }};
-
-    typedef sequence_tuple::tuple<
-        decltype(prepare_subtuples<T>(size_t_< ids_to_deal_with.data[INew] >{}, size_t_< indexes_in_subtuples.data[INew] >{}))...
-    > subtuples_uncleanuped_t;
-
-    return subtuples_uncleanuped_t{};*/
-
-    return sequence_tuple::tuple<
-        typename sequence_tuple::tuple_element<indexes_in_subtuples.data[INew], subtuples_uncleanuped_t>::type...
-    >{};
+    return subtuples_uncleanuped_t{};
 }
 
 template <class Array>

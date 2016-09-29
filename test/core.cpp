@@ -430,6 +430,63 @@ void test_and_debug_internals(std::index_sequence<I...>) {
     std::cerr << boost::typeindex::type_id<decltype(res)>() << "\n\n";*/
 }
 
+
+// test by Alexey Moiseytsev
+void another_test_with_unusual_alignment() {
+    struct nested {
+        char c0;
+        char c1;
+        int i0;
+        short s0;
+        char c2;
+    };
+
+    struct pair {
+        nested n0;
+        nested n1;
+    };
+
+    // layout:
+    // offset        struct      tuple
+    // 0             n0.c0       n0.c0
+    // 1             n0.c1       n0.c1
+    // 2             padding     padding
+    // 3             padding     padding
+    // 4             n0.i0       n0.i0
+    // 5             n0.i0       n0.i0
+    // 6             n0.i0       n0.i0
+    // 7             n0.i0       n0.i0
+    // 8             n0.s0       n0.s0
+    // 9             n0.s0       n0.s0
+    // 10            n0.c2       n0.c2
+    // 11            padding     n1.c0              !!!
+    // 12            n1.c0       n1.c1              !!!
+    // 13            n1.c1       padding            !!!
+    // 14            padding     padding
+    // 15            padding     padding
+    // 16            n1.i0       n1.i0
+    // 17            n1.i0       n1.i0
+    // 18            n1.i0       n1.i0
+    // 19            n1.i0       n1.i0
+    // 20            n1.s0       n1.s0
+    // 21            n1.s0       n1.s0
+    // 22            n1.c2       n1.c2
+    // 23            padding     padding
+
+    pair s{{'q', 'w', 12, 32, 'e'}, {'a', 's', 24, 64, 'd'}};
+    BOOST_TEST_EQ(flat_get<0>(s), 'q');
+    BOOST_TEST_EQ(flat_get<1>(s), 'w');
+    BOOST_TEST_EQ(flat_get<2>(s), 12);
+    BOOST_TEST_EQ(flat_get<3>(s), 32);
+    BOOST_TEST_EQ(flat_get<4>(s), 'e');
+
+    BOOST_TEST_EQ(flat_get<5>(s), 'a');
+    BOOST_TEST_EQ(flat_get<6>(s), 's');
+    BOOST_TEST_EQ(flat_get<7>(s), 24);
+    BOOST_TEST_EQ(flat_get<8>(s), 64);
+    BOOST_TEST_EQ(flat_get<9>(s), 'd');
+}
+
 int main() {
     test_compiletime<foo>();
     test_compiletime_array<int>();
@@ -500,6 +557,7 @@ int main() {
 
     test_and_debug_internals(std::make_index_sequence<6>{});
     test_alignment_with_neted_structure();
+    another_test_with_unusual_alignment();
 
     return boost::report_errors();
 }
