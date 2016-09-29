@@ -41,6 +41,7 @@ template <class T> struct identity{
 ///////////////////// Tuple that holds it's values in the supplied order
 namespace sequence_tuple {
 
+
 template <std::size_t N, class T>
 struct base_from_member {
     T value;
@@ -52,7 +53,31 @@ struct tuple_base;
 template <std::size_t... I, class ...Tail>
 struct tuple_base< std::index_sequence<I...>, Tail... >
     : base_from_member<I , Tail>...
-{};
+{
+    template <class... Arg>
+    constexpr tuple_base(Arg&&... v) noexcept
+        : base_from_member<I, Tail>{ std::forward<Arg>(v) }...
+    {}
+
+
+    constexpr tuple_base() noexcept = default;
+    constexpr tuple_base(tuple_base&&) noexcept = default;
+    constexpr tuple_base(const tuple_base&) noexcept = default;
+
+    static constexpr std::size_t size_v = sizeof...(I);
+};
+/*
+template <class T>
+struct tuple_base< std::index_sequence<0>, T >
+    : base_from_member<0, T>
+{
+    template <class Arg>
+    constexpr tuple_base(Arg&& v)
+        : base_from_member<0, T>{ std::forward<Arg>(v) }
+    {}
+
+    static constexpr std::size_t size_v = 1;
+};*/
 
 template <std::size_t N, class T>
 constexpr T& get_impl(base_from_member<N, T>& t) noexcept {
@@ -74,14 +99,16 @@ constexpr const volatile T& get_impl(const volatile base_from_member<N, T>& t) n
     return t.value;
 }
 
+template <std::size_t N, class T>
+constexpr T&& get_impl(base_from_member<N, T>&& t) noexcept {
+    return std::forward<T>(t.value);
+}
+
 template <class ...Values>
-struct tuple: tuple_base<
+using tuple = tuple_base<
         std::make_index_sequence<sizeof...(Values)>,
         Values...
-    >
-{
-    static constexpr std::size_t size_v = sizeof...(Values);
-};
+    >;
 
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(tuple<T...>& t) noexcept {
@@ -110,15 +137,13 @@ constexpr decltype(auto) get(volatile tuple<T...>& t) noexcept {
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(tuple<T...>&& t) noexcept {
     static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
-    return std::move(
-        get_impl<N>(t)
-    );
+    return get_impl<N>(std::move(t));
 }
 
 template <size_t I, class T>
-using tuple_element = typename std::remove_reference< decltype(
+using tuple_element = std::remove_reference< decltype(
         ::boost::pfr::detail::sequence_tuple::get<I>( std::declval<T>() )
-    ) >::type;
+    ) >;
 
 
 } // namespace sequence_tuple
@@ -132,7 +157,7 @@ struct print_impl {
     template <class Stream, class T>
     static void print (Stream& out, const T& value) {
         if (!!I) out << ", ";
-        out << ::std::get<I>(value);
+        out << boost::pfr::detail::sequence_tuple::get<I>(value);
         print_impl<I + 1, N>::print(out, value);
     }
 };
@@ -154,7 +179,7 @@ struct read_impl {
             in >> ignore;
             if (ignore != ' ')  in.setstate(Stream::failbit);
         }
-        in >> ::std::get<I>(value);
+        in >> boost::pfr::detail::sequence_tuple::get<I>(value);
         read_impl<I + 1, N>::read(in, value);
     }
 };
@@ -785,7 +810,7 @@ constexpr auto as_flat_tuple_impl_drop_helpers(std::index_sequence<First, I...>,
     // TODO: end of copypasted code
 
     return sequence_tuple::tuple<
-        sequence_tuple::tuple_element<indexes_in_subtuples.data[INew], SubtuplesUncleanupped>...
+        typename sequence_tuple::tuple_element<indexes_in_subtuples.data[INew], SubtuplesUncleanupped>::type...
     >{};
 }
 
@@ -850,15 +875,14 @@ template <class Tuple, std::size_t Begin, std::size_t Size>
 constexpr auto make_flat_tuple_of_references(Tuple&& t, size_t_<Begin>, size_t_<Size>) noexcept;
 
 template <class Tuple, std::size_t Begin>
-constexpr std::tuple<> make_flat_tuple_of_references(Tuple&& t, size_t_<Begin>, size_t_<0>) noexcept;
+constexpr detail::sequence_tuple::tuple<> make_flat_tuple_of_references(Tuple&& t, size_t_<Begin>, size_t_<0>) noexcept;
 
 template <class Tuple, std::size_t Begin>
 constexpr auto make_flat_tuple_of_references(Tuple&& t, size_t_<Begin>, size_t_<1>) noexcept;
 
-
 template <class... T>
-constexpr std::tuple<T&...> as_tuple_with_references(T&&... args) noexcept {
-    return std::tuple<T&...>{ std::forward<T>(args)... };
+constexpr auto as_tuple_with_references(T&&... args) noexcept {
+    return detail::sequence_tuple::tuple<T&...>{ std::forward<T>(args)... };
 }
 
 template <class... T>
@@ -874,33 +898,34 @@ constexpr decltype(auto) as_tuple_with_references(const detail::sequence_tuple::
 
 
 template <class Tuple1, std::size_t... I1, class Tuple2, std::size_t... I2>
-auto my_tuple_cat_impl(Tuple1&& t1, std::index_sequence<I1...>, Tuple2&& t2, std::index_sequence<I2...>) noexcept {
+constexpr auto my_tuple_cat_impl(Tuple1&& t1, std::index_sequence<I1...>, Tuple2&& t2, std::index_sequence<I2...>) noexcept {
     return as_tuple_with_references(
-        std::get<I1>( std::forward<Tuple1>(t1) )...,
-        std::get<I2>( std::forward<Tuple2>(t2) )...
+        detail::sequence_tuple::get<I1>( std::forward<Tuple1>(t1) )...,
+        detail::sequence_tuple::get<I2>( std::forward<Tuple2>(t2) )...
     );
 }
 
 template <class Tuple1, class Tuple2>
-auto my_tuple_cat(Tuple1&& t1, Tuple2&& t2) noexcept {
+constexpr auto my_tuple_cat(Tuple1& t1, Tuple2& t2) noexcept {
     return my_tuple_cat_impl(
-        std::forward<Tuple1>(t1), std::make_index_sequence< std::tuple_size<Tuple1>::value >{},
-        std::forward<Tuple2>(t2), std::make_index_sequence< std::tuple_size<Tuple2>::value >{}
+        t1, std::make_index_sequence< Tuple1::size_v >{},
+        t2, std::make_index_sequence< Tuple2::size_v >{}
     );
 }
 
 template <class Tuple, std::size_t Begin, std::size_t Size>
 constexpr auto make_flat_tuple_of_references(Tuple&& t, size_t_<Begin>, size_t_<Size>) noexcept {
     constexpr std::size_t next_size = Size / 2;
+    auto t1 = make_flat_tuple_of_references(std::forward<Tuple>(t), size_t_<Begin>{}, size_t_<next_size>{});
+    auto t2 = make_flat_tuple_of_references(std::forward<Tuple>(t), size_t_<Begin + Size / 2>{}, size_t_<Size - next_size>{});
     return my_tuple_cat(
-        make_flat_tuple_of_references(std::forward<Tuple>(t), size_t_<Begin>{}, size_t_<next_size>{}),
-        make_flat_tuple_of_references(std::forward<Tuple>(t), size_t_<Begin + Size / 2>{}, size_t_<Size - next_size>{})
+        t1, t2
     );
 }
 
 template <class Tuple, std::size_t Begin>
-constexpr std::tuple<> make_flat_tuple_of_references(Tuple&& /*t*/, size_t_<Begin>, size_t_<0>) noexcept {
-    return std::tuple<>{};
+constexpr detail::sequence_tuple::tuple<> make_flat_tuple_of_references(Tuple&& /*t*/, size_t_<Begin>, size_t_<0>) noexcept {
+    return detail::sequence_tuple::tuple<>{};
 }
 
 template <class Tuple, std::size_t Begin>
@@ -939,7 +964,14 @@ decltype(auto) tie_as_flat_tuple(T& val) noexcept {
 template <class T, std::size_t... I>
 constexpr auto make_stdtuple_from_tietuple(const T& t, std::index_sequence<I...>) noexcept {
     return std::make_tuple(
-        ::std::get<I>(t)...
+        boost::pfr::detail::sequence_tuple::get<I>(t)...
+    );
+}
+
+template <class T, std::size_t... I>
+constexpr auto make_stdtiedtuple_from_tietuple(const T& t, std::index_sequence<I...>) noexcept {
+    return std::tie(
+        boost::pfr::detail::sequence_tuple::get<I>(t)...
     );
 }
 
@@ -962,14 +994,14 @@ constexpr auto make_stdtuple_from_tietuple(const T& t, std::index_sequence<I...>
 /// \endcode
 template <std::size_t I, class T>
 decltype(auto) flat_get(const T& val) noexcept {
-    return std::get<I>( detail::tie_as_flat_tuple(val) );
+    return boost::pfr::detail::sequence_tuple::get<I>( boost::pfr::detail::tie_as_flat_tuple(val) );
 }
 
 
 /// \overload flat_get
 template <std::size_t I, class T>
 decltype(auto) flat_get(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable<T, T>::value>* = 0/* @endcond */ ) noexcept {
-    return std::get<I>( detail::tie_as_flat_tuple(val) );
+    return boost::pfr::detail::sequence_tuple::get<I>( boost::pfr::detail::tie_as_flat_tuple(val) );
 }
 
 
@@ -981,7 +1013,7 @@ decltype(auto) flat_get(T& val /* @cond */, std::enable_if_t< std::is_trivially_
 /// \endcode
 template <std::size_t I, class T>
 using flat_tuple_element = std::remove_reference<
-        typename std::tuple_element<I, decltype(detail::tie_as_flat_tuple(std::declval<T&>())) >::type
+        typename boost::pfr::detail::sequence_tuple::tuple_element<I, decltype(boost::pfr::detail::tie_as_flat_tuple(std::declval<T&>())) >::type
     >;
 
 
@@ -1002,7 +1034,7 @@ using flat_tuple_element_t = typename flat_tuple_element<I, T>::type;
 ///     std::array<int, boost::pfr::flat_tuple_size<my_structure>::value > a;
 /// \endcode
 template <class T>
-using flat_tuple_size = std::tuple_size<decltype(detail::tie_as_flat_tuple(std::declval<T&>()))>;
+using flat_tuple_size = boost::pfr::detail::size_t_<decltype(boost::pfr::detail::tie_as_flat_tuple(std::declval<T&>()))::size_v>;
 
 
 /// \brief `flat_tuple_size_v` is a template variable that contains fields count in a \flattening{flattened} T.
@@ -1069,7 +1101,10 @@ auto flat_structure_to_tuple(const T& val) noexcept {
 /// \endcode
 template <class T>
 auto flat_structure_tie(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable<T, T>::value>* = 0 /* @endcond */) noexcept {
-    return detail::tie_as_flat_tuple(val);
+    return detail::make_stdtiedtuple_from_tietuple(
+        detail::tie_as_flat_tuple(val),
+        std::make_index_sequence< flat_tuple_size_v<T> >()
+    );
 }
 
 /// \brief Writes \flattening{flattened} POD `value` to `out`

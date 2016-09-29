@@ -21,6 +21,112 @@
 namespace boost { namespace pfr {
 
 namespace detail {
+    template <std::size_t I, std::size_t N>
+    struct equal_impl {
+        template <class T, class U>
+        constexpr static bool cmp(const T& v1, const U& v2) noexcept {
+            return ::boost::pfr::detail::sequence_tuple::get<I>(v1) == ::boost::pfr::detail::sequence_tuple::get<I>(v2)
+                && equal_impl<I + 1, N>::cmp(v1, v2);
+        }
+    };
+
+    template <std::size_t N>
+    struct equal_impl<N, N> {
+        template <class T, class U>
+        constexpr static bool cmp(const T&, const U&) noexcept {
+            return T::size_v == U::size_v;
+        }
+    };
+
+    template <std::size_t I, std::size_t N>
+    struct not_equal_impl {
+        template <class T, class U>
+        constexpr static bool cmp(const T& v1, const U& v2) noexcept {
+            return ::boost::pfr::detail::sequence_tuple::get<I>(v1) != ::boost::pfr::detail::sequence_tuple::get<I>(v2)
+                || not_equal_impl<I + 1, N>::cmp(v1, v2);
+        }
+    };
+
+    template <std::size_t N>
+    struct not_equal_impl<N, N> {
+        template <class T, class U>
+        constexpr static bool cmp(const T&, const U&) noexcept {
+            return T::size_v != U::size_v;
+        }
+    };
+
+    template <std::size_t I, std::size_t N>
+    struct less_impl {
+        template <class T, class U>
+        constexpr static bool cmp(const T& v1, const U& v2) noexcept {
+            using ::boost::pfr::detail::sequence_tuple::get;
+            return get<I>(v1) < get<I>(v2)
+                || (get<I>(v1) == get<I>(v2) && less_impl<I + 1, N>::cmp(v1, v2));
+        }
+    };
+
+    template <std::size_t N>
+    struct less_impl<N, N> {
+        template <class T, class U>
+        constexpr static bool cmp(const T&, const U&) noexcept {
+            return T::size_v < U::size_v;
+        }
+    };
+
+    template <std::size_t I, std::size_t N>
+    struct less_equal_impl {
+        template <class T, class U>
+        constexpr static bool cmp(const T& v1, const U& v2) noexcept {
+            using ::boost::pfr::detail::sequence_tuple::get;
+            return get<I>(v1) < get<I>(v2)
+                || (get<I>(v1) == get<I>(v2) && less_equal_impl<I + 1, N>::cmp(v1, v2));
+        }
+    };
+
+    template <std::size_t N>
+    struct less_equal_impl<N, N> {
+        template <class T, class U>
+        constexpr static bool cmp(const T&, const U&) noexcept {
+            return T::size_v <= U::size_v;
+        }
+    };
+
+    template <std::size_t I, std::size_t N>
+    struct greater_impl {
+        template <class T, class U>
+        constexpr static bool cmp(const T& v1, const U& v2) noexcept {
+            using ::boost::pfr::detail::sequence_tuple::get;
+            return get<I>(v1) > get<I>(v2)
+                || (get<I>(v1) == get<I>(v2) && greater_impl<I + 1, N>::cmp(v1, v2));
+        }
+    };
+
+    template <std::size_t N>
+    struct greater_impl<N, N> {
+        template <class T, class U>
+        constexpr static bool cmp(const T&, const U&) noexcept {
+            return T::size_v > U::size_v;
+        }
+    };
+
+    template <std::size_t I, std::size_t N>
+    struct greater_equal_impl {
+        template <class T, class U>
+        constexpr static bool cmp(const T& v1, const U& v2) noexcept {
+            using ::boost::pfr::detail::sequence_tuple::get;
+            return get<I>(v1) > get<I>(v2)
+                || (get<I>(v1) == get<I>(v2) && greater_equal_impl<I + 1, N>::cmp(v1, v2));
+        }
+    };
+
+    template <std::size_t N>
+    struct greater_equal_impl<N, N> {
+        template <class T, class U>
+        constexpr static bool cmp(const T&, const U&) noexcept {
+            return T::size_v >= U::size_v;
+        }
+    };
+
     template <typename SizeT>
     constexpr void hash_combine(SizeT& seed, SizeT value) noexcept {
         seed ^= value + 0x9e3779b9 + (seed<<6) + (seed>>2);
@@ -30,8 +136,8 @@ namespace detail {
     struct hash_impl {
         template <class T>
         constexpr static std::size_t compute(const T& val) noexcept {
-            typedef typename std::decay< ::std::tuple_element_t<I, T> >::type elem_t;
-            std::size_t h = std::hash<elem_t>()( ::std::get<I>(val) );
+            typedef std::decay_t<typename detail::sequence_tuple::tuple_element<I, T>::type> elem_t;
+            std::size_t h = std::hash<elem_t>()( ::boost::pfr::detail::sequence_tuple::get<I>(val) );
             hash_combine(h, hash_impl<I + 1, N>::compute(val) );
             return h;
         }
@@ -57,7 +163,7 @@ namespace detail {
 template <class T = void> struct flat_equal_to {
     /// \return \b true if each field of \b x equals the field with same index of \b y
     bool operator()(const T& x, const T& y) const noexcept {
-        return detail::tie_as_flat_tuple(x) == detail::tie_as_flat_tuple(y);
+        return detail::equal_impl<0, flat_tuple_size_v<T> >::cmp(detail::tie_as_flat_tuple(x), detail::tie_as_flat_tuple(y));
     }
 
 #ifdef BOOST_PFR_DOXYGEN_INVOKED
@@ -74,7 +180,10 @@ template <class T = void> struct flat_equal_to {
 template <> struct flat_equal_to<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const noexcept {
-        return detail::tie_as_flat_tuple(x) == detail::tie_as_flat_tuple(y);
+        return detail::equal_impl<
+            0,
+            detail::min_size(flat_tuple_size_v<T>, flat_tuple_size_v<U>)
+        >::cmp(detail::tie_as_flat_tuple(x), detail::tie_as_flat_tuple(y));
     }
 
 };
@@ -84,7 +193,7 @@ template <> struct flat_equal_to<void> {
 template <class T = void> struct flat_not_equal {
     /// \return \b true if at least one field \b x not equals the field with same index of \b y
     bool operator()(const T& x, const T& y) const noexcept {
-        return detail::tie_as_flat_tuple(x) != detail::tie_as_flat_tuple(y);
+        return detail::not_equal_impl<0, flat_tuple_size_v<T> >::cmp(detail::tie_as_flat_tuple(x), detail::tie_as_flat_tuple(y));
     }
 
 #ifdef BOOST_PFR_DOXYGEN_INVOKED
@@ -101,7 +210,7 @@ template <class T = void> struct flat_not_equal {
 template <> struct flat_not_equal<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const noexcept {
-        return detail::tie_as_flat_tuple(x) != detail::tie_as_flat_tuple(y);
+        return detail::not_equal_impl<0, flat_tuple_size_v<T> >::cmp(detail::tie_as_flat_tuple(x), detail::tie_as_flat_tuple(y));
     }
 
     typedef std::true_type is_transparent;
@@ -112,7 +221,7 @@ template <> struct flat_not_equal<void> {
 template <class T = void> struct flat_greater {
     /// \return \b true if field of \b x greater than the field with same index of \b y and all previous fields of \b x eqeal to the same fields of \b y
     bool operator()(const T& x, const T& y) const noexcept {
-        return detail::tie_as_flat_tuple(x) > detail::tie_as_flat_tuple(y);
+        return detail::greater_impl<0, flat_tuple_size_v<T> >::cmp(detail::tie_as_flat_tuple(x), detail::tie_as_flat_tuple(y));
     }
 
 #ifdef BOOST_PFR_DOXYGEN_INVOKED
@@ -129,7 +238,10 @@ template <class T = void> struct flat_greater {
 template <> struct flat_greater<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const noexcept {
-        return detail::tie_as_flat_tuple(x) > detail::tie_as_flat_tuple(y);
+        return detail::greater_impl<
+            0,
+            detail::min_size(flat_tuple_size_v<T>, flat_tuple_size_v<U>)
+        >::cmp(detail::tie_as_flat_tuple(x), detail::tie_as_flat_tuple(y));
     }
 
     typedef std::true_type is_transparent;
@@ -140,7 +252,7 @@ template <> struct flat_greater<void> {
 template <class T = void> struct flat_less {
     /// \return \b true if field of \b x less than the field with same index of \b y and all previous fields of \b x eqeal to the same fields of \b y
     bool operator()(const T& x, const T& y) const noexcept {
-        return detail::tie_as_flat_tuple(x) < detail::tie_as_flat_tuple(y);
+        return detail::less_impl<0, flat_tuple_size_v<T> >::cmp(detail::tie_as_flat_tuple(x), detail::tie_as_flat_tuple(y));
     }
 
 #ifdef BOOST_PFR_DOXYGEN_INVOKED
@@ -157,7 +269,10 @@ template <class T = void> struct flat_less {
 template <> struct flat_less<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const noexcept {
-        return detail::tie_as_flat_tuple(x) < detail::tie_as_flat_tuple(y);
+        return detail::less_impl<
+            0,
+            detail::min_size(flat_tuple_size_v<T>, flat_tuple_size_v<U>)
+        >::cmp(detail::tie_as_flat_tuple(x), detail::tie_as_flat_tuple(y));
     }
 
     typedef std::true_type is_transparent;
@@ -169,7 +284,7 @@ template <class T = void> struct flat_greater_equal {
     /// \return \b true if field of \b x greater than the field with same index of \b y and all previous fields of \b x eqeal to the same fields of \b y;
     /// or if each field of \b x equals the field with same index of \b y .
     bool operator()(const T& x, const T& y) const noexcept {
-        return detail::tie_as_flat_tuple(x) >= detail::tie_as_flat_tuple(y);
+        return detail::greater_equal_impl<0, flat_tuple_size_v<T> >::cmp(detail::tie_as_flat_tuple(x), detail::tie_as_flat_tuple(y));
     }
 
 #ifdef BOOST_PFR_DOXYGEN_INVOKED
@@ -186,7 +301,10 @@ template <class T = void> struct flat_greater_equal {
 template <> struct flat_greater_equal<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const noexcept {
-        return detail::tie_as_flat_tuple(x) >= detail::tie_as_flat_tuple(y);
+        return detail::greater_equal_impl<
+            0,
+            detail::min_size(flat_tuple_size_v<T>, flat_tuple_size_v<U>)
+        >::cmp(detail::tie_as_flat_tuple(x), detail::tie_as_flat_tuple(y));
     }
 
     typedef std::true_type is_transparent;
@@ -198,7 +316,7 @@ template <class T = void> struct flat_less_equal {
     /// \return \b true if field of \b x less than the field with same index of \b y and all previous fields of \b x eqeal to the same fields of \b y;
     /// or if each field of \b x equals the field with same index of \b y .
     bool operator()(const T& x, const T& y) const noexcept {
-        return detail::tie_as_flat_tuple(x) <= detail::tie_as_flat_tuple(y);
+        return detail::less_equal_impl<0, flat_tuple_size_v<T> >::cmp(detail::tie_as_flat_tuple(x), detail::tie_as_flat_tuple(y));
     }
 
 #ifdef BOOST_PFR_DOXYGEN_INVOKED
@@ -215,7 +333,10 @@ template <class T = void> struct flat_less_equal {
 template <> struct flat_less_equal<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const noexcept {
-        return detail::tie_as_flat_tuple(x) <= detail::tie_as_flat_tuple(y);
+        return detail::less_equal_impl<
+            0,
+            detail::min_size(flat_tuple_size_v<T>, flat_tuple_size_v<U>)
+        >::cmp(detail::tie_as_flat_tuple(x), detail::tie_as_flat_tuple(y));
     }
 
     typedef std::true_type is_transparent;
