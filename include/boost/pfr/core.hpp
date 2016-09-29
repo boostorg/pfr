@@ -846,57 +846,92 @@ using internal_tuple_with_same_alignment_t = decltype( internal_tuple_with_same_
 #endif
 /// @endcond
 
+template <class Tuple, std::size_t Begin, std::size_t Size>
+constexpr auto make_flat_tuple_of_references(Tuple&& t, size_t_<Begin>, size_t_<Size>) noexcept;
 
-template <class Tuple, std::size_t... I>
-constexpr auto make_flat_tuple_of_references(Tuple&& t, std::index_sequence<I...>) noexcept;
+template <class Tuple, std::size_t Begin>
+constexpr std::tuple<> make_flat_tuple_of_references(Tuple&& t, size_t_<Begin>, size_t_<0>) noexcept;
+
+template <class Tuple, std::size_t Begin>
+constexpr auto make_flat_tuple_of_references(Tuple&& t, size_t_<Begin>, size_t_<1>) noexcept;
+
 
 template <class... T>
 constexpr std::tuple<T&...> as_tuple_with_references(T&&... args) noexcept {
-    return std::tuple<T&...>( std::forward<T>(args)... );
+    return std::tuple<T&...>{ std::forward<T>(args)... };
 }
 
 template <class... T>
 constexpr decltype(auto) as_tuple_with_references(detail::sequence_tuple::tuple<T...>& t) noexcept {
-    return make_flat_tuple_of_references(t, std::make_index_sequence< detail::sequence_tuple::tuple<T...>::size_v >{});
+    return make_flat_tuple_of_references(t, size_t_<0>{}, size_t_<detail::sequence_tuple::tuple<T...>::size_v>{});
 }
 
 template <class... T>
 constexpr decltype(auto) as_tuple_with_references(const detail::sequence_tuple::tuple<T...>& t) noexcept {
-    return make_flat_tuple_of_references(t, std::make_index_sequence< detail::sequence_tuple::tuple<T...>::size_v >{});
+    return make_flat_tuple_of_references(t, size_t_<0>{}, size_t_<detail::sequence_tuple::tuple<T...>::size_v>{});
 }
 
 
-template <class Tuple, std::size_t... I>
-constexpr auto make_flat_tuple_of_references(Tuple&& t, std::index_sequence<I...>) noexcept {
-    return std::tuple_cat(
-        as_tuple_with_references(
-            detail::sequence_tuple::get<I>(std::forward<Tuple>(t))
-        )...
+
+template <class Tuple1, std::size_t... I1, class Tuple2, std::size_t... I2>
+auto my_tuple_cat_impl(Tuple1&& t1, std::index_sequence<I1...>, Tuple2&& t2, std::index_sequence<I2...>) noexcept {
+    return as_tuple_with_references(
+        std::get<I1>( std::forward<Tuple1>(t1) )...,
+        std::get<I2>( std::forward<Tuple2>(t2) )...
+    );
+}
+
+template <class Tuple1, class Tuple2>
+auto my_tuple_cat(Tuple1&& t1, Tuple2&& t2) noexcept {
+    return my_tuple_cat_impl(
+        std::forward<Tuple1>(t1), std::make_index_sequence< std::tuple_size<Tuple1>::value >{},
+        std::forward<Tuple2>(t2), std::make_index_sequence< std::tuple_size<Tuple2>::value >{}
+    );
+}
+
+template <class Tuple, std::size_t Begin, std::size_t Size>
+constexpr auto make_flat_tuple_of_references(Tuple&& t, size_t_<Begin>, size_t_<Size>) noexcept {
+    constexpr std::size_t next_size = Size / 2;
+    return my_tuple_cat(
+        make_flat_tuple_of_references(std::forward<Tuple>(t), size_t_<Begin>{}, size_t_<next_size>{}),
+        make_flat_tuple_of_references(std::forward<Tuple>(t), size_t_<Begin + Size / 2>{}, size_t_<Size - next_size>{})
+    );
+}
+
+template <class Tuple, std::size_t Begin>
+constexpr std::tuple<> make_flat_tuple_of_references(Tuple&& /*t*/, size_t_<Begin>, size_t_<0>) noexcept {
+    return std::tuple<>{};
+}
+
+template <class Tuple, std::size_t Begin>
+constexpr auto make_flat_tuple_of_references(Tuple&& t, size_t_<Begin>, size_t_<1>) noexcept {
+    return as_tuple_with_references(
+        detail::sequence_tuple::get<Begin>(std::forward<Tuple>(t))
     );
 }
 
 template <class T>
-constexpr decltype(auto) tie_as_flat_tuple(const T& val) noexcept { // TODO: remove constexpr
+decltype(auto) tie_as_flat_tuple(const T& val) noexcept {
     MAY_ALIAS const auto* const t = reinterpret_cast<const detail::internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
-    return make_flat_tuple_of_references(*t, std::make_index_sequence< detail::internal_tuple_with_same_alignment_t<T>::size_v >{});
+    return make_flat_tuple_of_references(*t, size_t_<0>{}, size_t_<detail::internal_tuple_with_same_alignment_t<T>::size_v>{});
 }
 
 template <class T>
-constexpr decltype(auto) tie_as_flat_tuple(const volatile T& val) noexcept { // TODO: remove constexpr
+decltype(auto) tie_as_flat_tuple(const volatile T& val) noexcept {
     MAY_ALIAS const volatile auto* const t = reinterpret_cast<const volatile detail::internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
-    return make_flat_tuple_of_references(*t, std::make_index_sequence< detail::internal_tuple_with_same_alignment_t<T>::size_v >{});
+    return make_flat_tuple_of_references(*t, size_t_<0>{}, size_t_<detail::internal_tuple_with_same_alignment_t<T>::size_v>{});
 }
 
 template <class T>
-constexpr decltype(auto) tie_as_flat_tuple(volatile T& val) noexcept { // TODO: remove constexpr
+decltype(auto) tie_as_flat_tuple(volatile T& val) noexcept {
     MAY_ALIAS volatile auto* const t = reinterpret_cast<volatile detail::internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
-    return make_flat_tuple_of_references(*t, std::make_index_sequence< detail::internal_tuple_with_same_alignment_t<T>::size_v >{});
+    return make_flat_tuple_of_references(*t, size_t_<0>{}, size_t_<detail::internal_tuple_with_same_alignment_t<T>::size_v>{});
 }
 
 template <class T>
-constexpr decltype(auto) tie_as_flat_tuple(T& val) noexcept { // TODO: remove constexpr
+decltype(auto) tie_as_flat_tuple(T& val) noexcept {
     MAY_ALIAS auto* const t = reinterpret_cast<detail::internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
-    return make_flat_tuple_of_references(*t, std::make_index_sequence< detail::internal_tuple_with_same_alignment_t<T>::size_v >{});
+    return make_flat_tuple_of_references(*t, size_t_<0>{}, size_t_<detail::internal_tuple_with_same_alignment_t<T>::size_v>{});
 }
 
 #undef MAY_ALIAS
