@@ -5,7 +5,7 @@
 
 #include <boost/pfr.hpp>
 #include <boost/core/lightweight_test.hpp>
-#include <boost/type_index.hpp>
+//#include <boost/type_index.hpp> // for debugging
 
 #include <iostream>
 #include <typeinfo>
