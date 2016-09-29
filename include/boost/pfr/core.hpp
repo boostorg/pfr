@@ -730,44 +730,16 @@ constexpr auto prepare_subtuples(size_t_<typeid_conversions::tuple_begin_tag>, s
 }
 
 
-constexpr size_array<0> make_array() noexcept {
-    return {};
-}
-
-template <std::size_t... I>
-constexpr auto make_array(std::index_sequence<I...>) noexcept {
-    return size_array<sizeof...(I)>{{I...}};
-}
-
-template <std::size_t... I0, std::size_t... I1, class... Others>
-constexpr auto make_array(std::index_sequence<I0...>, std::index_sequence<I1...>, Others... vals) noexcept {
-    return make_array(std::index_sequence<I0..., I1...>{}, vals...);
-}
-
-template <std::size_t... I0, std::size_t... I1, std::size_t... I2, class... Others>
-constexpr auto make_array(std::index_sequence<I0...>, std::index_sequence<I1...>, std::index_sequence<I2...>, Others... vals) noexcept {
-    return make_array(std::index_sequence<I0..., I1..., I2...>{}, vals...);
-}
-
-template <std::size_t... I0, std::size_t... I1, std::size_t... I2, std::size_t... I3, class... Others>
-constexpr auto make_array(std::index_sequence<I0...>, std::index_sequence<I1...>, std::index_sequence<I2...>, std::index_sequence<I3...>, Others... vals) noexcept {
-    return make_array(std::index_sequence<I0..., I1..., I2..., I3...>{}, vals...);
-}
-
-template <std::size_t N, std::size_t I>
-constexpr auto empty_or_sequence(size_t_<N>, size_t_<I>) noexcept {
-    return increment_index_sequence<1 + I>(std::make_index_sequence<N - 1>{});
-}
-
-template <std::size_t I>
-constexpr std::index_sequence<> empty_or_sequence(size_t_<0>, size_t_<I>) noexcept {
-    return {};
-}
-
 template <class ArrayFrom, class ArraySkips>
-constexpr ArrayFrom remove_skips(ArrayFrom indexes_plus_1, const ArraySkips& skips) noexcept { // TODO: optimize
+constexpr ArrayFrom remove_skips(ArrayFrom indexes_plus_1, const ArraySkips& skips) noexcept {
     for (std::size_t i = 0; i < skips.size(); ++i) {
-        indexes_plus_1.data[ skips.data[i] ] = 0;
+        if (skips.data[i]) {
+            const std::size_t skips_count = skips.data[i];
+            for (std::size_t j = i + 1; j < skips_count + i; ++j) {
+                indexes_plus_1.data[j] = 0;
+            }
+            i += skips_count - 1;
+        }
     }
     return indexes_plus_1;
 }
@@ -791,16 +763,12 @@ constexpr auto as_flat_tuple_impl_drop_helpers(std::index_sequence<First, I...>,
     constexpr auto a = flat_array_of_type_ids<T>();
     (void)a; // `a` is unused if T is an empty type
 
-    constexpr auto skips_in_subtuples = make_array(
-        empty_or_sequence(
-            size_t_<a.count_from_opening_till_matching_parenthis_seq(First, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag) >{}, size_t_<First - First>{}
-        ),
-        empty_or_sequence(
-            size_t_<a.count_from_opening_till_matching_parenthis_seq(I, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag) >{}, size_t_<I - First>{}
-        )...
-    );
+    constexpr size_array<sizeof...(I) + 1> skips_in_subtuples {{
+        a.count_from_opening_till_matching_parenthis_seq(First, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag),
+        a.count_from_opening_till_matching_parenthis_seq(I, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag)...
+    }};
 
-    constexpr auto indexes_in_subtuples_uncleanuped = make_array(std::index_sequence<1, 1 + I - First...>{});
+    constexpr size_array<sizeof...(I) + 1> indexes_in_subtuples_uncleanuped {{ 1, 1 + I - First...}};
     constexpr auto indexes_plus_1_and_zeros_as_skips_in_subtuples = remove_skips(indexes_in_subtuples_uncleanuped, skips_in_subtuples);
     constexpr auto new_size = size_t_<indexes_plus_1_and_zeros_as_skips_in_subtuples.count_nonzeros()>{};
     constexpr auto indexes_in_subtuples = resize_dropping_zeros_and_decrementing(new_size, indexes_plus_1_and_zeros_as_skips_in_subtuples);

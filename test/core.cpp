@@ -382,7 +382,7 @@ void test_and_debug_internals(std::index_sequence<I...>) {
     B1 b1 { 5, 6 };
     BOOST_TEST_EQ(boost::pfr::flat_get<0>(b1), 5);
     BOOST_TEST_EQ(boost::pfr::flat_get<1>(b1), 6);
-
+/*
     struct B0 {
         A0 a;
         char c1;
@@ -396,14 +396,12 @@ void test_and_debug_internals(std::index_sequence<I...>) {
     constexpr auto a = flat_array_of_type_ids<T>();
     (void)a; // `a` is unused if T is an empty type
 
-    constexpr auto skips = make_array(
-        empty_or_sequence(
-            size_t_<a.count_from_opening_till_matching_parenthis_seq(I, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag) >{}, size_t_<I>{}
-        )...
-    );
+    constexpr size_array<a.size()> skips_in_subtuples {{
+        a.count_from_opening_till_matching_parenthis_seq(I, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag)...
+    }};
 
-    constexpr auto indexes_uncleanuped = make_array(std::index_sequence<1 + I...>{});
-    constexpr auto indexes_plus_1_and_zeros_as_skips = remove_skips(indexes_uncleanuped, skips);
+    constexpr size_array<sizeof...(I) + 1> indexes_in_subtuples_uncleanuped {{ 1, 1 + I...}};
+    constexpr auto indexes_plus_1_and_zeros_as_skips = remove_skips(indexes_in_subtuples_uncleanuped, skips_in_subtuples);
     constexpr auto new_size = size_t_<indexes_plus_1_and_zeros_as_skips.count_nonzeros()>{};
     constexpr auto indexes = resize_dropping_zeros_and_decrementing(new_size, indexes_plus_1_and_zeros_as_skips);
     static_assert(indexes.data[0] == 0, "");
@@ -429,7 +427,7 @@ void test_and_debug_internals(std::index_sequence<I...>) {
         std::cerr << afoo.data[i] << ' ';
     }
 
-    std::cerr << boost::typeindex::type_id<decltype(res)>() << "\n\n";
+    std::cerr << boost::typeindex::type_id<decltype(res)>() << "\n\n";*/
 }
 
 int main() {
