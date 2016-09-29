@@ -25,7 +25,7 @@ void print(T& f) {
         << typeid(flat_tuple_element_t<I, T>).name()
         << std::endl;
 }
-/*
+
 
 struct make_my_life_harder { int a0; short a1; };
 struct make_my_life_even_more_harder { unsigned int b0; unsigned short b1; make_my_life_harder cr;};
@@ -44,7 +44,7 @@ struct foo {
     make_my_life_harder v12and13;
     make_my_life_even_more_harder v14and15andv16and17;
 };
-
+/*
 void test_print() {
     foo f {
         'A', 11, 12, 13, {'B', 'C'}, 16, 17, 0, 0, 0, 30.1
@@ -419,6 +419,17 @@ void test_and_debug_internals(std::index_sequence<I...>) {
         >::value,
         ""
     );
+
+    constexpr auto res = as_flat_tuple_impl<foo>(
+        std::make_index_sequence< decltype(flat_array_of_type_ids<foo>())::size() >()
+    );
+    auto afoo = flat_array_of_type_ids<foo>();
+    std::cerr << "\n\n";
+    for (std::size_t i = 0; i < afoo.size(); ++i) {
+        std::cerr << afoo.data[i] << ' ';
+    }
+
+    std::cerr << boost::typeindex::type_id<decltype(res)>() << "\n\n";
 }
 
 int main() {
