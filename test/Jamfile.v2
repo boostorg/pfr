@@ -21,6 +21,7 @@ test-suite pfr
     [ compile-fail non_aggregate1.cpp ]
     [ compile-fail non_aggregate2.cpp ]
     [ compile-fail bitfields.cpp ]
+    [ run motivating_example.cpp ]
     [ run ../example/examples.cpp ]
   ;
 

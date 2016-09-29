@@ -11,35 +11,40 @@ This C++14 library is meant for accessing structure elements by index and provid
 ### Motivating example
 ```c++
 #include <iostream>
-#include "magic_get.hpp"
+#include "boost/pfr.hpp"
 
-struct my_struct {
+struct my_struct { // no ostream operator defined!
     int i;
     char c;
     double d;
 };
 
 int main() {
-    my_struct s{100, 'H', 3.141593 };
-    std::cout << "my_struct has " << flat_tuple_size<my_struct>::value << " fields: "
-        << "{ " << flat_get<0>(s) << ", " << flat_get<1>(s)<< ", " << flat_get<2>(s) << " }\n";
+    using namespace boost::pfr::flat_ops; // for ostream operator out-of-the-box for all PODs!
+
+    my_struct s{100, 'H', 3.141593};
+    std::cout << "my_struct has " << boost::pfr::flat_tuple_size<my_struct>::value
+        << " fields: " << s << "\n";
 }
+
 
 ```
 
 Outputs:
 ```
-my_struct has 3 fields: { 100, H, 3.14159 }
+my_struct has 3 fields: {100, H, 3.14159}
 ```
 
 
 ### Requirements and Limitations
 
 * C++14 compatible compiler (GCC-5.0+, Clang, ...)
+* Static variables are ignored
+
+C++14 limitations (C++17 fixes those):
 * T must be POD and must not contain references nor bitfields
 * T must not contain pointers to user defined types
 * Enums will be returned as their underlying type
-* Static variables are ignored
 
 ### License
 
