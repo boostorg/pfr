@@ -635,6 +635,11 @@ constexpr auto flat_type_to_array_of_type_ids(std::size_t* types, std::index_seq
 }
 
 ///////////////////// Methods for detecting max parameters for construction of T
+
+template <class T, std::size_t... I>
+constexpr auto enable_if_constructible_helper(std::index_sequence<I...>) noexcept
+    -> typename std::add_pointer<decltype(T{ ubiq_constructor{I}... })>::type;
+
 template <class T, std::size_t N>
 constexpr void detect_fields_count(std::size_t& count, size_t_<N>, size_t_<N>, long) noexcept {
     // Hand-made is_aggregate<T> trait:
@@ -653,7 +658,7 @@ constexpr void detect_fields_count(std::size_t& count, size_t_<Begin>, size_t_<M
 
 template <class T, std::size_t Begin, std::size_t Middle>
 constexpr auto detect_fields_count(std::size_t& count, size_t_<Begin>, size_t_<Middle>, long) noexcept
-    -> decltype( flat_type_to_array_of_type_ids<T, Middle>(nullptr, std::make_index_sequence<Middle>()) )
+    -> decltype( enable_if_constructible_helper<T>(std::make_index_sequence<Middle>()) )
 {
     constexpr std::size_t next = Middle + (Middle - Begin + 1) / 2;
     detect_fields_count<T>(count, size_t_<Middle>{}, size_t_<next>{}, 1L);
@@ -1040,7 +1045,7 @@ constexpr std::size_t flat_tuple_size_v = flat_tuple_size<T>::value;
 ///     std::array<int, boost::pfr::tuple_size<my_structure>::value > a;
 /// \endcode
 template <class T>
-using tuple_size = detail::size_t_< detail::fields_count<T>() >;
+using tuple_size = detail::size_t_< boost::pfr::detail::fields_count<T>() >;
 
 
 /// \brief `tuple_size_v` is a template variable that contains fields count in a T and
