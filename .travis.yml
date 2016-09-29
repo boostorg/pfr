@@ -7,14 +7,12 @@
 #
 # See https://svn.boost.org/trac/boost/wiki/TravisCoverals for description of this file
 # and how it can be used with Boost libraries.
-#
-# File revision #6 modified
 
 env:
     matrix:
         - CXX_STANDARD=c++14 TOOLSET=g++-5
         - CXX_STANDARD=c++1z TOOLSET=g++-5
-        - CXX_STANDARD=c++1y TOOLSET=clang++
+        #- CXX_STANDARD=c++1y TOOLSET=clang++
         #- CXX_STANDARD=c++14 TOOLSET=clang++-3.7
 
 
@@ -39,7 +37,7 @@ addons:
     - valgrind
     - gcc-5
     - g++-5
-    - clang
+    #- clang
     #- clang-3.7
 
 script:
