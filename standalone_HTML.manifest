@@ -5,9 +5,7 @@ boost_pfr_header_reference.html
 boost/pfr/flat_tuple_element.html
 boost/pfr/flat_tuple_element_t.html
 boost/pfr/flat_tuple_size.html
-boost/pfr/tuple_size.html
 boost/pfr/flat_tuple_size_v.html
-boost/pfr/tuple_size_v.html
 boost/pfr/flat_get.html
 boost/pfr/flat_structure_to_tuple.html
 boost/pfr/flat_structure_tie.html
@@ -20,6 +18,8 @@ boost/pfr/structure_to_tuple.html
 boost/pfr/structure_tie.html
 boost/pfr/write.html
 boost/pfr/read.html
+boost/pfr/tuple_size.html
+boost/pfr/tuple_size_v.html
 BOOST_PFR_FLAT_FUNCTIONS_FOR.html
 boost/pfr/flat_equal_to.html
 boost/pfr/flat_greater.html

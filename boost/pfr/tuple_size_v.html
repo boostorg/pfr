@@ -5,9 +5,9 @@
 <link rel="stylesheet" href="http://www.boost.org/doc/libs/1_61_0/doc/src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
 <link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.POD Flat Reflection 1.0">
-<link rel="up" href="../../boost_pfr_header_reference.html#header.boost.pfr.core_hpp" title="Header &lt;boost/pfr/core.hpp&gt;">
-<link rel="prev" href="flat_tuple_size_v.html" title="Global flat_tuple_size_v">
-<link rel="next" href="flat_get.html" title="Function flat_get">
+<link rel="up" href="../../boost_pfr_header_reference.html#header.boost.pfr.fields_count_hpp" title="Header &lt;boost/pfr/fields_count.hpp&gt;">
+<link rel="prev" href="tuple_size.html" title="Type definition tuple_size">
+<link rel="next" href="../../BOOST_PFR_FLAT_FUNCTIONS_FOR.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -20,7 +20,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="flat_tuple_size_v.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_pfr_header_reference.html#header.boost.pfr.core_hpp"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="flat_get.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="tuple_size.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_pfr_header_reference.html#header.boost.pfr.fields_count_hpp"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../../BOOST_PFR_FLAT_FUNCTIONS_FOR.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="refentry">
 <a name="boost.pfr.tuple_size_v"></a><div class="titlepage"></div>
@@ -29,11 +29,11 @@
 <p>boost::pfr::tuple_size_v &#8212; <code class="computeroutput">tuple_size_v</code> is a template variable that contains fields count in a T and works for any T that supports aggregate initialization even if T is not POD.  <a class="link" href="../../boost_pod_flat_reflection/quick_start.html#boost_pod_flat_reflection.quick_start.flattening" title="Flattening">Flattens</a> only multidimensional arrays. </p>
 </div>
 <h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
-<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../../boost_pfr_header_reference.html#header.boost.pfr.core_hpp" title="Header &lt;boost/pfr/core.hpp&gt;">boost/pfr/core.hpp</a>&gt;
+<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../../boost_pfr_header_reference.html#header.boost.pfr.fields_count_hpp" title="Header &lt;boost/pfr/fields_count.hpp&gt;">boost/pfr/fields_count.hpp</a>&gt;
 
 </span><span class="keyword">constexpr</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span> tuple_size_v<span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idm45836637667008"></a><h2>Description</h2>
+<a name="idm45845085910272"></a><h2>Description</h2>
 <p><span class="bold"><strong>Example:</strong></span> </p>
 <pre class="programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">array</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">,</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">tuple_size_v</span><span class="special">&lt;</span><span class="identifier">my_structure</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">a</span><span class="special">;</span>
 </pre>
@@ -50,7 +50,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="flat_tuple_size_v.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_pfr_header_reference.html#header.boost.pfr.core_hpp"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="flat_get.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="tuple_size.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_pfr_header_reference.html#header.boost.pfr.fields_count_hpp"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../../BOOST_PFR_FLAT_FUNCTIONS_FOR.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>
