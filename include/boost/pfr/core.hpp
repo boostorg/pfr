@@ -61,11 +61,6 @@ struct tuple_base< std::index_sequence<I...>, Tail... >
     constexpr tuple_base() noexcept = default;
     constexpr tuple_base(tuple_base&&) noexcept = default;
     constexpr tuple_base(const tuple_base&) noexcept = default;
-/*
-    template <class... Arg>
-    constexpr tuple_base(Arg&&... v) noexcept
-        : base_from_member<I, Tail>{ std::forward<Arg>(v) }...
-    {}*/
 
     constexpr tuple_base(Tail... v) noexcept
         : base_from_member<I, Tail>{ v }...
@@ -712,7 +707,7 @@ template <class T, std::size_t First, std::size_t... I>
 constexpr auto as_flat_tuple_impl(std::index_sequence<First, I...>) noexcept;
 
 template <class T>
-constexpr auto as_flat_tuple_impl(std::index_sequence<>) noexcept {
+constexpr sequence_tuple::tuple<> as_flat_tuple_impl(std::index_sequence<>) noexcept {
     return sequence_tuple::tuple<>{};
 }
 
@@ -721,33 +716,31 @@ constexpr auto increment_index_sequence(std::index_sequence<I...>) noexcept {
     return std::index_sequence<I + Increment...>{};
 }
 
-template <class T, std::size_t V, std::size_t I>
-constexpr auto prepare_subtuples(size_t_<V>, size_t_<I>) noexcept {
+template <class T, std::size_t V, std::size_t I, std::size_t SubtupleLength>
+constexpr auto prepare_subtuples(size_t_<V>, size_t_<I>, size_t_<SubtupleLength>) noexcept {
+    static_assert(SubtupleLength == 0, "Internal error while representing nested field as tuple");
     return typeid_conversions::id_to_type(size_t_<V>{});
 }
 
-struct end_cleanup_tag{};
-
-template <class T, std::size_t I>
-constexpr end_cleanup_tag prepare_subtuples(size_t_<typeid_conversions::tuple_end_tag>, size_t_<I>) noexcept {
-    return end_cleanup_tag{};
+template <class T, std::size_t I, std::size_t SubtupleLength>
+constexpr auto prepare_subtuples(size_t_<typeid_conversions::tuple_end_tag>, size_t_<I>, size_t_<SubtupleLength>) noexcept {
+    static_assert(sizeof(T) == 0, "Internal error while representing nested field as tuple");
+    return int{};
 }
 
-template <class T, std::size_t I>
-constexpr auto prepare_subtuples(size_t_<typeid_conversions::tuple_begin_tag>, size_t_<I>) noexcept {
-    constexpr auto a = flat_array_of_type_ids<T>();
-    constexpr std::size_t subtuple_size = a.count_from_opening_till_matching_parenthis_seq(I, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag);
-    static_assert(subtuple_size > 2, "Internal error while representing nested field as tuple");
-    constexpr auto seq = std::make_index_sequence<subtuple_size - 2>{};
+template <class T, std::size_t I, std::size_t SubtupleLength>
+constexpr auto prepare_subtuples(size_t_<typeid_conversions::tuple_begin_tag>, size_t_<I>, size_t_<SubtupleLength>) noexcept {
+    static_assert(SubtupleLength > 2, "Internal error while representing nested field as tuple");
+    constexpr auto seq = std::make_index_sequence<SubtupleLength - 2>{};
     return as_flat_tuple_impl<T>( increment_index_sequence<I + 1>(seq) );
 }
 
 
-template <class ArrayFrom, class ArraySkips>
-constexpr ArrayFrom remove_skips(ArrayFrom indexes_plus_1, const ArraySkips& skips) noexcept {
-    for (std::size_t i = 0; i < skips.size(); ++i) {
-        if (skips.data[i]) {
-            const std::size_t skips_count = skips.data[i];
+template <class Array>
+constexpr Array remove_subtuples(Array indexes_plus_1, const Array& subtuple_lengths) noexcept {
+    for (std::size_t i = 0; i < subtuple_lengths.size(); ++i) {
+        if (subtuple_lengths.data[i]) {
+            const std::size_t skips_count = subtuple_lengths.data[i];
             for (std::size_t j = i + 1; j < skips_count + i; ++j) {
                 indexes_plus_1.data[j] = 0;
             }
@@ -774,21 +767,23 @@ constexpr size_array<N> resize_dropping_zeros_and_decrementing(size_t_<N>, const
 template <class T, std::size_t First, std::size_t... I, std::size_t... INew>
 constexpr auto as_flat_tuple_impl_drop_helpers(std::index_sequence<First, I...>, std::index_sequence<INew...>) noexcept {
     constexpr auto a = flat_array_of_type_ids<T>();
-    (void)a; // `a` is unused if T is an empty type
 
-    constexpr size_array<sizeof...(I) + 1> skips_in_subtuples {{
+    constexpr size_array<sizeof...(I) + 1> subtuples_length {{
         a.count_from_opening_till_matching_parenthis_seq(First, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag),
         a.count_from_opening_till_matching_parenthis_seq(I, typeid_conversions::tuple_begin_tag, typeid_conversions::tuple_end_tag)...
     }};
 
-    constexpr size_array<sizeof...(I) + 1> indexes_in_subtuples_uncleanuped {{ 1, 1 + I - First...}};
-    constexpr auto indexes_plus_1_and_zeros_as_skips_in_subtuples = remove_skips(indexes_in_subtuples_uncleanuped, skips_in_subtuples);
-    constexpr auto new_size = size_t_<indexes_plus_1_and_zeros_as_skips_in_subtuples.count_nonzeros()>{};
-    constexpr auto indexes_in_subtuples = resize_dropping_zeros_and_decrementing(new_size, indexes_plus_1_and_zeros_as_skips_in_subtuples);
+    constexpr size_array<sizeof...(I) + 1> type_indexes_with_subtuple_internals {{ 1, 1 + I - First...}};
+    constexpr auto type_indexes_plus_1_and_zeros_as_skips = remove_subtuples(type_indexes_with_subtuple_internals, subtuples_length);
+    constexpr auto new_size = size_t_<type_indexes_plus_1_and_zeros_as_skips.count_nonzeros()>{};
+    constexpr auto type_indexes = resize_dropping_zeros_and_decrementing(new_size, type_indexes_plus_1_and_zeros_as_skips);
 
-    constexpr size_array<sizeof...(INew)> values_to_deal_with {{ a.data[ First + indexes_in_subtuples.data[INew] ]... }};
     typedef sequence_tuple::tuple<
-        decltype(prepare_subtuples<T>(size_t_< values_to_deal_with.data[INew] >{}, size_t_< First + indexes_in_subtuples.data[INew] >{}))...
+        decltype(prepare_subtuples<T>(
+            size_t_< a.data[ First + type_indexes.data[INew] ]          >{},    // id of type
+            size_t_< First + type_indexes.data[INew]                    >{},    // index of current id in `a`
+            size_t_< subtuples_length.data[ type_indexes.data[INew] ]   >{}     // if id of type is tuple, then length of that tuple
+        ))...
     > subtuples_uncleanuped_t;
 
     return subtuples_uncleanuped_t{};
@@ -811,11 +806,11 @@ constexpr std::size_t count_skips_in_array(std::size_t begin_index, std::size_t 
 template <class T, std::size_t First, std::size_t... I>
 constexpr auto as_flat_tuple_impl(std::index_sequence<First, I...>) noexcept {
     constexpr auto a = flat_array_of_type_ids<T>();
-    (void)a; // `a` is unused if T is an empty type
+    constexpr std::size_t count_of_I = sizeof...(I);
 
     return as_flat_tuple_impl_drop_helpers<T>(
         std::index_sequence<First, I...>{},
-        std::make_index_sequence< 1 + sizeof...(I) - count_skips_in_array(First, First + sizeof...(I), a) >{}
+        std::make_index_sequence< 1 + count_of_I - count_skips_in_array(First, First + count_of_I, a) >{}
     );
 }
 
@@ -868,15 +863,15 @@ constexpr decltype(auto) as_tuple_with_references(const detail::sequence_tuple::
 }
 
 template <class Tuple1, std::size_t... I1, class Tuple2, std::size_t... I2>
-constexpr auto my_tuple_cat_impl(Tuple1&& t1, std::index_sequence<I1...>, Tuple2&& t2, std::index_sequence<I2...>) noexcept {
+constexpr auto my_tuple_cat_impl(const Tuple1& t1, std::index_sequence<I1...>, const Tuple2& t2, std::index_sequence<I2...>) noexcept {
     return as_tuple_with_references(
-        detail::sequence_tuple::get<I1>( std::forward<Tuple1>(t1) )...,
-        detail::sequence_tuple::get<I2>( std::forward<Tuple2>(t2) )...
+        detail::sequence_tuple::get<I1>(t1)...,
+        detail::sequence_tuple::get<I2>(t2)...
     );
 }
 
 template <class Tuple1, class Tuple2>
-constexpr auto my_tuple_cat(Tuple1& t1, Tuple2& t2) noexcept {
+constexpr auto my_tuple_cat(const Tuple1& t1, const Tuple2& t2) noexcept {
     return my_tuple_cat_impl(
         t1, std::make_index_sequence< Tuple1::size_v >{},
         t2, std::make_index_sequence< Tuple2::size_v >{}
@@ -886,10 +881,9 @@ constexpr auto my_tuple_cat(Tuple1& t1, Tuple2& t2) noexcept {
 template <class Tuple, std::size_t Begin, std::size_t Size>
 constexpr auto make_flat_tuple_of_references(Tuple&& t, size_t_<Begin>, size_t_<Size>) noexcept {
     constexpr std::size_t next_size = Size / 2;
-    auto t1 = make_flat_tuple_of_references(std::forward<Tuple>(t), size_t_<Begin>{}, size_t_<next_size>{});
-    auto t2 = make_flat_tuple_of_references(std::forward<Tuple>(t), size_t_<Begin + Size / 2>{}, size_t_<Size - next_size>{});
     return my_tuple_cat(
-        t1, t2
+        make_flat_tuple_of_references(std::forward<Tuple>(t), size_t_<Begin>{}, size_t_<next_size>{}),
+        make_flat_tuple_of_references(std::forward<Tuple>(t), size_t_<Begin + Size / 2>{}, size_t_<Size - next_size>{})
     );
 }
 
