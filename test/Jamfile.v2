@@ -23,6 +23,7 @@ test-suite pfr
     [ compile-fail bitfields.cpp ]
     [ run motivating_example.cpp ]
     [ run ../example/examples.cpp ]
+    [ run only_fields_count.cpp ]
   ;
 
 
