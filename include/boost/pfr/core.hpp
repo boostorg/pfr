@@ -37,6 +37,11 @@ template <class T> struct identity{
     typedef T type;
 };
 
+template <class T>
+constexpr T nocopy_construct() noexcept {
+    return {};
+}
+
 
 ///////////////////// Tuple that holds it's values in the supplied order
 namespace sequence_tuple {
@@ -332,8 +337,7 @@ template <std::size_t Index> constexpr auto id_to_type(size_t_<Index >, if_exten
         return Index;                                           \
     }                                                           \
     constexpr Type id_to_type( size_t_<Index > ) noexcept {     \
-        Type res{};                                             \
-        return res;                                             \
+        return nocopy_construct<Type>();                        \
     }                                                           \
     /**/
 /// @endcond
@@ -432,7 +436,7 @@ constexpr std::size_t type_to_id(identity<Type>, std::enable_if_t<std::is_empty<
 
 template <class Type>
 constexpr size_array<sizeof(Type) * 3> type_to_id(identity<Type>, std::enable_if_t<!std::is_enum<Type>::value && !std::is_empty<Type>::value>*) noexcept {
-    constexpr auto  t = flat_array_of_type_ids<Type>();
+    constexpr auto t = flat_array_of_type_ids<Type>();
     size_array<sizeof(Type) * 3> result {{tuple_begin_tag}};
     constexpr bool requires_tuplening = (
         (t.count_nonzeros() != 1)  || (t.count_nonzeros() == t.count_from_opening_till_matching_parenthis_seq(0, tuple_begin_tag, tuple_end_tag))
@@ -454,26 +458,26 @@ constexpr size_array<sizeof(Type) * 3> type_to_id(identity<Type>, std::enable_if
 template <std::size_t Index>
 constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_ptr_type>) noexcept {
     typedef decltype( id_to_type(remove_1_ext<Index>()) )* res_t;
-    return res_t{};
+    return nocopy_construct<res_t>();
 }
 
 template <std::size_t Index>
 constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_const_ptr_type>) noexcept {
     typedef const decltype( id_to_type(remove_1_ext<Index>()) )* res_t;
-    return res_t{};
+    return nocopy_construct<res_t>();
 }
 
 template <std::size_t Index>
 constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_const_volatile_ptr_type>) noexcept {
     typedef const volatile decltype( id_to_type(remove_1_ext<Index>()) )* res_t;
-    return res_t{};
+    return nocopy_construct<res_t>();
 }
 
 
 template <std::size_t Index>
 constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_volatile_ptr_type>) noexcept {
     typedef volatile decltype( id_to_type(remove_1_ext<Index>()) )* res_t;
-    return res_t{};
+    return nocopy_construct<res_t>();
 }
 
 
@@ -503,33 +507,9 @@ struct ubiq_val {
     constexpr operator Type() const noexcept {
         constexpr auto typeids = typeid_conversions::type_to_id(identity<Type>{});
         assign(typeids);
-        return Type{};
+        return nocopy_construct<Type>();
     }
 };
-
-///////////////////// Structure that remembers types as integers on a `constexpr operator Type&()` call
-// Not used right now
-struct ubiq_ref {
-    std::size_t* ref_;
-
-    template <class T>
-    constexpr void assign(const T& ) const noexcept {
-        static_assert(!sizeof(T), "References to structures are not allowed");
-    }
-
-    constexpr void assign(std::size_t val) const noexcept {
-        ref_[0] = val;
-    }
-
-    template <class Type>
-    constexpr operator Type&() const noexcept {
-        constexpr auto typeids = typeid_conversions::type_to_id(identity<Type&>{});
-        assign(typeids);
-        Type local{};
-        return local;
-    }
-};
-
 
 ///////////////////// Structure that remembers size of the type on a `constexpr operator Type()` call
 struct ubiq_sizes {
@@ -538,7 +518,7 @@ struct ubiq_sizes {
     template <class Type>
     constexpr operator Type() const noexcept {
         ref_ = sizeof(Type);
-        return Type{};
+        return nocopy_construct<Type>();
     }
 };
 
@@ -557,25 +537,11 @@ constexpr size_array<N> get_type_offsets() noexcept {
     return offsets;
 }
 
-template <class T, std::size_t... I>
-constexpr std::false_type has_reference_members(
-        std::size_t* misc,
-        decltype(T{ ubiq_sizes{misc[I]}... })* = 0
-    ) noexcept;
-
-
-template <class T, std::size_t... I>
-constexpr std::true_type has_reference_members(void*) noexcept;
-
 ///////////////////// Returns array of typeids and zeros if construtor of a type accepts sizeof...(I) parameters, substitution failure otherwise
 template <class T, std::size_t N, std::size_t... I>
 constexpr auto flat_type_to_array_of_type_ids(std::size_t* types, std::index_sequence<I...>) noexcept
     -> typename std::add_pointer<decltype(T{ ubiq_constructor{I}... })>::type
 {
-    static_assert(
-        !decltype(has_reference_members<T, I...>(types))::value,
-        "Reference members are not supported."
-    );
     static_assert(
         N <= sizeof(T),
         "Bit fields are not supported."
@@ -583,6 +549,7 @@ constexpr auto flat_type_to_array_of_type_ids(std::size_t* types, std::index_seq
 
     constexpr auto offsets = get_type_offsets<T, N, I...>();
     T tmp{ ubiq_val{types + get<I>(offsets) * 3}... };
+    (void)types;
     (void)tmp;
     (void)offsets; // If type is empty offsets are not used
     return nullptr;
@@ -732,6 +699,11 @@ constexpr auto internal_tuple_with_same_alignment() noexcept {
     typedef typename std::remove_cv<T>::type type;
 
     static_assert(std::is_pod<type>::value, "Not applyable");
+
+    // BOOST_PFR_RELAX_POD_REQUIREMENT
+    //static_assert(std::is_standard_layout<type>::value, "Not applyable");
+    //static_assert(std::is_move_constructible<type>::value || std::is_array<type>::value, "Not applyable");
+
     static_assert(!std::is_reference<type>::value, "Not applyable");
     constexpr auto res = as_flat_tuple_impl<type>(
         std::make_index_sequence< decltype(flat_array_of_type_ids<type>())::size() >()

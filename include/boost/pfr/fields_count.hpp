@@ -34,7 +34,7 @@ using size_t_ = std::integral_constant<std::size_t, Index >;
 ///////////////////// Structure that can be converted to reference to anything
 struct ubiq_constructor {
     std::size_t ignore;
-    template <class Type> constexpr operator Type&() const noexcept; // Undefined
+    template <class Type> constexpr operator Type() const noexcept; // Undefined
 };
 
 ///////////////////// Structure that can be converted to reference to anything except reference to T

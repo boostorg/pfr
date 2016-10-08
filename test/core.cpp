@@ -5,7 +5,7 @@
 
 #include <boost/pfr.hpp>
 #include <boost/core/lightweight_test.hpp>
-//#include <boost/type_index.hpp> // for debugging
+#include <boost/type_index.hpp> // for debugging
 
 #include <iostream>
 #include <typeinfo>
@@ -487,6 +487,88 @@ void another_test_with_unusual_alignment() {
     BOOST_TEST_EQ(flat_get<9>(s), 'd');
 }
 
+#ifdef BOOST_PFR_RELAX_POD_REQUIREMENT
+// Test inspired by Anton Bikineev
+void test_structure_with_default_values() {
+    struct test_me {
+        int i = 2;
+        short s = 14;
+    };
+
+    test_me s;
+
+    BOOST_TEST_EQ(flat_get<0>(s), 2);
+    BOOST_TEST_EQ(flat_get<1>(s), 14);
+}
+
+// Test inspired by Anton Bikineev
+void test_st_layout_structure_with_non_constexpr_type() {
+    struct non_literal_structure {
+        int i1 = 2;
+        short s1 = 14;
+
+        non_literal_structure() = delete;
+        //non_literal_structure(non_literal_structure&&) = delete;
+
+        //non_literal_structure(const non_literal_structure&) = delete; // TODO: fix fields_cout
+
+        non_literal_structure(const non_literal_structure&) = default;
+        non_literal_structure(non_literal_structure&&) = default;
+        non_literal_structure& operator=(const non_literal_structure&) = delete;
+        non_literal_structure& operator=(non_literal_structure&&) = delete;
+    };
+    struct test_me {
+        int i = 2;
+        short s = 14;
+        non_literal_structure nonlit{};
+    };
+
+    typedef test_me type;
+    std::cerr << tuple_size_v<type> << '\n';
+
+    test_me s;
+    BOOST_TEST_EQ(flat_get<0>(s), 2);
+    BOOST_TEST_EQ(flat_get<1>(s), 14);
+    BOOST_TEST_EQ(flat_get<2>(s), 2);
+    BOOST_TEST_EQ(flat_get<3>(s), 14);
+}
+
+// Test inspired by Anton Bikineev
+void test_structure_with_user_provided_default_constructor() {
+    struct test_me {
+        int i = 2;
+        short s = 14;
+
+        constexpr test_me(){}
+    };
+
+    test_me s;
+
+    BOOST_TEST_EQ(flat_get<0>(s), 2);
+    BOOST_TEST_EQ(flat_get<1>(s), 14);
+}
+#endif
+
+void test_move_only_pod() {
+    struct move_only_pod {
+        int i1;
+        short s1;
+
+        move_only_pod() = delete;
+        //move_only_pod(move_only_pod&&) = delete;
+
+        move_only_pod(const move_only_pod&) = delete;
+        move_only_pod(move_only_pod&&) = default;
+        move_only_pod& operator=(const move_only_pod&) = delete;
+        move_only_pod& operator=(move_only_pod&&) = delete;
+    };
+
+    move_only_pod s{2, 14};
+    BOOST_TEST_EQ(tuple_size_v<move_only_pod>, 2u);
+    BOOST_TEST_EQ(flat_get<0>(s), 2);
+    BOOST_TEST_EQ(flat_get<1>(s), 14);
+}
+
 int main() {
     test_compiletime<foo>();
     test_compiletime_array<int>();
@@ -558,6 +640,14 @@ int main() {
     test_and_debug_internals(std::make_index_sequence<6>{});
     test_alignment_with_neted_structure();
     another_test_with_unusual_alignment();
+
+#ifdef BOOST_PFR_RELAX_POD_REQUIREMENT
+    test_structure_with_default_values();
+    test_st_layout_structure_with_non_constexpr_type();
+    test_structure_with_user_provided_default_constructor();
+#endif
+
+    test_move_only_pod();
 
     return boost::report_errors();
 }
