@@ -698,11 +698,13 @@ template <class T>
 constexpr auto internal_tuple_with_same_alignment() noexcept {
     typedef typename std::remove_cv<T>::type type;
 
-    static_assert(std::is_pod<type>::value, "Not applyable");
 
-    // BOOST_PFR_RELAX_POD_REQUIREMENT
-    //static_assert(std::is_standard_layout<type>::value, "Not applyable");
-    //static_assert(std::is_move_constructible<type>::value || std::is_array<type>::value, "Not applyable");
+#ifdef BOOST_PFR_RELAX_POD_REQUIREMENT
+    static_assert(std::is_standard_layout<type>::value, "Not applyable");
+    static_assert(std::is_move_constructible<type>::value || std::is_array<type>::value, "Not applyable");
+#else
+    static_assert(std::is_pod<type>::value, "Not applyable");
+#endif
 
     static_assert(!std::is_reference<type>::value, "Not applyable");
     constexpr auto res = as_flat_tuple_impl<type>(

@@ -9,5 +9,8 @@ int main() {
     struct nested { int i; char data[20]; };
     struct foo { int i; char c; nested n; };
     static_assert(boost::pfr::tuple_size_v<foo> == 3, "");
+
+    struct with_reference { int& i; char data; };
+    static_assert(boost::pfr::tuple_size_v<with_reference> == 2, "");
 }
 

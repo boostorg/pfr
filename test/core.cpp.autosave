@@ -538,7 +538,7 @@ void test_structure_with_user_provided_default_constructor() {
 
     test_me s{0};
     (void)s;
-    //BOOST_TEST_EQ(flat_get<0>(s), 2); // TODO: fix compile time error message
+    //BOOST_TEST_EQ(flat_get<0>(s), 2); // TODO: fix compile time error message2
 }
 #endif
 
