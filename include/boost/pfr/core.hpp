@@ -38,7 +38,7 @@ template <class T> struct identity{
 };
 
 template <class T>
-constexpr std::add_const_t<T> nocopy_construct() noexcept { // const here allows to deal with copyable only types
+constexpr T construct_helper() noexcept { // adding const here allows to deal with copyable only types
     return {};
 }
 
@@ -117,31 +117,31 @@ struct tuple: tuple_base<
 
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(tuple<T...>& t) noexcept {
-    static_assert(N < sizeof...(T), "Tuple index out of bounds");
+    static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
     return get_impl<N>(t);
 }
 
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(const tuple<T...>& t) noexcept {
-    static_assert(N < sizeof...(T), "Tuple index out of bounds");
+    static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
     return get_impl<N>(t);
 }
 
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(const volatile tuple<T...>& t) noexcept {
-    static_assert(N < sizeof...(T), "Tuple index out of bounds");
+    static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
     return get_impl<N>(t);
 }
 
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(volatile tuple<T...>& t) noexcept {
-    static_assert(N < sizeof...(T), "Tuple index out of bounds");
+    static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
     return get_impl<N>(t);
 }
 
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(tuple<T...>&& t) noexcept {
-    static_assert(N < sizeof...(T), "Tuple index out of bounds");
+    static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
     return get_impl<N>(std::move(t));
 }
 
@@ -337,7 +337,7 @@ template <std::size_t Index> constexpr auto id_to_type(size_t_<Index >, if_exten
         return Index;                                           \
     }                                                           \
     constexpr Type id_to_type( size_t_<Index > ) noexcept {     \
-        return nocopy_construct<Type>();                        \
+        return construct_helper<Type>();                        \
     }                                                           \
     /**/
 /// @endcond
@@ -458,26 +458,26 @@ constexpr size_array<sizeof(Type) * 3> type_to_id(identity<Type>, std::enable_if
 template <std::size_t Index>
 constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_ptr_type>) noexcept {
     typedef decltype( id_to_type(remove_1_ext<Index>()) )* res_t;
-    return nocopy_construct<res_t>();
+    return construct_helper<res_t>();
 }
 
 template <std::size_t Index>
 constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_const_ptr_type>) noexcept {
     typedef const decltype( id_to_type(remove_1_ext<Index>()) )* res_t;
-    return nocopy_construct<res_t>();
+    return construct_helper<res_t>();
 }
 
 template <std::size_t Index>
 constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_const_volatile_ptr_type>) noexcept {
     typedef const volatile decltype( id_to_type(remove_1_ext<Index>()) )* res_t;
-    return nocopy_construct<res_t>();
+    return construct_helper<res_t>();
 }
 
 
 template <std::size_t Index>
 constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_volatile_ptr_type>) noexcept {
     typedef volatile decltype( id_to_type(remove_1_ext<Index>()) )* res_t;
-    return nocopy_construct<res_t>();
+    return construct_helper<res_t>();
 }
 
 
@@ -504,10 +504,10 @@ struct ubiq_val {
     }
 
     template <class Type>
-    constexpr operator const Type() const noexcept {
+    constexpr operator Type() const noexcept {
         constexpr auto typeids = typeid_conversions::type_to_id(identity<Type>{});
         assign(typeids);
-        return nocopy_construct<Type>();
+        return construct_helper<Type>();
     }
 };
 
@@ -516,9 +516,9 @@ struct ubiq_sizes {
     std::size_t& ref_;
 
     template <class Type>
-    constexpr operator const Type() const noexcept {
+    constexpr operator Type() const noexcept {
         ref_ = sizeof(Type);
-        return nocopy_construct<Type>();
+        return construct_helper<Type>();
     }
 };
 

@@ -35,6 +35,7 @@ using size_t_ = std::integral_constant<std::size_t, Index >;
 struct ubiq_constructor {
     std::size_t ignore;
     template <class Type> constexpr operator Type&() const noexcept; // Undefined, allows initialization of reference fields (T& and const T&)
+    //template <class Type> constexpr operator Type&&() const noexcept; // Undefined, allows initialization of rvalue reference fields and move-only types
 };
 
 ///////////////////// Structure that can be converted to reference to anything except reference to T
@@ -109,7 +110,7 @@ template <class T>
 constexpr std::size_t fields_count() noexcept {
     static_assert(std::is_copy_constructible<std::remove_all_extents_t<T>>::value, "Structure and each field in structure must be copy constructible");
     std::size_t res = 0u;
-    constexpr std::size_t next = sizeof(T) / 2 + 1;
+    constexpr std::size_t next = (sizeof(T) * 8) / 2 + 1; // We multiply by 8 because we may have bitfields in T
     detect_fields_count<T>(res, size_t_<0>{}, size_t_<next>{}, 1L);
     return res;
 }

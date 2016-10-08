@@ -542,7 +542,7 @@ void test_structure_with_user_provided_default_constructor() {
     BOOST_TEST_EQ(flat_get<0>(s), 2); // TODO: fix compile time error message
 }
 #endif
-
+/*
 void test_copy_only_pod() {
     struct copy_only_pod {
         int i1;
@@ -579,8 +579,8 @@ void test_copy_only_pod() {
     BOOST_TEST_EQ(flat_get<0>(np), 2);
     BOOST_TEST_EQ(flat_get<1>(np), 3);
     BOOST_TEST_EQ(flat_get<2>(np), 4);
-}
-/* TODO: think of something with it!
+} // */
+/* // TODO: think of something with it!
 void test_move_only_pod() {
     struct move_only_pod {
         int i1;
@@ -610,14 +610,16 @@ void test_move_only_pod() {
 
     struct with_nested_move_only_pod {
         int i;
+        short s;
         move_only_pod p;
+        char c;
     };
-    BOOST_TEST_EQ(tuple_size_v<with_nested_move_only_pod>, 2u);
+    BOOST_TEST_EQ(tuple_size_v<with_nested_move_only_pod>, 4u);
 
-    with_nested_move_only_pod np{2, {3, 4}};
-    BOOST_TEST_EQ(flat_get<0>(np), 2);
-    BOOST_TEST_EQ(flat_get<1>(np), 3);
-    BOOST_TEST_EQ(flat_get<2>(np), 4);
+//    with_nested_move_only_pod np{2, {3, 4}};
+//    BOOST_TEST_EQ(flat_get<0>(np), 2);
+//    BOOST_TEST_EQ(flat_get<1>(np), 3);
+//    BOOST_TEST_EQ(flat_get<2>(np), 4);
 } // */
 
 int main() {
@@ -698,7 +700,7 @@ int main() {
     test_structure_with_user_provided_default_constructor();
 #endif
 
-    test_copy_only_pod();
+    //test_copy_only_pod();
     //test_move_only_pod();
 
     return boost::report_errors();
