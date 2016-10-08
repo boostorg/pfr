@@ -38,7 +38,7 @@ template <class T> struct identity{
 };
 
 template <class T>
-constexpr T nocopy_construct() noexcept {
+constexpr std::add_const_t<T> nocopy_construct() noexcept { // const here allows to deal with copyable only types
     return {};
 }
 
@@ -504,7 +504,7 @@ struct ubiq_val {
     }
 
     template <class Type>
-    constexpr operator Type() const noexcept {
+    constexpr operator const Type() const noexcept {
         constexpr auto typeids = typeid_conversions::type_to_id(identity<Type>{});
         assign(typeids);
         return nocopy_construct<Type>();
@@ -516,7 +516,7 @@ struct ubiq_sizes {
     std::size_t& ref_;
 
     template <class Type>
-    constexpr operator Type() const noexcept {
+    constexpr operator const Type() const noexcept {
         ref_ = sizeof(Type);
         return nocopy_construct<Type>();
     }
