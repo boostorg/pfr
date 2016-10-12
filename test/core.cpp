@@ -334,7 +334,7 @@ void test_hash() {
 }
 
 // Test case by Lisa Lippincott
-void test_alignment_with_neted_structure() {
+void test_alignment_with_nested_structure() {
     struct A0 {
         short s;
         char c;
@@ -691,7 +691,7 @@ int main() {
     static_assert(flat_tuple_size<decltype(i_2dimens)>::value == 4, "");
 
     test_and_debug_internals(std::make_index_sequence<6>{});
-    test_alignment_with_neted_structure();
+    test_alignment_with_nested_structure();
     another_test_with_unusual_alignment();
 
 #ifdef BOOST_PFR_RELAX_POD_REQUIREMENT
