@@ -7,7 +7,7 @@
 <link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.POD Flat Reflection 1.0">
 <link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.POD Flat Reflection 1.0">
 <link rel="prev" href="quick_start.html" title="Quick Start">
-<link rel="next" href="../boost_pfr_header_reference.html" title="Boost.PFR Header Reference">
+<link rel="next" href="how_it_works.html" title="How it works">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -20,7 +20,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="quick_start.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../boost_pfr_header_reference.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="quick_start.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="how_it_works.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h2 class="title" style="clear: both">
@@ -43,34 +43,20 @@
           (GCC-5.0+, Clang, ...)
         </li>
 <li class="listitem">
-          PODs must not contain references nor bitfields
-        </li>
-<li class="listitem">
-          PODs must not contain pointers to user defined types
-        </li>
-<li class="listitem">
-          Fields of enum type will be returned as their underlying type
-        </li>
-<li class="listitem">
           Static variables are ignored
         </li>
+<li class="listitem">
+          T must be aggregate initializable
+        </li>
 </ul></div>
-<div class="caution"><table border="0" summary="Caution">
-<tr>
-<td rowspan="2" align="center" valign="top" width="25"><img alt="[Caution]" src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/caution.png"></td>
-<th align="left">Caution</th>
-</tr>
-<tr><td align="left" valign="top">
 <p>
-        All the methods that provide access to filds have a <code class="computeroutput"><span class="keyword">reinterpret_cast</span></code>
-        to an unrelated type. All the possible efforts and compiler scpecific tricks
-        were used to avoid issues.
-      </p>
-<p>
-        But strictly speaking <span class="bold"><strong>this is an Undefined Behavior.</strong></span>
-      </p>
-</td></tr>
-</table></div>
+      C++14 limitations (C++17 fixes those): * T must be POD and must not contain
+      references nor bitfields * T must not contain pointers to user defined types
+      * Enums will be returned as their underlying type * All the methods that provide
+      access to filds have a <code class="computeroutput"><span class="keyword">reinterpret_cast</span></code>
+      to an unrelated type. All the possible efforts and compiler scpecific tricks
+      were used to avoid issues. But strictly speaking *this is an Undefined Behavior.
+    </p>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
@@ -82,7 +68,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="quick_start.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../boost_pfr_header_reference.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="quick_start.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="how_it_works.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

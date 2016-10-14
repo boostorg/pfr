@@ -1,6 +1,7 @@
 index.html
 boost_pod_flat_reflection/quick_start.html
 boost_pod_flat_reflection/requirements_and_limitations.html
+boost_pod_flat_reflection/how_it_works.html
 boost_pfr_header_reference.html
 boost/pfr/flat_tuple_element.html
 boost/pfr/flat_tuple_element_t.html

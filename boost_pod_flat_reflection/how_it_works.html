@@ -1,0 +1,70 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>How it works</title>
+<link rel="stylesheet" href="http://www.boost.org/doc/libs/1_61_0/doc/src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.POD Flat Reflection 1.0">
+<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.POD Flat Reflection 1.0">
+<link rel="prev" href="requirements_and_limitations.html" title="Requirements and Limitations">
+<link rel="next" href="../boost_pfr_header_reference.html" title="Boost.PFR Header Reference">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="http://www.boost.org/doc/libs/1_61_0/boost.png"></td>
+<td align="center"><a href="http://www.boost.org/doc/libs/1_61_0/index.html">Home</a></td>
+<td align="center"><a href="http://www.boost.org/doc/libs/1_61_0/libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="http://www.boost.org/doc/libs/1_61_0/more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="requirements_and_limitations.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../boost_pfr_header_reference.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="boost_pod_flat_reflection.how_it_works"></a><a class="link" href="how_it_works.html" title="How it works">How it works</a>
+</h2></div></div></div>
+<p>
+      Short description:
+    </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          at compile-time: uses aggregate initialization to detect fields count in
+          user-provided structure
+        </li>
+<li class="listitem">
+          at compile-time: makes a structure that is convertible to anything and
+          remeber types it has been converted to during aggregate initialization
+          of user-provided structure
+        </li>
+<li class="listitem">
+          at compile-time: creates a tuple with exactly the same layout as in user-provided
+          structure
+        </li>
+<li class="listitem">
+          at run-time: <code class="computeroutput"><span class="keyword">reinterpret_cast</span></code>s
+          pointer to user-provided structure to the tuple pointer =&gt; all the tuple
+          methods are available for the structure
+        </li>
+</ul></div>
+<p>
+      Long description: <a href="https://www.youtube.com/watch?v=abdeAew3gmQ" target="_top">Antony
+      Polukhin: C++14 Reflections Without Macros, Markup nor External Tooling. </a>.
+    </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2016 Antony Polukhin<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="requirements_and_limitations.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../boost_pfr_header_reference.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
