@@ -158,14 +158,27 @@ Argument Dependant Lookup works well, `std::less` will find the operators for `s
 [note Boost.PFR does not depend on any Boost library. You may use it's headers even without Boost. ]
 
 * Boost.PFR *requires C++14 compatible compiler* (GCC-5.0+, Clang, ...)
-* PODs must not contain references nor bitfields
-* PODs must not contain pointers to user defined types
-* Fields of enum type will be returned as their underlying type
 * Static variables are ignored
+* T must be aggregate initializable
 
-[caution All the methods that provide access to filds have a `reinterpret_cast` to an unrelated type. All the possible efforts and compiler scpecific tricks were used to avoid issues.
+C++14 limitations (C++17 fixes those):
+* T must be POD and must not contain references nor bitfields
+* T must not contain pointers to user defined types
+* Enums will be returned as their underlying type
+* All the methods that provide access to filds have a `reinterpret_cast` to an unrelated type. All the possible efforts and compiler scpecific tricks were used to avoid issues. But strictly speaking *this is an Undefined Behavior.
 
-But strictly speaking *this is an Undefined Behavior.* ]
+[endsect]
+
+[section How it works]
+
+Short description:
+
+* at compile-time: uses aggregate initialization to detect fields count in user-provided structure
+* at compile-time: makes a structure that is convertible to anything and remeber types it has been converted to during aggregate initialization of user-provided structure
+* at compile-time: creates a tuple with exactly the same layout as in user-provided structure
+* at run-time: `reinterpret_cast`s pointer to user-provided structure to the tuple pointer => all the tuple methods are available for the structure
+
+Long description: [@https://www.youtube.com/watch?v=abdeAew3gmQ Antony Polukhin: C++14 Reflections Without Macros, Markup nor External Tooling. ].
 
 [endsect]
 
