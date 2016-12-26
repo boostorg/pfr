@@ -38,8 +38,6 @@ env:
 
     matrix:
         # Note that "--coverage -fsanitize=address,leak,undefined -DBOOST_TRAVISCI_BUILD" are added automatically lower in code
-        - CXX_FLAGS="-std=c++98" LINK_FLAGS="" TOOLSET=gcc-6
-        - CXX_FLAGS="-std=c++11" LINK_FLAGS="" TOOLSET=gcc-6
         - CXX_FLAGS="-std=c++1y" LINK_FLAGS="" TOOLSET=gcc-6
         #- CXX_FLAGS="-std=c++11 -stdlib=libc++" LINK_FLAGS="-stdlib=libc++" TOOLSET=clang
         #- CXX_FLAGS="-std=c++1y -stdlib=libc++" LINK_FLAGS="-stdlib=libc++" TOOLSET=clang
