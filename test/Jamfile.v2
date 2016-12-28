@@ -7,26 +7,31 @@
 
 test-suite pfr
   :
-    [ run core.cpp ]
-    [ run minimal.cpp ]
-    [ run count_fields_on_chars.cpp ]
-    [ run count_fields_on_chars.cpp : : : <define>BOOST_PFR_RUN_HUGE_TESTS : count_fields_on_chars_huge ]
-    [ run count_fields_on_ints.cpp ]
-    [ run count_fields_on_long_longs.cpp ]
-    [ run count_fields_on_shorts.cpp ]
-    [ run count_fields_on_void_ptrs.cpp ]
-    [ run std_interactions.cpp ]
-    [ run flat_functions_for.cpp ]
-    [ run flat_ops.cpp ]
-    [ run global_flat_ops.cpp ]
-    [ compile-fail non_aggregate1.cpp ]
-    [ compile-fail non_aggregate2.cpp ]
-    [ compile-fail bitfields.cpp ]
-    [ run motivating_example.cpp ]
+    [ run common/ops.cpp : : : <define>BOOST_PFR_TEST_FLAT : flat_ops ]
+    #[ run common/ops.cpp : : : <define>BOOST_PFR_TEST_PRECISE : precise_ops ]
+
+    [ run flat/core.cpp ]
+    [ run flat/count_fields_on_chars.cpp ]
+    [ run flat/count_fields_on_chars.cpp : : : <define>BOOST_PFR_RUN_HUGE_TESTS : count_fields_on_chars_huge ]
+    [ run flat/count_fields_on_ints.cpp ]
+    [ run flat/count_fields_on_long_longs.cpp ]
+    [ run flat/count_fields_on_shorts.cpp ]
+    [ run flat/count_fields_on_void_ptrs.cpp ]
+    [ run flat/tuple_size.cpp : : : : flat_tuple_size ]
+    [ run flat/std_interactions.cpp ]
+    [ run flat/flat_functions_for.cpp ]
+    [ run flat/global_flat_ops.cpp ]
+    [ run flat/motivating_example.cpp ]
+    [ run flat/flat_for_each_field.cpp ]
+    [ run flat/for_each_field.cpp ]
+    [ compile-fail flat/non_aggregate.cpp : : flat_non_aggregate ]
+    [ compile-fail flat/bitfields.cpp : : flat_tuple_size_on_bitfields ]
+
+    [ run precise/tuple_size.cpp : : : : precise_tuple_size ]
+    [ run precise/bitfields.cpp : : : : precise_tuple_size_on_bitfields ]
+    [ compile-fail precise/non_aggregate.cpp : : precise_non_aggregate ]
+
     [ run ../example/examples.cpp ]
-    [ run only_fields_count.cpp ]
-    [ run flat_for_each_field.cpp ]
-    [ run for_each_field.cpp ]
   ;
 
 
