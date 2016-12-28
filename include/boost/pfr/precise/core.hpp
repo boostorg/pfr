@@ -7,6 +7,13 @@
 #ifndef BOOST_PFR_PRECISE_CORE_HPP
 #define BOOST_PFR_PRECISE_CORE_HPP
 
+#include <type_traits>
+#include <utility>      // metaprogramming stuff
+
+#include <boost/pfr/detail/sequence_tuple.hpp>
+#include <boost/pfr/detail/io.hpp>
+#include <boost/pfr/detail/stdtuple.hpp>
+
 #if __cplusplus >= 201606L /* Oulu meeting, not the exact value */
 #   include <boost/pfr/detail/core17.hpp>
 #else
@@ -14,6 +21,33 @@
 #endif
 
 namespace boost { namespace pfr {
+
+/// \brief Has a static const member variable `value` that constins fields count in a T.
+/// Works for any T that supports aggregate initialization even if T is not POD.
+/// \flattening{Flattens} only multidimensional arrays.
+///
+/// \b Requires: C++14.
+///
+/// \b Example:
+/// \code
+///     std::array<int, boost::pfr::tuple_size<my_structure>::value > a;
+/// \endcode
+template <class T>
+using tuple_size = detail::size_t_< boost::pfr::detail::fields_count<T>() >;
+
+
+/// \brief `tuple_size_v` is a template variable that contains fields count in a T and
+/// works for any T that supports aggregate initialization even if T is not POD.
+/// \flattening{Flattens} only multidimensional arrays.
+///
+/// \b Requires: C++14.
+///
+/// \b Example:
+/// \code
+///     std::array<int, boost::pfr::tuple_size_v<my_structure> > a;
+/// \endcode
+template <class T>
+constexpr std::size_t tuple_size_v = tuple_size<T>::value;
 
 /// \brief Returns reference or const reference to a field with index `I` in aggregate T.
 ///
@@ -48,10 +82,7 @@ constexpr decltype(auto) get(T& val) noexcept {
 ///     std::vector<  boost::pfr::tuple_element<0, my_structure>::type  > v;
 /// \endcode
 template <std::size_t I, class T>
-using tuple_element = detail::teleport_extents<
-        T,
-        typename detail::sequence_tuple::tuple_element<I, detail::as_tuple_t<T> >::type
-    >;
+using tuple_element = typename detail::sequence_tuple::tuple_element<I, detail::as_tuple_t<T> >::type;
 
 
 /// \brief Type of a field with index `I` in aggregate `T`.
@@ -68,7 +99,7 @@ using tuple_element_t = typename tuple_element<I, T>::type;
 
 /// \brief Creates an `std::tuple` from an aggregate T.
 ///
-/// \b Requires: C++17.
+/// \b Requires: C++17 or \simplepod{C++14 simple POD}.
 ///
 /// \b Example:
 /// \code
@@ -81,7 +112,7 @@ template <class T>
 constexpr auto structure_to_tuple(const T& val) noexcept {
     typedef detail::as_tuple_t<T> internal_tuple_t;
 
-    return detail::make_stdtuple_from_seqtuple(
+    return detail::make_stdtuple_from_tietuple(
         detail::as_tuple(val),
         std::make_index_sequence< internal_tuple_t::size_v >()
     );
@@ -90,7 +121,7 @@ constexpr auto structure_to_tuple(const T& val) noexcept {
 
 /// \brief Creates an `std::tuple` with lvalue references to fields of an aggregate T.
 ///
-/// \b Requires: C++17.
+/// \b Requires: C++17 or \simplepod{C++14 simple POD}.
 ///
 /// \b Example:
 /// \code
@@ -103,7 +134,7 @@ template <class T>
 constexpr auto structure_tie(T& val) noexcept {
     typedef detail::as_tuple_t<T> internal_tuple_t;
 
-    return detail::tie_sequence_tuple_impl(
+    return detail::make_stdtiedtuple_from_tietuple(
         detail::as_tuple(val),
         std::make_index_sequence< internal_tuple_t::size_v >()
     );
@@ -112,7 +143,7 @@ constexpr auto structure_tie(T& val) noexcept {
 
 /// \brief Writes aggregate `value` to `out`
 ///
-/// \b Requires: C++17.
+/// \b Requires: C++17 or \simplepod{C++14 simple POD}.
 ///
 /// \b Example:
 /// \code
@@ -123,13 +154,13 @@ constexpr auto structure_tie(T& val) noexcept {
 template <class Char, class Traits, class T>
 void write(std::basic_ostream<Char, Traits>& out, const T& value) {
     out << '{';
-    detail::sequence_tuple::print_impl<0, tuple_size_v<T> >::print(out, detail::as_tuple(value));
+    detail::print_impl<0, tuple_size_v<T> >::print(out, detail::as_tuple(value));
     out << '}';
 }
 
 /// Reads aggregate `value` from stream `in`
 ///
-/// \b Requires: C++17.
+/// \b Requires: C++17 or \simplepod{C++14 simple POD}.
 ///
 /// \b Example:
 /// \code
@@ -150,7 +181,7 @@ void read(std::basic_istream<Char, Traits>& in, T& value) {
     char parenthis = {};
     in >> parenthis;
     if (parenthis != '{') in.setstate(std::basic_istream<Char, Traits>::failbit);
-    detail::sequence_tuple::read_impl<0, tuple_size_v<T> >::read(in, detail::as_tuple(value));
+    detail::read_impl<0, tuple_size_v<T> >::read(in, detail::as_tuple(value));
 
     in >> parenthis;
     if (parenthis != '}') in.setstate(std::basic_istream<Char, Traits>::failbit);
@@ -161,4 +192,4 @@ void read(std::basic_istream<Char, Traits>& in, T& value) {
 
 }} // namespace boost::pfr
 
-#endif // BOOST_PFR_CORE17_HPP
+#endif // BOOST_PFR_PRECISE_CORE_HPP

@@ -7,9 +7,9 @@
 #define BOOST_PFR_HPP
 
 /// \file boost/pfr.hpp
-/// Includes all the Boost.PFR headers, except \xmlonly<link linkend='header.boost.pfr.global_flat_ops_hpp'>boost/pfr/global_flat_ops.hpp</link>\endxmlonly
+/// Includes all the Boost.PFR headers, except \xmlonly<link linkend='header.boost.pfr.flat.global_ops_hpp'>boost/pfr/flat/global_ops.hpp</link>\endxmlonly
 
-#include <boost/pfr/precise/tuple_size.hpp>
+#include <boost/pfr/precise.hpp>
 #include <boost/pfr/flat.hpp>
 
 #endif // BOOST_PFR_HPP

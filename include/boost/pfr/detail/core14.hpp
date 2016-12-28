@@ -631,6 +631,32 @@ constexpr auto make_flat_tuple_of_references(Tuple&& t, size_t_<Begin>, size_t_<
     );
 }
 
+struct ubiq_is_flat_refelectable {
+    bool& is_flat_refelectable;
+
+    template <class Type>
+    constexpr operator Type() const noexcept {
+        is_flat_refelectable = std::is_fundamental<Type>::value;
+        return {};
+    }
+};
+
+template <class T, std::size_t... I>
+constexpr bool is_flat_refelectable(std::index_sequence<I...>) noexcept {
+    constexpr std::size_t fields = sizeof...(I);
+    bool result[fields] = {};
+    const T v{ ubiq_is_flat_refelectable{result[I]}... };
+    (void)v;
+
+    for (std::size_t i = 0; i < fields; ++i) {
+        if (!result[i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 
 /// @cond
 #ifdef __GNUC__
@@ -663,6 +689,55 @@ decltype(auto) tie_as_flat_tuple(T& val) noexcept {
     MAY_ALIAS auto* const t = reinterpret_cast<internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
     return make_flat_tuple_of_references(*t, size_t_<0>{}, size_t_<detail::internal_tuple_with_same_alignment_t<T>::size_v>{});
 }
+
+
+
+
+
+
+template <class T>
+decltype(auto) as_tuple(const T& val) noexcept {
+    static_assert(
+        is_flat_refelectable<T>( std::make_index_sequence<fields_count<T>()>{} ),
+        "Not possible in C++14 to represent that type without loosing information. Use flat_ version or change type definition"
+    );
+    MAY_ALIAS const auto* const t = reinterpret_cast<const internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
+    return *t;
+}
+
+template <class T>
+decltype(auto) as_tuple(const volatile T& val) noexcept {
+    static_assert(
+        is_flat_refelectable<T>( std::make_index_sequence<fields_count<T>()>{} ),
+        "Not possible in C++14 to represent that type without loosing information. Use flat_ version or change type definition"
+    );
+    MAY_ALIAS const volatile auto* const t = reinterpret_cast<const volatile internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
+    return *t;
+}
+
+template <class T>
+decltype(auto) as_tuple(volatile T& val) noexcept {
+    static_assert(
+        is_flat_refelectable<T>( std::make_index_sequence<fields_count<T>()>{} ),
+        "Not possible in C++14 to represent that type without loosing information. Use flat_ version or change type definition"
+    );
+    MAY_ALIAS volatile auto* const t = reinterpret_cast<volatile internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
+    return *t;
+}
+
+template <class T>
+decltype(auto) as_tuple(T& val) noexcept {
+    static_assert(
+        is_flat_refelectable<T>( std::make_index_sequence<fields_count<T>()>{} ),
+        "Not possible in C++14 to represent that type without loosing information. Use flat_ version or change type definition"
+    );
+    MAY_ALIAS auto* const t = reinterpret_cast<internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
+    return *t;
+}
+
+
+template <class T>
+using as_tuple_t = decltype( ::boost::pfr::detail::as_tuple(std::declval<T&>()) );
 
 #undef MAY_ALIAS
 

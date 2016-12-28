@@ -9,6 +9,6 @@
 /// \file boost/pfr/precise.hpp
 /// Includes all the Boost.PFR headers that do not define `flat_*` functions, except \xmlonly<link linkend='header.boost.pfr.precise.global_ops_hpp'>boost/pfr/precise/global_ops.hpp</link>\endxmlonly
 
-#include <boost/pfr/precise/tuple_size.hpp>
+#include <boost/pfr/precise/core.hpp>
 
 #endif // BOOST_PFR_PRECISE_HPP
