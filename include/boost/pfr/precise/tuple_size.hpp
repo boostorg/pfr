@@ -3,10 +3,8 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_PFR_TUPLE_SIZE_HPP
-#define BOOST_PFR_TUPLE_SIZE_HPP
-
-#pragma once
+#ifndef BOOST_PFR_PRECISE_TUPLE_SIZE_HPP
+#define BOOST_PFR_PRECISE_TUPLE_SIZE_HPP
 
 #if __cplusplus < 201402L
 #   error C++14 is required for this header.
@@ -41,4 +39,4 @@ constexpr std::size_t tuple_size_v = tuple_size<T>::value;
 
 }} // namespace boost::pfr
 
-#endif // BOOST_PFR_TUPLE_SIZE_HPP
+#endif // BOOST_PFR_PRECISE_TUPLE_SIZE_HPP

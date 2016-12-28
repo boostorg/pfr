@@ -9,7 +9,7 @@
 #   error C++14 is required for this header.
 #endif
 
-#include <boost/pfr/flat_functors.hpp>
+#include <boost/pfr/flat/functors.hpp>
 
 /// \def BOOST_PFR_FLAT_FUNCTIONS_FOR(T)
 /// Defines comparison operators and stream operators for T.
@@ -17,7 +17,7 @@
 ///
 /// \b Example:
 /// \code
-///     #include <boost/pfr/flat_functions_for.hpp>
+///     #include <boost/pfr/flat/functions_for.hpp>
 ///     struct comparable_struct {      // No operators defined for that structure
 ///         int i; short s; char data[7]; bool bl; int a,b,c,d,e,f;
 ///     };

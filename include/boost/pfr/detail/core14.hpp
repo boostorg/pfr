@@ -14,7 +14,7 @@
 #include <utility>      // metaprogramming stuff
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
-#include <boost/pfr/tuple_size.hpp>
+#include <boost/pfr/detail/fields_count.hpp>
 
 #ifdef __clang__
 #   pragma clang diagnostic push

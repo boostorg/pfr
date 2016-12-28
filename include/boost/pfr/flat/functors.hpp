@@ -13,7 +13,7 @@
 #endif
 
 #include <boost/pfr/detail/functional.hpp>
-#include <boost/pfr/flat_core.hpp>
+#include <boost/pfr/flat/core.hpp>
 
 /// \file boost/pfr/functors.hpp
 /// Contains functors that can work with PODs and are close to the Standard Library ones.

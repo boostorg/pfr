@@ -3,14 +3,14 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#pragma once
+#ifndef BOOST_PFR_HPP
+#define BOOST_PFR_HPP
 
 /// \file boost/pfr.hpp
 /// Includes all the Boost.PFR headers, except \xmlonly<link linkend='header.boost.pfr.global_flat_ops_hpp'>boost/pfr/global_flat_ops.hpp</link>\endxmlonly
 
-#include <boost/pfr/tuple_size.hpp>
-#include <boost/pfr/flat_core.hpp>
-#include <boost/pfr/flat_functors.hpp>
-#include <boost/pfr/flat_ops.hpp>
-#include <boost/pfr/flat_functions_for.hpp>
+#include <boost/pfr/precise/tuple_size.hpp>
+#include <boost/pfr/flat.hpp>
+
+#endif // BOOST_PFR_HPP
 

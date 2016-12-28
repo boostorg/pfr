@@ -3,13 +3,14 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#pragma once
+#ifndef BOOST_PFR_FLAT_GLOBAL_OPS_HPP
+#define BOOST_PFR_FLAT_GLOBAL_OPS_HPP
 
 #if __cplusplus < 201402L
 #   error C++14 is required for this header.
 #endif
 
-#include <boost/pfr/flat_functors.hpp>
+#include <boost/pfr/flat/functors.hpp>
 
 /// \file boost/pfr/global_flat_ops.hpp
 /// Contains comparison operators and stream operators for any POD types that do not have their own operators.
@@ -108,3 +109,5 @@ namespace boost { namespace pfr { namespace detail {
         return ::boost::pfr::flat_hash<T>{}(value);
     }
 #endif
+
+#endif // BOOST_PFR_FLAT_GLOBAL_OPS_HPP
