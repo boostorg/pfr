@@ -8,7 +8,7 @@
 test-suite pfr
   :
     [ run common/ops.cpp : : : <define>BOOST_PFR_TEST_FLAT : flat_ops ]
-    #[ run common/ops.cpp : : : <define>BOOST_PFR_TEST_PRECISE : precise_ops ]
+    [ run common/ops.cpp : : : <define>BOOST_PFR_TEST_PRECISE : precise_ops ]
     [ run common/read_write.cpp : : : <define>BOOST_PFR_TEST_FLAT : flat_read_write ]
     [ run common/read_write.cpp : : : <define>BOOST_PFR_TEST_PRECISE : precise_read_write ]
 

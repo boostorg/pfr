@@ -3,12 +3,14 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#pragma once
+#ifndef BOOST_PFR_FLAT_OPS_HPP
+#define BOOST_PFR_FLAT_OPS_HPP
 
 #if __cplusplus < 201402L
 #   error C++14 is required for this header.
 #endif
 
+#include <boost/pfr/detail/detectors.hpp>
 #include <boost/pfr/flat/functors.hpp>
 
 /// \file boost/pfr/flat/ops.hpp
@@ -39,53 +41,31 @@
 namespace boost { namespace pfr { 
 
 namespace detail {
-///////////////////// `value` is true if Detector<Tleft, Tright> does not compile (SFINAE)
-    template <template <class, class> class Detector, class Tleft, class Tright>
-    struct not_appliable {
-        struct success{};
-        template <class Tl, class Tr> static Detector<Tl, Tr> detector_impl(long) noexcept;
-        template <class Tl, class Tr> static success detector_impl(int) noexcept;
 
-        static constexpr bool value = std::is_same<
-            decltype(detector_impl<Tleft, Tright>(1L)),
-            success
-        >::value;
-    };
-
-///////////////////// Detectors for different operators
-    template <class T1, class T2> using comp_eq_detector = decltype(std::declval<T1>() == std::declval<T2>());
-    template <class T1, class T2> using comp_ne_detector = decltype(std::declval<T1>() != std::declval<T2>());
-    template <class T1, class T2> using comp_lt_detector = decltype(std::declval<T1>() <  std::declval<T2>());
-    template <class T1, class T2> using comp_le_detector = decltype(std::declval<T1>() <= std::declval<T2>());
-    template <class T1, class T2> using comp_gt_detector = decltype(std::declval<T1>() >  std::declval<T2>());
-    template <class T1, class T2> using comp_ge_detector = decltype(std::declval<T1>() >= std::declval<T2>());
-    template <class S, class T> using ostreamable_detector = decltype(std::declval<S>() << std::declval<T>());
-    template <class S, class T> using istreamable_detector = decltype(std::declval<S>() >> std::declval<T>());
-
-///////////////////// Helper typedef that it used by all the enable_not_*_comp_t
+///////////////////// Helper typedef that it used by all the enable_flat_not_*_comp_t
     template <template <class, class> class Detector, class T>
-    using enable_not_comp_base_t = typename std::enable_if<
+    using enable_flat_not_comp_base_t = typename std::enable_if<
         not_appliable<Detector, T const&, T const&>::value && std::is_pod<T>::value,
         bool
     >::type;
 
 ///////////////////// std::enable_if_t like functions that enable only if types do not support operation and are PODs
 
-    template <class T> using enable_not_eq_comp_t = enable_not_comp_base_t<comp_eq_detector, T>;
-    template <class T> using enable_not_ne_comp_t = enable_not_comp_base_t<comp_ne_detector, T>;
-    template <class T> using enable_not_lt_comp_t = enable_not_comp_base_t<comp_lt_detector, T>;
-    template <class T> using enable_not_le_comp_t = enable_not_comp_base_t<comp_le_detector, T>;
-    template <class T> using enable_not_gt_comp_t = enable_not_comp_base_t<comp_gt_detector, T>;
-    template <class T> using enable_not_ge_comp_t = enable_not_comp_base_t<comp_ge_detector, T>;
+    template <class T> using enable_flat_not_eq_comp_t = enable_flat_not_comp_base_t<comp_eq_detector, T>;
+    template <class T> using enable_flat_not_ne_comp_t = enable_flat_not_comp_base_t<comp_ne_detector, T>;
+    template <class T> using enable_flat_not_lt_comp_t = enable_flat_not_comp_base_t<comp_lt_detector, T>;
+    template <class T> using enable_flat_not_le_comp_t = enable_flat_not_comp_base_t<comp_le_detector, T>;
+    template <class T> using enable_flat_not_gt_comp_t = enable_flat_not_comp_base_t<comp_gt_detector, T>;
+    template <class T> using enable_flat_not_ge_comp_t = enable_flat_not_comp_base_t<comp_ge_detector, T>;
 
     template <class Stream, class Type>
-    using enable_not_ostreamable_t = typename std::enable_if<
+    using enable_flat_not_ostreamable_t = typename std::enable_if<
         not_appliable<ostreamable_detector, Stream&, Type const&>::value && std::is_pod<Type>::value,
         Stream&
     >::type;
 
     template <class Stream, class Type>
-    using enable_not_istreamable_t = typename std::enable_if<
+    using enable_flat_not_istreamable_t = typename std::enable_if<
         not_appliable<istreamable_detector, Stream&, Type&>::value && std::is_pod<Type>::value,
         Stream&
     >::type;
@@ -110,44 +90,44 @@ namespace flat_ops {
     template <class T> std::size_t hash_value(const T& value) noexcept;
 #else
     template <class T>
-    static detail::enable_not_eq_comp_t<T> operator==(const T& lhs, const T& rhs) noexcept {
+    static detail::enable_flat_not_eq_comp_t<T> operator==(const T& lhs, const T& rhs) noexcept {
         return flat_equal_to<T>{}(lhs, rhs);
     }
 
     template <class T>
-    static detail::enable_not_ne_comp_t<T> operator!=(const T& lhs, const T& rhs) noexcept {
+    static detail::enable_flat_not_ne_comp_t<T> operator!=(const T& lhs, const T& rhs) noexcept {
         return flat_not_equal<T>{}(lhs, rhs);
     }
 
     template <class T>
-    static detail::enable_not_lt_comp_t<T> operator<(const T& lhs, const T& rhs) noexcept {
+    static detail::enable_flat_not_lt_comp_t<T> operator<(const T& lhs, const T& rhs) noexcept {
         return flat_less<T>{}(lhs, rhs);
     }
 
     template <class T>
-    static detail::enable_not_gt_comp_t<T> operator>(const T& lhs, const T& rhs) noexcept {
+    static detail::enable_flat_not_gt_comp_t<T> operator>(const T& lhs, const T& rhs) noexcept {
         return flat_greater<T>{}(lhs, rhs);
     }
 
     template <class T>
-    static detail::enable_not_le_comp_t<T> operator<=(const T& lhs, const T& rhs) noexcept {
+    static detail::enable_flat_not_le_comp_t<T> operator<=(const T& lhs, const T& rhs) noexcept {
         return flat_less_equal<T>{}(lhs, rhs);
     }
 
     template <class T>
-    static detail::enable_not_ge_comp_t<T> operator>=(const T& lhs, const T& rhs) noexcept {
+    static detail::enable_flat_not_ge_comp_t<T> operator>=(const T& lhs, const T& rhs) noexcept {
         return flat_greater_equal<T>{}(lhs, rhs);
     }
 
     template <class Char, class Traits, class T>
-    static detail::enable_not_ostreamable_t<std::basic_ostream<Char, Traits>, T> operator<<(std::basic_ostream<Char, Traits>& out, const T& value) {
-        flat_write(out, value);
+    static detail::enable_flat_not_ostreamable_t<std::basic_ostream<Char, Traits>, T> operator<<(std::basic_ostream<Char, Traits>& out, const T& value) {
+        boost::pfr::flat_write(out, value);
         return out;
     }
 
     template <class Char, class Traits, class T>
-    static detail::enable_not_istreamable_t<std::basic_istream<Char, Traits>, T> operator>>(std::basic_istream<Char, Traits>& in, T& value) {
-        flat_read(in, value);
+    static detail::enable_flat_not_istreamable_t<std::basic_istream<Char, Traits>, T> operator>>(std::basic_istream<Char, Traits>& in, T& value) {
+        boost::pfr::flat_read(in, value);
         return in;
     }
 
@@ -160,3 +140,5 @@ namespace flat_ops {
 } // namespace flat_ops
 
 }} // namespace boost::pfr
+
+#endif // BOOST_PFR_FLAT_OPS_HPP
