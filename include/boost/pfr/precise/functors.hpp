@@ -229,8 +229,22 @@ template <> struct less_equal<void> {
 /// \brief std::hash like functor
 template <class T> struct hash {
     /// \return hash value of \b x
-    std::size_t operator()(const T& x) const noexcept {
-        return detail::hash_impl<0, detail::fields_count<std::remove_reference_t<T>>() >::compute(detail::as_tuple(x));
+    std::size_t operator()(const T& x) const {
+        constexpr std::size_t fields_count = detail::fields_count<std::remove_reference_t<T>>();
+#if __cplusplus >= 201606L /* Oulu meeting, not the exact value */
+        return detail::hash_impl<0, fields_count>::compute(detail::as_tuple(x));
+#else
+        std::size_t result = 0;
+        ::boost::pfr::detail::for_each_field_dispatcher(
+            x,
+            [&result](const auto& lhs) {
+                result = detail::hash_impl<0, fields_count>::compute(lhs);
+            },
+            std::make_index_sequence<fields_count>{}
+        );
+
+        return result;
+#endif
     }
 };
 

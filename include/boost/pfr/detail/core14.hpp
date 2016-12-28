@@ -14,6 +14,7 @@
 #include <utility>      // metaprogramming stuff
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
+#include <boost/pfr/detail/cast_to_layout_compatible.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
 #include <boost/pfr/detail/for_each_field_impl.hpp>
 
@@ -544,24 +545,11 @@ template <class T>
 constexpr auto internal_tuple_with_same_alignment() noexcept {
     typedef typename std::remove_cv<T>::type type;
 
-
-#ifdef BOOST_PFR_RELAX_POD_REQUIREMENT
-    static_assert(std::is_standard_layout<type>::value, "Not applyable");
-    static_assert(std::is_move_constructible<type>::value || std::is_array<type>::value, "Not applyable");
-#else
-    static_assert(std::is_pod<type>::value, "Not applyable");
-#endif
-
+    static_assert(std::is_pod<type>::value, "Type can not be used is flat_ functions, because it's not POD");
     static_assert(!std::is_reference<type>::value, "Not applyable");
     constexpr auto res = as_flat_tuple_impl<type>(
         std::make_index_sequence< decltype(flat_array_of_type_ids<type>())::size() >()
     );
-
-    static_assert(
-        std::alignment_of<decltype(res)>::value == std::alignment_of<type>::value,
-        "Alignment check failed, probably your structure has user-defined alignment for the whole structure or for some of the fields."
-    );
-    static_assert(sizeof(res) == sizeof(type), "Size check failed, probably your structure has bitfields or user-defined alignment.");
 
     return res;
 }
@@ -658,84 +646,21 @@ constexpr bool is_flat_refelectable(std::index_sequence<I...>) noexcept {
     return true;
 }
 
-
-/// @cond
-#ifdef __GNUC__
-#define MAY_ALIAS __attribute__((__may_alias__))
-#else
-#define MAY_ALIAS
-#endif
-/// @endcond
-
 template <class T>
-decltype(auto) tie_as_flat_tuple(const T& val) noexcept {
-    MAY_ALIAS const auto* const t = reinterpret_cast<const internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
-    return make_flat_tuple_of_references(*t, size_t_<0>{}, size_t_<detail::internal_tuple_with_same_alignment_t<T>::size_v>{});
+decltype(auto) tie_as_flat_tuple(T&& val) noexcept {
+    typedef internal_tuple_with_same_alignment_t<std::remove_reference_t<T>> tuple_type;
+    auto&& t = cast_to_layout_compatible<tuple_type>(std::forward<T>(val));
+    return make_flat_tuple_of_references(std::forward<decltype(t)>(t), size_t_<0>{}, size_t_<tuple_type::size_v>{});
 }
 
 template <class T>
-decltype(auto) tie_as_flat_tuple(const volatile T& val) noexcept {
-    MAY_ALIAS const volatile auto* const t = reinterpret_cast<const volatile internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
-    return make_flat_tuple_of_references(*t, size_t_<0>{}, size_t_<detail::internal_tuple_with_same_alignment_t<T>::size_v>{});
-}
-
-template <class T>
-decltype(auto) tie_as_flat_tuple(volatile T& val) noexcept {
-    MAY_ALIAS volatile auto* const t = reinterpret_cast<volatile internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
-    return make_flat_tuple_of_references(*t, size_t_<0>{}, size_t_<detail::internal_tuple_with_same_alignment_t<T>::size_v>{});
-}
-
-template <class T>
-decltype(auto) tie_as_flat_tuple(T& val) noexcept {
-    MAY_ALIAS auto* const t = reinterpret_cast<internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
-    return make_flat_tuple_of_references(*t, size_t_<0>{}, size_t_<detail::internal_tuple_with_same_alignment_t<T>::size_v>{});
-}
-
-
-
-
-
-
-template <class T>
-decltype(auto) as_tuple(const T& val) noexcept {
+decltype(auto) as_tuple(T&& val) noexcept {
     static_assert(
         is_flat_refelectable<T>( std::make_index_sequence<fields_count<T>()>{} ),
         "Not possible in C++14 to represent that type without loosing information. Use flat_ version or change type definition"
     );
-    MAY_ALIAS const auto* const t = reinterpret_cast<const internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
-    return *t;
+    return tie_as_flat_tuple(std::forward<T>(val));
 }
-
-template <class T>
-decltype(auto) as_tuple(const volatile T& val) noexcept {
-    static_assert(
-        is_flat_refelectable<T>( std::make_index_sequence<fields_count<T>()>{} ),
-        "Not possible in C++14 to represent that type without loosing information. Use flat_ version or change type definition"
-    );
-    MAY_ALIAS const volatile auto* const t = reinterpret_cast<const volatile internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
-    return *t;
-}
-
-template <class T>
-decltype(auto) as_tuple(volatile T& val) noexcept {
-    static_assert(
-        is_flat_refelectable<T>( std::make_index_sequence<fields_count<T>()>{} ),
-        "Not possible in C++14 to represent that type without loosing information. Use flat_ version or change type definition"
-    );
-    MAY_ALIAS volatile auto* const t = reinterpret_cast<volatile internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
-    return *t;
-}
-
-template <class T>
-decltype(auto) as_tuple(T& val) noexcept {
-    static_assert(
-        is_flat_refelectable<T>( std::make_index_sequence<fields_count<T>()>{} ),
-        "Not possible in C++14 to represent that type without loosing information. Use flat_ version or change type definition"
-    );
-    MAY_ALIAS auto* const t = reinterpret_cast<internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
-    return *t;
-}
-
 
 template <class T>
 using as_tuple_t = decltype( ::boost::pfr::detail::as_tuple(std::declval<T&>()) );
@@ -800,21 +725,12 @@ void for_each_field_in_depth(T&& t, F&& f, std::index_sequence<I0, I...>, identi
 }
 
 template <class T, class F, class... Fields>
-void for_each_field_in_depth(const T& t, F&& f, std::index_sequence<>, identity<Fields>...) {
-    MAY_ALIAS const auto* const tuple = reinterpret_cast< ::boost::pfr::detail::sequence_tuple::tuple<Fields...>const *>(std::addressof(t));
+void for_each_field_in_depth(T&& t, F&& f, std::index_sequence<>, identity<Fields>...) {
+    auto&& tuple = cast_to_layout_compatible< ::boost::pfr::detail::sequence_tuple::tuple<Fields...> >(std::forward<T>(t));
     std::forward<F>(f)(
-        make_flat_tuple_of_references(*tuple, size_t_<0>{}, size_t_<sizeof...(Fields)>{})
+        make_flat_tuple_of_references(std::forward<decltype(tuple)>(tuple), size_t_<0>{}, size_t_<sizeof...(Fields)>{})
     );
 }
-
-template <class T, class F, class... Fields>
-void for_each_field_in_depth(T& t, F&& f, std::index_sequence<>, identity<Fields>...) {
-    MAY_ALIAS auto* const tuple = reinterpret_cast< ::boost::pfr::detail::sequence_tuple::tuple<Fields...>*>(std::addressof(t));
-    std::forward<F>(f)(
-        make_flat_tuple_of_references(*tuple, size_t_<0>{}, size_t_<sizeof...(Fields)>{})
-    );
-}
-
 
 template <class T, class F, std::size_t... I>
 void for_each_field_dispatcher_1(T&& t, F&& f, std::index_sequence<I...>, std::true_type /*is_flat_refelectable*/) {
@@ -837,7 +753,7 @@ template <class T, class F, std::size_t... I>
 void for_each_field_dispatcher(T&& t, F&& f, std::index_sequence<I...>) {
     typedef std::remove_reference_t<T> type;
 
-    /// Compile time error at this point means that you have called `for_each_field` for a
+    /// Compile time error at this point means that you have called `for_each_field` or some other non-flat function or operator for a
     /// type that is not constexpr aggregate initializable.
     ///
     /// Make sure that all the fields of your type have constexpr default construtors and trivial destructors.
