@@ -14,10 +14,10 @@
 #include <utility>      // metaprogramming stuff
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
-#include <boost/pfr/detail/io.hpp>
 #include <boost/pfr/detail/stdtuple.hpp>
 #include <boost/pfr/detail/core14.hpp>
 #include <boost/pfr/detail/for_each_field_impl.hpp>
+#include <boost/pfr/flat/tuple_size.hpp>
 
 namespace boost { namespace pfr {
 
@@ -65,25 +65,6 @@ template <std::size_t I, class T>
 using flat_tuple_element_t = typename flat_tuple_element<I, T>::type;
 
 
-/// \brief Has a static const member variable `value` that contains fields count in a \flattening{flattened} T.
-///
-/// \b Example:
-/// \code
-///     std::array<int, boost::pfr::flat_tuple_size<my_structure>::value > a;
-/// \endcode
-template <class T>
-using flat_tuple_size = boost::pfr::detail::size_t_<decltype(boost::pfr::detail::tie_as_flat_tuple(std::declval<T&>()))::size_v>;
-
-
-/// \brief `flat_tuple_size_v` is a template variable that contains fields count in a \flattening{flattened} T.
-///
-/// \b Example:
-/// \code
-///     std::array<int, boost::pfr::flat_tuple_size_v<my_structure> > a;
-/// \endcode
-template <class T>
-constexpr std::size_t flat_tuple_size_v = flat_tuple_size<T>::value;
-
 /// \brief Creates an `std::tuple` from a \flattening{flattened} T.
 ///
 /// \b Example:
@@ -121,56 +102,22 @@ auto flat_structure_tie(T& val /* @cond */, std::enable_if_t< std::is_trivially_
     );
 }
 
-/// \brief Writes \flattening{flattened} POD `value` to `out`
-///
-/// \b Example:
-/// \code
-///     struct my_struct { int i, short s; };
-///     my_struct s{12, 13};
-///     flat_write(std::cout, s); // outputs '{12, 13}'
-/// \endcode
-template <class Char, class Traits, class T>
-void flat_write(std::basic_ostream<Char, Traits>& out, const T& value) {
-    out << '{';
-    detail::print_impl<0, flat_tuple_size_v<T> >::print(out, detail::tie_as_flat_tuple(value));
-    out << '}';
-}
-
-/// Reads \flattening{flattened} POD `value` from stream `in`
-///
-/// \b Example:
-/// \code
-///     struct my_struct { int i, short s; };
-///     my_struct s;
-///     std::stringstream ss;
-///     ss << "{ 12, 13 }";
-///     ss >> s;
-///     assert(s.i == 12);
-///     assert(s.i == 13);
-/// \endcode
-template <class Char, class Traits, class T>
-void flat_read(std::basic_istream<Char, Traits>& in, T& value) {
-    const auto prev_exceptions = in.exceptions();
-    in.exceptions( typename std::basic_istream<Char, Traits>::iostate(0) );
-    const auto prev_flags = in.flags( typename std::basic_istream<Char, Traits>::fmtflags(0) );
-
-    char parenthis = {};
-    in >> parenthis;
-    if (parenthis != '{') in.setstate(std::basic_istream<Char, Traits>::failbit);
-    detail::read_impl<0, flat_tuple_size_v<T> >::read(in, detail::tie_as_flat_tuple(value));
-
-    in >> parenthis;
-    if (parenthis != '}') in.setstate(std::basic_istream<Char, Traits>::failbit);
-
-    in.flags(prev_flags);
-    in.exceptions(prev_exceptions);
-}
-
 /// Calls `func` for each field of a \flattening{flattened} POD `value`.
-/// `func` must have one of the following signatures:
-/// * any_return_type(auto value)
-/// * any_return_type(auto value, std::size_t i)
-/// * any_return_type(auto value, auto i). Here decltype(i) is an `std::integral_constant<size_t, field_index>`
+///
+/// \param func must have one of the following signatures:
+///     * template <class U> any_return_type func(U&& field)                // field of value is perfect forwarded to function
+///     * template <class U> any_return_type func(U&& field, std::size_t i)
+///     * template <class U, class I> any_return_type func(U&& value, I i)  // Here I is an `std::integral_constant<size_t, field_index>`
+///
+/// \param value After \flattening{flattening} to each field of this variable will be the `func` applied.
+///
+/// \b Example:
+/// \code
+///     struct my_struct { int i, short s; };
+///     int sum = 0;
+///     for_each_field(my_struct{20, 22}, [&sum](const auto& field) { sum += field; });
+///     assert(sum == 42);
+/// \endcode
 template <class T, class F>
 void flat_for_each_field(T&& value, F&& func) {
     ::boost::pfr::detail::for_each_field_impl(

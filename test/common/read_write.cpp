@@ -9,7 +9,7 @@
 
 
 #ifdef BOOST_PFR_TEST_FLAT
-#include <boost/pfr/flat/core.hpp>
+#include <boost/pfr/flat/io.hpp>
 
 namespace boost { namespace test {
     template <class Char, class Traits, class T>
@@ -26,7 +26,7 @@ namespace boost { namespace test {
 #endif
 
 #ifdef BOOST_PFR_TEST_PRECISE
-#include <boost/pfr/precise/core.hpp>
+#include <boost/pfr/precise/io.hpp>
 namespace boost { namespace test {
     using boost::pfr::read;
     using boost::pfr::write;

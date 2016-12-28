@@ -5,6 +5,7 @@
 
 #ifndef BOOST_PFR_DETAIL_CORE14_HPP
 #define BOOST_PFR_DETAIL_CORE14_HPP
+#pragma once
 
 #if __cplusplus < 201402L
 #   error C++14 is required for this header.
@@ -17,6 +18,7 @@
 #include <boost/pfr/detail/cast_to_layout_compatible.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
 #include <boost/pfr/detail/for_each_field_impl.hpp>
+#include <boost/pfr/detail/size_array.hpp>
 
 #ifdef __clang__
 #   pragma clang diagnostic push
@@ -38,67 +40,6 @@ template <class T>
 constexpr T construct_helper() noexcept { // adding const here allows to deal with copyable only types
     return {};
 }
-
-///////////////////// Array that has the constexpr
-template <std::size_t N>
-struct size_array {                         // libc++ misses constexpr on operator[]
-    typedef std::size_t type;
-    std::size_t data[N];
-
-    static constexpr std::size_t size() noexcept { return N; }
-
-
-    constexpr std::size_t count_nonzeros() const noexcept {
-        std::size_t count = 0;
-        for (std::size_t i = 0; i < size(); ++i) {
-            if (data[i]) {
-                ++ count;
-            }
-        }
-        return count;
-    }
-
-    constexpr std::size_t count_from_opening_till_matching_parenthis_seq(std::size_t from, std::size_t opening_parenthis, std::size_t closing_parenthis) const noexcept {
-        if (data[from] != opening_parenthis) {
-            return 0;
-        }
-        std::size_t unclosed_parnthesis = 0;
-        std::size_t count = 0;
-        for (; ; ++from) {
-            if (data[from] == opening_parenthis) {
-                ++ unclosed_parnthesis;
-            } else if (data[from] == closing_parenthis) {
-                -- unclosed_parnthesis;
-            }
-            ++ count;
-
-            if (unclosed_parnthesis == 0) {
-                return count;
-            }
-        }
-
-        return count;
-    }
-};
-
-template <>
-struct size_array<0> {                         // libc++ misses constexpr on operator[]
-    typedef std::size_t type;
-    std::size_t data[1];
-
-    static constexpr std::size_t size() noexcept { return 0; }
-
-    constexpr std::size_t count_nonzeros() const noexcept {
-        return 0;
-    }
-};
-
-template <std::size_t I, std::size_t N>
-constexpr std::size_t get(const size_array<N>& a) noexcept {
-    static_assert(I < N, "Array index out of bounds");
-    return a.data[I];
-}
-
 
 template <class T> constexpr size_array<sizeof(T) * 3> fields_count_and_type_ids_with_zeros() noexcept;
 template <class T> constexpr auto flat_array_of_type_ids() noexcept;
@@ -656,7 +597,7 @@ decltype(auto) tie_as_flat_tuple(T&& val) noexcept {
 template <class T>
 decltype(auto) as_tuple(T&& val) noexcept {
     static_assert(
-        is_flat_refelectable<T>( std::make_index_sequence<fields_count<T>()>{} ),
+        is_flat_refelectable<std::remove_reference_t<T>>( std::make_index_sequence<fields_count<T>()>{} ),
         "Not possible in C++14 to represent that type without loosing information. Use flat_ version or change type definition"
     );
     return tie_as_flat_tuple(std::forward<T>(val));
@@ -775,8 +716,6 @@ void for_each_field_dispatcher(T&& t, F&& f, std::index_sequence<I...>) {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-#undef MAY_ALIAS
 
 #ifdef __clang__
 #   pragma clang diagnostic pop

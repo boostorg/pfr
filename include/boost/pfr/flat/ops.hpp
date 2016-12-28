@@ -12,6 +12,7 @@
 
 #include <boost/pfr/detail/detectors.hpp>
 #include <boost/pfr/flat/functors.hpp>
+#include <boost/pfr/flat/io.hpp>
 
 /// \file boost/pfr/flat/ops.hpp
 /// Contains comparison operators and stream operators for any POD types that do not have their own operators.

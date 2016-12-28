@@ -5,7 +5,6 @@
 
 #ifndef BOOST_PFR_DETAIL_FIELDS_COUNT_HPP
 #define BOOST_PFR_DETAIL_FIELDS_COUNT_HPP
-
 #pragma once
 
 #if __cplusplus < 201402L

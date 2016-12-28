@@ -3,8 +3,9 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_PFR_DETAIL_cast_to_layout_compatible_HPP
-#define BOOST_PFR_DETAIL_cast_to_layout_compatible_HPP
+#ifndef BOOST_PFR_DETAIL_CAST_TO_LAYOUT_COMPATIBLE_HPP
+#define BOOST_PFR_DETAIL_CAST_TO_LAYOUT_COMPATIBLE_HPP
+#pragma once
 
 #if __cplusplus < 201402L
 #   error C++14 is required for this header.
@@ -55,7 +56,6 @@ MAY_ALIAS volatile To& cast_to_layout_compatible(volatile From& val) noexcept {
 }
 
 
-
 template <class To, class From>
 MAY_ALIAS To& cast_to_layout_compatible(From& val) noexcept {
     MAY_ALIAS To* const t = reinterpret_cast<To*>( std::addressof(val) );
@@ -75,4 +75,4 @@ MAY_ALIAS std::enable_if_t<std::is_rvalue_reference<From&&>::value, To&&> cast_t
 
 }}} // namespace boost::pfr::detail
 
-#endif // BOOST_PFR_DETAIL_cast_to_layout_compatible_HPP
+#endif // BOOST_PFR_DETAIL_CAST_TO_LAYOUT_COMPATIBLE_HPP

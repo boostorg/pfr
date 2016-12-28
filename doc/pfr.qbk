@@ -1,4 +1,4 @@
-[library Boost.POD Flat Reflection
+[library Boost.Precise and Flat Reflection
     [quickbook 1.6]
     [version 1.0]
     [copyright 2016 Antony Polukhin]
@@ -23,7 +23,7 @@ This library provides tuple like methods for POD types, making PODs usable in co
 
 No macro or other type/member registrations required.]
 
-Boost.POD Flat Reflection (Boost.PFR) adds following out-of-the-box functionality to PODs:
+Boost.Precise and Flat Reflection (Boost.PFR) adds following out-of-the-box functionality to PODs:
 
 * comparison operators
 * heterogeneous comparators
@@ -45,7 +45,24 @@ Boost.POD Flat Reflection (Boost.PFR) adds following out-of-the-box functionalit
 
 [section Accessing POD member by index] [pfr_example_get] [endsect]
 [section Flattening] [pfr_example_flattening] [pfr_example_flattening_2] [endsect]
-[/ [section Counting fields] [pfr_example_flat_tuple_size] [endsect] ]
+[/ [section Counting fields] [pfr_example_tuple_size] [endsect] ]
+
+[section Flat or Precise functions to chose]
+All the functions that have `flat_` prefix and are defclared in `boost/pfr/flat/*` headers the [*flat] functions, other function are [*precise] and are defclared in `boost/pfr/precise/*`. In previous example you've seen how the the flattening works.
+
+Flat functions are more limited in their reflection capabilities, but guarantee to not affect debug and release builds in C++14 mode (no additional code would be produced).
+
+Precise functions have almost unlimited reflection capabilities, but may produce additional code in C++14 mode in debug builds and even in release builds (on old compilers or compilers with bad optimizers).
+
+Here's how to chose your functions:
+
+* If you use C++17 - use [*precise] functions
+* If you work only with flat POD types in C++14 - use [*flat] functions
+* If you work only with POD types in C++14 and wish them flattened - use [*flat] functions
+* If you have modern compiler in C++14 mode and work with non-POD literal types with some hierarhy - you are forced to use [*precise] functions
+
+[endsect]
+
 [section Three ways of getting operators ]
 
 There are three ways to start using Boost.PFR hashing, comparison and streaming operators for type `T` in your code. Each method has it's own drawbacks and suits own cases.
@@ -57,24 +74,24 @@ There are three ways to start using Boost.PFR hashing, comparison and streaming 
                                                                                                         [ Usable localy, without affecting code from other scopes ]
                                                                                                                             [ Ignores implicit conversion operators ]  
                                                                                                                                                             [ Respects user defined operators ] ]
-    [[ [headerref boost/pfr/flat_ops.hpp] ]              [ no ]                  [ no ]      [ yes ]     [ yes ]                                             [ no ]          [ yes ]                     ]
-    [[ [headerref boost/pfr/flat_functions_for.hpp] ] [ yes if T is in it ]   [ yes ]     [ no ]      [ no, but could be limited to translation unit ]    [ yes for T ]   [ no (compile time error) ] ]
-    [[ [headerref boost/pfr/global_flat_ops.hpp] ]       [ yes ]                 [ yes ]     [ yes ]     [ no, but could be limited to translation unit ]    [ yes all ]     [ yes ]                     ]
+    [[ [headerref boost/pfr/flat/ops.hpp] or [headerref boost/pfr/precise/ops.hpp] ]              [ no ]                  [ no ]      [ yes ]     [ yes ]                                             [ no ]          [ yes ]                     ]
+    [[ [headerref boost/pfr/flat/functions_for.hpp] or [headerref boost/pfr/precise/functions_for.hpp]  ] [ yes if T is in it ]   [ yes ]     [ no ]      [ no, but could be limited to translation unit ]    [ yes for T ]   [ no (compile time error) ] ]
+    [[ [headerref boost/pfr/flat/global_ops.hpp] or [headerref boost/pfr/precise/global_ops.hpp] ]       [ yes ]                 [ yes ]     [ yes ]     [ no, but could be limited to translation unit ]    [ yes all ]     [ yes ]                     ]
 ]
 
 More detailed description:
 
-[*1) [headerref boost/pfr/flat_ops.hpp] approach]
+[*1) [headerref boost/pfr/precise/ops.hpp] and [headerref boost/pfr/flat/ops.hpp] approach]
 
 This method is good if you're writing generic algorithms and need to use operators from Boost.PFR only if there's no operators defined for the type:
 
 ```
-#include <boost/pfr/flat_ops.hpp>
+#include <boost/pfr/precise/ops.hpp>
 
 template <class T>
 struct uniform_comparator_less {
     bool operator()(const T& lhs, const T& rhs) const noexcept {
-        using namespace flat_ops;    // Enables Boost.PFR operators usage in this scope.
+        using namespace boost::pfr::ops;    // Enables Boost.PFR operators usage in this scope.
         return lhs < rhs;           // If T has operator< or conversion operator then will use it, otherwise will use boost::pfr::flat_less<T>.
     }
 };
@@ -83,7 +100,7 @@ This method's effects are local to the function. It works even for local types, 
 However *Argument Dependant Lookup* does not work with it:
 
 ```
-#include <boost/pfr/flat_ops.hpp>
+#include <boost/pfr/flat/ops.hpp>
 template <class T>
 struct uniform_comparator_less {
     bool operator()(const T& lhs, const T& rhs) const noexcept {
@@ -93,11 +110,11 @@ struct uniform_comparator_less {
 };
 ```
 
-[*2) [headerref boost/pfr/flat_functions_for.hpp] approach]
+[*2) [headerref boost/pfr/flat/functions_for.hpp] approach]
 
 This method is good if you're writing POD structure and wish to define operators for that structure.
 ```
-#include <boost/pfr/flat_functions_for.hpp>
+#include <boost/pfr/flat/functions_for.hpp>
 
 struct pair_like {
     int first;
@@ -114,7 +131,7 @@ Argument Dependant Lookup works well, `std::less` will find the operators for `s
 can not be used for local types, it must be called only once in namespace of `T`. It does not respect conversion operators of `T`, so for example the following code
 will output different values:
 ```
-#include <boost/pfr/flat_functions_for.hpp>
+#include <boost/pfr/flat/functions_for.hpp>
 
 struct empty {
     operator std::string() { return "empty{}"; }
@@ -126,12 +143,12 @@ struct empty {
 std::cout << empty{}; // Outputs `empty{}` if BOOST_PFR_FLAT_FUNCTIONS_FOR(empty) is commented out, '{}' otherwise.
 ```
 
-[*3) [headerref boost/pfr/global_flat_ops.hpp] approach]
+[*3) [headerref boost/pfr/flat/global_ops.hpp] approach]
 
 This approach is for those, who wish to have comparisong/streaming/hashing for all their types.
 
 ```
-#include <boost/pfr/global_flat_ops.hpp>
+#include <boost/pfr/flat/global_ops.hpp>
 
 struct pair_like {
     int first;
@@ -161,11 +178,17 @@ Argument Dependant Lookup works well, `std::less` will find the operators for `s
 * Static variables are ignored
 * T must be aggregate initializable
 
-C++14 limitations (C++17 fixes those):
+[*Flat] functions limitations:
+
 * T must be POD and must not contain references nor bitfields
 * T must not contain pointers to user defined types
 * Enums will be returned as their underlying type
 * All the methods that provide access to filds have a `reinterpret_cast` to an unrelated type. All the possible efforts and compiler scpecific tricks were used to avoid issues. But strictly speaking *this is an Undefined Behavior.
+
+C++14 [*precise] functions limitations (C++17 fixes those):
+
+* T must be constexpr aggregate initializable and all it's fields must be constexpr default constructible
+* [funcref boost::pfr::get], [funcref boost::pfr::structure_to_tuple], [funcref boost::pfr::structure_tie], [headerref boost/pfr/precise/core.hpp boost::pfr::tuple_element] require T to be a flat POD type
 
 [endsect]
 
@@ -173,10 +196,24 @@ C++14 limitations (C++17 fixes those):
 
 Short description:
 
-* at compile-time: uses aggregate initialization to detect fields count in user-provided structure
-* at compile-time: makes a structure that is convertible to anything and remeber types it has been converted to during aggregate initialization of user-provided structure
-* at compile-time: creates a tuple with exactly the same layout as in user-provided structure
-* at run-time: `reinterpret_cast`s pointer to user-provided structure to the tuple pointer => all the tuple methods are available for the structure
+* Flat functions:
+    # at compile-time: use aggregate initialization to detect fields count in user-provided structure
+    # at compile-time: make a structure that is convertible to anything and remeber types it has been converted to during aggregate initialization of user-provided structure
+    # at compile-time: create a tuple with exactly the same layout as in user-provided structure
+    # at run-time: `reinterpret_cast` a pointer to user-provided structure to the tuple pointer (this has no runtime penalty)
+    # at run-time: a tuple of references to fields is returned => all the tuple methods are available for the structure
+
+* Precise functions:
+    # at compile-time: use aggregate initialization to detect fields count in user-provided structure
+        * C++17:
+            # at compile-time: structured bindings are used to decompose a type `T` to known amount of fields fields
+        * C++14:
+            # at compile-time: let `I` be is an index of current field, it equals 0
+            # at run-time: `T` is constructed and field `I` is aggregate initialized using a separate instance of structure that is convertible to anything [note Additional care is taken to make sure that all the information about `T` is avalable to the compiler and that operations on `T` have no side effects, so the compiler can optimize away the unnecessary temporary objects.]
+            # at compile-time: `I += 1`
+            # at compile-time: if `I` does not equal fields count goto step [~b.] from inside of the conversion operator of the structure that is convertible to anything
+            # at run-time: `reinterpret_cast` pointer to user-provided structure to the tuple pointer (this has no runtime penalty)
+    # at run-time: a tuple of references to fields is returned => all the tuple methods are available for the structure
 
 Long description: [@https://www.youtube.com/watch?v=abdeAew3gmQ Antony Polukhin: C++14 Reflections Without Macros, Markup nor External Tooling. ].
 

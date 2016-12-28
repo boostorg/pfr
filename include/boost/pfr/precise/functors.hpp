@@ -18,7 +18,8 @@
 /// \file boost/pfr/functors.hpp
 /// Contains functors that are close to the Standard Library ones.
 /// Each functor iterates over fields of the type.
-
+///
+/// \b Requires: C++17 or \constexprinit{C++14 constexpr aggregate intializable type}.
 namespace boost { namespace pfr {
 
 namespace detail {

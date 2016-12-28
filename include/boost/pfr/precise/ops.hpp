@@ -13,12 +13,15 @@
 #include <boost/pfr/detail/detectors.hpp>
 #include <boost/pfr/precise/functors.hpp>
 #include <boost/pfr/precise/core.hpp>
+#include <boost/pfr/precise/io.hpp>
 
 /// \file boost/pfr/precise/ops.hpp
 /// Contains comparison operators and stream operators for types that do not have their own operators.
 /// If type is comparable or streamable using it's own operator or it's conversion operator, then the original operator is used.
 ///
 /// Just write \b using \b namespace \b ops; and operators will be available in scope.
+///
+/// \b Requires: C++17 or \constexprinit{C++14 constexpr aggregate intializable type}.
 ///
 /// \b Example:
 /// \code
@@ -39,7 +42,7 @@
 /// \podops for other ways to define operators and more details.
 ///
 /// \b This \b header \b contains:
-namespace boost { namespace pfr { 
+namespace boost { namespace pfr {
 
 namespace detail {
 

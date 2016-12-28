@@ -12,6 +12,8 @@
 #include <boost/pfr/flat/core.hpp>
 #include <boost/pfr/flat/functors.hpp>
 #include <boost/pfr/flat/ops.hpp>
+#include <boost/pfr/flat/io.hpp>
+#include <boost/pfr/flat/tuple_size.hpp>
 #include <boost/pfr/flat/functions_for.hpp>
 
 #endif // BOOST_PFR_FLAT_HPP

@@ -3,6 +3,8 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#ifndef BOOST_PFR_FLAT_FUNCTIONS_FOR_HPP
+#define BOOST_PFR_FLAT_FUNCTIONS_FOR_HPP
 #pragma once
 
 #if __cplusplus < 201402L
@@ -10,6 +12,7 @@
 #endif
 
 #include <boost/pfr/flat/functors.hpp>
+#include <boost/pfr/flat/io.hpp>
 
 /// \def BOOST_PFR_FLAT_FUNCTIONS_FOR(T)
 /// Defines comparison operators and stream operators for T.
@@ -72,5 +75,7 @@
         return ::boost::pfr::flat_hash<T>{}(v);                                                                                     \
     }                                                                                                                               \
 /**/
+
+#endif // BOOST_PFR_FLAT_FUNCTIONS_FOR_HPP
 
 

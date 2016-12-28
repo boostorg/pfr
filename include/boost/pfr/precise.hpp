@@ -12,5 +12,8 @@
 #include <boost/pfr/precise/core.hpp>
 #include <boost/pfr/precise/functors.hpp>
 #include <boost/pfr/precise/ops.hpp>
+#include <boost/pfr/precise/io.hpp>
+#include <boost/pfr/precise/tuple_size.hpp>
+#include <boost/pfr/precise/functions_for.hpp>
 
 #endif // BOOST_PFR_PRECISE_HPP

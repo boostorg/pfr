@@ -8,11 +8,11 @@
 
 //[pfr_example_get
 /*`
-    The following example shows how to access structure fields by index using [funcref boost::pfr::flat_get].
+    The following example shows how to access structure fields by index using [funcref boost::pfr::get].
 
     Let's define some structure:
 */
-#include <boost/pfr/flat/core.hpp>
+#include <boost/pfr/precise/core.hpp>
 
 struct foo {            // defining structure
     int some_integer;
@@ -23,15 +23,15 @@ struct foo {            // defining structure
     We can access fields of that structure by index:
 */
 foo f {777, '!'};
-auto& r1 = boost::pfr::flat_get<0>(f); // accessing field with index 0, returns reference to `foo::some_integer`
-auto& r2 = boost::pfr::flat_get<1>(f); // accessing field with index 1, returns reference to `foo::c`
+auto& r1 = boost::pfr::get<0>(f); // accessing field with index 0, returns reference to `foo::some_integer`
+auto& r2 = boost::pfr::get<1>(f); // accessing field with index 1, returns reference to `foo::c`
 //] [/pfr_example_get]
 
-//[pfr_example_flat_tuple_size
+//[pfr_example_tuple_size
 /*`
-    The following example shows how to count fields using [classref boost::pfr::flat_tuple_size].
+    The following example shows how to count fields using [classref boost::pfr::tuple_size].
 */
-#include <boost/pfr/flat/core.hpp>
+#include <boost/pfr/precise/core.hpp>
 
 struct foo2 {            // defining structure
     int some_integer;
@@ -41,15 +41,15 @@ struct foo2 {            // defining structure
 
 
 static_assert(
-    boost::pfr::flat_tuple_size<foo2>::value        // returns total count of fields in `foo2`
+    boost::pfr::tuple_size<foo2>::value        // returns total count of fields in `foo2`
     == 3, ""
 );
 
 static_assert(
-    boost::pfr::flat_tuple_size<int[100]>::value    // works with arrays too!
+    boost::pfr::tuple_size<int[100]>::value    // works with arrays too!
     == 100, ""
 );
-//] [/pfr_example_flat_tuple_size]
+//] [/pfr_example_tuple_size]
 
 
 
@@ -59,6 +59,7 @@ static_assert(
 
 Take a look at the `struct my_struct`:
 */
+#include <boost/pfr/flat/core.hpp>
 
 struct my_struct_nested { short a1; int a2; };
 

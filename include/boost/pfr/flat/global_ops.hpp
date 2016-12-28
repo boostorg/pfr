@@ -11,14 +11,16 @@
 #endif
 
 #include <boost/pfr/flat/functors.hpp>
+#include <boost/pfr/flat/core.hpp>
+#include <boost/pfr/flat/io.hpp>
 
-/// \file boost/pfr/global_flat_ops.hpp
+/// \file boost/pfr/flat/global_ops.hpp
 /// Contains comparison operators and stream operators for any POD types that do not have their own operators.
 /// If POD is comparable or streamable using it's own operator (but not it's conversion operator), then the original operator is used.
 ///
 /// \b Example:
 /// \code
-///     #include <boost/pfr/global_flat_ops.hpp>
+///     #include <boost/pfr/flat/global_ops.hpp>
 ///     struct comparable_struct {      // No operators defined for that structure
 ///         int i; short s; char data[7]; bool bl; int a,b,c,d,e,f;
 ///     };
@@ -37,7 +39,7 @@
 namespace boost { namespace pfr { namespace detail {
 
     template <class T, class U>
-    using enable_comparisons = std::enable_if_t<
+    using enable_flat_comparisons = std::enable_if_t<
         std::is_same<T, U>::value && std::is_pod<T>::value,
         bool
     >;
@@ -63,32 +65,32 @@ namespace boost { namespace pfr { namespace detail {
     template <class T> std::size_t hash_value(const T& value) noexcept;
 #else
     template <class T, class U>
-    static boost::pfr::detail::enable_comparisons<T, U> operator==(const T& lhs, const U& rhs) noexcept {
+    static boost::pfr::detail::enable_flat_comparisons<T, U> operator==(const T& lhs, const U& rhs) noexcept {
         return ::boost::pfr::flat_equal_to<T>{}(lhs, rhs);
     }
 
     template <class T, class U>
-    static boost::pfr::detail::enable_comparisons<T, U> operator!=(const T& lhs, const U& rhs) noexcept {
+    static boost::pfr::detail::enable_flat_comparisons<T, U> operator!=(const T& lhs, const U& rhs) noexcept {
         return ::boost::pfr::flat_not_equal<T>{}(lhs, rhs);
     }
 
     template <class T, class U>
-    static boost::pfr::detail::enable_comparisons<T, U> operator<(const T& lhs, const U& rhs) noexcept {
+    static boost::pfr::detail::enable_flat_comparisons<T, U> operator<(const T& lhs, const U& rhs) noexcept {
         return ::boost::pfr::flat_less<T>{}(lhs, rhs);
     }
 
     template <class T, class U>
-    static boost::pfr::detail::enable_comparisons<T, U> operator>(const T& lhs, const U& rhs) noexcept {
+    static boost::pfr::detail::enable_flat_comparisons<T, U> operator>(const T& lhs, const U& rhs) noexcept {
         return ::boost::pfr::flat_greater<T>{}(lhs, rhs);
     }
 
     template <class T, class U>
-    static boost::pfr::detail::enable_comparisons<T, U> operator<=(const T& lhs, const U& rhs) noexcept {
+    static boost::pfr::detail::enable_flat_comparisons<T, U> operator<=(const T& lhs, const U& rhs) noexcept {
         return ::boost::pfr::flat_less_equal<T>{}(lhs, rhs);
     }
 
     template <class T, class U>
-    static boost::pfr::detail::enable_comparisons<T, U> operator>=(const T& lhs, const U& rhs) noexcept {
+    static boost::pfr::detail::enable_flat_comparisons<T, U> operator>=(const T& lhs, const U& rhs) noexcept {
         return ::boost::pfr::flat_greater_equal<T>{}(lhs, rhs);
     }
 
