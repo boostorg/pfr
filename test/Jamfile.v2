@@ -9,6 +9,8 @@ test-suite pfr
   :
     [ run common/ops.cpp : : : <define>BOOST_PFR_TEST_FLAT : flat_ops ]
     #[ run common/ops.cpp : : : <define>BOOST_PFR_TEST_PRECISE : precise_ops ]
+    [ run common/read_write.cpp : : : <define>BOOST_PFR_TEST_FLAT : flat_read_write ]
+    [ run common/read_write.cpp : : : <define>BOOST_PFR_TEST_PRECISE : precise_read_write ]
 
     [ run flat/core.cpp ]
     [ run flat/count_fields_on_chars.cpp ]
@@ -17,18 +19,19 @@ test-suite pfr
     [ run flat/count_fields_on_long_longs.cpp ]
     [ run flat/count_fields_on_shorts.cpp ]
     [ run flat/count_fields_on_void_ptrs.cpp ]
-    [ run flat/tuple_size.cpp : : : : flat_tuple_size ]
+    [ run flat/flat_tuple_size.cpp ]
     [ run flat/std_interactions.cpp ]
     [ run flat/flat_functions_for.cpp ]
     [ run flat/global_flat_ops.cpp ]
-    [ run flat/motivating_example.cpp ]
+    [ run flat/flat_motivating_example.cpp ]
     [ run flat/flat_for_each_field.cpp ]
-    [ run flat/for_each_field.cpp ]
-    [ compile-fail flat/non_aggregate.cpp : : flat_non_aggregate ]
-    [ compile-fail flat/bitfields.cpp : : flat_tuple_size_on_bitfields ]
+    [ compile-fail flat/flat_tuple_size_on_non_aggregate.cpp ]
+    [ compile-fail flat/flat_tuple_size_on_bitfields.cpp ]
 
     [ run precise/tuple_size.cpp : : : : precise_tuple_size ]
     [ run precise/bitfields.cpp : : : : precise_tuple_size_on_bitfields ]
+    [ run precise/for_each_field.cpp : : : : precise_for_each_field ]
+    #[ run precise/motivating_example.cpp : : : : precise_motivating_example ]
     [ compile-fail precise/non_aggregate.cpp : : precise_non_aggregate ]
 
     [ run ../example/examples.cpp ]

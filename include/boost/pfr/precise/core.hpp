@@ -143,7 +143,7 @@ constexpr auto structure_tie(T& val) noexcept {
 
 /// \brief Writes aggregate `value` to `out`
 ///
-/// \b Requires: C++17 or \simplepod{C++14 simple POD}.
+/// \b Requires: C++17 or \constexprinit{C++14 constexpr aggregate intializable type}.
 ///
 /// \b Example:
 /// \code
@@ -153,8 +153,19 @@ constexpr auto structure_tie(T& val) noexcept {
 /// \endcode
 template <class Char, class Traits, class T>
 void write(std::basic_ostream<Char, Traits>& out, const T& value) {
+    constexpr std::size_t fields_count = detail::fields_count<std::remove_reference_t<T>>();
     out << '{';
+#if __cplusplus >= 201606L /* Oulu meeting, not the exact value */
     detail::print_impl<0, tuple_size_v<T> >::print(out, detail::as_tuple(value));
+#else
+    ::boost::pfr::detail::for_each_field_dispatcher(
+        value,
+        [&out](const auto& val) {
+            detail::print_impl<0, fields_count>::print(out, val);
+        },
+        std::make_index_sequence<fields_count>{}
+    );
+#endif
     out << '}';
 }
 
@@ -174,6 +185,8 @@ void write(std::basic_ostream<Char, Traits>& out, const T& value) {
 /// \endcode
 template <class Char, class Traits, class T>
 void read(std::basic_istream<Char, Traits>& in, T& value) {
+    constexpr std::size_t fields_count = detail::fields_count<std::remove_reference_t<T>>();
+
     const auto prev_exceptions = in.exceptions();
     in.exceptions( typename std::basic_istream<Char, Traits>::iostate(0) );
     const auto prev_flags = in.flags( typename std::basic_istream<Char, Traits>::fmtflags(0) );
@@ -181,7 +194,18 @@ void read(std::basic_istream<Char, Traits>& in, T& value) {
     char parenthis = {};
     in >> parenthis;
     if (parenthis != '{') in.setstate(std::basic_istream<Char, Traits>::failbit);
+
+#if __cplusplus >= 201606L /* Oulu meeting, not the exact value */
     detail::read_impl<0, tuple_size_v<T> >::read(in, detail::as_tuple(value));
+#else
+    ::boost::pfr::detail::for_each_field_dispatcher(
+        value,
+        [&in](const auto& val) {
+            detail::read_impl<0, fields_count>::read(in, val);
+        },
+        std::make_index_sequence<fields_count>{}
+    );
+#endif
 
     in >> parenthis;
     if (parenthis != '}') in.setstate(std::basic_istream<Char, Traits>::failbit);
@@ -190,13 +214,25 @@ void read(std::basic_istream<Char, Traits>& in, T& value) {
     in.exceptions(prev_exceptions);
 }
 
-
+/// Calls `func` for each field of a `value`.
+/// `func` must have one of the following signatures:
+/// * any_return_type(auto value)
+/// * any_return_type(auto value, std::size_t i)
+/// * any_return_type(auto value, auto i). Here decltype(i) is an `std::integral_constant<size_t, field_index>`
 template <class T, class F>
 void for_each_field(T&& value, F&& func) {
+    constexpr std::size_t fields_count = detail::fields_count<std::remove_reference_t<T>>();
+
     ::boost::pfr::detail::for_each_field_dispatcher(
         std::forward<T>(value),
-        std::forward<F>(func),
-        std::make_index_sequence< detail::fields_count<std::remove_reference_t<T>>() >{}
+        [f = std::forward<F>(func)](auto&& t) mutable {
+            ::boost::pfr::detail::for_each_field_impl(
+                std::forward<decltype(t)>(t),
+                std::forward<F>(f),
+                std::make_index_sequence<fields_count>{}
+            );
+        },
+        std::make_index_sequence<fields_count>{}
     );
 }
 

@@ -740,7 +740,6 @@ decltype(auto) as_tuple(T& val) noexcept {
 template <class T>
 using as_tuple_t = decltype( ::boost::pfr::detail::as_tuple(std::declval<T&>()) );
 
-#undef MAY_ALIAS
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -802,19 +801,25 @@ void for_each_field_in_depth(T&& t, F&& f, std::index_sequence<I0, I...>, identi
 
 template <class T, class F, class... Fields>
 void for_each_field_in_depth(const T& t, F&& f, std::index_sequence<>, identity<Fields>...) {
-    for_each_field_impl(
-        reinterpret_cast< ::boost::pfr::detail::sequence_tuple::tuple<Fields...> const&>(t), // TODO: aliasing, fix perfect forwarding
-        std::forward<F>(f),
-        std::make_index_sequence<fields_count<std::remove_reference_t<T>>() >{}
+    MAY_ALIAS const auto* const tuple = reinterpret_cast< ::boost::pfr::detail::sequence_tuple::tuple<Fields...>const *>(std::addressof(t));
+    std::forward<F>(f)(
+        make_flat_tuple_of_references(*tuple, size_t_<0>{}, size_t_<sizeof...(Fields)>{})
     );
 }
 
+template <class T, class F, class... Fields>
+void for_each_field_in_depth(T& t, F&& f, std::index_sequence<>, identity<Fields>...) {
+    MAY_ALIAS auto* const tuple = reinterpret_cast< ::boost::pfr::detail::sequence_tuple::tuple<Fields...>*>(std::addressof(t));
+    std::forward<F>(f)(
+        make_flat_tuple_of_references(*tuple, size_t_<0>{}, size_t_<sizeof...(Fields)>{})
+    );
+}
+
+
 template <class T, class F, std::size_t... I>
 void for_each_field_dispatcher_1(T&& t, F&& f, std::index_sequence<I...>, std::true_type /*is_flat_refelectable*/) {
-    for_each_field_impl(
-        tie_as_flat_tuple(std::forward<T>(t)),
-        std::forward<F>(f),
-        std::index_sequence<I...>{}
+    std::forward<F>(f)(
+        tie_as_flat_tuple(std::forward<T>(t))
     );
 }
 
@@ -855,6 +860,7 @@ void for_each_field_dispatcher(T&& t, F&& f, std::index_sequence<I...>) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+#undef MAY_ALIAS
 
 #ifdef __clang__
 #   pragma clang diagnostic pop
