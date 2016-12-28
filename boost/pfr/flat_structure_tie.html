@@ -4,10 +4,10 @@
 <title>Function template flat_structure_tie</title>
 <link rel="stylesheet" href="http://www.boost.org/doc/libs/1_61_0/doc/src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
-<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.POD Flat Reflection 1.0">
-<link rel="up" href="../../boost_pfr_header_reference.html#header.boost.pfr.core_hpp" title="Header &lt;boost/pfr/core.hpp&gt;">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Precise and Flat Reflection 1.0">
+<link rel="up" href="../../boost_pfr_header_reference.html#header.boost.pfr.flat.core_hpp" title="Header &lt;boost/pfr/flat/core.hpp&gt;">
 <link rel="prev" href="flat_structure_to_tuple.html" title="Function template flat_structure_to_tuple">
-<link rel="next" href="flat_write.html" title="Function template flat_write">
+<link rel="next" href="flat_for_each_field.html" title="Function template flat_for_each_field">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -20,21 +20,21 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="flat_structure_to_tuple.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_pfr_header_reference.html#header.boost.pfr.core_hpp"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="flat_write.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="flat_structure_to_tuple.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_pfr_header_reference.html#header.boost.pfr.flat.core_hpp"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="flat_for_each_field.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="refentry">
 <a name="boost.pfr.flat_structure_tie"></a><div class="titlepage"></div>
 <div class="refnamediv">
 <h2><span class="refentrytitle">Function template flat_structure_tie</span></h2>
-<p>boost::pfr::flat_structure_tie &#8212; Creates an <code class="computeroutput">std::tuple</code> with lvalue references to fields of a <a class="link" href="../../boost_pod_flat_reflection/quick_start.html#boost_pod_flat_reflection.quick_start.flattening" title="Flattening">flattened</a> T. </p>
+<p>boost::pfr::flat_structure_tie &#8212; Creates an <code class="computeroutput">std::tuple</code> with lvalue references to fields of a <a class="link" href="../../boost_precise_and_flat_reflectio/quick_start.html#boost_precise_and_flat_reflectio.quick_start.flattening" title="Flattening">flattened</a> T. </p>
 </div>
 <h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
-<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../../boost_pfr_header_reference.html#header.boost.pfr.core_hpp" title="Header &lt;boost/pfr/core.hpp&gt;">boost/pfr/core.hpp</a>&gt;
+<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../../boost_pfr_header_reference.html#header.boost.pfr.flat.core_hpp" title="Header &lt;boost/pfr/flat/core.hpp&gt;">boost/pfr/flat/core.hpp</a>&gt;
 
 </span>
 <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> T<span class="special">&gt;</span> <span class="keyword">auto</span> <span class="identifier">flat_structure_tie</span><span class="special">(</span><span class="identifier">T</span> <span class="special">&amp;</span> val<span class="special">)</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idm44946519313552"></a><h2>Description</h2>
+<a name="idm45648497054080"></a><h2>Description</h2>
 <p><span class="bold"><strong>Requires:</strong></span> <code class="computeroutput">T</code> must not have const fields.</p>
 <p><span class="bold"><strong>Example:</strong></span> </p>
 <pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">my_struct</span> <span class="special">{</span> <span class="keyword">int</span> <span class="identifier">i</span><span class="special">,</span> <span class="keyword">short</span> <span class="identifier">s</span><span class="special">;</span> <span class="special">}</span><span class="special">;</span>
@@ -55,7 +55,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="flat_structure_to_tuple.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_pfr_header_reference.html#header.boost.pfr.core_hpp"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="flat_write.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="flat_structure_to_tuple.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_pfr_header_reference.html#header.boost.pfr.flat.core_hpp"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="flat_for_each_field.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

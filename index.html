@@ -1,11 +1,11 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<title>Chapter&#160;1.&#160;Boost.POD Flat Reflection 1.0</title>
+<title>Chapter&#160;1.&#160;Boost.Precise and Flat Reflection 1.0</title>
 <link rel="stylesheet" href="http://www.boost.org/doc/libs/1_61_0/doc/src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
-<link rel="home" href="index.html" title="Chapter&#160;1.&#160;Boost.POD Flat Reflection 1.0">
-<link rel="next" href="boost_pod_flat_reflection/quick_start.html" title="Quick Start">
+<link rel="home" href="index.html" title="Chapter&#160;1.&#160;Boost.Precise and Flat Reflection 1.0">
+<link rel="next" href="boost_precise_and_flat_reflectio/quick_start.html" title="Quick Start">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -17,14 +17,14 @@
 <td align="center"><a href="http://www.boost.org/doc/libs/1_61_0/more/index.htm">More</a></td>
 </tr></table>
 <hr>
-<div class="spirit-nav"><a accesskey="n" href="boost_pod_flat_reflection/quick_start.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a></div>
+<div class="spirit-nav"><a accesskey="n" href="boost_precise_and_flat_reflectio/quick_start.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a></div>
 <div class="chapter">
 <div class="titlepage"><div>
 <div><h2 class="title">
-<a name="boost_pod_flat_reflection"></a>Chapter&#160;1.&#160;Boost.POD Flat Reflection 1.0</h2></div>
+<a name="boost_precise_and_flat_reflectio"></a>Chapter&#160;1.&#160;Boost.Precise and Flat Reflection 1.0</h2></div>
 <div><p class="copyright">Copyright &#169; 2016 Antony Polukhin</p></div>
 <div><div class="legalnotice">
-<a name="boost_pod_flat_reflection.legal"></a><p>
+<a name="boost_precise_and_flat_reflectio.legal"></a><p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>
@@ -33,34 +33,45 @@
 <div class="toc">
 <p><b>Table of Contents</b></p>
 <dl>
-<dt><span class="section"><a href="index.html#boost_pod_flat_reflection.motivation">Motivation</a></span></dt>
-<dt><span class="section"><a href="boost_pod_flat_reflection/quick_start.html">Quick Start</a></span></dt>
+<dt><span class="section"><a href="index.html#boost_precise_and_flat_reflectio.motivation">Motivation</a></span></dt>
+<dt><span class="section"><a href="boost_precise_and_flat_reflectio/quick_start.html">Quick Start</a></span></dt>
 <dd><dl>
-<dt><span class="section"><a href="boost_pod_flat_reflection/quick_start.html#boost_pod_flat_reflection.quick_start.accessing_pod_member_by_index">Accessing
+<dt><span class="section"><a href="boost_precise_and_flat_reflectio/quick_start.html#boost_precise_and_flat_reflectio.quick_start.accessing_pod_member_by_index">Accessing
       POD member by index</a></span></dt>
-<dt><span class="section"><a href="boost_pod_flat_reflection/quick_start.html#boost_pod_flat_reflection.quick_start.flattening">Flattening</a></span></dt>
-<dt><span class="section"><a href="boost_pod_flat_reflection/quick_start.html#boost_pod_flat_reflection.quick_start.three_ways_of_getting_operators">Three
+<dt><span class="section"><a href="boost_precise_and_flat_reflectio/quick_start.html#boost_precise_and_flat_reflectio.quick_start.flattening">Flattening</a></span></dt>
+<dt><span class="section"><a href="boost_precise_and_flat_reflectio/quick_start.html#boost_precise_and_flat_reflectio.quick_start.flat_or_precise_functions_to_cho">Flat
+      or Precise functions to chose</a></span></dt>
+<dt><span class="section"><a href="boost_precise_and_flat_reflectio/quick_start.html#boost_precise_and_flat_reflectio.quick_start.three_ways_of_getting_operators">Three
       ways of getting operators </a></span></dt>
 </dl></dd>
-<dt><span class="section"><a href="boost_pod_flat_reflection/requirements_and_limitations.html">Requirements
+<dt><span class="section"><a href="boost_precise_and_flat_reflectio/requirements_and_limitations.html">Requirements
     and Limitations</a></span></dt>
-<dt><span class="section"><a href="boost_pod_flat_reflection/how_it_works.html">How it works</a></span></dt>
+<dt><span class="section"><a href="boost_precise_and_flat_reflectio/how_it_works.html">How it works</a></span></dt>
 <dt><span class="section"><a href="boost_pfr_header_reference.html">Boost.PFR Header Reference</a></span></dt>
 <dd><dl>
 <dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr_hpp">Header &lt;boost/pfr.hpp&gt;</a></span></dt>
-<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.core_hpp">Header &lt;boost/pfr/core.hpp&gt;</a></span></dt>
-<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.core17_hpp">Header &lt;boost/pfr/core17.hpp&gt;</a></span></dt>
-<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.fields_count_hpp">Header &lt;boost/pfr/fields_count.hpp&gt;</a></span></dt>
-<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.flat_functions_for_hpp">Header &lt;boost/pfr/flat_functions_for.hpp&gt;</a></span></dt>
-<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.flat_ops_hpp">Header &lt;boost/pfr/flat_ops.hpp&gt;</a></span></dt>
-<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.functors_hpp">Header &lt;boost/pfr/functors.hpp&gt;</a></span></dt>
-<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.global_flat_ops_hpp">Header &lt;boost/pfr/global_flat_ops.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.flat_hpp">Header &lt;boost/pfr/flat.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.flat.core_hpp">Header &lt;boost/pfr/flat/core.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.precise.core_hpp">Header &lt;boost/pfr/precise/core.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.flat.functions_for_hpp">Header &lt;boost/pfr/flat/functions_for.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.precise.functions_for_hpp">Header &lt;boost/pfr/precise/functions_for.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.flat.functors_hpp">Header &lt;boost/pfr/flat/functors.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.precise.functors_hpp">Header &lt;boost/pfr/precise/functors.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.flat.global_ops_hpp">Header &lt;boost/pfr/flat/global_ops.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.precise.global_ops_hpp">Header &lt;boost/pfr/precise/global_ops.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.flat.io_hpp">Header &lt;boost/pfr/flat/io.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.precise.io_hpp">Header &lt;boost/pfr/precise/io.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.flat.ops_hpp">Header &lt;boost/pfr/flat/ops.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.precise.ops_hpp">Header &lt;boost/pfr/precise/ops.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.flat.tuple_size_hpp">Header &lt;boost/pfr/flat/tuple_size.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.precise.tuple_size_hpp">Header &lt;boost/pfr/precise/tuple_size.hpp&gt;</a></span></dt>
+<dt><span class="section"><a href="boost_pfr_header_reference.html#header.boost.pfr.precise_hpp">Header &lt;boost/pfr/precise.hpp&gt;</a></span></dt>
 </dl></dd>
 </dl>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h2 class="title" style="clear: both">
-<a name="boost_pod_flat_reflection.motivation"></a><a class="link" href="index.html#boost_pod_flat_reflection.motivation" title="Motivation">Motivation</a>
+<a name="boost_precise_and_flat_reflectio.motivation"></a><a class="link" href="index.html#boost_precise_and_flat_reflectio.motivation" title="Motivation">Motivation</a>
 </h2></div></div></div>
 <p>
       In C++ we have:
@@ -95,8 +106,8 @@
 </td></tr>
 </table></div>
 <p>
-      Boost.POD Flat Reflection (Boost.PFR) adds following out-of-the-box functionality
-      to PODs:
+      Boost.Precise and Flat Reflection (Boost.PFR) adds following out-of-the-box
+      functionality to PODs:
     </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
@@ -145,10 +156,10 @@
 </div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
-<td align="left"><p><small>Last revised: October 14, 2016 at 05:59:41 GMT</small></p></td>
+<td align="left"><p><small>Last revised: December 28, 2016 at 19:41:48 GMT</small></p></td>
 <td align="right"><div class="copyright-footer"></div></td>
 </tr></table>
 <hr>
-<div class="spirit-nav"><a accesskey="n" href="boost_pod_flat_reflection/quick_start.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a></div>
+<div class="spirit-nav"><a accesskey="n" href="boost_precise_and_flat_reflectio/quick_start.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a></div>
 </body>
 </html>

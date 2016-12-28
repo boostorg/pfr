@@ -1,0 +1,457 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Quick Start</title>
+<link rel="stylesheet" href="http://www.boost.org/doc/libs/1_61_0/doc/src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.Precise and Flat Reflection 1.0">
+<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.Precise and Flat Reflection 1.0">
+<link rel="prev" href="../index.html" title="Chapter&#160;1.&#160;Boost.Precise and Flat Reflection 1.0">
+<link rel="next" href="requirements_and_limitations.html" title="Requirements and Limitations">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="http://www.boost.org/doc/libs/1_61_0/boost.png"></td>
+<td align="center"><a href="http://www.boost.org/doc/libs/1_61_0/index.html">Home</a></td>
+<td align="center"><a href="http://www.boost.org/doc/libs/1_61_0/libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="http://www.boost.org/doc/libs/1_61_0/more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="requirements_and_limitations.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="boost_precise_and_flat_reflectio.quick_start"></a><a class="link" href="quick_start.html" title="Quick Start">Quick Start</a>
+</h2></div></div></div>
+<div class="toc"><dl>
+<dt><span class="section"><a href="quick_start.html#boost_precise_and_flat_reflectio.quick_start.accessing_pod_member_by_index">Accessing
+      POD member by index</a></span></dt>
+<dt><span class="section"><a href="quick_start.html#boost_precise_and_flat_reflectio.quick_start.flattening">Flattening</a></span></dt>
+<dt><span class="section"><a href="quick_start.html#boost_precise_and_flat_reflectio.quick_start.flat_or_precise_functions_to_cho">Flat
+      or Precise functions to chose</a></span></dt>
+<dt><span class="section"><a href="quick_start.html#boost_precise_and_flat_reflectio.quick_start.three_ways_of_getting_operators">Three
+      ways of getting operators </a></span></dt>
+</dl></div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_precise_and_flat_reflectio.quick_start.accessing_pod_member_by_index"></a><a class="link" href="quick_start.html#boost_precise_and_flat_reflectio.quick_start.accessing_pod_member_by_index" title="Accessing POD member by index">Accessing
+      POD member by index</a>
+</h3></div></div></div>
+<p>
+        The following example shows how to access structure fields by index using
+        <code class="computeroutput"><a class="link" href="../boost/pfr/get.html" title="Function get">boost::pfr::get</a></code>.
+      </p>
+<p>
+        Let's define some structure:
+      </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">pfr</span><span class="special">/</span><span class="identifier">precise</span><span class="special">/</span><span class="identifier">core</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="keyword">struct</span> <span class="identifier">foo</span> <span class="special">{</span>            <span class="comment">// defining structure</span>
+    <span class="keyword">int</span> <span class="identifier">some_integer</span><span class="special">;</span>
+    <span class="keyword">char</span> <span class="identifier">c</span><span class="special">;</span>
+<span class="special">};</span>
+</pre>
+<p>
+        We can access fields of that structure by index:
+      </p>
+<pre class="programlisting"><span class="identifier">foo</span> <span class="identifier">f</span> <span class="special">{</span><span class="number">777</span><span class="special">,</span> <span class="char">'!'</span><span class="special">};</span>
+<span class="keyword">auto</span><span class="special">&amp;</span> <span class="identifier">r1</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">0</span><span class="special">&gt;(</span><span class="identifier">f</span><span class="special">);</span> <span class="comment">// accessing field with index 0, returns reference to `foo::some_integer`</span>
+<span class="keyword">auto</span><span class="special">&amp;</span> <span class="identifier">r2</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">f</span><span class="special">);</span> <span class="comment">// accessing field with index 1, returns reference to `foo::c`</span>
+</pre>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_precise_and_flat_reflectio.quick_start.flattening"></a><a class="link" href="quick_start.html#boost_precise_and_flat_reflectio.quick_start.flattening" title="Flattening">Flattening</a>
+</h3></div></div></div>
+<div class="warning"><table border="0" summary="Warning">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/warning.png"></td>
+<th align="left">Warning</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+          All the functions and metafunctions in Boost.PFR that start with <code class="computeroutput"><span class="identifier">flat_</span></code> represent template parameter type
+          as flat structure without static members!
+        </p></td></tr>
+</table></div>
+<p>
+        Take a look at the <code class="computeroutput"><span class="keyword">struct</span> <span class="identifier">my_struct</span></code>:
+      </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">pfr</span><span class="special">/</span><span class="identifier">flat</span><span class="special">/</span><span class="identifier">core</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="keyword">struct</span> <span class="identifier">my_struct_nested</span> <span class="special">{</span> <span class="keyword">short</span> <span class="identifier">a1</span><span class="special">;</span> <span class="keyword">int</span> <span class="identifier">a2</span><span class="special">;</span> <span class="special">};</span>
+
+<span class="keyword">struct</span> <span class="identifier">my_struct</span> <span class="special">{</span>
+    <span class="keyword">int</span> <span class="identifier">a0</span><span class="special">;</span>
+    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> <span class="identifier">cvalue</span> <span class="special">=</span> <span class="number">1000</span><span class="special">;</span>
+    <span class="identifier">my_struct_nested</span> <span class="identifier">nested</span><span class="special">;</span>
+    <span class="keyword">short</span> <span class="identifier">a3_a4</span><span class="special">[</span><span class="number">2</span><span class="special">];</span>
+<span class="special">};</span>
+</pre>
+<p>
+        It will be flattened and represented as:
+      </p>
+<pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">my_struct_flat</span> <span class="special">{</span>
+    <span class="keyword">int</span>     <span class="identifier">a0</span><span class="special">;</span>
+    <span class="keyword">short</span>   <span class="identifier">a1</span><span class="special">;</span>
+    <span class="keyword">int</span>     <span class="identifier">a2</span><span class="special">;</span>
+    <span class="keyword">short</span>   <span class="identifier">a3</span><span class="special">;</span>
+    <span class="keyword">short</span>   <span class="identifier">a4</span><span class="special">;</span>
+<span class="special">};</span>
+</pre>
+<p>
+        It means, that:
+      </p>
+<pre class="programlisting"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_get</span><span class="special">&lt;</span><span class="number">2</span><span class="special">&gt;(</span><span class="identifier">my_struct</span><span class="special">{});</span>   <span class="comment">// ... will return `my_struct::my_struct_nested::a2` field.</span>
+<span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_get</span><span class="special">&lt;</span><span class="number">3</span><span class="special">&gt;(</span><span class="identifier">my_struct</span><span class="special">{});</span>   <span class="comment">// ... will return `my_struct::a3_a4[0]` field.</span>
+</pre>
+<p>
+        Exactly the same story with arrays:
+      </p>
+<pre class="programlisting"><span class="keyword">int</span> <span class="identifier">i</span><span class="special">[</span><span class="number">2</span><span class="special">][</span><span class="number">2</span><span class="special">]</span> <span class="special">=</span> <span class="special">{{</span><span class="number">10</span><span class="special">,</span> <span class="number">11</span><span class="special">},</span> <span class="special">{</span><span class="number">12</span><span class="special">,</span> <span class="number">13</span><span class="special">}</span> <span class="special">};</span>
+<span class="keyword">const</span> <span class="keyword">int</span><span class="special">&amp;</span> <span class="identifier">r</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">i</span><span class="special">);</span>
+<span class="identifier">assert</span><span class="special">(</span><span class="identifier">r</span> <span class="special">==</span> <span class="number">11</span><span class="special">);</span>
+</pre>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_precise_and_flat_reflectio.quick_start.flat_or_precise_functions_to_cho"></a><a class="link" href="quick_start.html#boost_precise_and_flat_reflectio.quick_start.flat_or_precise_functions_to_cho" title="Flat or Precise functions to chose">Flat
+      or Precise functions to chose</a>
+</h3></div></div></div>
+<p>
+        All the functions that have <code class="computeroutput"><span class="identifier">flat_</span></code>
+        prefix and are defclared in <code class="computeroutput"><span class="identifier">boost</span><span class="special">/</span><span class="identifier">pfr</span><span class="special">/</span><span class="identifier">flat</span><span class="comment">/*</span></code>
+        headers the <span class="bold"><strong>flat</strong></span> functions, other function
+        are <span class="bold"><strong>precise</strong></span> and are defclared in <code class="computeroutput"><span class="identifier">boost</span><span class="special">/</span><span class="identifier">pfr</span><span class="special">/</span><span class="identifier">precise</span><span class="comment">/*</span></code>. In previous example you've seen how the
+        the flattening works.
+      </p>
+<p>
+        Flat functions are more limited in their reflection capabilities, but guarantee
+        to not affect debug and release builds in C++14 mode (no additional code
+        would be produced).
+      </p>
+<p>
+        Precise functions have almost unlimited reflection capabilities, but may
+        produce additional code in C++14 mode in debug builds and even in release
+        builds (on old compilers or compilers with bad optimizers).
+      </p>
+<p>
+        Here's how to chose your functions:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+            If you use C++17 - use <span class="bold"><strong>precise</strong></span> functions
+          </li>
+<li class="listitem">
+            If you work only with flat POD types in C++14 - use <span class="bold"><strong>flat</strong></span>
+            functions
+          </li>
+<li class="listitem">
+            If you work only with POD types in C++14 and wish them flattened - use
+            <span class="bold"><strong>flat</strong></span> functions
+          </li>
+<li class="listitem">
+            If you have modern compiler in C++14 mode and work with non-POD literal
+            types with some hierarhy - you are forced to use <span class="bold"><strong>precise</strong></span>
+            functions
+          </li>
+</ul></div>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_precise_and_flat_reflectio.quick_start.three_ways_of_getting_operators"></a><a class="link" href="quick_start.html#boost_precise_and_flat_reflectio.quick_start.three_ways_of_getting_operators" title="Three ways of getting operators">Three
+      ways of getting operators </a>
+</h3></div></div></div>
+<p>
+        There are three ways to start using Boost.PFR hashing, comparison and streaming
+        operators for type <code class="computeroutput"><span class="identifier">T</span></code> in your
+        code. Each method has it's own drawbacks and suits own cases.
+      </p>
+<div class="table">
+<a name="boost_precise_and_flat_reflectio.quick_start.three_ways_of_getting_operators.flat_ops_comp"></a><p class="title"><b>Table&#160;1.1.&#160;Different approaches for operators</b></p>
+<div class="table-contents"><table class="table" summary="Different approaches for operators">
+<colgroup>
+<col>
+<col>
+<col>
+<col>
+<col>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+                <p>
+                  Approach
+                </p>
+              </th>
+<th>
+                <p>
+                  Defines operators in global namespace
+                </p>
+              </th>
+<th>
+                <p>
+                  Defined operators could be found by ADL
+                </p>
+              </th>
+<th>
+                <p>
+                  Works for local types
+                </p>
+              </th>
+<th>
+                <p>
+                  Usable localy, without affecting code from other scopes
+                </p>
+              </th>
+<th>
+                <p>
+                  Ignores implicit conversion operators
+                </p>
+              </th>
+<th>
+                <p>
+                  Respects user defined operators
+                </p>
+              </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><a class="link" href="../boost_pfr_header_reference.html#header.boost.pfr.flat.ops_hpp" title="Header &lt;boost/pfr/flat/ops.hpp&gt;">boost/pfr/flat/ops.hpp</a></code>
+                  or <code class="computeroutput"><a class="link" href="../boost_pfr_header_reference.html#header.boost.pfr.precise.ops_hpp" title="Header &lt;boost/pfr/precise/ops.hpp&gt;">boost/pfr/precise/ops.hpp</a></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  no
+                </p>
+              </td>
+<td>
+                <p>
+                  no
+                </p>
+              </td>
+<td>
+                <p>
+                  yes
+                </p>
+              </td>
+<td>
+                <p>
+                  yes
+                </p>
+              </td>
+<td>
+                <p>
+                  no
+                </p>
+              </td>
+<td>
+                <p>
+                  yes
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><a class="link" href="../boost_pfr_header_reference.html#header.boost.pfr.flat.functions_for_hpp" title="Header &lt;boost/pfr/flat/functions_for.hpp&gt;">boost/pfr/flat/functions_for.hpp</a></code>
+                  or <code class="computeroutput"><a class="link" href="../boost_pfr_header_reference.html#header.boost.pfr.precise.functions_for_hpp" title="Header &lt;boost/pfr/precise/functions_for.hpp&gt;">boost/pfr/precise/functions_for.hpp</a></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  yes if T is in it
+                </p>
+              </td>
+<td>
+                <p>
+                  yes
+                </p>
+              </td>
+<td>
+                <p>
+                  no
+                </p>
+              </td>
+<td>
+                <p>
+                  no, but could be limited to translation unit
+                </p>
+              </td>
+<td>
+                <p>
+                  yes for T
+                </p>
+              </td>
+<td>
+                <p>
+                  no (compile time error)
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+                <p>
+                  <code class="computeroutput"><a class="link" href="../boost_pfr_header_reference.html#header.boost.pfr.flat.global_ops_hpp" title="Header &lt;boost/pfr/flat/global_ops.hpp&gt;">boost/pfr/flat/global_ops.hpp</a></code>
+                  or <code class="computeroutput"><a class="link" href="../boost_pfr_header_reference.html#header.boost.pfr.precise.global_ops_hpp" title="Header &lt;boost/pfr/precise/global_ops.hpp&gt;">boost/pfr/precise/global_ops.hpp</a></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  yes
+                </p>
+              </td>
+<td>
+                <p>
+                  yes
+                </p>
+              </td>
+<td>
+                <p>
+                  yes
+                </p>
+              </td>
+<td>
+                <p>
+                  no, but could be limited to translation unit
+                </p>
+              </td>
+<td>
+                <p>
+                  yes all
+                </p>
+              </td>
+<td>
+                <p>
+                  yes
+                </p>
+              </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><p>
+        More detailed description:
+      </p>
+<p>
+        <span class="bold"><strong>1) <code class="computeroutput"><a class="link" href="../boost_pfr_header_reference.html#header.boost.pfr.precise.ops_hpp" title="Header &lt;boost/pfr/precise/ops.hpp&gt;">boost/pfr/precise/ops.hpp</a></code>
+        and <code class="computeroutput"><a class="link" href="../boost_pfr_header_reference.html#header.boost.pfr.flat.ops_hpp" title="Header &lt;boost/pfr/flat/ops.hpp&gt;">boost/pfr/flat/ops.hpp</a></code>
+        approach</strong></span>
+      </p>
+<p>
+        This method is good if you're writing generic algorithms and need to use
+        operators from Boost.PFR only if there's no operators defined for the type:
+      </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">pfr</span><span class="special">/</span><span class="identifier">precise</span><span class="special">/</span><span class="identifier">ops</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="keyword">struct</span> <span class="identifier">uniform_comparator_less</span> <span class="special">{</span>
+    <span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">()(</span><span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;</span> <span class="identifier">lhs</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;</span> <span class="identifier">rhs</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span> <span class="special">{</span>
+        <span class="keyword">using</span> <span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">ops</span><span class="special">;</span>    <span class="comment">// Enables Boost.PFR operators usage in this scope.</span>
+        <span class="keyword">return</span> <span class="identifier">lhs</span> <span class="special">&lt;</span> <span class="identifier">rhs</span><span class="special">;</span>           <span class="comment">// If T has operator&lt; or conversion operator then will use it, otherwise will use boost::pfr::flat_less&lt;T&gt;.</span>
+    <span class="special">}</span>
+<span class="special">};</span>
+</pre>
+<p>
+        This method's effects are local to the function. It works even for local
+        types, like structures defined in functions. However <span class="bold"><strong>Argument
+        Dependant Lookup</strong></span> does not work with it:
+      </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">pfr</span><span class="special">/</span><span class="identifier">flat</span><span class="special">/</span><span class="identifier">ops</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="keyword">struct</span> <span class="identifier">uniform_comparator_less</span> <span class="special">{</span>
+    <span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">()(</span><span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;</span> <span class="identifier">lhs</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;</span> <span class="identifier">rhs</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span> <span class="special">{</span>
+        <span class="keyword">using</span> <span class="keyword">namespace</span> <span class="identifier">flat_ops</span><span class="special">;</span>
+        <span class="keyword">return</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">less</span><span class="special">{}(</span><span class="identifier">lhs</span><span class="special">,</span> <span class="identifier">rhs</span><span class="special">);</span>   <span class="comment">// Compile time error if T has neither operator&lt; nor conversion operator to comparable type.</span>
+    <span class="special">}</span>
+<span class="special">};</span>
+</pre>
+<p>
+        <span class="bold"><strong>2) <code class="computeroutput"><a class="link" href="../boost_pfr_header_reference.html#header.boost.pfr.flat.functions_for_hpp" title="Header &lt;boost/pfr/flat/functions_for.hpp&gt;">boost/pfr/flat/functions_for.hpp</a></code>
+        approach</strong></span>
+      </p>
+<p>
+        This method is good if you're writing POD structure and wish to define operators
+        for that structure.
+      </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">pfr</span><span class="special">/</span><span class="identifier">flat</span><span class="special">/</span><span class="identifier">functions_for</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="keyword">struct</span> <span class="identifier">pair_like</span> <span class="special">{</span>
+    <span class="keyword">int</span> <span class="identifier">first</span><span class="special">;</span>
+    <span class="keyword">short</span> <span class="identifier">second</span><span class="special">;</span>
+<span class="special">};</span>
+
+<span class="identifier">BOOST_PFR_FLAT_FUNCTIONS_FOR</span><span class="special">(</span><span class="identifier">pair_like</span><span class="special">)</span>   <span class="comment">// Defines operators</span>
+
+<span class="comment">// ...</span>
+
+<span class="identifier">assert</span><span class="special">(</span><span class="identifier">pair_like</span><span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">2</span><span class="special">}</span> <span class="special">&lt;</span> <span class="identifier">pair_like</span><span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">3</span><span class="special">});</span>
+</pre>
+<p>
+        Argument Dependant Lookup works well, <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">less</span></code>
+        will find the operators for <code class="computeroutput"><span class="keyword">struct</span>
+        <span class="identifier">pair_like</span></code>. <code class="computeroutput"><a class="link" href="../BOOST_PFR_FLAT_FUNCTIONS_FOR.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR(T)</a></code>
+        can not be used for local types, it must be called only once in namespace
+        of <code class="computeroutput"><span class="identifier">T</span></code>. It does not respect
+        conversion operators of <code class="computeroutput"><span class="identifier">T</span></code>,
+        so for example the following code will output different values:
+      </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">pfr</span><span class="special">/</span><span class="identifier">flat</span><span class="special">/</span><span class="identifier">functions_for</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="keyword">struct</span> <span class="identifier">empty</span> <span class="special">{</span>
+    <span class="keyword">operator</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span><span class="special">()</span> <span class="special">{</span> <span class="keyword">return</span> <span class="string">"empty{}"</span><span class="special">;</span> <span class="special">}</span>
+<span class="special">};</span>
+<span class="comment">// Uncomment to get different output:</span>
+<span class="comment">// BOOST_PFR_FLAT_FUNCTIONS_FOR(empty)</span>
+
+<span class="comment">// ...</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">empty</span><span class="special">{};</span> <span class="comment">// Outputs `empty{}` if BOOST_PFR_FLAT_FUNCTIONS_FOR(empty) is commented out, '{}' otherwise.</span>
+</pre>
+<p>
+        <span class="bold"><strong>3) <code class="computeroutput"><a class="link" href="../boost_pfr_header_reference.html#header.boost.pfr.flat.global_ops_hpp" title="Header &lt;boost/pfr/flat/global_ops.hpp&gt;">boost/pfr/flat/global_ops.hpp</a></code>
+        approach</strong></span>
+      </p>
+<p>
+        This approach is for those, who wish to have comparisong/streaming/hashing
+        for all their types.
+      </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">pfr</span><span class="special">/</span><span class="identifier">flat</span><span class="special">/</span><span class="identifier">global_ops</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="keyword">struct</span> <span class="identifier">pair_like</span> <span class="special">{</span>
+    <span class="keyword">int</span> <span class="identifier">first</span><span class="special">;</span>
+    <span class="keyword">short</span> <span class="identifier">second</span><span class="special">;</span>
+<span class="special">};</span>
+
+<span class="comment">// ...</span>
+
+<span class="identifier">assert</span><span class="special">(</span><span class="identifier">pair_like</span><span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">2</span><span class="special">}</span> <span class="special">&lt;</span> <span class="identifier">pair_like</span><span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">3</span><span class="special">});</span>
+</pre>
+<p>
+        Argument Dependant Lookup works well, <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">less</span></code>
+        will find the operators for <code class="computeroutput"><span class="keyword">struct</span>
+        <span class="identifier">pair_like</span></code>. Operators for local
+        types will be also defined. <span class="bold"><strong>All conversion operators
+        of all POD types won't be used during comparisons/streaming/hashing.</strong></span>
+      </p>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2016 Antony Polukhin<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="requirements_and_limitations.html"><img src="http://www.boost.org/doc/libs/1_61_0/doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
