@@ -9,7 +9,7 @@
 #   error C++14 is required for this header.
 #endif
 
-#include <boost/pfr/functors.hpp>
+#include <boost/pfr/flat_functors.hpp>
 
 /// \file boost/pfr/global_flat_ops.hpp
 /// Contains comparison operators and stream operators for any POD types that do not have their own operators.

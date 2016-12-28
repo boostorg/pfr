@@ -9,7 +9,7 @@
 #   error C++14 is required for this header.
 #endif
 
-#include <boost/pfr/functors.hpp>
+#include <boost/pfr/flat_functors.hpp>
 
 /// \def BOOST_PFR_FLAT_FUNCTIONS_FOR(T)
 /// Defines comparison operators and stream operators for T.

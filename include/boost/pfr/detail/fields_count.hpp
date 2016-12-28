@@ -3,8 +3,8 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_PFR_FIELDS_COUNT_HPP
-#define BOOST_PFR_FIELDS_COUNT_HPP
+#ifndef BOOST_PFR_DETAIL_FIELDS_COUNT_HPP
+#define BOOST_PFR_DETAIL_FIELDS_COUNT_HPP
 
 #pragma once
 
@@ -23,9 +23,7 @@
 #   pragma clang diagnostic ignored "-Wmissing-field-initializers"
 #endif
 
-namespace boost { namespace pfr {
-
-namespace detail {
+namespace boost { namespace pfr { namespace detail {
 
 ///////////////////// General utility stuff
 template <std::size_t Index>
@@ -115,35 +113,10 @@ constexpr std::size_t fields_count() noexcept {
     return res;
 }
 
-} // namespace detail
+}}} // namespace boost::pfr::detail
 
 #ifdef __clang__
 #   pragma clang diagnostic pop
 #endif
 
-/// \brief Has a static const member variable `value` that constins fields count in a T.
-/// Works for any T that supports aggregate initialization even if T is not POD.
-/// \flattening{Flattens} only multidimensional arrays.
-///
-/// \b Example:
-/// \code
-///     std::array<int, boost::pfr::tuple_size<my_structure>::value > a;
-/// \endcode
-template <class T>
-using tuple_size = detail::size_t_< boost::pfr::detail::fields_count<T>() >;
-
-
-/// \brief `tuple_size_v` is a template variable that contains fields count in a T and
-/// works for any T that supports aggregate initialization even if T is not POD.
-/// \flattening{Flattens} only multidimensional arrays.
-///
-/// \b Example:
-/// \code
-///     std::array<int, boost::pfr::tuple_size_v<my_structure> > a;
-/// \endcode
-template <class T>
-constexpr std::size_t tuple_size_v = tuple_size<T>::value;
-
-}} // namespace boost::pfr
-
-#endif // BOOST_PFR_FIELDS_COUNT_HPP
+#endif // BOOST_PFR_DETAIL_FIELDS_COUNT_HPP

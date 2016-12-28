@@ -12,7 +12,7 @@
 
     Let's define some structure:
 */
-#include <boost/pfr/core.hpp>
+#include <boost/pfr/flat_core.hpp>
 
 struct foo {            // defining structure
     int some_integer;
@@ -31,7 +31,7 @@ auto& r2 = boost::pfr::flat_get<1>(f); // accessing field with index 1, returns 
 /*`
     The following example shows how to count fields using [classref boost::pfr::flat_tuple_size].
 */
-#include <boost/pfr/core.hpp>
+#include <boost/pfr/flat_core.hpp>
 
 struct foo2 {            // defining structure
     int some_integer;

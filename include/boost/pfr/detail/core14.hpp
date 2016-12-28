@@ -3,10 +3,8 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_PFR_CORE_HPP
-#define BOOST_PFR_CORE_HPP
-
-#pragma once
+#ifndef BOOST_PFR_DETAIL_CORE14_HPP
+#define BOOST_PFR_DETAIL_CORE14_HPP
 
 #if __cplusplus < 201402L
 #   error C++14 is required for this header.
@@ -14,10 +12,9 @@
 
 #include <type_traits>
 #include <utility>      // metaprogramming stuff
-#include <tuple>
-#include <iosfwd>       // stream operators
 
-#include <boost/pfr/fields_count.hpp>
+#include <boost/pfr/detail/sequence_tuple.hpp>
+#include <boost/pfr/tuple_size.hpp>
 
 #ifdef __clang__
 #   pragma clang diagnostic push
@@ -27,9 +24,7 @@
 #   pragma clang diagnostic ignored "-Wmissing-field-initializers"
 #endif
 
-namespace boost { namespace pfr {
-
-namespace detail {
+namespace boost { namespace pfr { namespace detail {
 
 ///////////////////// General utility stuff
 
@@ -41,156 +36,6 @@ template <class T>
 constexpr T construct_helper() noexcept { // adding const here allows to deal with copyable only types
     return {};
 }
-
-
-///////////////////// Tuple that holds it's values in the supplied order
-namespace sequence_tuple {
-
-
-template <std::size_t N, class T>
-struct base_from_member {
-    T value;
-};
-
-template <class I, class ...Tail>
-struct tuple_base;
-
-
-
-template <std::size_t... I, class ...Tail>
-struct tuple_base< std::index_sequence<I...>, Tail... >
-    : base_from_member<I , Tail>...
-{
-    static constexpr std::size_t size_v = sizeof...(I);
-
-    constexpr tuple_base() noexcept = default;
-    constexpr tuple_base(tuple_base&&) noexcept = default;
-    constexpr tuple_base(const tuple_base&) noexcept = default;
-
-    constexpr tuple_base(Tail... v) noexcept
-        : base_from_member<I, Tail>{ v }...
-    {}
-};
-
-template <>
-struct tuple_base<std::index_sequence<> > {
-    static constexpr std::size_t size_v = 0;
-};
-
-template <std::size_t N, class T>
-constexpr T& get_impl(base_from_member<N, T>& t) noexcept {
-    return t.value;
-}
-
-template <std::size_t N, class T>
-constexpr const T& get_impl(const base_from_member<N, T>& t) noexcept {
-    return t.value;
-}
-
-template <std::size_t N, class T>
-constexpr volatile T& get_impl(volatile base_from_member<N, T>& t) noexcept {
-    return t.value;
-}
-
-template <std::size_t N, class T>
-constexpr const volatile T& get_impl(const volatile base_from_member<N, T>& t) noexcept {
-    return t.value;
-}
-
-template <std::size_t N, class T>
-constexpr T&& get_impl(base_from_member<N, T>&& t) noexcept {
-    return std::forward<T>(t.value);
-}
-
-
-template <class ...Values>
-struct tuple: tuple_base<
-    std::make_index_sequence<sizeof...(Values)>,
-    Values...>
-{
-    using tuple_base<
-        std::make_index_sequence<sizeof...(Values)>,
-        Values...
-    >::tuple_base;
-};
-
-
-template <std::size_t N, class ...T>
-constexpr decltype(auto) get(tuple<T...>& t) noexcept {
-    static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
-    return get_impl<N>(t);
-}
-
-template <std::size_t N, class ...T>
-constexpr decltype(auto) get(const tuple<T...>& t) noexcept {
-    static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
-    return get_impl<N>(t);
-}
-
-template <std::size_t N, class ...T>
-constexpr decltype(auto) get(const volatile tuple<T...>& t) noexcept {
-    static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
-    return get_impl<N>(t);
-}
-
-template <std::size_t N, class ...T>
-constexpr decltype(auto) get(volatile tuple<T...>& t) noexcept {
-    static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
-    return get_impl<N>(t);
-}
-
-template <std::size_t N, class ...T>
-constexpr decltype(auto) get(tuple<T...>&& t) noexcept {
-    static_assert(N < tuple<T...>::size_v, "Tuple index out of bounds");
-    return get_impl<N>(std::move(t));
-}
-
-template <size_t I, class T>
-using tuple_element = std::remove_reference< decltype(
-        ::boost::pfr::detail::sequence_tuple::get<I>( std::declval<T>() )
-    ) >;
-
-
-} // namespace sequence_tuple
-
-
-template <std::size_t I, std::size_t N>
-struct print_impl {
-    template <class Stream, class T>
-    static void print (Stream& out, const T& value) {
-        if (!!I) out << ", ";
-        out << boost::pfr::detail::sequence_tuple::get<I>(value);
-        print_impl<I + 1, N>::print(out, value);
-    }
-};
-
-template <std::size_t I>
-struct print_impl<I, I> {
-    template <class Stream, class T> static void print (Stream&, const T&) noexcept {}
-};
-
-
-template <std::size_t I, std::size_t N>
-struct read_impl {
-    template <class Stream, class T>
-    static void read (Stream& in, const T& value) {
-        char ignore = {};
-        if (!!I) {
-            in >> ignore;
-            if (ignore != ',') in.setstate(Stream::failbit);
-            in >> ignore;
-            if (ignore != ' ')  in.setstate(Stream::failbit);
-        }
-        in >> boost::pfr::detail::sequence_tuple::get<I>(value);
-        read_impl<I + 1, N>::read(in, value);
-    }
-};
-
-template <std::size_t I>
-struct read_impl<I, I> {
-    template <class Stream, class T> static void read (Stream&, const T&) {}
-};
-
 
 ///////////////////// Array that has the constexpr
 template <std::size_t N>
@@ -797,197 +642,34 @@ constexpr auto make_flat_tuple_of_references(Tuple&& t, size_t_<Begin>, size_t_<
 
 template <class T>
 decltype(auto) tie_as_flat_tuple(const T& val) noexcept {
-    MAY_ALIAS const auto* const t = reinterpret_cast<const detail::internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
+    MAY_ALIAS const auto* const t = reinterpret_cast<const internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
     return make_flat_tuple_of_references(*t, size_t_<0>{}, size_t_<detail::internal_tuple_with_same_alignment_t<T>::size_v>{});
 }
 
 template <class T>
 decltype(auto) tie_as_flat_tuple(const volatile T& val) noexcept {
-    MAY_ALIAS const volatile auto* const t = reinterpret_cast<const volatile detail::internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
+    MAY_ALIAS const volatile auto* const t = reinterpret_cast<const volatile internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
     return make_flat_tuple_of_references(*t, size_t_<0>{}, size_t_<detail::internal_tuple_with_same_alignment_t<T>::size_v>{});
 }
 
 template <class T>
 decltype(auto) tie_as_flat_tuple(volatile T& val) noexcept {
-    MAY_ALIAS volatile auto* const t = reinterpret_cast<volatile detail::internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
+    MAY_ALIAS volatile auto* const t = reinterpret_cast<volatile internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
     return make_flat_tuple_of_references(*t, size_t_<0>{}, size_t_<detail::internal_tuple_with_same_alignment_t<T>::size_v>{});
 }
 
 template <class T>
 decltype(auto) tie_as_flat_tuple(T& val) noexcept {
-    MAY_ALIAS auto* const t = reinterpret_cast<detail::internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
+    MAY_ALIAS auto* const t = reinterpret_cast<internal_tuple_with_same_alignment_t<T>*>( std::addressof(val) );
     return make_flat_tuple_of_references(*t, size_t_<0>{}, size_t_<detail::internal_tuple_with_same_alignment_t<T>::size_v>{});
 }
 
 #undef MAY_ALIAS
 
-template <class T, std::size_t... I>
-constexpr auto make_stdtuple_from_tietuple(const T& t, std::index_sequence<I...>) noexcept {
-    return std::make_tuple(
-        boost::pfr::detail::sequence_tuple::get<I>(t)...
-    );
-}
-
-template <class T, std::size_t... I>
-constexpr auto make_stdtiedtuple_from_tietuple(const T& t, std::index_sequence<I...>) noexcept {
-    return std::tie(
-        boost::pfr::detail::sequence_tuple::get<I>(t)...
-    );
-}
-
-} // namespace detail
-
 #ifdef __clang__
 #   pragma clang diagnostic pop
 #endif
 
+}}} // namespace boost::pfr::detail
 
-
-/// \brief Returns reference or const reference to a field with index `I` in \flattening{flattened} T.
-///
-/// \b Example:
-/// \code
-///     struct my_struct { int i, short s; };
-///     my_struct s {10, 11};
-///     assert(boost::pfr::flat_get<0>(s) == 10);
-///     boost::pfr::flat_get<1>(s) = 0;
-/// \endcode
-template <std::size_t I, class T>
-decltype(auto) flat_get(const T& val) noexcept {
-    return boost::pfr::detail::sequence_tuple::get<I>( boost::pfr::detail::tie_as_flat_tuple(val) );
-}
-
-
-/// \overload flat_get
-template <std::size_t I, class T>
-decltype(auto) flat_get(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable<T, T>::value>* = 0/* @endcond */ ) noexcept {
-    return boost::pfr::detail::sequence_tuple::get<I>( boost::pfr::detail::tie_as_flat_tuple(val) );
-}
-
-
-/// \brief `flat_tuple_element` has a `typedef type-of-the-field-with-index-I-in-\flattening{flattened}-T type;`
-///
-/// \b Example:
-/// \code
-///     std::vector<  boost::pfr::flat_tuple_element<0, my_structure>::type  > v;
-/// \endcode
-template <std::size_t I, class T>
-using flat_tuple_element = std::remove_reference<
-        typename boost::pfr::detail::sequence_tuple::tuple_element<I, decltype(boost::pfr::detail::tie_as_flat_tuple(std::declval<T&>())) >::type
-    >;
-
-
-/// \brief Type of a field with index `I` in \flattening{flattened} `T`
-///
-/// \b Example:
-/// \code
-///     std::vector<  boost::pfr::flat_tuple_element_t<0, my_structure>  > v;
-/// \endcode
-template <std::size_t I, class T>
-using flat_tuple_element_t = typename flat_tuple_element<I, T>::type;
-
-
-/// \brief Has a static const member variable `value` that contains fields count in a \flattening{flattened} T.
-///
-/// \b Example:
-/// \code
-///     std::array<int, boost::pfr::flat_tuple_size<my_structure>::value > a;
-/// \endcode
-template <class T>
-using flat_tuple_size = boost::pfr::detail::size_t_<decltype(boost::pfr::detail::tie_as_flat_tuple(std::declval<T&>()))::size_v>;
-
-
-/// \brief `flat_tuple_size_v` is a template variable that contains fields count in a \flattening{flattened} T.
-///
-/// \b Example:
-/// \code
-///     std::array<int, boost::pfr::flat_tuple_size_v<my_structure> > a;
-/// \endcode
-template <class T>
-constexpr std::size_t flat_tuple_size_v = flat_tuple_size<T>::value;
-
-/// \brief Creates an `std::tuple` from a \flattening{flattened} T.
-///
-/// \b Example:
-/// \code
-///     struct my_struct { int i, short s; };
-///     my_struct s {10, 11};
-///     std::tuple<int, short> t = flat_make_tuple(s);
-///     assert(flat_get<0>(t) == 10);
-/// \endcode
-template <class T>
-auto flat_structure_to_tuple(const T& val) noexcept {
-    return detail::make_stdtuple_from_tietuple(
-        detail::tie_as_flat_tuple(val),
-        std::make_index_sequence< flat_tuple_size_v<T> >()
-    );
-}
-
-
-/// \brief Creates an `std::tuple` with lvalue references to fields of a \flattening{flattened} T.
-///
-/// \b Requires: `T` must not have const fields.
-///
-/// \b Example:
-/// \code
-///     struct my_struct { int i, short s; };
-///     my_struct s;
-///     flat_structure_tie(s) = std::tuple<int, short>{10, 11};
-///     assert(s.s == 11);
-/// \endcode
-template <class T>
-auto flat_structure_tie(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable<T, T>::value>* = 0 /* @endcond */) noexcept {
-    return detail::make_stdtiedtuple_from_tietuple(
-        detail::tie_as_flat_tuple(val),
-        std::make_index_sequence< flat_tuple_size_v<T> >()
-    );
-}
-
-/// \brief Writes \flattening{flattened} POD `value` to `out`
-///
-/// \b Example:
-/// \code
-///     struct my_struct { int i, short s; };
-///     my_struct s{12, 13};
-///     flat_write(std::cout, s); // outputs '{12, 13}'
-/// \endcode
-template <class Char, class Traits, class T>
-void flat_write(std::basic_ostream<Char, Traits>& out, const T& value) {
-    out << '{';
-    detail::print_impl<0, flat_tuple_size_v<T> >::print(out, detail::tie_as_flat_tuple(value));
-    out << '}';
-}
-
-/// Reads \flattening{flattened} POD `value` from stream `in`
-///
-/// \b Example:
-/// \code
-///     struct my_struct { int i, short s; };
-///     my_struct s;
-///     std::stringstream ss;
-///     ss << "{ 12, 13 }";
-///     ss >> s;
-///     assert(s.i == 12);
-///     assert(s.i == 13);
-/// \endcode
-template <class Char, class Traits, class T>
-void flat_read(std::basic_istream<Char, Traits>& in, T& value) {
-    const auto prev_exceptions = in.exceptions();
-    in.exceptions( typename std::basic_istream<Char, Traits>::iostate(0) );
-    const auto prev_flags = in.flags( typename std::basic_istream<Char, Traits>::fmtflags(0) );
-
-    char parenthis = {};
-    in >> parenthis;
-    if (parenthis != '{') in.setstate(std::basic_istream<Char, Traits>::failbit);
-    detail::read_impl<0, flat_tuple_size_v<T> >::read(in, detail::tie_as_flat_tuple(value));
-
-    in >> parenthis;
-    if (parenthis != '}') in.setstate(std::basic_istream<Char, Traits>::failbit);
-
-    in.flags(prev_flags);
-    in.exceptions(prev_exceptions);
-}
-
-}} // namespace boost::pfr
-
-#endif // BOOST_PFR_CORE_HPP
+#endif // BOOST_PFR_DETAIL_CORE14_HPP
