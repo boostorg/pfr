@@ -190,6 +190,16 @@ void read(std::basic_istream<Char, Traits>& in, T& value) {
     in.exceptions(prev_exceptions);
 }
 
+
+template <class T, class F>
+void for_each_field(T&& value, F&& func) {
+    ::boost::pfr::detail::for_each_field_dispatcher(
+        std::forward<T>(value),
+        std::forward<F>(func),
+        std::make_index_sequence< detail::fields_count<std::remove_reference_t<T>>() >{}
+    );
+}
+
 }} // namespace boost::pfr
 
 #endif // BOOST_PFR_PRECISE_CORE_HPP

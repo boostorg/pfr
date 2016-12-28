@@ -15,6 +15,7 @@
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
+#include <boost/pfr/detail/for_each_field_impl.hpp>
 
 #ifdef __clang__
 #   pragma clang diagnostic push
@@ -740,6 +741,120 @@ template <class T>
 using as_tuple_t = decltype( ::boost::pfr::detail::as_tuple(std::declval<T&>()) );
 
 #undef MAY_ALIAS
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////// Structure that can be converted to copy of anything
+struct ubiq_constructor_constexpr_copy {
+    std::size_t ignore;
+
+    template <class Type>
+    constexpr operator Type() const noexcept {
+        static_assert(
+            std::is_trivially_destructible<Type>::value,
+            "One of the fields in the type passed to `for_each_field` has non trivial destructor."
+        );
+        return {};
+    }
+};
+
+/////////////////////
+template <class T, std::size_t... I>
+struct is_constexpr_aggregate_initializable { // TODO: try to fix it
+    template <T = T{ ubiq_constructor_constexpr_copy{I}... } >
+    static std::true_type test(long) noexcept;
+
+    static std::false_type test(...) noexcept;
+
+    static constexpr decltype( test(0) ) value{};
+};
+
+
+
+template <class T, class F, class IndexSeq, class... Fields>
+struct next_step {
+    T& t;
+    F& f;
+
+    template <class Field>
+    operator Field() const {
+         for_each_field_in_depth(
+             std::forward<T>(t),
+             std::forward<F>(f),
+             IndexSeq{},
+             identity<Fields>{}...,
+             identity<Field>{}
+         );
+
+         return {};
+    }
+};
+
+template <class T, class F, std::size_t I0, std::size_t... I, class... Fields>
+void for_each_field_in_depth(T&& t, F&& f, std::index_sequence<I0, I...>, identity<Fields>...) {
+    (void)std::add_const_t<std::remove_reference_t<T>>{
+        Fields{}...,
+        next_step<T, F, std::index_sequence<I...>, Fields...>{t, f},
+        ubiq_constructor_constexpr_copy{I}...
+    };
+}
+
+template <class T, class F, class... Fields>
+void for_each_field_in_depth(const T& t, F&& f, std::index_sequence<>, identity<Fields>...) {
+    for_each_field_impl(
+        reinterpret_cast< ::boost::pfr::detail::sequence_tuple::tuple<Fields...> const&>(t), // TODO: aliasing, fix perfect forwarding
+        std::forward<F>(f),
+        std::make_index_sequence<fields_count<std::remove_reference_t<T>>() >{}
+    );
+}
+
+template <class T, class F, std::size_t... I>
+void for_each_field_dispatcher_1(T&& t, F&& f, std::index_sequence<I...>, std::true_type /*is_flat_refelectable*/) {
+    for_each_field_impl(
+        tie_as_flat_tuple(std::forward<T>(t)),
+        std::forward<F>(f),
+        std::index_sequence<I...>{}
+    );
+}
+
+
+template <class T, class F, std::size_t... I>
+void for_each_field_dispatcher_1(T&& t, F&& f, std::index_sequence<I...>, std::false_type /*is_flat_refelectable*/) {
+    for_each_field_in_depth(
+        std::forward<T>(t),
+        std::forward<F>(f),
+        std::index_sequence<I...>{}
+    );
+}
+
+template <class T, class F, std::size_t... I>
+void for_each_field_dispatcher(T&& t, F&& f, std::index_sequence<I...>) {
+    typedef std::remove_reference_t<T> type;
+
+    /// Compile time error at this point means that you have called `for_each_field` for a
+    /// type that is not constexpr aggregate initializable.
+    ///
+    /// Make sure that all the fields of your type have constexpr default construtors and trivial destructors.
+    /// Or compile in C++17 mode.
+    constexpr type tmp{ ubiq_constructor_constexpr_copy{I}... };
+    (void)tmp;
+
+    //static_assert(is_constexpr_aggregate_initializable<type, I...>::value, "T must be a constexpr initializable type");
+
+    constexpr bool is_flat_refelectable_val = is_flat_refelectable<type>( std::index_sequence<I...>{} );
+    for_each_field_dispatcher_1(
+        std::forward<T>(t),
+        std::forward<F>(f),
+        std::index_sequence<I...>{},
+        std::integral_constant<bool, is_flat_refelectable_val>{}
+    );
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 #ifdef __clang__
 #   pragma clang diagnostic pop

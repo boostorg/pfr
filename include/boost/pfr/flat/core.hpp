@@ -17,6 +17,7 @@
 #include <boost/pfr/detail/io.hpp>
 #include <boost/pfr/detail/stdtuple.hpp>
 #include <boost/pfr/detail/core14.hpp>
+#include <boost/pfr/detail/for_each_field_impl.hpp>
 
 namespace boost { namespace pfr {
 
@@ -163,6 +164,20 @@ void flat_read(std::basic_istream<Char, Traits>& in, T& value) {
 
     in.flags(prev_flags);
     in.exceptions(prev_exceptions);
+}
+
+/// Calls `func` for each field of a \flattening{flattened} POD `value`.
+/// `func` must have one of the following signatures:
+/// * any_return_type(auto value)
+/// * any_return_type(auto value, std::size_t i)
+/// * any_return_type(auto value, auto i). Here decltype(i) is an `std::integral_constant<size_t, field_index>`
+template <class T, class F>
+void flat_for_each_field(T&& value, F&& func) {
+    ::boost::pfr::detail::for_each_field_impl(
+        detail::tie_as_flat_tuple(std::forward<T>(value)),
+        std::forward<F>(func),
+        std::make_index_sequence< flat_tuple_size_v<T> >{}
+    );
 }
 
 }} // namespace boost::pfr
