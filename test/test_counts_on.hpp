@@ -62,8 +62,9 @@ void test_counts_on_multiple_chars_impl() {
     test_counts_on_multiple_chars_impl_1<T1, CountInT, 5>();
     test_counts_on_multiple_chars_impl_1<T1, CountInT, 6>();
     test_counts_on_multiple_chars_impl_1<T1, CountInT, 7>();
+#ifdef BOOST_PFR_RUN_HUGE_TESTS
     test_counts_on_multiple_chars_impl_1<T1, CountInT, 8>();
-/*    test_counts_on_multiple_chars_impl_1<T1, CountInT, 9>();
+    test_counts_on_multiple_chars_impl_1<T1, CountInT, 9>();
     test_counts_on_multiple_chars_impl_1<T1, CountInT, 10>();
     test_counts_on_multiple_chars_impl_1<T1, CountInT, 11>();
     test_counts_on_multiple_chars_impl_1<T1, CountInT, 12>();
@@ -76,7 +77,8 @@ void test_counts_on_multiple_chars_impl() {
     test_counts_on_multiple_chars_impl_1<T1, CountInT, 19>();
     test_counts_on_multiple_chars_impl_1<T1, CountInT, 20>();
     test_counts_on_multiple_chars_impl_1<T1, CountInT, 23>();
-    test_counts_on_multiple_chars_impl_1<T1, CountInT, 24>();*/
+    test_counts_on_multiple_chars_impl_1<T1, CountInT, 24>();
+#endif
 }
 
 template <class T>

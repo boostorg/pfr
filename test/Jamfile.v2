@@ -10,6 +10,7 @@ test-suite pfr
     [ run core.cpp ]
     [ run minimal.cpp ]
     [ run count_fields_on_chars.cpp ]
+    [ run count_fields_on_chars.cpp : : : <define>BOOST_PFR_RUN_HUGE_TESTS : count_fields_on_chars_huge ]
     [ run count_fields_on_ints.cpp ]
     [ run count_fields_on_long_longs.cpp ]
     [ run count_fields_on_shorts.cpp ]
@@ -25,6 +26,7 @@ test-suite pfr
     [ run ../example/examples.cpp ]
     [ run only_fields_count.cpp ]
     [ run flat_for_each_field.cpp ]
+    [ run for_each_field.cpp ]
   ;
 
 
