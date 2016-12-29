@@ -6,14 +6,21 @@
 using quickbook ;
 using boostbook ;
 using doxygen ;
+using xsltproc ;
 
-doxygen autodoc
-   :
-      [ glob ../../../boost/pfr.hpp ]
-      [ glob ../../../boost/pfr/*.hpp ]
-      [ glob ../../../boost/pfr/flat/*.hpp ]
-      [ glob ../../../boost/pfr/precise/*.hpp ]
-   :
+import set ;
+import doxygen ;
+import xsltproc ;
+import notfile ;
+import path ;
+
+project pfr/doc ;
+
+#
+# Common params for doxygen
+# 
+
+local doxygen_params =
         <doxygen:param>EXTRACT_ALL=NO
         <doxygen:param>HIDE_UNDOC_MEMBERS=YES
         <doxygen:param>EXTRACT_PRIVATE=NO
@@ -27,19 +34,56 @@ doxygen autodoc
             \"podops=\\b See \\b Also: \\xmlonly<link linkend='boost_precise_and_flat_reflectio.quick_start.three_ways_of_getting_operators'>Three ways of getting operators</link>\\endxmlonly\" \\
             \"constexprinit{1}=\\xmlonly<link linkend='boost_precise_and_flat_reflectio.requirements_and_limitations'>\\1</link>\\endxmlonly\" \\
             \"flatpod{1}=\\xmlonly<link linkend='boost_precise_and_flat_reflectio.requirements_and_limitations'>\\1</link>\\endxmlonly\" \\
-            "
-        <doxygen:param>"PREDEFINED=\"BOOST_PFR_DOXYGEN_INVOKED\" \\
-                                   \"detail::stl_type_info=std::type_info\""
-        <xsl:param>"boost.doxygen.reftitle=Boost.PFR Header Reference"
-   ;
-
-xml pfr : pfr.qbk : <dependency>autodoc ;
-boostbook standalone
-    :
-        pfr
-    :
-        <xsl:param>boost.root=http://www.boost.org/doc/libs/1_61_0
-#        <xsl:param>boost.root=../../../..
-        <format>pdf:<xsl:param>boost.url.prefix=http://www.boost.org/doc/libs/release/doc/html
+        "
     ;
+
+doxygen autodoc_all
+    :
+        [ glob ../../../boost/pfr.hpp ]
+    :
+        $(doxygen_params)
+        <xsl:param>"boost.doxygen.reftitle=Include all"
+    ;
+
+
+doxygen autodoc_flat
+    :
+        [ glob ../../../boost/pfr/flat.hpp ]
+        [ glob ../../../boost/pfr/flat/*.hpp ]
+    :
+        $(doxygen_params)
+        <xsl:param>"boost.doxygen.reftitle=Flat Reflection"
+    ;
+
+
+doxygen autodoc_precise
+    :
+        [ glob ../../../boost/pfr/precise.hpp ]
+        [ glob ../../../boost/pfr/precise/*.hpp ]
+    :
+        $(doxygen_params)
+        <xsl:param>"boost.doxygen.reftitle=Precise Reflection"
+    ;
+
+boostbook pfr-doc
+    :
+        pfr.qbk
+    :
+        <dependency>autodoc_all
+        <dependency>autodoc_precise
+        <dependency>autodoc_flat
+        <xsl:param>boost.root=http://www.boost.org/doc/libs/1_63_0
+        #<xsl:param>boost.root=../../../.
+        <xml:param>html.stylesheet=../../../../doc/src/boostbook.css
+    ;
+
+###############################################################################
+alias boostdoc
+    : pfr-doc/<format>docbook
+    :
+    :
+    : ;
+explicit boostdoc ;
+alias boostrelease ;
+explicit boostrelease ;
 
