@@ -574,7 +574,7 @@ struct ubiq_is_flat_refelectable {
 template <class T, std::size_t... I>
 constexpr bool is_flat_refelectable(std::index_sequence<I...>) noexcept {
     constexpr std::size_t fields = sizeof...(I);
-    bool result[fields] = {};
+    bool result[fields] = {I...};
     const T v{ ubiq_is_flat_refelectable{result[I]}... };
     (void)v;
 
@@ -596,8 +596,9 @@ decltype(auto) tie_as_flat_tuple(T&& val) noexcept {
 
 template <class T>
 decltype(auto) as_tuple(T&& val) noexcept {
+    typedef std::remove_reference_t<T> type;
     static_assert(
-        is_flat_refelectable<std::remove_reference_t<T>>( std::make_index_sequence<fields_count<T>()>{} ),
+        boost::pfr::detail::is_flat_refelectable<type>( std::make_index_sequence<fields_count<type>()>{} ),
         "Not possible in C++14 to represent that type without loosing information. Use flat_ version or change type definition"
     );
     return tie_as_flat_tuple(std::forward<T>(val));

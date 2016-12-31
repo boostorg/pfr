@@ -63,6 +63,71 @@ Here's how to chose your functions:
 
 [endsect]
 
+
+
+[section Short examples]
+
+
+[pfr_quick_examples_structures]
+
+Following examples use definition from above:
+
+[table:quick_examples
+[[ Code snippet ] [ `var` content or output ] [ Function description: ]]
+[
+    [ [pfr_quick_examples_flat_for_each] ]
+    [ `var == {B, {778, 4.14159}}` ]
+    [ [funcref boost::pfr::flat_for_each_field] ]
+][
+    [ [pfr_quick_examples_for_each] ]
+    [ `var == {B, {787, 103.142}}` ]
+    [ [funcref boost::pfr::for_each_field] ]
+][
+    [ [pfr_quick_examples_flat_for_each_idx] ]
+    [ ```0: char
+1: int
+2: double
+``` ]
+    [ [funcref boost::pfr::flat_for_each_field] ]
+][
+    [ [pfr_quick_examples_for_each_idx] ]
+    [ ```0: char
+1: quick_examples_ns::foo
+``` ]
+    [ [funcref boost::pfr::for_each_field] ]
+][
+    [ [pfr_quick_examples_tuple_size] ]
+    [ `tuple_size: 2` ]
+    [ [classref boost::pfr::tuple_size] ]
+][
+    [ [pfr_quick_examples_flat_tuple_size] ]
+    [ `flat_tuple_size: 3` ]
+    [ [classref boost::pfr::flat_tuple_size] ]
+][
+    [ [pfr_quick_examples_get_1] ]
+    [ `var == {A {1, 2.0}}` ]
+    [ [funcref boost::pfr::get] ]
+][
+    [ [pfr_quick_examples_flat_get_1] ]
+    [ `var == {A, {1, 3.14159}}` ]
+    [ [funcref boost::pfr::flat_get] ]
+][
+    [ [pfr_quick_examples_get_2] ]
+    [ `var == {A, {777, 42.01}}` ]
+    [ [funcref boost::pfr::get] ]
+][
+    [ [pfr_quick_examples_flat_get_2] ]
+    [ `var == {A, {777, 42.01}}` ]
+    [ [funcref boost::pfr::flat_get] ]
+]]
+
+[endsect]
+
+
+
+
+
+
 [section Three ways of getting operators ]
 
 There are three ways to start using Boost.PFR hashing, comparison and streaming operators for type `T` in your code. Each method has it's own drawbacks and suits own cases.

@@ -23,7 +23,7 @@ test-suite pfr
     [ run common/test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=short : test_tuple_sizes_on_shorts ]
     [ run common/test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=void* : test_tuple_sizes_on_voidptrs ]
     [ run common/test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=std::size_t : test_tuple_sizes_on_size_ts ]
-    [ run common/test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=char <define>BOOST_PFR_RUN_HUGE_TESTS : test_tuple_sizes_on_chars_huge ]
+    #[ run common/test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=char <define>BOOST_PFR_RUN_HUGE_TESTS : test_tuple_sizes_on_chars_huge ]
 
     [ run flat/core.cpp ]
     [ run flat/flat_tuple_size.cpp ]
