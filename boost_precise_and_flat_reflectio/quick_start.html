@@ -391,6 +391,78 @@
                 </p>
               </td>
 </tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="keyword">char</span><span class="special">,</span> <span class="identifier">foo</span><span class="special">&gt;</span> <span class="identifier">t</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">structure_to_tuple</span><span class="special">(</span><span class="identifier">var</span><span class="special">);</span> <span class="comment">// C++17 is required</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">t</span><span class="special">)</span> <span class="special">=</span> <span class="identifier">foo</span><span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">2</span><span class="special">};</span>
+</pre>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">var</span> <span class="special">==</span>
+                  <span class="special">{</span><span class="identifier">A</span><span class="special">,</span> <span class="special">{</span><span class="number">777</span><span class="special">,</span> <span class="number">3.14159</span><span class="special">}}</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><a class="link" href="../boost/pfr/structure_to_tuple.html" title="Function template structure_to_tuple">boost::pfr::structure_to_tuple</a></code>
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="keyword">char</span><span class="special">,</span> <span class="keyword">int</span><span class="special">,</span> <span class="keyword">double</span><span class="special">&gt;</span> <span class="identifier">t</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_structure_to_tuple</span><span class="special">(</span><span class="identifier">var</span><span class="special">);</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">0</span><span class="special">&gt;(</span><span class="identifier">t</span><span class="special">)</span> <span class="special">=</span> <span class="char">'C'</span><span class="special">;</span>
+</pre>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">var</span> <span class="special">==</span>
+                  <span class="special">{</span><span class="identifier">A</span><span class="special">,</span> <span class="special">{</span><span class="number">777</span><span class="special">,</span> <span class="number">3.14159</span><span class="special">}}</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><a class="link" href="../boost/pfr/flat_structure_to_tuple.html" title="Function template flat_structure_to_tuple">boost::pfr::flat_structure_to_tuple</a></code>
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="keyword">char</span><span class="special">&amp;,</span> <span class="identifier">foo</span><span class="special">&amp;&gt;</span> <span class="identifier">t</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">structure_tie</span><span class="special">(</span><span class="identifier">var</span><span class="special">);</span> <span class="comment">// C++17 is required</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">t</span><span class="special">)</span> <span class="special">=</span> <span class="identifier">foo</span><span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">2</span><span class="special">};</span>
+</pre>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">var</span> <span class="special">==</span>
+                  <span class="special">{</span><span class="identifier">A</span><span class="special">,</span> <span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">2.0</span><span class="special">}}</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><a class="link" href="../boost/pfr/structure_tie.html" title="Function template structure_tie">boost::pfr::structure_tie</a></code>
+                </p>
+              </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="keyword">char</span><span class="special">&amp;,</span> <span class="keyword">int</span><span class="special">&amp;,</span> <span class="keyword">double</span><span class="special">&amp;&gt;</span> <span class="identifier">t</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_structure_tie</span><span class="special">(</span><span class="identifier">var</span><span class="special">);</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">0</span><span class="special">&gt;(</span><span class="identifier">t</span><span class="special">)</span> <span class="special">=</span> <span class="char">'C'</span><span class="special">;</span>
+</pre>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><span class="identifier">var</span> <span class="special">==</span>
+                  <span class="special">{</span><span class="identifier">C</span><span class="special">,</span> <span class="special">{</span><span class="number">777</span><span class="special">,</span> <span class="number">3.14159</span><span class="special">}}</span></code>
+                </p>
+              </td>
+<td>
+                <p>
+                  <code class="computeroutput"><a class="link" href="../boost/pfr/flat_structure_tie.html" title="Function template flat_structure_tie">boost::pfr::flat_structure_tie</a></code>
+                </p>
+              </td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -459,7 +531,9 @@
 <td>
                 <p>
                   <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.flat.ops_hpp" title="Header &lt;boost/pfr/flat/ops.hpp&gt;">boost/pfr/flat/ops.hpp</a></code>
-                  or <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.precise.ops_hpp" title="Header &lt;boost/pfr/precise/ops.hpp&gt;">boost/pfr/precise/ops.hpp</a></code>
+                </p>
+                <p>
+                  <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.precise.ops_hpp" title="Header &lt;boost/pfr/precise/ops.hpp&gt;">boost/pfr/precise/ops.hpp</a></code>
                 </p>
               </td>
 <td>
@@ -497,7 +571,9 @@
 <td>
                 <p>
                   <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.flat.functions_for_hpp" title="Header &lt;boost/pfr/flat/functions_for.hpp&gt;">boost/pfr/flat/functions_for.hpp</a></code>
-                  or <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.precise.functions_for_hpp" title="Header &lt;boost/pfr/precise/functions_for.hpp&gt;">boost/pfr/precise/functions_for.hpp</a></code>
+                </p>
+                <p>
+                  <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.precise.functions_for_hpp" title="Header &lt;boost/pfr/precise/functions_for.hpp&gt;">boost/pfr/precise/functions_for.hpp</a></code>
                 </p>
               </td>
 <td>
@@ -535,7 +611,9 @@
 <td>
                 <p>
                   <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.flat.global_ops_hpp" title="Header &lt;boost/pfr/flat/global_ops.hpp&gt;">boost/pfr/flat/global_ops.hpp</a></code>
-                  or <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.precise.global_ops_hpp" title="Header &lt;boost/pfr/precise/global_ops.hpp&gt;">boost/pfr/precise/global_ops.hpp</a></code>
+                </p>
+                <p>
+                  <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.precise.global_ops_hpp" title="Header &lt;boost/pfr/precise/global_ops.hpp&gt;">boost/pfr/precise/global_ops.hpp</a></code>
                 </p>
               </td>
 <td>
