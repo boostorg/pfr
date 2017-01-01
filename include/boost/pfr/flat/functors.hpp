@@ -82,7 +82,7 @@ template <> struct flat_not_equal<void> {
 
 /// \brief std::greater like flattening comparator
 template <class T = void> struct flat_greater {
-    /// \return \b true if field of \b x greater than the field with same index of \b y and all previous fields of \b x eqeal to the same fields of \b y
+    /// \return \b true if field of \b x greater than the field with same index of \b y and all previous fields of \b x equal to the same fields of \b y
     bool operator()(const T& x, const T& y) const noexcept {
         return detail::greater_impl<0, flat_tuple_size_v<T> >::cmp(detail::tie_as_flat_tuple(x), detail::tie_as_flat_tuple(y));
     }
@@ -113,7 +113,7 @@ template <> struct flat_greater<void> {
 
 /// \brief std::less like flattening comparator
 template <class T = void> struct flat_less {
-    /// \return \b true if field of \b x less than the field with same index of \b y and all previous fields of \b x eqeal to the same fields of \b y
+    /// \return \b true if field of \b x less than the field with same index of \b y and all previous fields of \b x equal to the same fields of \b y
     bool operator()(const T& x, const T& y) const noexcept {
         return detail::less_impl<0, flat_tuple_size_v<T> >::cmp(detail::tie_as_flat_tuple(x), detail::tie_as_flat_tuple(y));
     }
@@ -144,7 +144,7 @@ template <> struct flat_less<void> {
 
 /// \brief std::greater_equal like flattening comparator
 template <class T = void> struct flat_greater_equal {
-    /// \return \b true if field of \b x greater than the field with same index of \b y and all previous fields of \b x eqeal to the same fields of \b y;
+    /// \return \b true if field of \b x greater than the field with same index of \b y and all previous fields of \b x equal to the same fields of \b y;
     /// or if each field of \b x equals the field with same index of \b y .
     bool operator()(const T& x, const T& y) const noexcept {
         return detail::greater_equal_impl<0, flat_tuple_size_v<T> >::cmp(detail::tie_as_flat_tuple(x), detail::tie_as_flat_tuple(y));
@@ -176,7 +176,7 @@ template <> struct flat_greater_equal<void> {
 
 /// \brief std::less_equal like flattening comparator
 template <class T = void> struct flat_less_equal {
-    /// \return \b true if field of \b x less than the field with same index of \b y and all previous fields of \b x eqeal to the same fields of \b y;
+    /// \return \b true if field of \b x less than the field with same index of \b y and all previous fields of \b x equal to the same fields of \b y;
     /// or if each field of \b x equals the field with same index of \b y .
     bool operator()(const T& x, const T& y) const noexcept {
         return detail::less_equal_impl<0, flat_tuple_size_v<T> >::cmp(detail::tie_as_flat_tuple(x), detail::tie_as_flat_tuple(y));

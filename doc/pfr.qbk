@@ -119,7 +119,24 @@ Following examples use definition from above:
     [ [pfr_quick_examples_flat_get_2] ]
     [ `var == {A, {777, 42.01}}` ]
     [ [funcref boost::pfr::flat_get] ]
+][
+    [ [pfr_quick_examples_structure_to_tuple] ]
+    [ `var == {A, {777, 3.14159}}` ]
+    [ [funcref boost::pfr::structure_to_tuple] ]
+][
+    [ [pfr_quick_examples_flat_structure_to_tuple] ]
+    [ `var == {A, {777, 3.14159}}` ]
+    [ [funcref boost::pfr::flat_structure_to_tuple] ]
+][
+    [ [pfr_quick_examples_structure_tie] ]
+    [ `var == {A, {1, 2.0}}` ]
+    [ [funcref boost::pfr::structure_tie] ]
+][
+    [ [pfr_quick_examples_flat_structure_tie] ]
+    [ `var == {C, {777, 3.14159}}` ]
+    [ [funcref boost::pfr::flat_structure_tie] ]
 ]]
+
 
 [endsect]
 
@@ -133,15 +150,26 @@ Following examples use definition from above:
 There are three ways to start using Boost.PFR hashing, comparison and streaming operators for type `T` in your code. Each method has it's own drawbacks and suits own cases.
 
 [table:flat_ops_comp Different approaches for operators
-    [[ Approach ]                                       [ Defines operators in global namespace ]
-                                                                                [ Defined operators could be found by ADL ]
-                                                                                            [ Works for local types ]
-                                                                                                        [ Usable localy, without affecting code from other scopes ]
-                                                                                                                            [ Ignores implicit conversion operators ]  
-                                                                                                                                                            [ Respects user defined operators ] ]
-    [[ [headerref boost/pfr/flat/ops.hpp] or [headerref boost/pfr/precise/ops.hpp] ]              [ no ]                  [ no ]      [ yes ]     [ yes ]                                             [ no ]          [ yes ]                     ]
-    [[ [headerref boost/pfr/flat/functions_for.hpp] or [headerref boost/pfr/precise/functions_for.hpp]  ] [ yes if T is in it ]   [ yes ]     [ no ]      [ no, but could be limited to translation unit ]    [ yes for T ]   [ no (compile time error) ] ]
-    [[ [headerref boost/pfr/flat/global_ops.hpp] or [headerref boost/pfr/precise/global_ops.hpp] ]       [ yes ]                 [ yes ]     [ yes ]     [ no, but could be limited to translation unit ]    [ yes all ]     [ yes ]                     ]
+    [[ Approach
+    ][ Defines operators in global namespace ][ Defined operators could be found by ADL ][ Works for local types ][ Usable localy, without affecting code from other scopes ][ Ignores implicit conversion operators ][ Respects user defined operators ]]
+
+    [[
+        [headerref boost/pfr/flat/ops.hpp]
+
+        [headerref boost/pfr/precise/ops.hpp] 
+    ][ no ][ no ][ yes ][ yes ][ no ][ yes ]]
+
+    [[
+        [headerref boost/pfr/flat/functions_for.hpp]
+        
+        [headerref boost/pfr/precise/functions_for.hpp]  
+    ][ yes if T is in it ][ yes ][ no ][ no, but could be limited to translation unit ][ yes for T ] [ no (compile time error) ]]
+
+    [[
+        [headerref boost/pfr/flat/global_ops.hpp]
+
+        [headerref boost/pfr/precise/global_ops.hpp]
+    ][ yes ][ yes ][ yes ][ no, but could be limited to translation unit ][ yes all ][ yes ]]
 ]
 
 More detailed description:

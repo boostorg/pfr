@@ -15,7 +15,7 @@
 
 namespace boost { namespace pfr {
 
-/// \brief Has a static const member variable `value` that constins fields count in a T.
+/// \brief Has a static const member variable `value` that contains fields count in a T.
 /// Works for any T that supports aggregate initialization even if T is not POD.
 /// \flattening{Flattens} only multidimensional arrays.
 ///

@@ -224,6 +224,46 @@ void test_examples() {
 //]
     std::cout << "boost::pfr::flat_get<1>(var.f) outputs:\n" << var << '\n';
   }
+
+#if __cplusplus >= 201606L /* Oulu meeting, not the exact value */
+  {
+    bar var{'A', {777, 3.141593}};
+//[pfr_quick_examples_structure_to_tuple
+    std::tuple<char, foo> t = boost::pfr::structure_to_tuple(var); // C++17 is required
+    std::get<1>(t) = foo{1, 2};
+//]
+    std::cout << "boost::pfr::structure_to_tuple(var) :\n" << var << '\n';
+  }
+#endif
+
+  {
+    bar var{'A', {777, 3.141593}};
+//[pfr_quick_examples_flat_structure_to_tuple
+    std::tuple<char, int, double> t = boost::pfr::flat_structure_to_tuple(var);
+    std::get<0>(t) = 'C';
+//]
+    std::cout << "boost::pfr::flat_structure_to_tuple(var) :\n" << var << '\n';
+  }
+
+#if __cplusplus >= 201606L /* Oulu meeting, not the exact value */
+  {
+    bar var{'A', {777, 3.141593}};
+//[pfr_quick_examples_structure_tie
+    std::tuple<char&, foo&> t = boost::pfr::structure_tie(var); // C++17 is required
+    std::get<1>(t) = foo{1, 2};
+//]
+    std::cout << "boost::pfr::structure_tie(var) :\n" << var << '\n';
+  }
+#endif
+
+  {
+    bar var{'A', {777, 3.141593}};
+//[pfr_quick_examples_flat_structure_tie
+    std::tuple<char&, int&, double&> t = boost::pfr::flat_structure_tie(var);
+    std::get<0>(t) = 'C';
+//]
+    std::cout << "boost::pfr::flat_structure_tie(var) :\n" << var << '\n';
+  }
 }
 
 } // namespace for_each_field_ex

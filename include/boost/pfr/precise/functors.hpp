@@ -114,7 +114,7 @@ template <> struct not_equal<void> {
 
 /// \brief std::greater like comparator
 template <class T = void> struct greater {
-    /// \return \b true if field of \b x greater than the field with same index of \b y and all previous fields of \b x eqeal to the same fields of \b y
+    /// \return \b true if field of \b x greater than the field with same index of \b y and all previous fields of \b x equal to the same fields of \b y
     bool operator()(const T& x, const T& y) const {
         return detail::binary_visit<detail::greater_impl>(x, y);
     }
@@ -142,7 +142,7 @@ template <> struct greater<void> {
 
 /// \brief std::less like comparator
 template <class T = void> struct less {
-    /// \return \b true if field of \b x less than the field with same index of \b y and all previous fields of \b x eqeal to the same fields of \b y
+    /// \return \b true if field of \b x less than the field with same index of \b y and all previous fields of \b x equal to the same fields of \b y
     bool operator()(const T& x, const T& y) const {
         return detail::binary_visit<detail::less_impl>(x, y);
     }
@@ -170,7 +170,7 @@ template <> struct less<void> {
 
 /// \brief std::greater_equal like comparator
 template <class T = void> struct greater_equal {
-    /// \return \b true if field of \b x greater than the field with same index of \b y and all previous fields of \b x eqeal to the same fields of \b y;
+    /// \return \b true if field of \b x greater than the field with same index of \b y and all previous fields of \b x equal to the same fields of \b y;
     /// or if each field of \b x equals the field with same index of \b y .
     bool operator()(const T& x, const T& y) const {
         return detail::binary_visit<detail::greater_equal_impl>(x, y);
@@ -199,7 +199,7 @@ template <> struct greater_equal<void> {
 
 /// \brief std::less_equal like comparator
 template <class T = void> struct less_equal {
-    /// \return \b true if field of \b x less than the field with same index of \b y and all previous fields of \b x eqeal to the same fields of \b y;
+    /// \return \b true if field of \b x less than the field with same index of \b y and all previous fields of \b x equal to the same fields of \b y;
     /// or if each field of \b x equals the field with same index of \b y .
     bool operator()(const T& x, const T& y) const {
         return detail::binary_visit<detail::less_equal_impl>(x, y);
