@@ -1,6 +1,6 @@
-#POD Flat Reflection (Magic Get) [![Build Status](https://travis-ci.org/apolukhin/magic_get.svg?branch=master)](https://travis-ci.org/apolukhin/magic_get) [![Build Status](https://travis-ci.org/apolukhin/magic_get.svg?branch=develop)](https://travis-ci.org/apolukhin/magic_get)
+#Precise and Flat Reflection (ex Magic Get, ex PODs Flat Reflection) [![Build Status](https://travis-ci.org/apolukhin/magic_get.svg?branch=master)](https://travis-ci.org/apolukhin/magic_get) [![Build Status](https://travis-ci.org/apolukhin/magic_get.svg?branch=develop)](https://travis-ci.org/apolukhin/magic_get)
 
-This C++14 library is meant for accessing structure elements by index and providing other std::tuple like methods for user defined POD types.
+This C++14 library is meant for accessing structure elements by index and providing other std::tuple like methods for user defined types.
 
 
 [Latest documentation](http://apolukhin.github.com/magic_get/index.html)
@@ -20,13 +20,12 @@ struct my_struct { // no ostream operator defined!
 };
 
 int main() {
-    using namespace boost::pfr::flat_ops; // for ostream operator out-of-the-box for all PODs!
+    using namespace boost::pfr::ops; // out-of-the-box ostream operator for all PODs!
 
     my_struct s{100, 'H', 3.141593};
-    std::cout << "my_struct has " << boost::pfr::flat_tuple_size<my_struct>::value
+    std::cout << "my_struct has " << boost::pfr::tuple_size<my_struct>::value
         << " fields: " << s << "\n";
 }
-
 
 ```
 
@@ -42,9 +41,7 @@ my_struct has 3 fields: {100, H, 3.14159}
 * Static variables are ignored
 
 C++14 limitations (C++17 fixes those):
-* T must be POD and must not contain references nor bitfields
-* T must not contain pointers to user defined types
-* Enums will be returned as their underlying type
+* T must be constexpr aggregate initializable and must not contain references nor bitfields
 
 ### License
 

@@ -8,7 +8,7 @@ struct my_struct { // no ostream operator defined!
 };
 
 int main() {
-    using namespace boost::pfr::ops; // ostream operator out-of-the-box for all PODs!
+    using namespace boost::pfr::ops; // out-of-the-box ostream operator for all PODs!
 
     my_struct s{100, 'H', 3.141593};
     std::cout << "my_struct has " << boost::pfr::tuple_size<my_struct>::value

@@ -15,9 +15,9 @@
 In C++ we have:
 
 * tuples - types that provide access to members by index. Those are useful for generic programming.
-* PODs - types with named fields that do not provide access to members by index. Those are just easy to use.
+* structures - types with named fields that do not provide access to members by index. Those are just easy to use.
 
-This library provides tuple like methods for POD types, making PODs usable in contexts were only tuples were useful.
+This library provides tuple like methods for aggregate initializable structures, making them usable in contexts were only tuples were useful.
 
 [note All you have to do is to add `#include <boost/pfr.hpp>`.
 
@@ -32,6 +32,7 @@ Boost.Precise and Flat Reflection (Boost.PFR) adds following out-of-the-box func
 * access to members by index
 * member reflections
 * methods for cooperation with `std::tuple`
+* methods to visit each field of the structure
 
 [warning This is not an official Boost library! It wasn't reviewed and can't be downloaded from www.boost.org. This library is available to the community to know real interest and get comments for refinement. The intention is to submit library to formal review, if community think that it is interesting!]
 
@@ -39,7 +40,7 @@ Boost.Precise and Flat Reflection (Boost.PFR) adds following out-of-the-box func
 
 [endsect]
 
-[section Quick Start]
+[section Tutorial]
 
 [import ../example/examples.cpp]
 
@@ -62,87 +63,6 @@ Here's how to chose your functions:
 * If you have modern compiler in C++14 mode and work with non-POD literal types with some hierarchy - you are forced to use [*precise] functions
 
 [endsect]
-
-
-
-[section Short examples]
-
-
-[pfr_quick_examples_structures]
-
-Following examples use definition from above:
-
-[table:quick_examples
-[[ Code snippet ] [ `var` content or output ] [ Function description: ]]
-[
-    [ [pfr_quick_examples_flat_for_each] ]
-    [ `var == {B, {778, 4.14159}}` ]
-    [ [funcref boost::pfr::flat_for_each_field] ]
-][
-    [ [pfr_quick_examples_for_each] ]
-    [ `var == {B, {787, 103.142}}` ]
-    [ [funcref boost::pfr::for_each_field] ]
-][
-    [ [pfr_quick_examples_flat_for_each_idx] ]
-    [ ```0: char
-1: int
-2: double
-``` ]
-    [ [funcref boost::pfr::flat_for_each_field] ]
-][
-    [ [pfr_quick_examples_for_each_idx] ]
-    [ ```0: char
-1: quick_examples_ns::foo
-``` ]
-    [ [funcref boost::pfr::for_each_field] ]
-][
-    [ [pfr_quick_examples_tuple_size] ]
-    [ `tuple_size: 2` ]
-    [ [classref boost::pfr::tuple_size] ]
-][
-    [ [pfr_quick_examples_flat_tuple_size] ]
-    [ `flat_tuple_size: 3` ]
-    [ [classref boost::pfr::flat_tuple_size] ]
-][
-    [ [pfr_quick_examples_get_1] ]
-    [ `var == {A {1, 2.0}}` ]
-    [ [funcref boost::pfr::get] ]
-][
-    [ [pfr_quick_examples_flat_get_1] ]
-    [ `var == {A, {1, 3.14159}}` ]
-    [ [funcref boost::pfr::flat_get] ]
-][
-    [ [pfr_quick_examples_get_2] ]
-    [ `var == {A, {777, 42.01}}` ]
-    [ [funcref boost::pfr::get] ]
-][
-    [ [pfr_quick_examples_flat_get_2] ]
-    [ `var == {A, {777, 42.01}}` ]
-    [ [funcref boost::pfr::flat_get] ]
-][
-    [ [pfr_quick_examples_structure_to_tuple] ]
-    [ `var == {A, {777, 3.14159}}` ]
-    [ [funcref boost::pfr::structure_to_tuple] ]
-][
-    [ [pfr_quick_examples_flat_structure_to_tuple] ]
-    [ `var == {A, {777, 3.14159}}` ]
-    [ [funcref boost::pfr::flat_structure_to_tuple] ]
-][
-    [ [pfr_quick_examples_structure_tie] ]
-    [ `var == {A, {1, 2.0}}` ]
-    [ [funcref boost::pfr::structure_tie] ]
-][
-    [ [pfr_quick_examples_flat_structure_tie] ]
-    [ `var == {C, {777, 3.14159}}` ]
-    [ [funcref boost::pfr::flat_structure_tie] ]
-]]
-
-
-[endsect]
-
-
-
-
 
 
 [section Three ways of getting operators ]
@@ -257,7 +177,80 @@ Argument Dependant Lookup works well, `std::less` will find the operators for `s
 
 [endsect]
 
+[endsect]
 
+
+[section Short Examples for the Impatient]
+
+
+[pfr_quick_examples_structures]
+
+Following examples use definition from above:
+
+[table:quick_examples
+[[ Code snippet ] [ `var` content or output ] [ Function description: ]]
+[
+    [ [pfr_quick_examples_flat_for_each] ]
+    [ `var == {B, {778, 4.14159}}` ]
+    [ [funcref boost::pfr::flat_for_each_field] ]
+][
+    [ [pfr_quick_examples_for_each] ]
+    [ `var == {B, {787, 103.142}}` ]
+    [ [funcref boost::pfr::for_each_field] ]
+][
+    [ [pfr_quick_examples_flat_for_each_idx] ]
+    [ ```0: char
+1: int
+2: double
+``` ]
+    [ [funcref boost::pfr::flat_for_each_field] ]
+][
+    [ [pfr_quick_examples_for_each_idx] ]
+    [ ```0: char
+1: quick_examples_ns::foo
+``` ]
+    [ [funcref boost::pfr::for_each_field] ]
+][
+    [ [pfr_quick_examples_tuple_size] ]
+    [ `tuple_size: 2` ]
+    [ [classref boost::pfr::tuple_size] ]
+][
+    [ [pfr_quick_examples_flat_tuple_size] ]
+    [ `flat_tuple_size: 3` ]
+    [ [classref boost::pfr::flat_tuple_size] ]
+][
+    [ [pfr_quick_examples_get_1] ]
+    [ `var == {A {1, 2.0}}` ]
+    [ [funcref boost::pfr::get] ]
+][
+    [ [pfr_quick_examples_flat_get_1] ]
+    [ `var == {A, {1, 3.14159}}` ]
+    [ [funcref boost::pfr::flat_get] ]
+][
+    [ [pfr_quick_examples_get_2] ]
+    [ `var == {A, {777, 42.01}}` ]
+    [ [funcref boost::pfr::get] ]
+][
+    [ [pfr_quick_examples_flat_get_2] ]
+    [ `var == {A, {777, 42.01}}` ]
+    [ [funcref boost::pfr::flat_get] ]
+][
+    [ [pfr_quick_examples_structure_to_tuple] ]
+    [ `var == {A, {777, 3.14159}}` ]
+    [ [funcref boost::pfr::structure_to_tuple] ]
+][
+    [ [pfr_quick_examples_flat_structure_to_tuple] ]
+    [ `var == {A, {777, 3.14159}}` ]
+    [ [funcref boost::pfr::flat_structure_to_tuple] ]
+][
+    [ [pfr_quick_examples_structure_tie] ]
+    [ `var == {A, {1, 2.0}}` ]
+    [ [funcref boost::pfr::structure_tie] ]
+][
+    [ [pfr_quick_examples_flat_structure_tie] ]
+    [ `var == {C, {777, 3.14159}}` ]
+    [ [funcref boost::pfr::flat_structure_tie] ]
+]]
 
 
 [endsect]
@@ -301,10 +294,11 @@ Short description:
         * C++17:
             # at compile-time: structured bindings are used to decompose a type `T` to known amount of fields fields
         * C++14:
+            # at compile-time: use flat reflection if it could precisely reflect the type. Otherwise:
             # at compile-time: let `I` be is an index of current field, it equals 0
             # at run-time: `T` is constructed and field `I` is aggregate initialized using a separate instance of structure that is convertible to anything [note Additional care is taken to make sure that all the information about `T` is available to the compiler and that operations on `T` have no side effects, so the compiler can optimize away the unnecessary temporary objects.]
             # at compile-time: `I += 1`
-            # at compile-time: if `I` does not equal fields count goto step [~b.] from inside of the conversion operator of the structure that is convertible to anything
+            # at compile-time: if `I` does not equal fields count goto step [~c.] from inside of the conversion operator of the structure that is convertible to anything
             # at run-time: `reinterpret_cast` pointer to user-provided structure to the tuple pointer (this has no runtime penalty)
     # at run-time: a tuple of references to fields is returned => all the tuple methods are available for the structure
 
