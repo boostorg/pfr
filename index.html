@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="http://www.boost.org/doc/libs/1_63_0/doc/src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
 <link rel="home" href="index.html" title="Chapter&#160;1.&#160;Boost.Precise and Flat Reflection 1.0">
-<link rel="next" href="boost_precise_and_flat_reflectio/quick_start.html" title="Quick Start">
+<link rel="next" href="boost_precise_and_flat_reflectio/tutorial.html" title="Tutorial">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -17,7 +17,7 @@
 <td align="center"><a href="http://www.boost.org/doc/libs/1_63_0/more/index.htm">More</a></td>
 </tr></table>
 <hr>
-<div class="spirit-nav"><a accesskey="n" href="boost_precise_and_flat_reflectio/quick_start.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/next.png" alt="Next"></a></div>
+<div class="spirit-nav"><a accesskey="n" href="boost_precise_and_flat_reflectio/tutorial.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/next.png" alt="Next"></a></div>
 <div class="chapter">
 <div class="titlepage"><div>
 <div><h2 class="title">
@@ -34,18 +34,18 @@
 <p><b>Table of Contents</b></p>
 <dl>
 <dt><span class="section"><a href="index.html#boost_precise_and_flat_reflectio.motivation">Motivation</a></span></dt>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/quick_start.html">Quick Start</a></span></dt>
+<dt><span class="section"><a href="boost_precise_and_flat_reflectio/tutorial.html">Tutorial</a></span></dt>
 <dd><dl>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/quick_start.html#boost_precise_and_flat_reflectio.quick_start.accessing_pod_member_by_index">Accessing
+<dt><span class="section"><a href="boost_precise_and_flat_reflectio/tutorial.html#boost_precise_and_flat_reflectio.tutorial.accessing_pod_member_by_index">Accessing
       POD member by index</a></span></dt>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/quick_start.html#boost_precise_and_flat_reflectio.quick_start.flattening">Flattening</a></span></dt>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/quick_start.html#boost_precise_and_flat_reflectio.quick_start.flat_or_precise_functions_to_cho">Flat
+<dt><span class="section"><a href="boost_precise_and_flat_reflectio/tutorial.html#boost_precise_and_flat_reflectio.tutorial.flattening">Flattening</a></span></dt>
+<dt><span class="section"><a href="boost_precise_and_flat_reflectio/tutorial.html#boost_precise_and_flat_reflectio.tutorial.flat_or_precise_functions_to_cho">Flat
       or Precise functions to chose</a></span></dt>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/quick_start.html#boost_precise_and_flat_reflectio.quick_start.short_examples">Short
-      examples</a></span></dt>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/quick_start.html#boost_precise_and_flat_reflectio.quick_start.three_ways_of_getting_operators">Three
+<dt><span class="section"><a href="boost_precise_and_flat_reflectio/tutorial.html#boost_precise_and_flat_reflectio.tutorial.three_ways_of_getting_operators">Three
       ways of getting operators </a></span></dt>
 </dl></dd>
+<dt><span class="section"><a href="boost_precise_and_flat_reflectio/short_examples_for_the_impatient.html">Short
+    Examples for the Impatient</a></span></dt>
 <dt><span class="section"><a href="boost_precise_and_flat_reflectio/requirements_and_limitations.html">Requirements
     and Limitations</a></span></dt>
 <dt><span class="section"><a href="boost_precise_and_flat_reflectio/how_it_works.html">How it works</a></span></dt>
@@ -71,13 +71,13 @@
           for generic programming.
         </li>
 <li class="listitem">
-          PODs - types with named fields that do not provide access to members by
-          index. Those are just easy to use.
+          structures - types with named fields that do not provide access to members
+          by index. Those are just easy to use.
         </li>
 </ul></div>
 <p>
-      This library provides tuple like methods for POD types, making PODs usable
-      in contexts were only tuples were useful.
+      This library provides tuple like methods for aggregate initializable structures,
+      making them usable in contexts were only tuples were useful.
     </p>
 <div class="note"><table border="0" summary="Note">
 <tr>
@@ -120,6 +120,9 @@
 <li class="listitem">
           methods for cooperation with <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span></code>
         </li>
+<li class="listitem">
+          methods to visit each field of the structure
+        </li>
 </ul></div>
 <div class="warning"><table border="0" summary="Warning">
 <tr>
@@ -145,10 +148,10 @@
 </div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
-<td align="left"><p><small>Last revised: January 01, 2017 at 15:07:51 GMT</small></p></td>
+<td align="left"><p><small>Last revised: January 03, 2017 at 18:48:50 GMT</small></p></td>
 <td align="right"><div class="copyright-footer"></div></td>
 </tr></table>
 <hr>
-<div class="spirit-nav"><a accesskey="n" href="boost_precise_and_flat_reflectio/quick_start.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/next.png" alt="Next"></a></div>
+<div class="spirit-nav"><a accesskey="n" href="boost_precise_and_flat_reflectio/tutorial.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/next.png" alt="Next"></a></div>
 </body>
 </html>

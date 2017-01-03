@@ -76,6 +76,10 @@
                       C++14:
                       <div class="orderedlist"><ol class="orderedlist" type="a">
 <li class="listitem">
+                            at compile-time: use flat reflection if it could precisely
+                            reflect the type. Otherwise:
+                          </li>
+<li class="listitem">
                             at compile-time: let <code class="computeroutput"><span class="identifier">I</span></code>
                             be is an index of current field, it equals 0
                           </li>
@@ -107,7 +111,7 @@
                           </li>
 <li class="listitem">
                             at compile-time: if <code class="computeroutput"><span class="identifier">I</span></code>
-                            does not equal fields count goto step <em class="replaceable"><code>b.</code></em>
+                            does not equal fields count goto step <em class="replaceable"><code>c.</code></em>
                             from inside of the conversion operator of the structure
                             that is convertible to anything
                           </li>
