@@ -30,8 +30,8 @@ local doxygen_params =
         <doxygen:param>INLINE_SIMPLE_STRUCTS=YES
         <doxygen:param>SORT_MEMBER_DOCS=NO
         <doxygen:param>"ALIASES= \\
-            \"flattening{1}=\\xmlonly<link linkend='boost_precise_and_flat_reflectio.quick_start.flattening'>\\1</link>\\endxmlonly\" \\
-            \"podops=\\b See \\b Also: \\xmlonly<link linkend='boost_precise_and_flat_reflectio.quick_start.three_ways_of_getting_operators'>Three ways of getting operators</link>\\endxmlonly\" \\
+            \"flattening{1}=\\xmlonly<link linkend='boost_precise_and_flat_reflectio.tutorial.flattening'>\\1</link>\\endxmlonly\" \\
+            \"podops=\\b See \\b Also: \\xmlonly<link linkend='boost_precise_and_flat_reflectio.tutorial.three_ways_of_getting_operators'>Three ways of getting operators</link>\\endxmlonly\" \\
             \"constexprinit{1}=\\xmlonly<link linkend='boost_precise_and_flat_reflectio.requirements_and_limitations'>\\1</link>\\endxmlonly\" \\
             \"flatpod{1}=\\xmlonly<link linkend='boost_precise_and_flat_reflectio.requirements_and_limitations'>\\1</link>\\endxmlonly\" \\
         "
