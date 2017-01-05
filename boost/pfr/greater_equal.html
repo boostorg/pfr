@@ -34,23 +34,23 @@
 </span><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> T <span class="special">=</span> <span class="keyword">void</span><span class="special">&gt;</span> 
 <span class="keyword">struct</span> <a class="link" href="greater_equal.html" title="Struct template greater_equal">greater_equal</a> <span class="special">{</span>
 
-  <span class="comment">// <a class="link" href="greater_equal.html#idm45564037151024-bb">public member functions</a></span>
-  <span class="keyword">bool</span> <a class="link" href="greater_equal.html#idm45564037150528-bb"><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span></a><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
+  <span class="comment">// <a class="link" href="greater_equal.html#idm45836262461216-bb">public member functions</a></span>
+  <span class="keyword">bool</span> <a class="link" href="greater_equal.html#idm45836262460720-bb"><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span></a><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span><span class="special">)</span> <span class="keyword">const</span><span class="special">;</span>
 <span class="special">}</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idm45620858011456"></a><h2>Description</h2>
+<a name="idm45776172185920"></a><h2>Description</h2>
 <div class="refsect2">
-<a name="idm45620858011040"></a><h3>
-<a name="idm45564037151024-bb"></a><code class="computeroutput">greater_equal</code> public member functions</h3>
+<a name="idm45776172185504"></a><h3>
+<a name="idm45836262461216-bb"></a><code class="computeroutput">greater_equal</code> public member functions</h3>
 <div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
-<pre class="literallayout"><span class="keyword">bool</span> <a name="idm45564037150528-bb"></a><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span> x<span class="special">,</span> <span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span> y<span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
+<pre class="literallayout"><span class="keyword">bool</span> <a name="idm45836262460720-bb"></a><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span> x<span class="special">,</span> <span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span> y<span class="special">)</span> <span class="keyword">const</span><span class="special">;</span></pre>
 <p>
-</p>
+<span class="bold"><strong>Misc:</strong></span> Reinterpret casts unrelated types in C++14 only. May have overhead in C++14 only on non-optimizing compilers. </p>
 <div class="variablelist"><table border="0">
 <col align="left" valign="top">
 <tbody><tr>
 <td><p><span class="term">Returns:</span></p></td>
-<td><p><span class="bold"><strong>true</strong></span> if field of <span class="bold"><strong>x</strong></span> greater than the field with same index of <span class="bold"><strong>y</strong></span> and all previous fields of <span class="bold"><strong>x</strong></span> equal to the same fields of <span class="bold"><strong>y</strong></span>; or if each field of <span class="bold"><strong>x</strong></span> equals the field with same index of <span class="bold"><strong>y</strong></span> . </p></td>
+<td><p><span class="bold"><strong>true</strong></span> if field of <span class="bold"><strong>x</strong></span> greater than the field with same index of <span class="bold"><strong>y</strong></span> and all previous fields of <span class="bold"><strong>x</strong></span> equal to the same fields of <span class="bold"><strong>y</strong></span>; or if each field of <span class="bold"><strong>x</strong></span> equals the field with same index of <span class="bold"><strong>y</strong></span>.</p></td>
 </tr></tbody>
 </table></div>
 </li></ol></div>

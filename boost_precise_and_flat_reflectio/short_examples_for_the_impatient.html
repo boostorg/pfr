@@ -74,6 +74,82 @@
 <tbody>
 <tr>
 <td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="comment">// no `std::hash&lt;bar&gt;` or `bar::operator==(const bar&amp;)` defined</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">unordered_set</span><span class="special">&lt;</span><span class="identifier">bar</span><span class="special">,</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_hash</span><span class="special">&lt;</span><span class="identifier">bar</span><span class="special">&gt;,</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_equal_to</span><span class="special">&lt;&gt;&gt;</span> <span class="identifier">my_uset</span><span class="special">;</span>
+<span class="identifier">my_uset</span><span class="special">.</span><span class="identifier">insert</span><span class="special">(</span><span class="identifier">var</span><span class="special">);</span>
+</pre>
+            </td>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">my_uset</span></code> constains
+                <code class="computeroutput"><span class="identifier">var</span></code>
+              </p>
+            </td>
+<td>
+              <p>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_hash.html" title="Struct template flat_hash">boost::pfr::flat_hash</a></code>
+              </p>
+              <p>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_equal_to.html" title="Struct template flat_equal_to">boost::pfr::flat_equal_to</a></code>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="comment">// no `bar::operator&lt;(const bar&amp;)` defined</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">set</span><span class="special">&lt;</span><span class="identifier">bar</span><span class="special">,</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_less</span><span class="special">&lt;&gt;&gt;</span> <span class="identifier">my_set</span><span class="special">;</span>
+<span class="identifier">my_set</span><span class="special">.</span><span class="identifier">insert</span><span class="special">(</span><span class="identifier">var</span><span class="special">);</span>
+</pre>
+            </td>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">my_set</span></code> constains
+                <code class="computeroutput"><span class="identifier">var</span></code>
+              </p>
+            </td>
+<td>
+              <p>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_less.html" title="Struct template flat_less">boost::pfr::flat_less</a></code>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_ops</span><span class="special">;</span> <span class="comment">// Defines comparisons</span>
+<span class="identifier">assert</span><span class="special">((</span><span class="identifier">var</span> <span class="special">&lt;</span> <span class="identifier">bar</span><span class="special">{</span><span class="char">'Z'</span><span class="special">,</span> <span class="special">{}}</span> <span class="special">&amp;&amp;</span> <span class="identifier">var</span><span class="special">.</span><span class="identifier">f</span> <span class="special">==</span> <span class="identifier">foo</span><span class="special">{</span><span class="number">777</span><span class="special">,</span> <span class="number">3.141593</span><span class="special">}));</span>
+</pre>
+            </td>
+<td>
+              <p>
+                assert succeeds
+              </p>
+            </td>
+<td>
+              <p>
+                <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.flat.ops_hpp" title="Header &lt;boost/pfr/flat/ops.hpp&gt;">using&#160;namespace&#160;boost::pfr::flat_ops;</a></code>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="keyword">struct</span> <span class="identifier">test</span> <span class="special">{</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string</span> <span class="identifier">f1</span><span class="special">;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">string_view</span> <span class="identifier">f2</span><span class="special">;</span> <span class="special">};</span>
+<span class="keyword">using</span> <span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">ops</span><span class="special">;</span> <span class="comment">// Defines comparisons</span>
+<span class="identifier">assert</span><span class="special">((</span><span class="identifier">test</span><span class="special">{</span><span class="string">"abc"</span><span class="special">,</span> <span class="string">""</span><span class="special">}</span> <span class="special">&gt;</span> <span class="identifier">test</span><span class="special">{</span><span class="string">"aaa"</span><span class="special">,</span> <span class="string">"zomg"</span><span class="special">}));</span>
+</pre>
+            </td>
+<td>
+              <p>
+                assert succeeds
+              </p>
+            </td>
+<td>
+              <p>
+                <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.precise.ops_hpp" title="Header &lt;boost/pfr/precise/ops.hpp&gt;">using&#160;namespace&#160;boost::pfr::ops;</a></code>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="comment">// incrementing each field on 1:</span>
 <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_for_each_field</span><span class="special">(</span><span class="identifier">var</span><span class="special">,</span> <span class="special">[](</span><span class="keyword">auto</span><span class="special">&amp;</span> <span class="identifier">field</span><span class="special">)</span> <span class="special">{</span>
     <span class="identifier">field</span> <span class="special">+=</span> <span class="number">1</span><span class="special">;</span>

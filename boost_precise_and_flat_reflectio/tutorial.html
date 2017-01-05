@@ -142,15 +142,14 @@
       </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
+            If you work only with POD types and wish them flattened - use <span class="bold"><strong>flat</strong></span> functions
+          </li>
+<li class="listitem">
             If you use C++17 - use <span class="bold"><strong>precise</strong></span> functions
           </li>
 <li class="listitem">
             If you work only with flat POD types in C++14 - use <span class="bold"><strong>flat</strong></span>
             functions
-          </li>
-<li class="listitem">
-            If you work only with POD types in C++14 and wish them flattened - use
-            <span class="bold"><strong>flat</strong></span> functions
           </li>
 <li class="listitem">
             If you have modern compiler in C++14 mode and work with non-POD literal
@@ -222,10 +221,10 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.flat.ops_hpp" title="Header &lt;boost/pfr/flat/ops.hpp&gt;">boost/pfr/flat/ops.hpp</a></code>
+                  <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.precise.ops_hpp" title="Header &lt;boost/pfr/precise/ops.hpp&gt;">using&#160;namespace&#160;boost::pfr::ops;</a></code>
                 </p>
                 <p>
-                  <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.precise.ops_hpp" title="Header &lt;boost/pfr/precise/ops.hpp&gt;">boost/pfr/precise/ops.hpp</a></code>
+                  <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.flat.ops_hpp" title="Header &lt;boost/pfr/flat/ops.hpp&gt;">using&#160;namespace&#160;boost::pfr::flat_ops;</a></code>
                 </p>
               </td>
 <td>
@@ -262,10 +261,10 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.flat.functions_for_hpp" title="Header &lt;boost/pfr/flat/functions_for.hpp&gt;">boost/pfr/flat/functions_for.hpp</a></code>
+                  <code class="computeroutput"><a class="link" href="../BOOST_PFR_FLAT_FUNCTIONS_FOR.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
                 </p>
                 <p>
-                  <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.precise.functions_for_hpp" title="Header &lt;boost/pfr/precise/functions_for.hpp&gt;">boost/pfr/precise/functions_for.hpp</a></code>
+                  <code class="computeroutput"><a class="link" href="../BOOST_PFR_PRECISE_FUNCTIONS_FOR.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
                 </p>
               </td>
 <td>
@@ -343,12 +342,12 @@
 </table></div>
 </div>
 <br class="table-break"><p>
-        More detailed description:
+        More detailed description follows:
       </p>
 <p>
-        <span class="bold"><strong>1) <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.precise.ops_hpp" title="Header &lt;boost/pfr/precise/ops.hpp&gt;">boost/pfr/precise/ops.hpp</a></code>
-        and <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.flat.ops_hpp" title="Header &lt;boost/pfr/flat/ops.hpp&gt;">boost/pfr/flat/ops.hpp</a></code>
-        approach</strong></span>
+        <span class="bold"><strong>1. <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.precise.ops_hpp" title="Header &lt;boost/pfr/precise/ops.hpp&gt;">using namespace
+        boost::pfr::ops;</a></code> and <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.flat.ops_hpp" title="Header &lt;boost/pfr/flat/ops.hpp&gt;">using namespace
+        boost::pfr::flat_ops;</a></code> approach</strong></span>
       </p>
 <p>
         This method is good if you're writing generic algorithms and need to use
@@ -379,7 +378,8 @@
 <span class="special">};</span>
 </pre>
 <p>
-        <span class="bold"><strong>2) <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.flat.functions_for_hpp" title="Header &lt;boost/pfr/flat/functions_for.hpp&gt;">boost/pfr/flat/functions_for.hpp</a></code>
+        <span class="bold"><strong>2. <code class="computeroutput"><a class="link" href="../BOOST_PFR_FLAT_FUNCTIONS_FOR.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
+        and <code class="computeroutput"><a class="link" href="../BOOST_PFR_PRECISE_FUNCTIONS_FOR.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
         approach</strong></span>
       </p>
 <p>
@@ -420,7 +420,8 @@
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">empty</span><span class="special">{};</span> <span class="comment">// Outputs `empty{}` if BOOST_PFR_FLAT_FUNCTIONS_FOR(empty) is commented out, '{}' otherwise.</span>
 </pre>
 <p>
-        <span class="bold"><strong>3) <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.flat.global_ops_hpp" title="Header &lt;boost/pfr/flat/global_ops.hpp&gt;">boost/pfr/flat/global_ops.hpp</a></code>
+        <span class="bold"><strong>3. <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.flat.global_ops_hpp" title="Header &lt;boost/pfr/flat/global_ops.hpp&gt;">boost/pfr/flat/global_ops.hpp</a></code>
+        and <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.precise.global_ops_hpp" title="Header &lt;boost/pfr/precise/global_ops.hpp&gt;">boost/pfr/precise/global_ops.hpp</a></code>
         approach</strong></span>
       </p>
 <p>

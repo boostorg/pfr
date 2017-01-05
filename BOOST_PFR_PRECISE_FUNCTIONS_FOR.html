@@ -33,7 +33,7 @@
 
 </span>BOOST_PFR_PRECISE_FUNCTIONS_FOR(T)</pre></div>
 <div class="refsect1">
-<a name="idm45620858322752"></a><h2>Description</h2>
+<a name="idm45776172519296"></a><h2>Description</h2>
 <p>Defines comparison operators and stream operators for T. If type T is comparable or streamable using it's own operator (but not it's conversion operator), then the original operator is used.</p>
 <p><span class="bold"><strong>Example:</strong></span> </p>
 <pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">pfr</span><span class="special">/</span><span class="identifier">precise</span><span class="special">/</span><span class="identifier">functions_for</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
@@ -48,6 +48,7 @@
 <span class="identifier">assert</span><span class="special">(</span><span class="identifier">s1</span> <span class="special">&lt;</span> <span class="identifier">s2</span><span class="special">)</span><span class="special">;</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">s1</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">endl</span><span class="special">;</span> <span class="comment">// Outputs: {0, 1, H, e, l, l, o, , , 0, 6, 7, 8, 9, 10, 11}</span>
 </pre>
+<p><span class="bold"><strong>Misc:</strong></span> Reinterpret casts unrelated types in C++14 only. May have overhead in C++14 only on non-optimizing compilers.</p>
 <p><span class="bold"><strong>See</strong></span> <span class="bold"><strong>Also: <a class="link" href="boost_precise_and_flat_reflectio/tutorial.html#boost_precise_and_flat_reflectio.tutorial.three_ways_of_getting_operators" title="Three ways of getting operators">Three ways of getting operators</a></strong></span> for other ways to define operators and more details.</p>
 <p><span class="bold"><strong>Defines</strong></span> <span class="bold"><strong>following</strong></span> <span class="bold"><strong>for</strong></span> <span class="bold"><strong>T:</strong></span> </p>
 <pre class="programlisting"><span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">==</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;</span> <span class="identifier">lhs</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;</span> <span class="identifier">rhs</span><span class="special">)</span><span class="special">;</span>
