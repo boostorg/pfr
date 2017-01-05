@@ -23,6 +23,8 @@
 ///
 /// \b Requires: C++17 or \constexprinit{C++14 constexpr aggregate intializable type}.
 ///
+/// \rcast14
+///
 /// \b Example:
 /// \code
 ///     #include <boost/pfr/precise/ops.hpp>

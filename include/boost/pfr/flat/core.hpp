@@ -23,6 +23,8 @@ namespace boost { namespace pfr {
 
 /// \brief Returns reference or const reference to a field with index `I` in \flattening{flattened} T.
 ///
+/// \rcast
+///
 /// \b Example:
 /// \code
 ///     struct my_struct { int i, short s; };
@@ -67,6 +69,8 @@ using flat_tuple_element_t = typename flat_tuple_element<I, T>::type;
 
 /// \brief Creates an `std::tuple` from a \flattening{flattened} T.
 ///
+/// \rcast
+///
 /// \b Example:
 /// \code
 ///     struct my_struct { int i, short s; };
@@ -84,6 +88,8 @@ auto flat_structure_to_tuple(const T& val) noexcept {
 
 
 /// \brief Creates an `std::tuple` with lvalue references to fields of a \flattening{flattened} T.
+///
+/// \rcast
 ///
 /// \b Requires: `T` must not have const fields.
 ///
@@ -104,10 +110,12 @@ auto flat_structure_tie(T& val /* @cond */, std::enable_if_t< std::is_trivially_
 
 /// Calls `func` for each field of a \flattening{flattened} POD `value`.
 ///
+/// \rcast
+///
 /// \param func must have one of the following signatures:
-///     * template <class U> any_return_type func(U&& field)                // field of value is perfect forwarded to function
-///     * template <class U> any_return_type func(U&& field, std::size_t i)
-///     * template <class U, class I> any_return_type func(U&& value, I i)  // Here I is an `std::integral_constant<size_t, field_index>`
+///     * any_return_type func(U&& field)                // field of value is perfect forwarded to function
+///     * any_return_type func(U&& field, std::size_t i)
+///     * any_return_type func(U&& value, I i)  // Here I is an `std::integral_constant<size_t, field_index>`
 ///
 /// \param value After \flattening{flattening} to each field of this variable will be the `func` applied.
 ///

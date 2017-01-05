@@ -22,6 +22,8 @@ namespace boost { namespace pfr {
 
 /// \brief Writes \flattening{flattened} POD `value` to `out`
 ///
+/// \rcast14
+///
 /// \b Example:
 /// \code
 ///     struct my_struct { int i, short s; };
@@ -36,6 +38,8 @@ void flat_write(std::basic_ostream<Char, Traits>& out, const T& value) {
 }
 
 /// Reads \flattening{flattened} POD `value` from stream `in`
+///
+/// \rcast14
 ///
 /// \b Example:
 /// \code

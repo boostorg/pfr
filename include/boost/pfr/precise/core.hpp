@@ -26,6 +26,8 @@ namespace boost { namespace pfr {
 ///
 /// \b Requires: C++17 or \flatpod{C++14 flat POD}.
 ///
+/// \rcast14
+///
 /// \b Example:
 /// \code
 ///     struct my_struct { int i, short s; };
@@ -74,6 +76,8 @@ using tuple_element_t = typename tuple_element<I, T>::type;
 ///
 /// \b Requires: C++17 or \flatpod{C++14 flat POD}.
 ///
+/// \rcast14
+///
 /// \b Example:
 /// \code
 ///     struct my_struct { int i, short s; };
@@ -95,6 +99,8 @@ constexpr auto structure_to_tuple(const T& val) noexcept {
 /// \brief Creates an `std::tuple` with lvalue references to fields of an aggregate T.
 ///
 /// \b Requires: C++17 or \flatpod{C++14 flat POD}.
+///
+/// \rcast14
 ///
 /// \b Example:
 /// \code
@@ -118,11 +124,13 @@ constexpr auto structure_tie(T& val) noexcept {
 /// \b Requires: C++17 or \constexprinit{C++14 constexpr aggregate intializable type}.
 ///
 /// \param func must have one of the following signatures:
-///     * template <class U> any_return_type func(U&& field)                // field of value is perfect forwarded to function
-///     * template <class U> any_return_type func(U&& field, std::size_t i)
-///     * template <class U, class I> any_return_type func(U&& value, I i)  // Here I is an `std::integral_constant<size_t, field_index>`
+///     * any_return_type func(U&& field)                // field of value is perfect forwarded to function
+///     * any_return_type func(U&& field, std::size_t i)
+///     * any_return_type func(U&& value, I i)  // Here I is an `std::integral_constant<size_t, field_index>`
 ///
 /// \param value To each field of this variable will be the `func` applied.
+///
+/// \rcast14
 ///
 /// \b Example:
 /// \code

@@ -23,7 +23,7 @@ This library provides tuple like methods for aggregate initializable structures,
 
 No macro or other type/member registrations required.]
 
-Boost.Precise and Flat Reflection (Boost.PFR) adds following out-of-the-box functionality to PODs:
+Boost.Precise and Flat Reflection (Boost.PFR) adds following out-of-the-box functionality for aggregate initializable structures:
 
 * comparison operators
 * heterogeneous comparators
@@ -57,9 +57,9 @@ Precise functions have almost unlimited reflection capabilities, but may produce
 
 Here's how to chose your functions:
 
+* If you work only with POD types and wish them flattened - use [*flat] functions
 * If you use C++17 - use [*precise] functions
 * If you work only with flat POD types in C++14 - use [*flat] functions
-* If you work only with POD types in C++14 and wish them flattened - use [*flat] functions
 * If you have modern compiler in C++14 mode and work with non-POD literal types with some hierarchy - you are forced to use [*precise] functions
 
 [endsect]
@@ -74,15 +74,15 @@ There are three ways to start using Boost.PFR hashing, comparison and streaming 
     ][ Defines operators in global namespace ][ Defined operators could be found by ADL ][ Works for local types ][ Usable localy, without affecting code from other scopes ][ Ignores implicit conversion operators ][ Respects user defined operators ]]
 
     [[
-        [headerref boost/pfr/flat/ops.hpp]
+        [headerref boost/pfr/precise/ops.hpp using\u00A0namespace\u00A0boost::pfr::ops;]
 
-        [headerref boost/pfr/precise/ops.hpp] 
+        [headerref boost/pfr/flat/ops.hpp using\u00A0namespace\u00A0boost::pfr::flat_ops;]
     ][ no ][ no ][ yes ][ yes ][ no ][ yes ]]
 
     [[
-        [headerref boost/pfr/flat/functions_for.hpp]
+        [macroref BOOST_PFR_FLAT_FUNCTIONS_FOR]
         
-        [headerref boost/pfr/precise/functions_for.hpp]  
+        [macroref BOOST_PFR_PRECISE_FUNCTIONS_FOR]  
     ][ yes if T is in it ][ yes ][ no ][ no, but could be limited to translation unit ][ yes for T ] [ no (compile time error) ]]
 
     [[
@@ -92,9 +92,9 @@ There are three ways to start using Boost.PFR hashing, comparison and streaming 
     ][ yes ][ yes ][ yes ][ no, but could be limited to translation unit ][ yes all ][ yes ]]
 ]
 
-More detailed description:
+More detailed description follows:
 
-[*1) [headerref boost/pfr/precise/ops.hpp] and [headerref boost/pfr/flat/ops.hpp] approach]
+[*1. [headerref boost/pfr/precise/ops.hpp `using namespace boost::pfr::ops;`] and [headerref boost/pfr/flat/ops.hpp `using namespace boost::pfr::flat_ops;`] approach]
 
 This method is good if you're writing generic algorithms and need to use operators from Boost.PFR only if there's no operators defined for the type:
 
@@ -123,7 +123,7 @@ struct uniform_comparator_less {
 };
 ```
 
-[*2) [headerref boost/pfr/flat/functions_for.hpp] approach]
+[*2. [macroref BOOST_PFR_FLAT_FUNCTIONS_FOR] and [macroref BOOST_PFR_PRECISE_FUNCTIONS_FOR] approach]
 
 This method is good if you're writing POD structure and wish to define operators for that structure.
 ```
@@ -156,7 +156,7 @@ struct empty {
 std::cout << empty{}; // Outputs `empty{}` if BOOST_PFR_FLAT_FUNCTIONS_FOR(empty) is commented out, '{}' otherwise.
 ```
 
-[*3) [headerref boost/pfr/flat/global_ops.hpp] approach]
+[*3. [headerref boost/pfr/flat/global_ops.hpp] and [headerref boost/pfr/precise/global_ops.hpp] approach]
 
 This approach is for those, who wish to have comparisons/streaming/hashing for all their types.
 
@@ -190,6 +190,26 @@ Following examples use definition from above:
 [table:quick_examples
 [[ Code snippet ] [ `var` content or output ] [ Function description: ]]
 [
+    [ [pfr_quick_examples_flat_functors_uset] ]
+    [ `my_uset` constains `var` ]
+    [
+        [classref boost::pfr::flat_hash]
+    
+        [classref boost::pfr::flat_equal_to] 
+    ]
+][
+    [ [pfr_quick_examples_flat_functors_set] ]
+    [ `my_set` constains `var` ]
+    [ [classref boost::pfr::flat_less] ]
+][
+    [ [pfr_quick_examples_flat_ops] ]
+    [ assert succeeds ]
+    [ [headerref boost/pfr/flat/ops.hpp using\u00A0namespace\u00A0boost::pfr::flat_ops;] ]
+][
+    [ [pfr_quick_examples_ops] ]
+    [ assert succeeds ]
+    [ [headerref boost/pfr/precise/ops.hpp using\u00A0namespace\u00A0boost::pfr::ops;] ]
+][
     [ [pfr_quick_examples_flat_for_each] ]
     [ `var == {B, {778, 4.14159}}` ]
     [ [funcref boost::pfr::flat_for_each_field] ]

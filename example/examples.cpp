@@ -101,6 +101,9 @@ assert(r == 11);
 
 #include <iostream>
 #include <boost/type_index.hpp>
+#include <unordered_set>
+#include <set>
+#include <boost/pfr.hpp>
 
 namespace quick_examples_ns {
 
@@ -128,6 +131,44 @@ inline std::ostream& operator<<(std::ostream& os, const bar& b) {
 }
 
 void test_examples() {
+  {
+    bar var{'A', {777, 3.141593}};
+    
+//[pfr_quick_examples_flat_functors_uset
+    // no `std::hash<bar>` or `bar::operator==(const bar&)` defined
+    std::unordered_set<bar, boost::pfr::flat_hash<bar>, boost::pfr::flat_equal_to<>> my_uset;
+    my_uset.insert(var);
+//]
+  }
+
+  {
+    bar var{'A', {777, 3.141593}};
+    
+//[pfr_quick_examples_flat_functors_set
+    // no `bar::operator<(const bar&)` defined
+    std::set<bar, boost::pfr::flat_less<>> my_set;
+    my_set.insert(var);
+//]
+  }
+
+  {
+//[pfr_quick_examples_flat_ops
+    using namespace boost::pfr::flat_ops; // Defines comparisons
+    assert((var < bar{'Z', {}} && var.f == foo{777, 3.141593}));
+//]
+    std::cout << "boost::pfr::flat_structure_tie(var) :\n" << var << '\n';
+  }
+
+#if __cplusplus >= 201606L /* Oulu meeting, not the exact value */
+  {
+//[pfr_quick_examples_ops
+    struct test { std::string f1; std::string_view f2; };
+    using namespace boost::pfr::ops; // Defines comparisons
+    assert((test{"abc", ""} > test{"aaa", "zomg"}));
+//]
+  }
+#endif
+
   {
     bar var{'A', {777, 3.141593}};
     
