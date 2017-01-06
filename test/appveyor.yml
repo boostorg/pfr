@@ -14,7 +14,7 @@ init:
     - set BRANCH_TO_TEST=%APPVEYOR_REPO_BRANCH%
     - set BOOST_REMOVE=pfr
 
-os: Visual Studio 2017 RC
+image: Visual Studio 2017 RC
 configuration: Debug
 platform: x64
 
