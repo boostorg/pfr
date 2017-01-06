@@ -7,7 +7,7 @@
 #define BOOST_PFR_DETAIL_CONFIG_HPP
 #pragma once
 
-#if #if __cplusplus < 201402L && (!defined(_MSC_VER) || _MSC_VER <= 1900)
+#if __cplusplus < 201402L && (!defined(_MSC_VER) || _MSC_VER <= 1900)
 #   error Boost.PFR library requires C++14.
 #endif
 
