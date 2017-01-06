@@ -5,12 +5,9 @@
 
 #ifndef BOOST_PFR_PRECISE_FUNCTORS_HPP
 #define BOOST_PFR_PRECISE_FUNCTORS_HPP
-
 #pragma once
 
-#if __cplusplus < 201402L
-#   error C++14 is required for this header.
-#endif
+#include <boost/pfr/detail/config.hpp>
 
 #include <boost/pfr/detail/functional.hpp>
 #include <boost/pfr/flat/core.hpp>

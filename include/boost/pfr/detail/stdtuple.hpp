@@ -5,6 +5,9 @@
 
 #ifndef BOOST_PFR_DETAIL_STDTUPLE_HPP
 #define BOOST_PFR_DETAIL_STDTUPLE_HPP
+#pragma once
+
+#include <boost/pfr/detail/config.hpp>
 
 #include <utility>      // metaprogramming stuff
 #include <tuple>

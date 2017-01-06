@@ -5,6 +5,9 @@
 
 #ifndef BOOST_PFR_DETAIL_FOR_EACH_FIELD_IMPL_HPP
 #define BOOST_PFR_DETAIL_FOR_EACH_FIELD_IMPL_HPP
+#pragma once
+
+#include <boost/pfr/detail/config.hpp>
 
 #include <utility>      // metaprogramming stuff
 

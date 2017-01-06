@@ -5,6 +5,9 @@
 
 #ifndef BOOST_PFR_DETAIL_DETECTORS_HPP
 #define BOOST_PFR_DETAIL_DETECTORS_HPP
+#pragma once
+
+#include <boost/pfr/detail/config.hpp>
 
 namespace boost { namespace pfr { namespace detail {
 ///////////////////// `value` is true if Detector<Tleft, Tright> does not compile (SFINAE)

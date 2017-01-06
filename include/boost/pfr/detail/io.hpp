@@ -5,12 +5,9 @@
 
 #ifndef BOOST_PFR_DETAIL_IO_HPP
 #define BOOST_PFR_DETAIL_IO_HPP
-
 #pragma once
 
-#if __cplusplus < 201402L
-#   error C++14 is required for this header.
-#endif
+#include <boost/pfr/detail/config.hpp>
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <iosfwd>       // stream operators

@@ -5,6 +5,9 @@
 
 #ifndef BOOST_PFR_DETAIL_FUNCTIONAL_HPP
 #define BOOST_PFR_DETAIL_FUNCTIONAL_HPP
+#pragma once
+
+#include <boost/pfr/detail/config.hpp>
 
 #include <functional>
 

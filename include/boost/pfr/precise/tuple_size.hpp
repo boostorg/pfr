@@ -6,6 +6,9 @@
 
 #ifndef BOOST_PFR_PRECISE_TUPLE_SIZE_HPP
 #define BOOST_PFR_PRECISE_TUPLE_SIZE_HPP
+#pragma once
+
+#include <boost/pfr/detail/config.hpp>
 
 #include <type_traits>
 #include <utility>      // metaprogramming stuff

@@ -7,9 +7,7 @@
 #define BOOST_PFR_PRECISE_FUNCTIONS_FOR_HPP
 #pragma once
 
-#if __cplusplus < 201402L
-#   error C++14 is required for this header.
-#endif
+#include <boost/pfr/detail/config.hpp>
 
 #include <boost/pfr/precise/functors.hpp>
 #include <boost/pfr/precise/io.hpp>

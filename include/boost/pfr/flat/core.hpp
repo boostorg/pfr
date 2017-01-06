@@ -5,10 +5,9 @@
 
 #ifndef BOOST_PFR_FLAT_CORE_HPP
 #define BOOST_PFR_FLAT_CORE_HPP
+#pragma once
 
-#if __cplusplus < 201402L
-#   error C++14 is required for this header.
-#endif
+#include <boost/pfr/detail/config.hpp>
 
 #include <type_traits>
 #include <utility>      // metaprogramming stuff
