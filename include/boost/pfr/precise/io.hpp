@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Antony Polukhin
+// Copyright (c) 2016-2017 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,7 +17,7 @@
 #include <boost/pfr/detail/io.hpp>
 #include <boost/pfr/precise/tuple_size.hpp>
 
-#if __cplusplus >= 201606L /* Oulu meeting, not the exact value */
+#if BOOST_PFR_USE_CPP17
 #   include <boost/pfr/detail/core17.hpp>
 #else
 #   include <boost/pfr/detail/core14.hpp>
@@ -41,7 +41,7 @@ template <class Char, class Traits, class T>
 void write(std::basic_ostream<Char, Traits>& out, const T& value) {
     constexpr std::size_t fields_count = detail::fields_count<std::remove_reference_t<T>>();
     out << '{';
-#if __cplusplus >= 201606L /* Oulu meeting, not the exact value */
+#if BOOST_PFR_USE_CPP17
     detail::print_impl<0, fields_count>::print(out, detail::as_tuple(value));
 #else
     ::boost::pfr::detail::for_each_field_dispatcher(
@@ -83,7 +83,7 @@ void read(std::basic_istream<Char, Traits>& in, T& value) {
     in >> parenthis;
     if (parenthis != '{') in.setstate(std::basic_istream<Char, Traits>::failbit);
 
-#if __cplusplus >= 201606L /* Oulu meeting, not the exact value */
+#if BOOST_PFR_USE_CPP17
     detail::read_impl<0, fields_count>::read(in, detail::as_tuple(value));
 #else
     ::boost::pfr::detail::for_each_field_dispatcher(

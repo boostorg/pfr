@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Antony Polukhin
+// Copyright (c) 2016-2017 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -116,7 +116,7 @@ int main() {
         "{1, 2, 3, 4, {with_operator}}"
     );
 
-#if __cplusplus >= 201606L /* Oulu meeting, not the exact value */
+#if BOOST_PFR_USE_CPP17
     struct test4 {
         int f0;
         std::string f1;

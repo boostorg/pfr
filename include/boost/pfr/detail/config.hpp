@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Antony Polukhin
+// Copyright (c) 2016-2017 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,7 +13,7 @@
 
 
 #ifndef BOOST_PFR_USE_CPP17
-#   if __cplusplus > 201606L /* Oulu meeting, not the exact value */
+#   ifdef __cpp_structured_bindings
 #       define BOOST_PFR_USE_CPP17 1
 #   else
 #       define BOOST_PFR_USE_CPP17 0

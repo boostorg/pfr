@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Antony Polukhin
+// Copyright (c) 2016-2017 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,7 +16,7 @@
 #include <boost/pfr/detail/stdtuple.hpp>
 
 #include <boost/pfr/precise/tuple_size.hpp>
-#if __cplusplus >= 201606L /* Oulu meeting, not the exact value */
+#if BOOST_PFR_USE_CPP17
 #   include <boost/pfr/detail/core17.hpp>
 #else
 #   include <boost/pfr/detail/core14.hpp>

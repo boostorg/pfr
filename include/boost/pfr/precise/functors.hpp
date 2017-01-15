@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Antony Polukhin
+// Copyright (c) 2016-2017 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -30,7 +30,7 @@ namespace detail {
         constexpr std::size_t fields_count_min = detail::min_size(fields_count_lhs, fields_count_rhs);
         typedef Visitor<0, fields_count_min> visitor_t;
 
-#if __cplusplus >= 201606L /* Oulu meeting, not the exact value */
+#if BOOST_PFR_USE_CPP17
         return visitor_t::cmp(detail::as_tuple(x), detail::as_tuple(y));
 #else
         bool result = true;
@@ -245,7 +245,7 @@ template <class T> struct hash {
     /// \rcast14
     std::size_t operator()(const T& x) const {
         constexpr std::size_t fields_count = detail::fields_count<std::remove_reference_t<T>>();
-#if __cplusplus >= 201606L /* Oulu meeting, not the exact value */
+#if BOOST_PFR_USE_CPP17
         return detail::hash_impl<0, fields_count>::compute(detail::as_tuple(x));
 #else
         std::size_t result = 0;

@@ -1,4 +1,4 @@
-// Copyright 2016 Antony Polukhin
+// Copyright 2016-2017 Antony Polukhin
 
 // Distributed under the Boost Software License, Version 1.0.
 // (See the accompanying file LICENSE_1_0.txt
@@ -159,7 +159,7 @@ void test_examples() {
     std::cout << "boost::pfr::flat_structure_tie(var) :\n" << var << '\n';
   }
 
-#if __cplusplus >= 201606L /* Oulu meeting, not the exact value */
+#if BOOST_PFR_USE_CPP17
   {
 //[pfr_quick_examples_ops
     struct test { std::string f1; std::string_view f2; };
@@ -231,7 +231,7 @@ void test_examples() {
 //]
   }
 
-#if __cplusplus >= 201606L /* Oulu meeting, not the exact value */
+#if BOOST_PFR_USE_CPP17
   {
     bar var{'A', {777, 3.141593}};
 //[pfr_quick_examples_get_1
@@ -266,7 +266,7 @@ void test_examples() {
     std::cout << "boost::pfr::flat_get<1>(var.f) outputs:\n" << var << '\n';
   }
 
-#if __cplusplus >= 201606L /* Oulu meeting, not the exact value */
+#if BOOST_PFR_USE_CPP17
   {
     bar var{'A', {777, 3.141593}};
 //[pfr_quick_examples_structure_to_tuple
@@ -286,7 +286,7 @@ void test_examples() {
     std::cout << "boost::pfr::flat_structure_to_tuple(var) :\n" << var << '\n';
   }
 
-#if __cplusplus >= 201606L /* Oulu meeting, not the exact value */
+#if BOOST_PFR_USE_CPP17
   {
     bar var{'A', {777, 3.141593}};
 //[pfr_quick_examples_structure_tie

@@ -13,7 +13,7 @@ import string
 # Skipping some letters that mey produce keywords or are hard to read 
 ascii_letters = string.ascii_letters.replace("o", "").replace("O", "").replace("i", "").replace("I", "")
 
-PROLOGUE = """// Copyright (c) 2016 Antony Polukhin
+PROLOGUE = """// Copyright (c) 2016-2017 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,16 +23,18 @@ PROLOGUE = """// Copyright (c) 2016 Antony Polukhin
 //////////////// This is an auto generated header. Modify pfr/misc/generate_cpp17.py instead.   ////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BOOST_PFR_CORE17_GENERATED_HPP
-#define BOOST_PFR_CORE17_GENERATED_HPP
-
+#ifndef BOOST_PFR_DETAIL_CORE17_GENERATED_HPP
+#define BOOST_PFR_DETAIL_CORE17_GENERATED_HPP
 #pragma once
 
-#if __cplusplus < 201606L /* Oulu meeting, not the exact value */
+#include <boost/pfr/detail/config.hpp>
+
+#if BOOST_PFR_USE_CPP17
 #   error C++17 is required for this header.
 #endif
 
-#include <boost/pfr/core.hpp>
+#include <boost/pfr/detail/sequence_tuple.hpp>
+#include <boost/pfr/detail/fields_count.hpp>
 
 namespace boost { namespace pfr { namespace detail {
 
@@ -69,7 +71,7 @@ using as_tuple_t = decltype( ::boost::pfr::detail::as_tuple(std::declval<T&>()) 
 
 }}} // namespace boost::pfr::detail
 
-#endif // BOOST_PFR_CORE17_GENERATED_HPP
+#endif // BOOST_PFR_DETAIL_CORE17_GENERATED_HPP
 """
 
 ############################################################################################################################
