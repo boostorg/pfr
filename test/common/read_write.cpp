@@ -124,7 +124,27 @@ int main() {
         int f3;
         std::string f4;
     };
-    test_type(test4{1, "my o my", '3', 4, "hello there!"});
+    test_type(
+        test4{1, {"my o my"}, '3', 4, {"hello there!"} },
+        "{1, \"my o my\", 3, 4, \"hello there!\"}"
+    );
+
+    #if 0
+    // TODO:
+    std::string f1_referenced{"my O my"};
+    std::string f4_referenced{"Hello There!"};
+    struct test5 {
+        int f0;
+        const std::string& f1;
+        char f2;
+        int f3;
+        const std::string& f4;
+    };
+    to_string_test(
+        test5{1, f1_referenced, '3', 4, f4_referenced },
+        "{1, \"my o my\", 3, 4, \"hello there!\"}"
+    );
+    #endif
 #endif
 #endif // BOOST_PFR_TEST_PRECISE
 

@@ -34,15 +34,15 @@ struct adl_hash {
 };
 
 struct comparable_struct {
-    int i; short s; char data[50]; bool bl; int a,b,c,d,e,f;
+    int i; short s; bool bl; int a,b,c,d,e,f;
 };
 
 BOOST_PFR_TEST_FUNCTIONS_FOR(comparable_struct)
 
 void test_comparable_struct() {
-    comparable_struct s1 {0, 1, "Hello", false, 6,7,8,9,10,11};
+    comparable_struct s1 {0, 1, false, 6,7,8,9,10,11};
     comparable_struct s2 = s1;
-    comparable_struct s3 {0, 1, "Hello", false, 6,7,8,9,10,11111};
+    comparable_struct s3 {0, 1, false, 6,7,8,9,10,11111};
     BOOST_TEST_EQ(s1, s2);
     BOOST_TEST(s1 <= s2);
     BOOST_TEST(s1 >= s2);

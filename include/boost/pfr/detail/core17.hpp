@@ -16,10 +16,8 @@ namespace boost { namespace pfr { namespace detail {
 
 template <class T, class F, std::size_t... I>
 void for_each_field_dispatcher(T&& t, F&& f, std::index_sequence<I...>) {
-    ::boost::pfr::detail::for_each_field_impl(
-        detail::as_tuple(std::forward<T>(t)),
-        std::forward<F>(f),
-        std::index_sequence<I...>{}
+    std::forward<F>(f)(
+        detail::as_tuple(std::forward<T>(t))
     );
 }
 

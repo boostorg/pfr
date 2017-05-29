@@ -27,9 +27,9 @@
 template <class T>
 void test_comparable_struct() {
     using namespace BOOST_PFR_TEST_NAMESPECE;
-    T s1 {0, 1, "Hello", false, 6,7,8,9,10,11};
+    T s1 {0, 1, false, 6,7,8,9,10,11};
     T s2 = s1;
-    T s3 {0, 1, "Hello", false, 6,7,8,9,10,11111};
+    T s3 {0, 1, false, 6,7,8,9,10,11111};
     BOOST_TEST(s1 == s2);
     BOOST_TEST(s1 <= s2);
     BOOST_TEST(s1 >= s2);
@@ -71,7 +71,7 @@ void test_implicit_conversions() {
 
 namespace foo {
 struct comparable_struct {
-    int i; short s; char data[50]; bool bl; int a,b,c,d,e,f;
+    int i; short s; bool bl; int a,b,c,d,e,f;
 };
 }
 
@@ -79,7 +79,7 @@ int main() {
     test_comparable_struct<foo::comparable_struct>();
 
     struct local_comparable_struct {
-        int i; short s; char data[50]; bool bl; int a,b,c,d,e,f;
+        int i; short s; bool bl; int a,b,c,d,e,f;
     };
 
     test_comparable_struct<local_comparable_struct>();

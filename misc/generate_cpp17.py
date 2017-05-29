@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2016 Antony Polukhin
+# Copyright (c) 2016-2017 Antony Polukhin
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,8 +10,8 @@
 import sys
 import string
 
-# Skipping some letters that mey produce keywords or are hard to read 
-ascii_letters = string.ascii_letters.replace("o", "").replace("O", "").replace("i", "").replace("I", "")
+# Skipping some letters that may produce keywords or are hard to read, or shadow template parameters
+ascii_letters = string.ascii_letters.replace("o", "").replace("O", "").replace("i", "").replace("I", "").replace("T", "")
 
 PROLOGUE = """// Copyright (c) 2016-2017 Antony Polukhin
 //
@@ -29,7 +29,7 @@ PROLOGUE = """// Copyright (c) 2016-2017 Antony Polukhin
 
 #include <boost/pfr/detail/config.hpp>
 
-#if BOOST_PFR_USE_CPP17
+#if !BOOST_PFR_USE_CPP17
 #   error C++17 is required for this header.
 #endif
 
@@ -48,6 +48,18 @@ constexpr auto as_tuple_impl(T&& /*val*/, size_t_<0>) noexcept {
   return sequence_tuple::tuple<>{};
 }
 
+template <class T>
+constexpr auto as_tuple_impl(T&& val, size_t_<1>, std::enable_if_t<std::is_class< std::remove_cv_t<std::remove_reference_t<T>> >::value>* = 0) noexcept {
+  auto& [a] = std::forward<T>(val);
+  return ::boost::pfr::detail::make_tuple_of_references(a);
+}
+
+
+template <class T>
+constexpr auto as_tuple_impl(T&& val, size_t_<1>, std::enable_if_t<!std::is_class< std::remove_cv_t<std::remove_reference_t<T>> >::value>* = 0) noexcept {
+  return ::boost::pfr::detail::make_tuple_of_references( std::forward<T>(val) );
+}
+
 """
 
 ############################################################################################################################
@@ -57,13 +69,13 @@ EPILOGUE = """
 template <class T>
 constexpr auto as_tuple(const T& val) noexcept {
   typedef size_t_<fields_count<T>()> fields_count_tag;
-  return detail::as_tuple_impl(val, fields_count_tag{});
+  return boost::pfr::detail::as_tuple_impl(val, fields_count_tag{});
 }
 
 template <class T>
 constexpr auto as_tuple(T& val) noexcept {
   typedef size_t_<fields_count<T>()> fields_count_tag;
-  return detail::as_tuple_impl(val, fields_count_tag{});
+  return boost::pfr::detail::as_tuple_impl(val, fields_count_tag{});
 }
 
 template <class T>
@@ -75,15 +87,24 @@ using as_tuple_t = decltype( ::boost::pfr::detail::as_tuple(std::declval<T&>()) 
 """
 
 ############################################################################################################################
+generate_sfinae_attempts = False
 
-indexes = ""
+
+if generate_sfinae_attempts:
+    print """
+    template <class T, std::size_t I>
+    constexpr auto as_tuple_impl(T&& val, size_t_<I>) noexcept {
+      return as_tuple_impl( std::forward<T>(val), size_t_<I - 1>{});
+    }
+    """
+
+
+indexes = "    a"
 print PROLOGUE
 funcs_count = 100 if len(sys.argv) == 1 else int(sys.argv[1])
 max_args_on_a_line = len(ascii_letters)
-for i in xrange(funcs_count):
-    if i == 0:
-        indexes = "    "
-    elif i % max_args_on_a_line == 0:
+for i in xrange(1, funcs_count):
+    if i % max_args_on_a_line == 0:
         indexes += ",\n    "
     else:
         indexes += ","
@@ -107,5 +128,11 @@ for i in xrange(funcs_count):
         print "  );"
 
     print "}\n"
+
+    if generate_sfinae_attempts:
+        print "template <class T>"
+        print "constexpr auto as_tuple_impl(T&& val, size_t_<" + str(i + 1) + "> v) noexcept"
+        print "  ->decltype( ::boost::pfr::detail::as_tuple_impl0(std::forward<T>(val), v) )"
+        print "{ return ::boost::pfr::detail::as_tuple_impl0(std::forward<T>(val), v); }\n"
 
 print EPILOGUE

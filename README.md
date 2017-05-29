@@ -15,8 +15,9 @@ Develop:        | [![Build Status](https://travis-ci.org/apolukhin/magic_get.svg
 Master:         | [![Build Status](https://travis-ci.org/apolukhin/magic_get.svg?branch=master)](https://travis-ci.org/apolukhin/magic_get) <!--  [![Build status](https://ci.appveyor.com/api/projects/status/t6q6yhcabtk5b99l/branch/master?svg=true)](https://ci.appveyor.com/project/apolukhin/boost-dll/branch/master)  --> | [![Coverage Status](https://coveralls.io/repos/github/apolukhin/magic_get/badge.png?branch=master)](https://coveralls.io/github/apolukhin/magic_get?branch=master) | <!-- [details...](http://www.boost.org/development/tests/master/developer/pfr.html)) -->
 
 
-### Motivating example
+### C++14 Motivating Example
 ```c++
+// requires: C++14
 #include <iostream>
 #include "boost/pfr.hpp"
 
@@ -41,14 +42,45 @@ Outputs:
 my_struct has 3 fields: {100, H, 3.14159}
 ```
 
+### C++17 Motivating Example
+
+```c++
+#include <iostream>
+#include "boost/pfr.hpp"
+
+struct my_struct { // no ostream operator defined!
+    std::string s;
+    int i;
+};
+
+int main() {
+    using namespace boost::pfr::ops; // C++17 out-of-the-box ostream operators for aggregate initializables!
+
+    my_struct s{{"Das ist fantastisch!"}, 100};
+    std::cout << "my_struct has " << boost::pfr::tuple_size<my_struct>::value
+        << " fields: " << s << "\n";
+}
+
+```
+
+Outputs:
+```
+my_struct has 2 fields: {"Das ist fantastisch!", 100}
+```
+
 
 ### Requirements and Limitations
 
+General:
 * C++14 compatible compiler (GCC-5.0+, Clang, ...)
 * Static variables are ignored
 
-C++14 limitations (C++17 fixes those):
+C++14 limitations:
 * T must be constexpr aggregate initializable and must not contain references nor bitfields
+
+C++17 limitations:
+* T must be aggregate initializable and must not contain arrays (but may contain `std::array` like classes)
+
 
 ### License
 

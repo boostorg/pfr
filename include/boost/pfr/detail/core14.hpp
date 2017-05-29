@@ -624,6 +624,9 @@ struct ubiq_constructor_constexpr_copy {
 };
 
 /////////////////////
+
+#if !BOOST_PFR_USE_CPP17
+
 template <class T, std::size_t... I>
 struct is_constexpr_aggregate_initializable { // TODO: try to fix it
     template <T = T{ ubiq_constructor_constexpr_copy{I}... } >
@@ -712,6 +715,7 @@ void for_each_field_dispatcher(T&& t, F&& f, std::index_sequence<I...>) {
     );
 }
 
+#endif // #if !BOOST_PFR_USE_CPP17
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

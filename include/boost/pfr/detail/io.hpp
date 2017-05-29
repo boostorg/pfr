@@ -11,16 +11,46 @@
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <iosfwd>       // stream operators
+#include <iomanip>
 
+// Forward declaration
+namespace std {
+    template <class CharT, class Traits> class basic_string_view;
+}
 
 namespace boost { namespace pfr { namespace detail {
+
+inline auto quoted_helper(const std::string& s) noexcept {
+    return std::quoted(s);
+}
+
+template <class CharT, class Traits>
+inline auto quoted_helper(const std::basic_string_view<CharT, Traits>& s) noexcept {
+    return std::quoted(s);
+}
+
+inline auto quoted_helper(std::string& s) noexcept {
+    return std::quoted(s);
+}
+
+template <class T>
+inline decltype(auto) quoted_helper(T&& v) noexcept {
+    return std::forward<T>(v);
+}
 
 template <std::size_t I, std::size_t N>
 struct print_impl {
     template <class Stream, class T>
     static void print (Stream& out, const T& value) {
         if (!!I) out << ", ";
-        out << boost::pfr::detail::sequence_tuple::get<I>(value);
+        out << quoted_helper(boost::pfr::detail::sequence_tuple::get<I>(value));
+        print_impl<I + 1, N>::print(out, value);
+    }
+
+    template <class Stream, class T>
+    static void print (Stream& out, const std::string& value) {
+        if (!!I) out << ", ";
+        out << std::quoted( boost::pfr::detail::sequence_tuple::get<I>(value) );
         print_impl<I + 1, N>::print(out, value);
     }
 };
@@ -42,7 +72,7 @@ struct read_impl {
             in >> ignore;
             if (ignore != ' ')  in.setstate(Stream::failbit);
         }
-        in >> boost::pfr::detail::sequence_tuple::get<I>(value);
+        in >> quoted_helper( boost::pfr::detail::sequence_tuple::get<I>(value) );
         read_impl<I + 1, N>::read(in, value);
     }
 };

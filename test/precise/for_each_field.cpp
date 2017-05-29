@@ -57,12 +57,24 @@ struct simple {
 
 
 int main () {
-    int array[100] = {};
     std::size_t control = 0;
-    boost::pfr::for_each_field(array, [&control](auto&& /*val*/, std::size_t i) {
+
+    int v = {};
+    boost::pfr::for_each_field(v, [&control](auto&& val, std::size_t i) {
         BOOST_TEST_EQ(i, control);
+        (void)val;
         ++ control;
     });
+    BOOST_TEST_EQ(control, 1);
+
+    control = 0;
+    int array[100] = {};
+    boost::pfr::for_each_field(array, [&control](auto&& val, std::size_t i) {
+        BOOST_TEST_EQ(i, control);
+        (void)val;
+        ++ control;
+    });
+    BOOST_TEST_EQ(control, 100);
 
     std::stringstream ss;
     boost::pfr::for_each_field(reg{42, 'a', {}, nullptr, color::green, "hello world!"}, [&ss](auto&& val, std::size_t i) {
