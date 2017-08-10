@@ -572,7 +572,7 @@ struct ubiq_is_flat_refelectable {
 template <class T, std::size_t... I>
 constexpr bool is_flat_refelectable(std::index_sequence<I...>) noexcept {
     constexpr std::size_t fields = sizeof...(I);
-    bool result[fields] = {I...};
+    bool result[fields] = {static_cast<bool>(I)...};
     const T v{ ubiq_is_flat_refelectable{result[I]}... };
     (void)v;
 

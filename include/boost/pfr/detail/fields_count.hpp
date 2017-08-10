@@ -76,7 +76,7 @@ constexpr void detect_fields_count(std::size_t& count, size_t_<N>, size_t_<N>, l
     // Special case for N == 1: `std::is_constructible<T, ubiq_constructor>` returns true if N == 1 and T is copy/move constructible.
     static_assert(
         is_aggregate_initializable_n<T, N>::value,
-        "Types with user specified constructors (non-aggregate types) are not supported."
+        "Types with user specified constructors (non-aggregate initializable types) are not supported."
     );
 
     count = N;
@@ -103,7 +103,27 @@ constexpr void detect_fields_count(std::size_t& count, size_t_<Begin>, size_t_<M
 ///////////////////// Returns non-flattened fields count
 template <class T>
 constexpr std::size_t fields_count() noexcept {
-    static_assert(std::is_copy_constructible<std::remove_all_extents_t<T>>::value, "Structure and each field in structure must be copy constructible");
+    static_assert(
+        std::is_copy_constructible<std::remove_all_extents_t<T>>::value,
+        "Type and each field in the type must be copy constructible."
+    );
+
+#ifdef __cpp_lib_is_aggregate
+    static_assert(
+        std::is_aggregate<T>::value             // Does not return `true` for build in types.
+        || std::is_standard_layout<T>::value,   // Does not return `true` for structs that have non standard layout members.
+        "Type must be aggregate initializable."
+    );
+#endif
+
+// Can't use the following. See the non_std_layout.cpp test.
+//#if !BOOST_PFR_USE_CPP17
+//    static_assert(
+//        std::is_standard_layout<T>::value,   // Does not return `true` for structs that have non standard layout members.
+//        "Type must be aggregate initializable."
+//    );
+//#endif
+
     std::size_t res = 0u;
     constexpr std::size_t next = (sizeof(T) * 8) / 2 + 1; // We multiply by 8 because we may have bitfields in T
     detect_fields_count<T>(res, size_t_<0>{}, size_t_<next>{}, 1L);

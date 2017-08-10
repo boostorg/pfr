@@ -1,4 +1,4 @@
-#  Copyright (C) 2016, Antony Polukhin.
+#  Copyright (C) 2016-2017, Antony Polukhin.
 #
 # Use, modification and distribution is subject to the Boost Software License,
 # Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -17,6 +17,12 @@ test-suite pfr
     [ run common/read_write.cpp         : : : <define>BOOST_PFR_TEST_PRECISE    : precise_read_write ]
     [ run common/std_interactions.cpp   : : : <define>BOOST_PFR_TEST_FLAT       : flat_std_interactions ]
     [ run common/std_interactions.cpp   : : : <define>BOOST_PFR_TEST_PRECISE    : precise_std_interactions ]
+    [ compile-fail common/private_fields.cpp : <define>BOOST_PFR_TEST_FLAT      : flat_private_fields ]
+    [ compile-fail common/private_fields.cpp : <define>BOOST_PFR_TEST_PRECISE   : precise_private_fields ]
+    [ compile-fail common/protected_fields.cpp : <define>BOOST_PFR_TEST_FLAT    : flat_protected_fields ]
+    [ compile-fail common/protected_fields.cpp : <define>BOOST_PFR_TEST_PRECISE : precise_protected_fields ]
+    [ compile-fail common/non_std_layout.cpp : <define>BOOST_PFR_TEST_FLAT      : flat_non_standard_layout ]
+    [ run common/non_std_layout.cpp     : : : <define>BOOST_PFR_TEST_PRECISE    : precise_non_standard_layout ]
 
     [ run common/test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=char : test_tuple_sizes_on_chars ]
     [ run common/test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=int : test_tuple_sizes_on_ints ]

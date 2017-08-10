@@ -31,9 +31,11 @@ struct tuple_base< std::index_sequence<I...>, Tail... >
 {
     static constexpr std::size_t size_v = sizeof...(I);
 
-    constexpr tuple_base() noexcept = default;
-    constexpr tuple_base(tuple_base&&) noexcept = default;
-    constexpr tuple_base(const tuple_base&) noexcept = default;
+    // We do not use `noexcept` in the following functions, because if user forget to put one then clang will issue an error:
+    // "error: exception specification of explicitly defaulted default constructor does not match the calculated one".
+    constexpr tuple_base() = default;
+    constexpr tuple_base(tuple_base&&) = default;
+    constexpr tuple_base(const tuple_base&) = default;
 
     constexpr tuple_base(Tail... v) noexcept
         : base_from_member<I, Tail>{ v }...
