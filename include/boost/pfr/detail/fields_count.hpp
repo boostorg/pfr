@@ -108,6 +108,11 @@ constexpr std::size_t fields_count() noexcept {
         "Type and each field in the type must be copy constructible."
     );
 
+    static_assert(
+        !std::is_polymorphic<T>::value,
+        "Type must have no virtual function, because otherwise it is not aggregate initializable."
+    );
+
 #ifdef __cpp_lib_is_aggregate
     static_assert(
         std::is_aggregate<T>::value             // Does not return `true` for build in types.

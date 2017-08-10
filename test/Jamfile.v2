@@ -21,6 +21,8 @@ test-suite pfr
     [ compile-fail common/private_fields.cpp : <define>BOOST_PFR_TEST_PRECISE   : precise_private_fields ]
     [ compile-fail common/protected_fields.cpp : <define>BOOST_PFR_TEST_FLAT    : flat_protected_fields ]
     [ compile-fail common/protected_fields.cpp : <define>BOOST_PFR_TEST_PRECISE : precise_protected_fields ]
+    [ compile-fail common/virtual_functions.cpp : <define>BOOST_PFR_TEST_FLAT      : flat_virtual_functions ]
+    [ compile-fail common/virtual_functions.cpp : <define>BOOST_PFR_TEST_PRECISE   : precise_virtual_functions ]
     [ compile-fail common/non_std_layout.cpp : <define>BOOST_PFR_TEST_FLAT      : flat_non_standard_layout ]
     [ run common/non_std_layout.cpp     : : : <define>BOOST_PFR_TEST_PRECISE    : precise_non_standard_layout ]
 
