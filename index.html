@@ -22,7 +22,7 @@
 <div class="titlepage"><div>
 <div><h2 class="title">
 <a name="boost_precise_and_flat_reflectio"></a>Chapter&#160;1.&#160;Boost.Precise and Flat Reflection 1.0</h2></div>
-<div><p class="copyright">Copyright &#169; 2016 Antony Polukhin</p></div>
+<div><p class="copyright">Copyright &#169; 2016, 2017 Antony Polukhin</p></div>
 <div><div class="legalnotice">
 <a name="boost_precise_and_flat_reflectio.legal"></a><p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -95,6 +95,28 @@
 </td></tr>
 </table></div>
 <p>
+      <span class="bold"><strong>Flat</strong></span> reflection stands for representing the
+      type as if all the fields of nested types were listed directly into the type:
+    </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">pfr</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="keyword">struct</span> <span class="identifier">nested_t</span> <span class="special">{</span> <span class="keyword">char</span> <span class="identifier">c</span><span class="special">;</span> <span class="special">};</span>
+<span class="keyword">struct</span> <span class="identifier">foo_t</span> <span class="special">{</span> <span class="keyword">int</span> <span class="identifier">i</span><span class="special">;</span> <span class="identifier">nested_t</span> <span class="identifier">nested</span><span class="special">;</span> <span class="special">};</span>
+
+
+<span class="keyword">static_assert</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">is_same</span><span class="special">&lt;</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_tuple_element_t</span><span class="special">&lt;</span><span class="number">1</span><span class="special">,</span> <span class="identifier">foo_t</span><span class="special">&gt;,</span> <span class="comment">// Flat reflection</span>
+    <span class="keyword">char</span>    <span class="comment">// `char`, not `nested_t`!</span>
+<span class="special">&gt;::</span><span class="identifier">value</span><span class="special">);</span>
+
+
+<span class="comment">// Requires C++17:</span>
+<span class="keyword">static_assert</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">is_same</span><span class="special">&lt;</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">tuple_element_t</span><span class="special">&lt;</span><span class="number">1</span><span class="special">,</span> <span class="identifier">foo_t</span><span class="special">&gt;,</span>      <span class="comment">// Precise reflection.</span>
+    <span class="identifier">nested_t</span>
+<span class="special">&gt;::</span><span class="identifier">value</span><span class="special">);</span>
+</pre>
+<p>
       Boost.Precise and Flat Reflection (Boost.PFR) adds following out-of-the-box
       functionality for aggregate initializable structures:
     </p>
@@ -148,7 +170,7 @@
 </div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
-<td align="left"><p><small>Last revised: January 05, 2017 at 17:54:49 GMT</small></p></td>
+<td align="left"><p><small>Last revised: August 13, 2017 at 07:52:36 GMT</small></p></td>
 <td align="right"><div class="copyright-footer"></div></td>
 </tr></table>
 <hr>
