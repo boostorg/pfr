@@ -15,9 +15,9 @@ struct foo_t { int i; nested_t nested; };
 
 
 static_assert(std::is_same<
-    boost::pfr::flat_tuple_element_t<1, foo_t>, // Flat reflection
+    boost::pfr::flat_tuple_element_t<1, foo_t>, // Flat reflection.
     char    // `char`, not `nested_t`!
->::value);
+>::value, "");
 
 
 // Requires C++17:
@@ -26,7 +26,7 @@ static_assert(std::is_same<
 static_assert(std::is_same<
     boost::pfr::tuple_element_t<1, foo_t>,      // Precise reflection.
     nested_t
->::value); //<-
+>::value, ""); //<-
 #endif //->
 //] [/pfr_intro]
 

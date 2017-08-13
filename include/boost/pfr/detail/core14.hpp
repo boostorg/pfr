@@ -597,7 +597,7 @@ decltype(auto) as_tuple(T&& val) noexcept {
     typedef std::remove_reference_t<T> type;
     static_assert(
         boost::pfr::detail::is_flat_refelectable<type>( std::make_index_sequence<fields_count<type>()>{} ),
-        "Not possible in C++14 to represent that type without loosing information. Use flat_ version or change type definition"
+        "Not possible in C++14 to represent that type without loosing information. Use boost::pfr::flat_ version, or change type definition, or enable C++17"
     );
     return tie_as_flat_tuple(std::forward<T>(val));
 }
