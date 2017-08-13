@@ -6,6 +6,31 @@
 
 #include <cassert>
 
+
+//[pfr_intro
+#include <boost/pfr.hpp>
+
+struct nested_t { char c; };
+struct foo_t { int i; nested_t nested; };
+
+
+static_assert(std::is_same<
+    boost::pfr::flat_tuple_element_t<1, foo_t>, // Flat reflection
+    char    // `char`, not `nested_t`!
+>::value);
+
+
+// Requires C++17:
+//<-
+#if BOOST_PFR_USE_CPP17 //->
+static_assert(std::is_same<
+    boost::pfr::tuple_element_t<1, foo_t>,      // Precise reflection.
+    nested_t
+>::value); //<-
+#endif //->
+//] [/pfr_intro]
+
+
 //[pfr_example_get
 /*`
     The following example shows how to access structure fields by index using [funcref boost::pfr::get].

@@ -23,6 +23,14 @@ This library provides tuple like methods for aggregate initializable structures,
 
 No macro or other type/member registrations required.]
 
+
+[import ../example/examples.cpp]
+
+
+[*Flat] reflection stands for representing the type as if all the fields of nested types were listed directly into the type:
+
+[pfr_intro]
+
 Boost.Precise and Flat Reflection (Boost.PFR) adds following out-of-the-box functionality for aggregate initializable structures:
 
 * comparison operators
@@ -34,6 +42,7 @@ Boost.Precise and Flat Reflection (Boost.PFR) adds following out-of-the-box func
 * methods for cooperation with `std::tuple`
 * methods to visit each field of the structure
 
+
 [warning This is not an official Boost library! It wasn't reviewed and can't be downloaded from www.boost.org. This library is available to the community to know real interest and get comments for refinement. The intention is to submit library to formal review, if community think that it is interesting!]
 
 [caution This is a C++14 library! Pre C++14 compilers (C++11, C++03...) are not supported]
@@ -42,14 +51,12 @@ Boost.Precise and Flat Reflection (Boost.PFR) adds following out-of-the-box func
 
 [section Tutorial]
 
-[import ../example/examples.cpp]
-
 [section Accessing POD member by index] [pfr_example_get] [endsect]
 [section Flattening] [pfr_example_flattening] [pfr_example_flattening_2] [endsect]
 [/ [section Counting fields] [pfr_example_tuple_size] [endsect] ]
 
 [section Flat or Precise functions to chose]
-All the functions that have `flat_` prefix and are declared in `boost/pfr/flat/*` headers the [*flat] functions, other function are [*precise] and are defclared in `boost/pfr/precise/*`. In previous example you've seen how the the flattening works.
+All the functions that have `flat_` prefix and are declared in `boost/pfr/flat/*` headers the [*flat] functions, other function are [*precise] and are declared in `boost/pfr/precise/*`. In previous example you've seen how the the flattening works.
 
 Flat functions are more limited in their reflection capabilities, but guarantee to not affect debug and release builds in C++14 mode (no additional code would be produced).
 
