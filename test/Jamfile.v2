@@ -48,6 +48,7 @@ test-suite pfr
     [ compile-fail precise/non_aggregate.cpp : : precise_non_aggregate ]
 
     [ run ../example/examples.cpp ]
+    [ run ../example/quick_examples.cpp ]
   ;
 
 

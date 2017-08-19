@@ -189,6 +189,7 @@ Argument Dependant Lookup works well, `std::less` will find the operators for `s
 
 [section Short Examples for the Impatient]
 
+[import ../example/quick_examples.cpp]
 
 [pfr_quick_examples_structures]
 
