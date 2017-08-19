@@ -59,7 +59,7 @@ constexpr decltype(auto) get(T& val) noexcept {
 ///     std::vector<  boost::pfr::tuple_element<0, my_structure>::type  > v;
 /// \endcode
 template <std::size_t I, class T>
-using tuple_element = typename detail::sequence_tuple::tuple_element<I, detail::as_tuple_t<T> >::type;
+using tuple_element = detail::sequence_tuple::tuple_element<I, detail::as_tuple_t<T> >;
 
 
 /// \brief Type of a field with index `I` in aggregate `T`.

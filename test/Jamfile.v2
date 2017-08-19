@@ -44,6 +44,7 @@ test-suite pfr
     [ run precise/bitfields.cpp : : : : precise_tuple_size_on_bitfields ]
     [ run precise/for_each_field.cpp : : : : precise_for_each_field ]
     [ run precise/motivating_example.cpp : : : : precise_motivating_example ]
+    [ run precise/motivating_example2.cpp : : : : precise_motivating_example2 ]
     [ compile-fail precise/non_aggregate.cpp : : precise_non_aggregate ]
 
     [ run ../example/examples.cpp ]

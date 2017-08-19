@@ -1,17 +1,17 @@
-// requires: C++14
 #include <iostream>
 #include "boost/pfr.hpp"
 
 struct my_struct { // no ostream operator defined!
+    std::string s;
     int i;
-    char c;
-    double d;
 };
 
 int main() {
-    using namespace boost::pfr::ops; // out-of-the-box ostream operator for all PODs!
+#if BOOST_PFR_USE_CPP17
+    using namespace boost::pfr::ops; // C++17 out-of-the-box ostream operators for aggregate initializables!
 
-    my_struct s{100, 'H', 3.141593};
+    my_struct s{{"Das ist fantastisch!"}, 100};
     std::cout << "my_struct has " << boost::pfr::tuple_size<my_struct>::value
         << " fields: " << s << "\n";
+#endif
 }
