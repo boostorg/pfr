@@ -95,8 +95,22 @@
 </td></tr>
 </table></div>
 <p>
-      <span class="bold"><strong>Flat</strong></span> reflection stands for representing the
-      type as if all the fields of nested types were listed directly into the type:
+      The two different types of reflection are:
+    </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+          <span class="bold"><strong>Precise</strong></span> reflection, where each field type
+          is represented as it actually exists, even if the type is itself a user-defined
+          type.
+        </li>
+<li class="listitem">
+          <span class="bold"><strong>Flat</strong></span> reflection, where user-defined types
+          are represented by their individual field types, and all other types are
+          represented as they actually exists.
+        </li>
+</ul></div>
+<p>
+      As an example:
     </p>
 <pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">pfr</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
 
@@ -170,7 +184,7 @@
 </div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
-<td align="left"><p><small>Last revised: August 13, 2017 at 08:48:57 GMT</small></p></td>
+<td align="left"><p><small>Last revised: August 19, 2017 at 09:21:16 GMT</small></p></td>
 <td align="right"><div class="copyright-footer"></div></td>
 </tr></table>
 <hr>
