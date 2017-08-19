@@ -26,10 +26,15 @@ No macro or other type/member registrations required.]
 
 [import ../example/examples.cpp]
 
+The two different types of reflection are:
 
-[*Flat] reflection stands for representing the type as if all the fields of nested types were listed directly into the type:
+* [*Precise] reflection, where each field type is represented as it actually exists, even if the type is itself a user-defined type.
+* [*Flat] reflection, where user-defined types are represented by their individual field types, and all other types are represented as they actually exists.
+
+As an example:
 
 [pfr_intro]
+
 
 Boost.Precise and Flat Reflection (Boost.PFR) adds following out-of-the-box functionality for aggregate initializable structures:
 
