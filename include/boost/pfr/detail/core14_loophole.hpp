@@ -28,7 +28,12 @@
 #include <boost/pfr/detail/cast_to_layout_compatible.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
 #include <boost/pfr/detail/flatten_tuple_recursively.hpp>
+#include <boost/pfr/detail/for_each_field_impl.hpp>
+#include <boost/pfr/detail/make_flat_tuple_of_references.hpp>
 #include <boost/pfr/detail/sequence_tuple.hpp>
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnon-template-friend"
 
 namespace boost { namespace pfr { namespace detail {
 
@@ -84,13 +89,17 @@ struct loophole_type_list< T, std::index_sequence<NN...> >
 // Internal API:
 
 template <class T>
-decltype(auto) tie_as_tuple(T&& val) noexcept {
+auto tie_as_tuple(T&& val) noexcept {
     typedef std::remove_reference_t<T> type;
 
-    using indexes = std::make_index_sequence<fields_count<type>;
+    using indexes = std::make_index_sequence<fields_count<type>()>;
     using tuple_type = typename loophole_type_list<type, indexes>::type;
 
-    return cast_to_layout_compatible<tuple_type>(std::forward<T>(val));
+    return make_flat_tuple_of_references(
+        cast_to_layout_compatible<tuple_type>(std::forward<T>(val)),
+        size_t_<0>{},
+        size_t_<tuple_type::size_v>{}
+    );
 }
 
 template <class T, class F, std::size_t... I>
@@ -101,13 +110,26 @@ void for_each_field_dispatcher(T&& t, F&& f, std::index_sequence<I...>) {
 }
 
 template <class T>
-decltype(auto) tie_as_flat_tuple(T&& t) {
+auto tie_as_flat_tuple(const T& t) {
     return flatten_tuple_recursively(
-        tie_as_tuple(std::forward<T>(t))
+        tie_as_tuple(t)
     );
 }
 
+template <class T>
+auto tie_as_flat_tuple(T& t) {
+    return flatten_tuple_recursively(
+        tie_as_tuple(t)
+    );
+}
+
+
+template <class T>
+using tie_as_tuple_t = decltype( ::boost::pfr::detail::tie_as_tuple(std::declval<T&>()) );
+
 }}} // namespace boost::pfr::detail
+
+#pragma GCC diagnostic pop
 
 #endif // BOOST_PFR_DETAIL_CORE14_LOOPHOLE_HPP
 

@@ -17,7 +17,7 @@ namespace boost { namespace pfr { namespace detail {
 
 // Forward declarations:
 template <class T> auto flatten_tuple_recursively(T&& val) noexcept;
-template <class T> decltype(auto) tie_as_tuple(T&& val) noexcept;
+template <class T> auto tie_as_tuple(T&& val) noexcept;
 
 template <class T>
 auto tie_or_value(T&& val, std::enable_if_t<std::is_class< std::remove_reference_t<T> >::value>* = 0) noexcept {
