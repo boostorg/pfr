@@ -22,8 +22,12 @@
 
 #include <boost/pfr/detail/config.hpp>
 
+#include <type_traits>
+#include <utility>
+
 #include <boost/pfr/detail/cast_to_layout_compatible.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
+#include <boost/pfr/detail/flatten_tuple_recursively.hpp>
 #include <boost/pfr/detail/sequence_tuple.hpp>
 
 namespace boost { namespace pfr { namespace detail {
@@ -55,12 +59,12 @@ struct fn_def<T, U, N, true> {};
 // Important point, using sizeof seems to be more reliable. Also default template
 // arguments are "cached" (I think). To fix that I provide a U template parameter to
 // the ins functions which do the detection using constexpr friend functions and SFINAE.
-template<typename T, int N>
+template<typename T, std::size_t N>
 struct loophole_ubiq {
-    template<typename U, int M> static auto ins(...) -> int;
-    template<typename U, int M, int = cloophole(tag<T,M>{}) > static auto ins(int) -> char;
+    template<typename U, std::size_t M> static auto ins(...) -> int;
+    template<typename U, std::size_t M, int = cloophole(tag<T,M>{}) > static auto ins(int) -> char;
 
-    template<typename U, int = sizeof(fn_def<T, U, N, sizeof(ins<U, N>(0)) == sizeof(char)>)>
+    template<typename U, std::size_t = sizeof(fn_def<T, U, N, sizeof(ins<U, N>(0)) == sizeof(char)>)>
     constexpr operator U() noexcept;
 };
 
@@ -70,13 +74,17 @@ template<typename T, typename U>
 struct loophole_type_list;
 
 template<typename T, std::size_t... NN>
-struct loophole_type_list< T, std::index_sequence<NN...> > {
+struct loophole_type_list< T, std::index_sequence<NN...> >
+    : sequence_tuple::tuple< decltype(T{ loophole_ubiq<T, NN>{}... }, 0) > // Instantiating loopholes.
+{
     using type = sequence_tuple::tuple< decltype(loophole(tag<T, NN>{}))... >;
 };
 
 
+// Internal API:
+
 template <class T>
-decltype(auto) as_tuple(T&& val) noexcept {
+decltype(auto) tie_as_tuple(T&& val) noexcept {
     typedef std::remove_reference_t<T> type;
 
     using indexes = std::make_index_sequence<fields_count<type>;
@@ -85,6 +93,19 @@ decltype(auto) as_tuple(T&& val) noexcept {
     return cast_to_layout_compatible<tuple_type>(std::forward<T>(val));
 }
 
+template <class T, class F, std::size_t... I>
+void for_each_field_dispatcher(T&& t, F&& f, std::index_sequence<I...>) {
+    std::forward<F>(f)(
+        detail::tie_as_tuple(std::forward<T>(t))
+    );
+}
+
+template <class T, class F, std::size_t... I>
+void tie_as_flat_tuple(T&& t) {
+    return flatten_tuple_recursively(
+        tie_as_tuple(std::forward<T>(t))
+    );
+}
 
 }}} // namespace boost::pfr::detail
 

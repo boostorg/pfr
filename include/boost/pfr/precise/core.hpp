@@ -39,14 +39,14 @@ namespace boost { namespace pfr {
 /// \endcode
 template <std::size_t I, class T>
 constexpr decltype(auto) get(const T& val) noexcept {
-    return detail::sequence_tuple::get<I>( detail::as_tuple(val) );
+    return detail::sequence_tuple::get<I>( detail::tie_as_tuple(val) );
 }
 
 
 /// \overload get
 template <std::size_t I, class T>
 constexpr decltype(auto) get(T& val) noexcept {
-    return detail::sequence_tuple::get<I>( detail::as_tuple(val) );
+    return detail::sequence_tuple::get<I>( detail::tie_as_tuple(val) );
 }
 
 
@@ -59,7 +59,7 @@ constexpr decltype(auto) get(T& val) noexcept {
 ///     std::vector<  boost::pfr::tuple_element<0, my_structure>::type  > v;
 /// \endcode
 template <std::size_t I, class T>
-using tuple_element = detail::sequence_tuple::tuple_element<I, detail::as_tuple_t<T> >;
+using tuple_element = detail::sequence_tuple::tuple_element<I, detail::tie_as_tuple_t<T> >;
 
 
 /// \brief Type of a field with index `I` in aggregate `T`.
@@ -89,10 +89,10 @@ using tuple_element_t = typename tuple_element<I, T>::type;
 /// \endcode
 template <class T>
 constexpr auto structure_to_tuple(const T& val) noexcept {
-    typedef detail::as_tuple_t<T> internal_tuple_t;
+    typedef detail::tie_as_tuple_t<T> internal_tuple_t;
 
     return detail::make_stdtuple_from_tietuple(
-        detail::as_tuple(val),
+        detail::tie_as_tuple(val),
         std::make_index_sequence< internal_tuple_t::size_v >()
     );
 }
@@ -113,10 +113,10 @@ constexpr auto structure_to_tuple(const T& val) noexcept {
 /// \endcode
 template <class T>
 constexpr auto structure_tie(T& val) noexcept {
-    typedef detail::as_tuple_t<T> internal_tuple_t;
+    typedef detail::tie_as_tuple_t<T> internal_tuple_t;
 
     return detail::make_stdtiedtuple_from_tietuple(
-        detail::as_tuple(val),
+        detail::tie_as_tuple(val),
         std::make_index_sequence< internal_tuple_t::size_v >()
     );
 }

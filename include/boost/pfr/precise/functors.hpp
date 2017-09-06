@@ -31,7 +31,7 @@ namespace detail {
         typedef Visitor<0, fields_count_min> visitor_t;
 
 #if BOOST_PFR_USE_CPP17
-        return visitor_t::cmp(detail::as_tuple(x), detail::as_tuple(y));
+        return visitor_t::cmp(detail::tie_as_tuple(x), detail::tie_as_tuple(y));
 #else
         bool result = true;
         ::boost::pfr::detail::for_each_field_dispatcher(
@@ -246,7 +246,7 @@ template <class T> struct hash {
     std::size_t operator()(const T& x) const {
         constexpr std::size_t fields_count = detail::fields_count<std::remove_reference_t<T>>();
 #if BOOST_PFR_USE_CPP17
-        return detail::hash_impl<0, fields_count>::compute(detail::as_tuple(x));
+        return detail::hash_impl<0, fields_count>::compute(detail::tie_as_tuple(x));
 #else
         std::size_t result = 0;
         ::boost::pfr::detail::for_each_field_dispatcher(

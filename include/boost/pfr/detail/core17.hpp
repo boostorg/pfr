@@ -44,7 +44,7 @@ static_assert(
 template <class T, class F, std::size_t... I>
 void for_each_field_dispatcher(T&& t, F&& f, std::index_sequence<I...>) {
     std::forward<F>(f)(
-        detail::as_tuple(std::forward<T>(t))
+        detail::tie_as_tuple(std::forward<T>(t))
     );
 }
 

@@ -29,301 +29,301 @@ constexpr auto make_tuple_of_references(Args&&... args) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& /*val*/, size_t_<0>) noexcept {
+constexpr auto tie_as_tuple(T&& /*val*/, size_t_<0>) noexcept {
   return sequence_tuple::tuple<>{};
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<1>, std::enable_if_t<std::is_class< std::remove_cv_t<std::remove_reference_t<T>> >::value>* = 0) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<1>, std::enable_if_t<std::is_class< std::remove_cv_t<std::remove_reference_t<T>> >::value>* = 0) noexcept {
   auto& [a] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a);
 }
 
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<1>, std::enable_if_t<!std::is_class< std::remove_cv_t<std::remove_reference_t<T>> >::value>* = 0) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<1>, std::enable_if_t<!std::is_class< std::remove_cv_t<std::remove_reference_t<T>> >::value>* = 0) noexcept {
   return ::boost::pfr::detail::make_tuple_of_references( std::forward<T>(val) );
 }
 
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<2>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<2>) noexcept {
   auto& [a,b] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<3>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<3>) noexcept {
   auto& [a,b,c] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<4>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<4>) noexcept {
   auto& [a,b,c,d] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<5>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<5>) noexcept {
   auto& [a,b,c,d,e] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<6>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<6>) noexcept {
   auto& [a,b,c,d,e,f] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<7>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<7>) noexcept {
   auto& [a,b,c,d,e,f,g] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<8>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<8>) noexcept {
   auto& [a,b,c,d,e,f,g,h] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<9>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<9>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<10>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<10>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<11>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<11>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<12>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<12>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<13>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<13>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<14>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<14>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<15>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<15>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<16>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<16>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<17>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<17>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<18>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<18>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<19>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<19>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<20>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<20>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<21>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<21>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<22>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<22>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<23>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<23>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<24>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<24>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<25>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<25>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<26>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<26>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<27>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<27>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<28>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<28>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<29>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<29>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<30>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<30>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<31>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<31>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<32>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<32>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<33>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<33>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<34>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<34>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<35>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<35>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<36>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<36>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<37>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<37>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<38>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<38>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<39>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<39>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<40>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<40>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<41>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<41>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<42>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<42>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<43>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<43>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<44>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<44>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<45>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<45>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<46>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<46>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<47>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<47>) noexcept {
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z);
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<48>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<48>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa
@@ -336,7 +336,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<48>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<49>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<49>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab
@@ -349,7 +349,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<49>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<50>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<50>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac
@@ -362,7 +362,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<50>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<51>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<51>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad
@@ -375,7 +375,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<51>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<52>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<52>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae
@@ -388,7 +388,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<52>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<53>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<53>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af
@@ -401,7 +401,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<53>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<54>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<54>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag
@@ -414,7 +414,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<54>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<55>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<55>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah
@@ -427,7 +427,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<55>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<56>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<56>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj
@@ -440,7 +440,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<56>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<57>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<57>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak
@@ -453,7 +453,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<57>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<58>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<58>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al
@@ -466,7 +466,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<58>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<59>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<59>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am
@@ -479,7 +479,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<59>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<60>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<60>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an
@@ -492,7 +492,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<60>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<61>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<61>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap
@@ -505,7 +505,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<61>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<62>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<62>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq
@@ -518,7 +518,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<62>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<63>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<63>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar
@@ -531,7 +531,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<63>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<64>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<64>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as
@@ -544,7 +544,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<64>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<65>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<65>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at
@@ -557,7 +557,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<65>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<66>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<66>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au
@@ -570,7 +570,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<66>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<67>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<67>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av
@@ -583,7 +583,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<67>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<68>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<68>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw
@@ -596,7 +596,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<68>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<69>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<69>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax
@@ -609,7 +609,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<69>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<70>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<70>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay
@@ -622,7 +622,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<70>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<71>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<71>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az
@@ -635,7 +635,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<71>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<72>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<72>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA
@@ -648,7 +648,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<72>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<73>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<73>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB
@@ -661,7 +661,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<73>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<74>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<74>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC
@@ -674,7 +674,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<74>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<75>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<75>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD
@@ -687,7 +687,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<75>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<76>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<76>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE
@@ -700,7 +700,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<76>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<77>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<77>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF
@@ -713,7 +713,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<77>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<78>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<78>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG
@@ -726,7 +726,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<78>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<79>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<79>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH
@@ -739,7 +739,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<79>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<80>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<80>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ
@@ -752,7 +752,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<80>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<81>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<81>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK
@@ -765,7 +765,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<81>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<82>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<82>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL
@@ -778,7 +778,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<82>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<83>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<83>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM
@@ -791,7 +791,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<83>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<84>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<84>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN
@@ -804,7 +804,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<84>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<85>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<85>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP
@@ -817,7 +817,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<85>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<86>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<86>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ
@@ -830,7 +830,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<86>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<87>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<87>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR
@@ -843,7 +843,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<87>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<88>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<88>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS
@@ -856,7 +856,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<88>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<89>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<89>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU
@@ -869,7 +869,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<89>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<90>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<90>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV
@@ -882,7 +882,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<90>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<91>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<91>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW
@@ -895,7 +895,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<91>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<92>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<92>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX
@@ -908,7 +908,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<92>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<93>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<93>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY
@@ -921,7 +921,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<93>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<94>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<94>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ
@@ -934,7 +934,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<94>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<95>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<95>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
@@ -949,7 +949,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<95>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<96>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<96>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
@@ -964,7 +964,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<96>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<97>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<97>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
@@ -979,7 +979,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<97>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<98>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<98>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
@@ -994,7 +994,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<98>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<99>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<99>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
@@ -1009,7 +1009,7 @@ constexpr auto as_tuple_impl(T&& val, size_t_<99>) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<100>) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<100>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
@@ -1027,19 +1027,19 @@ constexpr auto as_tuple_impl(T&& val, size_t_<100>) noexcept {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template <class T>
-constexpr auto as_tuple(const T& val) noexcept {
+constexpr auto tie_as_tuple(const T& val) noexcept {
   typedef size_t_<fields_count<T>()> fields_count_tag;
-  return boost::pfr::detail::as_tuple_impl(val, fields_count_tag{});
+  return boost::pfr::detail::tie_as_tuple(val, fields_count_tag{});
 }
 
 template <class T>
-constexpr auto as_tuple(T& val) noexcept {
+constexpr auto tie_as_tuple(T& val) noexcept {
   typedef size_t_<fields_count<T>()> fields_count_tag;
-  return boost::pfr::detail::as_tuple_impl(val, fields_count_tag{});
+  return boost::pfr::detail::tie_as_tuple(val, fields_count_tag{});
 }
 
 template <class T>
-using as_tuple_t = decltype( ::boost::pfr::detail::as_tuple(std::declval<T&>()) );
+using tie_as_tuple_t = decltype( ::boost::pfr::detail::tie_as_tuple(std::declval<T&>()) );
 
 }}} // namespace boost::pfr::detail
 

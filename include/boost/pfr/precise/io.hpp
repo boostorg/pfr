@@ -42,7 +42,7 @@ void write(std::basic_ostream<Char, Traits>& out, const T& value) {
     constexpr std::size_t fields_count = detail::fields_count<std::remove_reference_t<T>>();
     out << '{';
 #if BOOST_PFR_USE_CPP17
-    detail::print_impl<0, fields_count>::print(out, detail::as_tuple(value));
+    detail::print_impl<0, fields_count>::print(out, detail::tie_as_tuple(value));
 #else
     ::boost::pfr::detail::for_each_field_dispatcher(
         value,
@@ -84,7 +84,7 @@ void read(std::basic_istream<Char, Traits>& in, T& value) {
     if (parenthis != '{') in.setstate(std::basic_istream<Char, Traits>::failbit);
 
 #if BOOST_PFR_USE_CPP17
-    detail::read_impl<0, fields_count>::read(in, detail::as_tuple(value));
+    detail::read_impl<0, fields_count>::read(in, detail::tie_as_tuple(value));
 #else
     ::boost::pfr::detail::for_each_field_dispatcher(
         value,
