@@ -526,14 +526,14 @@ constexpr bool is_flat_refelectable(std::index_sequence<I...>) noexcept {
 }
 
 template <class T>
-decltype(auto) tie_as_flat_tuple(T&& val) noexcept {
+auto tie_as_flat_tuple(T&& val) noexcept {
     typedef internal_tuple_with_same_alignment_t<std::remove_reference_t<T>> tuple_type;
     auto&& t = cast_to_layout_compatible<tuple_type>(std::forward<T>(val));
     return make_flat_tuple_of_references(std::forward<decltype(t)>(t), size_t_<0>{}, size_t_<tuple_type::size_v>{});
 }
 
 template <class T>
-decltype(auto) tie_as_tuple(T&& val) noexcept {
+auto tie_as_tuple(T&& val) noexcept {
     typedef std::remove_reference_t<T> type;
     static_assert(
         boost::pfr::detail::is_flat_refelectable<type>( std::make_index_sequence<fields_count<type>()>{} ),

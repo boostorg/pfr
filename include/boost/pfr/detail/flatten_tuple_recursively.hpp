@@ -16,30 +16,32 @@
 namespace boost { namespace pfr { namespace detail {
 
 // Forward declarations:
-template <class T> decltype(auto) flatten_tuple_recursively(T&& val) noexcept;
+template <class T> auto flatten_tuple_recursively(T&& val) noexcept;
 template <class T> decltype(auto) tie_as_tuple(T&& val) noexcept;
 
 template <class T>
-decltype(auto) tie_or_value(T&& val, std::enable_if_t<std::is_class< std::remove_reference_t<T> >::value>* = 0) noexcept {
-    return flatten_tuple(std::forward<T>(val));
+auto tie_or_value(T&& val, std::enable_if_t<std::is_class< std::remove_reference_t<T> >::value>* = 0) noexcept {
+    return flatten_tuple_recursively(
+        tie_as_tuple(std::forward<T>(val))
+    );
 }
 
 template <class T>
-decltype(auto) tie_or_value(T&& val, std::enable_if_t<!std::is_class< std::remove_reference_t<T> >::value>* = 0) noexcept {
+decltype(auto) tie_or_value(T&& val, std::enable_if_t<!std::is_class< std::remove_reference_t<T> >::value && !std::is_array< std::remove_reference_t<T> >::value>* = 0) noexcept {
     return std::forward<T>(val);
 }
 
 template <class T, std::size_t... I>
-decltype(auto) flatten_tuple_recursively_impl(T&& tup, std::index_sequence<I...> ) noexcept {
+auto flatten_tuple_recursively_impl(T&& tup, std::index_sequence<I...> ) noexcept {
     return sequence_tuple::tuple<
         decltype(tie_or_value(sequence_tuple::get<I>(std::forward<T>(tup))))...
     >{tie_or_value(sequence_tuple::get<I>(std::forward<T>(tup)))...};
 }
 
 template <class T>
-decltype(auto) flatten_tuple_recursively(T&& tup) noexcept {
+auto flatten_tuple_recursively(T&& tup) noexcept {
     using indexes = std::make_index_sequence<T::size_v>;
-    return flatten_tuple_impl(std::forward<T>(tup), indexes{});
+    return flatten_tuple_recursively_impl(std::forward<T>(tup), indexes{});
 }
 
 }}} // namespace boost::pfr::detail

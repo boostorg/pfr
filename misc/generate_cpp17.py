@@ -44,19 +44,19 @@ constexpr auto make_tuple_of_references(Args&&... args) noexcept {
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& /*val*/, size_t_<0>) noexcept {
+constexpr auto tie_as_tuple(T&& /*val*/, size_t_<0>) noexcept {
   return sequence_tuple::tuple<>{};
 }
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<1>, std::enable_if_t<std::is_class< std::remove_cv_t<std::remove_reference_t<T>> >::value>* = 0) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<1>, std::enable_if_t<std::is_class< std::remove_cv_t<std::remove_reference_t<T>> >::value>* = 0) noexcept {
   auto& [a] = std::forward<T>(val);
   return ::boost::pfr::detail::make_tuple_of_references(a);
 }
 
 
 template <class T>
-constexpr auto as_tuple_impl(T&& val, size_t_<1>, std::enable_if_t<!std::is_class< std::remove_cv_t<std::remove_reference_t<T>> >::value>* = 0) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<1>, std::enable_if_t<!std::is_class< std::remove_cv_t<std::remove_reference_t<T>> >::value>* = 0) noexcept {
   return ::boost::pfr::detail::make_tuple_of_references( std::forward<T>(val) );
 }
 
@@ -67,19 +67,19 @@ EPILOGUE = """
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template <class T>
-constexpr auto as_tuple(const T& val) noexcept {
+constexpr auto tie_as_tuple(const T& val) noexcept {
   typedef size_t_<fields_count<T>()> fields_count_tag;
-  return boost::pfr::detail::as_tuple_impl(val, fields_count_tag{});
+  return boost::pfr::detail::tie_as_tuple(val, fields_count_tag{});
 }
 
 template <class T>
-constexpr auto as_tuple(T& val) noexcept {
+constexpr auto tie_as_tuple(T& val) noexcept {
   typedef size_t_<fields_count<T>()> fields_count_tag;
-  return boost::pfr::detail::as_tuple_impl(val, fields_count_tag{});
+  return boost::pfr::detail::tie_as_tuple(val, fields_count_tag{});
 }
 
 template <class T>
-using as_tuple_t = decltype( ::boost::pfr::detail::as_tuple(std::declval<T&>()) );
+using tie_as_tuple_t = decltype( ::boost::pfr::detail::tie_as_tuple(std::declval<T&>()) );
 
 }}} // namespace boost::pfr::detail
 
@@ -93,8 +93,8 @@ generate_sfinae_attempts = False
 if generate_sfinae_attempts:
     print """
     template <class T, std::size_t I>
-    constexpr auto as_tuple_impl(T&& val, size_t_<I>) noexcept {
-      return as_tuple_impl( std::forward<T>(val), size_t_<I - 1>{});
+    constexpr auto tie_as_tuple(T&& val, size_t_<I>) noexcept {
+      return tie_as_tuple( std::forward<T>(val), size_t_<I - 1>{});
     }
     """
 
@@ -114,7 +114,7 @@ for i in xrange(1, funcs_count):
     indexes += ascii_letters[i % max_args_on_a_line]
 
     print "template <class T>"
-    print "constexpr auto as_tuple_impl(T&& val, size_t_<" + str(i + 1) + ">) noexcept {"
+    print "constexpr auto tie_as_tuple(T&& val, size_t_<" + str(i + 1) + ">) noexcept {"
     if i < max_args_on_a_line:
         print "  auto& [" + indexes.strip() + "] = std::forward<T>(val);"
         print "  return ::boost::pfr::detail::make_tuple_of_references(" + indexes.strip() + ");"
@@ -131,8 +131,8 @@ for i in xrange(1, funcs_count):
 
     if generate_sfinae_attempts:
         print "template <class T>"
-        print "constexpr auto as_tuple_impl(T&& val, size_t_<" + str(i + 1) + "> v) noexcept"
-        print "  ->decltype( ::boost::pfr::detail::as_tuple_impl0(std::forward<T>(val), v) )"
-        print "{ return ::boost::pfr::detail::as_tuple_impl0(std::forward<T>(val), v); }\n"
+        print "constexpr auto tie_as_tuple(T&& val, size_t_<" + str(i + 1) + "> v) noexcept"
+        print "  ->decltype( ::boost::pfr::detail::tie_as_tuple0(std::forward<T>(val), v) )"
+        print "{ return ::boost::pfr::detail::tie_as_tuple0(std::forward<T>(val), v); }\n"
 
 print EPILOGUE

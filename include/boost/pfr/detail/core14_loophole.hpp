@@ -100,8 +100,8 @@ void for_each_field_dispatcher(T&& t, F&& f, std::index_sequence<I...>) {
     );
 }
 
-template <class T, class F, std::size_t... I>
-void tie_as_flat_tuple(T&& t) {
+template <class T>
+decltype(auto) tie_as_flat_tuple(T&& t) {
     return flatten_tuple_recursively(
         tie_as_tuple(std::forward<T>(t))
     );
