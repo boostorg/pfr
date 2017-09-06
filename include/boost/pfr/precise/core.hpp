@@ -14,6 +14,7 @@
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/stdtuple.hpp>
+#include <boost/pfr/detail/for_each_field_impl.hpp>
 
 #include <boost/pfr/precise/tuple_size.hpp>
 #if BOOST_PFR_USE_CPP17
@@ -59,7 +60,7 @@ constexpr decltype(auto) get(T& val) noexcept {
 ///     std::vector<  boost::pfr::tuple_element<0, my_structure>::type  > v;
 /// \endcode
 template <std::size_t I, class T>
-using tuple_element = detail::sequence_tuple::tuple_element<I, detail::tie_as_tuple_t<T> >;
+using tuple_element = detail::sequence_tuple::tuple_element<I, decltype( ::boost::pfr::detail::tie_as_tuple(std::declval<T&>()) ) >;
 
 
 /// \brief Type of a field with index `I` in aggregate `T`.
@@ -89,11 +90,9 @@ using tuple_element_t = typename tuple_element<I, T>::type;
 /// \endcode
 template <class T>
 constexpr auto structure_to_tuple(const T& val) noexcept {
-    typedef detail::tie_as_tuple_t<T> internal_tuple_t;
-
     return detail::make_stdtuple_from_tietuple(
         detail::tie_as_tuple(val),
-        std::make_index_sequence< internal_tuple_t::size_v >()
+        std::make_index_sequence< tuple_size_v<T> >()
     );
 }
 
@@ -113,11 +112,9 @@ constexpr auto structure_to_tuple(const T& val) noexcept {
 /// \endcode
 template <class T>
 constexpr auto structure_tie(T& val) noexcept {
-    typedef detail::tie_as_tuple_t<T> internal_tuple_t;
-
     return detail::make_stdtiedtuple_from_tietuple(
         detail::tie_as_tuple(val),
-        std::make_index_sequence< internal_tuple_t::size_v >()
+        std::make_index_sequence< tuple_size_v<T> >()
     );
 }
 

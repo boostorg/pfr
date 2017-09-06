@@ -10,7 +10,11 @@
 #include <boost/pfr/detail/config.hpp>
 
 #include <boost/pfr/detail/functional.hpp>
-#include <boost/pfr/flat/core.hpp>
+#if BOOST_PFR_USE_CPP17
+#   include <boost/pfr/detail/core17.hpp>
+#else
+#   include <boost/pfr/detail/core14.hpp>
+#endif
 
 /// \file boost/pfr/functors.hpp
 /// Contains functors that are close to the Standard Library ones.

@@ -15,7 +15,6 @@
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/cast_to_layout_compatible.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
-#include <boost/pfr/detail/for_each_field_impl.hpp>
 #include <boost/pfr/detail/make_flat_tuple_of_references.hpp>
 #include <boost/pfr/detail/size_array.hpp>
 
@@ -528,24 +527,34 @@ constexpr bool is_flat_refelectable(std::index_sequence<I...>) noexcept {
 template <class T>
 auto tie_as_flat_tuple(T&& val) noexcept {
     typedef internal_tuple_with_same_alignment_t<std::remove_reference_t<T>> tuple_type;
-    auto&& t = cast_to_layout_compatible<tuple_type>(std::forward<T>(val));
-    return make_flat_tuple_of_references(std::forward<decltype(t)>(t), size_t_<0>{}, size_t_<tuple_type::size_v>{});
+    auto& t = cast_to_layout_compatible<tuple_type>(std::forward<T>(val));
+    return make_flat_tuple_of_references(t, size_t_<0>{}, size_t_<tuple_type::size_v>{});
 }
 
+#if !BOOST_PFR_USE_CPP17
+
 template <class T>
-auto tie_as_tuple(T&& val) noexcept {
-    typedef std::remove_reference_t<T> type;
+auto tie_as_tuple(T& val) noexcept {
+    typedef T type;
     static_assert(
         boost::pfr::detail::is_flat_refelectable<type>( std::make_index_sequence<fields_count<type>()>{} ),
         "Not possible in C++14 to represent that type without loosing information. Use boost::pfr::flat_ version, or change type definition, or enable C++17"
     );
-    return tie_as_flat_tuple(std::forward<T>(val));
+    return tie_as_flat_tuple(val);
 }
 
+
 template <class T>
-using tie_as_tuple_t = decltype( ::boost::pfr::detail::tie_as_tuple(std::declval<T&>()) );
+auto tie_as_tuple(const T& val) noexcept {
+    typedef T type;
+    static_assert(
+        boost::pfr::detail::is_flat_refelectable<type>( std::make_index_sequence<fields_count<type>()>{} ),
+        "Not possible in C++14 to represent that type without loosing information. Use boost::pfr::flat_ version, or change type definition, or enable C++17"
+    );
+    return tie_as_flat_tuple(val);
+}
 
-
+#endif // #if !BOOST_PFR_USE_CPP17
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -609,9 +618,9 @@ void for_each_field_in_depth(T&& t, F&& f, std::index_sequence<I0, I...>, identi
 
 template <class T, class F, class... Fields>
 void for_each_field_in_depth(T&& t, F&& f, std::index_sequence<>, identity<Fields>...) {
-    auto&& tuple = cast_to_layout_compatible< ::boost::pfr::detail::sequence_tuple::tuple<Fields...> >(std::forward<T>(t));
+    auto& tuple = cast_to_layout_compatible< ::boost::pfr::detail::sequence_tuple::tuple<Fields...> >(std::forward<T>(t));
     std::forward<F>(f)(
-        make_flat_tuple_of_references(std::forward<decltype(tuple)>(tuple), size_t_<0>{}, size_t_<sizeof...(Fields)>{})
+        make_flat_tuple_of_references(tuple, size_t_<0>{}, size_t_<sizeof...(Fields)>{})
     );
 }
 

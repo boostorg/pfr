@@ -78,9 +78,6 @@ constexpr auto tie_as_tuple(T& val) noexcept {
   return boost::pfr::detail::tie_as_tuple(val, fields_count_tag{});
 }
 
-template <class T>
-using tie_as_tuple_t = decltype( ::boost::pfr::detail::tie_as_tuple(std::declval<T&>()) );
-
 }}} // namespace boost::pfr::detail
 
 #endif // BOOST_PFR_DETAIL_CORE17_GENERATED_HPP

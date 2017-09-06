@@ -28,7 +28,6 @@
 #include <boost/pfr/detail/cast_to_layout_compatible.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
 #include <boost/pfr/detail/flatten_tuple_recursively.hpp>
-#include <boost/pfr/detail/for_each_field_impl.hpp>
 #include <boost/pfr/detail/make_flat_tuple_of_references.hpp>
 #include <boost/pfr/detail/sequence_tuple.hpp>
 
@@ -122,10 +121,6 @@ auto tie_as_flat_tuple(T& t) {
         tie_as_tuple(t)
     );
 }
-
-
-template <class T>
-using tie_as_tuple_t = decltype( ::boost::pfr::detail::tie_as_tuple(std::declval<T&>()) );
 
 }}} // namespace boost::pfr::detail
 

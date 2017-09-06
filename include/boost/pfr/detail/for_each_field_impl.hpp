@@ -15,6 +15,9 @@
 
 namespace boost { namespace pfr { namespace detail {
 
+template <std::size_t Index>
+using size_t_ = std::integral_constant<std::size_t, Index >;
+
 template <class T, class F, class I, class = decltype(std::declval<F>()(std::declval<T>(), I{}))>
 void for_each_field_impl(T&& v, F&& f, I i, long) {
     std::forward<F>(f)(std::forward<T>(v), i);
