@@ -27,12 +27,21 @@
 
 #include <boost/pfr/detail/cast_to_layout_compatible.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
-#include <boost/pfr/detail/flatten_tuple_recursively.hpp>
 #include <boost/pfr/detail/make_flat_tuple_of_references.hpp>
 #include <boost/pfr/detail/sequence_tuple.hpp>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnon-template-friend"
+
+#ifdef __clang__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wmissing-braces"
+#   pragma clang diagnostic ignored "-Wundefined-inline"
+#   pragma clang diagnostic ignored "-Wundefined-internal"
+#   pragma clang diagnostic ignored "-Wmissing-field-initializers"
+#elif defined(__GNUC__)
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wnon-template-friend"
+#endif
+
 
 namespace boost { namespace pfr { namespace detail {
 
@@ -41,21 +50,21 @@ namespace boost { namespace pfr { namespace detail {
 // The second one is used in the detection of instantiations without which we'd get multiple
 // definitions.
 
-template<typename T, int N>
+template<typename T, std::size_t N>
 struct tag {
     friend auto loophole(tag<T,N>);
-    constexpr friend int cloophole(tag<T,N>);
+    constexpr friend std::size_t cloophole(tag<T,N>);
 };
 
 // The definitions of friend functions.
-template<typename T, typename U, int N, bool B>
+template<typename T, typename U, std::size_t N, bool B>
 struct fn_def {
-    friend auto loophole(tag<T,N>) { return U{}; }
-    constexpr friend int cloophole(tag<T,N>) { return 0; }
+    friend auto loophole(tag<T,N>) { return std::remove_all_extents_t<U>{}; }
+    constexpr friend std::size_t cloophole(tag<T,N>) { return 0; }
 };
 
 // This specialization is to avoid multiple definition errors.
-template<typename T, typename U, int N>
+template<typename T, typename U, std::size_t N>
 struct fn_def<T, U, N, true> {};
 
 
@@ -65,8 +74,8 @@ struct fn_def<T, U, N, true> {};
 // the ins functions which do the detection using constexpr friend functions and SFINAE.
 template<typename T, std::size_t N>
 struct loophole_ubiq {
-    template<typename U, std::size_t M> static auto ins(...) -> int;
-    template<typename U, std::size_t M, int = cloophole(tag<T,M>{}) > static auto ins(int) -> char;
+    template<typename U, std::size_t M> static auto ins(...) -> std::size_t;
+    template<typename U, std::size_t M, std::size_t = cloophole(tag<T,M>{}) > static auto ins(int) -> char;
 
     template<typename U, std::size_t = sizeof(fn_def<T, U, N, sizeof(ins<U, N>(0)) == sizeof(char)>)>
     constexpr operator U() noexcept;
@@ -77,54 +86,111 @@ struct loophole_ubiq {
 template<typename T, typename U>
 struct loophole_type_list;
 
-template<typename T, std::size_t... NN>
-struct loophole_type_list< T, std::index_sequence<NN...> >
-    : sequence_tuple::tuple< decltype(T{ loophole_ubiq<T, NN>{}... }, 0) > // Instantiating loopholes.
+template<typename T, std::size_t... I>
+struct loophole_type_list< T, std::index_sequence<I...> >
+    : sequence_tuple::tuple< decltype(T{ loophole_ubiq<T, I>{}... }, 0) > // Instantiating loopholes.
 {
-    using type = sequence_tuple::tuple< decltype(loophole(tag<T, NN>{}))... >;
+    using type = sequence_tuple::tuple< decltype(loophole(tag<T, I>{}))... >;
 };
 
 
-// Internal API:
-
 template <class T>
-auto tie_as_tuple(T&& val) noexcept {
-    typedef std::remove_reference_t<T> type;
+auto tie_as_tuple_loophole_impl(T&& val) noexcept {
+    typedef std::remove_cv_t<
+        std::remove_reference_t<T>
+    > type;
 
     using indexes = std::make_index_sequence<fields_count<type>()>;
     using tuple_type = typename loophole_type_list<type, indexes>::type;
 
-    return make_flat_tuple_of_references(
-        cast_to_layout_compatible<tuple_type>(std::forward<T>(val)),
+    return boost::pfr::detail::make_flat_tuple_of_references(
+        boost::pfr::detail::cast_to_layout_compatible<tuple_type>(std::forward<T>(val)),
         size_t_<0>{},
         size_t_<tuple_type::size_v>{}
+    );
+}
+
+// Forward declarations:
+template <class T> auto tie_as_tuple_recursively(T&& val) noexcept;
+
+template <class T>
+auto tie_or_value(T&& val, std::enable_if_t<std::is_class< std::remove_reference_t<T> >::value>* = 0) noexcept {
+    return boost::pfr::detail::tie_as_tuple_recursively(
+        boost::pfr::detail::tie_as_tuple_loophole_impl(std::forward<T>(val))
+    );
+}
+
+template <class T>
+decltype(auto) tie_or_value(T&& val, std::enable_if_t<std::is_enum<std::remove_reference_t<T>>::value>* = 0) noexcept {
+    return boost::pfr::detail::cast_to_layout_compatible<
+        std::underlying_type_t<std::remove_reference_t<T> >
+    >( std::forward<T>(val) );
+}
+
+template <class T>
+decltype(auto) tie_or_value(T&& val, std::enable_if_t<!std::is_class< std::remove_reference_t<T> >::value && !std::is_enum< std::remove_reference_t<T> >::value>* = 0) noexcept {
+    return std::forward<T>(val);
+}
+
+template <class T, std::size_t... I>
+auto tie_as_tuple_recursively_impl(T&& tup, std::index_sequence<I...> ) noexcept
+    ->  sequence_tuple::tuple<
+            decltype(boost::pfr::detail::tie_or_value(
+                sequence_tuple::get<I>(std::forward<T>(tup))
+            ))...
+        >
+{
+    return {
+        boost::pfr::detail::tie_or_value(
+            sequence_tuple::get<I>(std::forward<T>(tup))
+        )...
+    };
+}
+
+template <class T>
+auto tie_as_tuple_recursively(T&& tup) noexcept {
+    using indexes = std::make_index_sequence<T::size_v>;
+    return boost::pfr::detail::tie_as_tuple_recursively_impl(std::forward<T>(tup), indexes{});
+}
+
+template <class T>
+auto tie_as_flat_tuple(T&& t) {
+    auto rec_tuples = boost::pfr::detail::tie_as_tuple_recursively(
+        boost::pfr::detail::tie_as_tuple_loophole_impl(std::forward<T>(t))
+    );
+
+    return boost::pfr::detail::make_flat_tuple_of_references(
+        rec_tuples, size_t_<0>{}, size_t_<decltype(rec_tuples)::size_v>{}
+    );
+}
+
+
+#if !BOOST_PFR_USE_CPP17
+template <class T>
+auto tie_as_tuple(T&& val) noexcept {
+    return boost::pfr::detail::tie_as_tuple_loophole_impl(
+        std::forward<T>(val)
     );
 }
 
 template <class T, class F, std::size_t... I>
 void for_each_field_dispatcher(T&& t, F&& f, std::index_sequence<I...>) {
     std::forward<F>(f)(
-        detail::tie_as_tuple(std::forward<T>(t))
+        boost::pfr::detail::tie_as_tuple_loophole_impl(std::forward<T>(t))
     );
 }
 
-template <class T>
-auto tie_as_flat_tuple(const T& t) {
-    return flatten_tuple_recursively(
-        tie_as_tuple(t)
-    );
-}
-
-template <class T>
-auto tie_as_flat_tuple(T& t) {
-    return flatten_tuple_recursively(
-        tie_as_tuple(t)
-    );
-}
+#endif // #if !BOOST_PFR_USE_CPP17
 
 }}} // namespace boost::pfr::detail
 
-#pragma GCC diagnostic pop
+
+#ifdef __clang__
+#   pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#   pragma GCC diagnostic pop
+#endif
+
 
 #endif // BOOST_PFR_DETAIL_CORE14_LOOPHOLE_HPP
 

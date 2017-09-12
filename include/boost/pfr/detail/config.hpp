@@ -15,6 +15,9 @@
 #   error Boost.PFR library requires C++14.
 #endif
 
+#ifndef BOOST_PFR_USE_LOOPHOLE
+#   define BOOST_PFR_USE_LOOPHOLE 0
+#endif
 
 #ifndef BOOST_PFR_USE_CPP17
 #   ifdef __cpp_structured_bindings

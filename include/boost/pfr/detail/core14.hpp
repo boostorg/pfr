@@ -8,7 +8,11 @@
 #pragma once
 
 #include <boost/pfr/detail/config.hpp>
-//#include <boost/pfr/detail/core14_loophole.hpp>
-#include <boost/pfr/detail/core14_classic.hpp>
+
+#if BOOST_PFR_USE_LOOPHOLE
+#   include <boost/pfr/detail/core14_loophole.hpp>
+#else
+#   include <boost/pfr/detail/core14_classic.hpp>
+#endif
 
 #endif // BOOST_PFR_DETAIL_CORE14_HPP

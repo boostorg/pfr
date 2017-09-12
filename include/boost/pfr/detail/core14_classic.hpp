@@ -527,8 +527,8 @@ constexpr bool is_flat_refelectable(std::index_sequence<I...>) noexcept {
 template <class T>
 auto tie_as_flat_tuple(T&& val) noexcept {
     typedef internal_tuple_with_same_alignment_t<std::remove_reference_t<T>> tuple_type;
-    auto& t = cast_to_layout_compatible<tuple_type>(std::forward<T>(val));
-    return make_flat_tuple_of_references(t, size_t_<0>{}, size_t_<tuple_type::size_v>{});
+    auto& t = boost::pfr::detail::cast_to_layout_compatible<tuple_type>(std::forward<T>(val));
+    return boost::pfr::detail::make_flat_tuple_of_references(t, size_t_<0>{}, size_t_<tuple_type::size_v>{});
 }
 
 #if !BOOST_PFR_USE_CPP17
@@ -540,7 +540,7 @@ auto tie_as_tuple(T& val) noexcept {
         boost::pfr::detail::is_flat_refelectable<type>( std::make_index_sequence<fields_count<type>()>{} ),
         "Not possible in C++14 to represent that type without loosing information. Use boost::pfr::flat_ version, or change type definition, or enable C++17"
     );
-    return tie_as_flat_tuple(val);
+    return boost::pfr::detail::tie_as_flat_tuple(val);
 }
 
 
@@ -551,7 +551,7 @@ auto tie_as_tuple(const T& val) noexcept {
         boost::pfr::detail::is_flat_refelectable<type>( std::make_index_sequence<fields_count<type>()>{} ),
         "Not possible in C++14 to represent that type without loosing information. Use boost::pfr::flat_ version, or change type definition, or enable C++17"
     );
-    return tie_as_flat_tuple(val);
+    return boost::pfr::detail::tie_as_flat_tuple(val);
 }
 
 #endif // #if !BOOST_PFR_USE_CPP17
@@ -587,6 +587,11 @@ struct is_constexpr_aggregate_initializable { // TODO: try to fix it
 };
 
 
+template <class T, class F, std::size_t I0, std::size_t... I, class... Fields>
+void for_each_field_in_depth(T&& t, F&& f, std::index_sequence<I0, I...>, identity<Fields>...);
+
+template <class T, class F, class... Fields>
+void for_each_field_in_depth(T&& t, F&& f, std::index_sequence<>, identity<Fields>...);
 
 template <class T, class F, class IndexSeq, class... Fields>
 struct next_step {
@@ -595,7 +600,7 @@ struct next_step {
 
     template <class Field>
     operator Field() const {
-         for_each_field_in_depth(
+         boost::pfr::detail::for_each_field_in_depth(
              std::forward<T>(t),
              std::forward<F>(f),
              IndexSeq{},
@@ -618,23 +623,23 @@ void for_each_field_in_depth(T&& t, F&& f, std::index_sequence<I0, I...>, identi
 
 template <class T, class F, class... Fields>
 void for_each_field_in_depth(T&& t, F&& f, std::index_sequence<>, identity<Fields>...) {
-    auto& tuple = cast_to_layout_compatible< ::boost::pfr::detail::sequence_tuple::tuple<Fields...> >(std::forward<T>(t));
+    auto& tuple = boost::pfr::detail::cast_to_layout_compatible< ::boost::pfr::detail::sequence_tuple::tuple<Fields...> >(std::forward<T>(t));
     std::forward<F>(f)(
-        make_flat_tuple_of_references(tuple, size_t_<0>{}, size_t_<sizeof...(Fields)>{})
+        boost::pfr::detail::make_flat_tuple_of_references(tuple, size_t_<0>{}, size_t_<sizeof...(Fields)>{})
     );
 }
 
 template <class T, class F, std::size_t... I>
 void for_each_field_dispatcher_1(T&& t, F&& f, std::index_sequence<I...>, std::true_type /*is_flat_refelectable*/) {
     std::forward<F>(f)(
-        tie_as_flat_tuple(std::forward<T>(t))
+        boost::pfr::detail::tie_as_flat_tuple(std::forward<T>(t))
     );
 }
 
 
 template <class T, class F, std::size_t... I>
 void for_each_field_dispatcher_1(T&& t, F&& f, std::index_sequence<I...>, std::false_type /*is_flat_refelectable*/) {
-    for_each_field_in_depth(
+    boost::pfr::detail::for_each_field_in_depth(
         std::forward<T>(t),
         std::forward<F>(f),
         std::index_sequence<I...>{}
