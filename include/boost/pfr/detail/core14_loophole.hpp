@@ -50,21 +50,19 @@ namespace boost { namespace pfr { namespace detail {
 // The second one is used in the detection of instantiations without which we'd get multiple
 // definitions.
 
-template<typename T, std::size_t N>
+template <class T, std::size_t N>
 struct tag {
     friend auto loophole(tag<T,N>);
-    constexpr friend std::size_t cloophole(tag<T,N>);
 };
 
 // The definitions of friend functions.
-template<typename T, typename U, std::size_t N, bool B>
+template <class T, class U, std::size_t N, bool B>
 struct fn_def {
     friend auto loophole(tag<T,N>) { return std::remove_all_extents_t<U>{}; }
-    constexpr friend std::size_t cloophole(tag<T,N>) { return 0; }
 };
 
 // This specialization is to avoid multiple definition errors.
-template<typename T, typename U, std::size_t N>
+template <class T, class U, std::size_t N>
 struct fn_def<T, U, N, true> {};
 
 
@@ -72,21 +70,21 @@ struct fn_def<T, U, N, true> {};
 // Important point, using sizeof seems to be more reliable. Also default template
 // arguments are "cached" (I think). To fix that I provide a U template parameter to
 // the ins functions which do the detection using constexpr friend functions and SFINAE.
-template<typename T, std::size_t N>
+template <class T, std::size_t N>
 struct loophole_ubiq {
-    template<typename U, std::size_t M> static auto ins(...) -> std::size_t;
-    template<typename U, std::size_t M, std::size_t = cloophole(tag<T,M>{}) > static auto ins(int) -> char;
+    template<class U, std::size_t M> static std::size_t ins(...);
+    template<class U, std::size_t M, std::size_t = sizeof(loophole(tag<T,M>{})) > static char ins(int);
 
-    template<typename U, std::size_t = sizeof(fn_def<T, U, N, sizeof(ins<U, N>(0)) == sizeof(char)>)>
+    template<class U, std::size_t = sizeof(fn_def<T, U, N, sizeof(ins<U, N>(0)) == sizeof(char)>)>
     constexpr operator U() noexcept;
 };
 
 
 // This is a helper to turn a data structure into a tuple.
-template<typename T, typename U>
+template <class T, class U>
 struct loophole_type_list;
 
-template<typename T, std::size_t... I>
+template <typename T, std::size_t... I>
 struct loophole_type_list< T, std::index_sequence<I...> >
     : sequence_tuple::tuple< decltype(T{ loophole_ubiq<T, I>{}... }, 0) > // Instantiating loopholes.
 {
