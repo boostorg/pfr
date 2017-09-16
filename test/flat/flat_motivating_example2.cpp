@@ -7,7 +7,7 @@ struct my_struct { // no ostream operator defined!
 };
 
 int main() {
-#if BOOST_PFR_USE_CPP17
+#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
     using namespace boost::pfr::flat_ops; // C++17 out-of-the-box ostream operators for aggregate initializables!
 
     my_struct s{{"Das ist fantastisch!"}, 100};

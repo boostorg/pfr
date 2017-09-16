@@ -6,54 +6,56 @@
 #
 
 local LOOPHOLE_FLAT_DEF = <define>BOOST_PFR_TEST_FLAT <define>BOOST_PFR_USE_LOOPHOLE=1 ;
+local CLASSIC_FLAT_DEF = <define>BOOST_PFR_TEST_FLAT <define>BOOST_PFR_USE_LOOPHOLE=0 ;
 local LOOPHOLE_PREC_DEF = <define>BOOST_PFR_TEST_PRECISE <define>BOOST_PFR_USE_LOOPHOLE=1 ;
+local CLASSIC_PREC_DEF = <define>BOOST_PFR_TEST_PRECISE <define>BOOST_PFR_USE_LOOPHOLE=0 ;
 
 test-suite pfr
   :
     ##### Common tests
-    [ run common/ops.cpp                : : : <define>BOOST_PFR_TEST_FLAT       : flat_ops ]
+    [ run common/ops.cpp                : : : $(CLASSIC_FLAT_DEF)               : flat_ops ]
     [ run common/ops.cpp                : : : $(LOOPHOLE_FLAT_DEF)              : flat_lh_ops ]
-    [ run common/ops.cpp                : : : <define>BOOST_PFR_TEST_PRECISE    : precise_ops ]
+    [ run common/ops.cpp                : : : $(CLASSIC_PREC_DEF)               : precise_ops ]
     [ run common/ops.cpp                : : : $(LOOPHOLE_PREC_DEF)              : precise_lh_ops ]
 
-    [ run common/global_ops.cpp         : : : <define>BOOST_PFR_TEST_FLAT       : flat_global_ops ]
+    [ run common/global_ops.cpp         : : : $(CLASSIC_FLAT_DEF)               : flat_global_ops ]
     [ run common/global_ops.cpp         : : : $(LOOPHOLE_FLAT_DEF)              : flat_lh_global_ops ]
-    [ run common/global_ops.cpp         : : : <define>BOOST_PFR_TEST_PRECISE    : precise_global_ops ]
+    [ run common/global_ops.cpp         : : : $(CLASSIC_PREC_DEF)               : precise_global_ops ]
     [ run common/global_ops.cpp         : : : $(LOOPHOLE_PREC_DEF)              : precise_lh_global_ops ]
 
-    [ run common/functions_for.cpp      : : : <define>BOOST_PFR_TEST_FLAT       : flat_function_for ]
+    [ run common/functions_for.cpp      : : : $(CLASSIC_FLAT_DEF)               : flat_function_for ]
     [ run common/functions_for.cpp      : : : $(LOOPHOLE_FLAT_DEF)              : flat_lh_function_for ]
-    [ run common/functions_for.cpp      : : : <define>BOOST_PFR_TEST_PRECISE    : precise_function_for ]
+    [ run common/functions_for.cpp      : : : $(CLASSIC_PREC_DEF)               : precise_function_for ]
     [ run common/functions_for.cpp      : : : $(LOOPHOLE_PREC_DEF)              : precise_lh_function_for ]
 
-    [ run common/read_write.cpp         : : : <define>BOOST_PFR_TEST_FLAT       : flat_read_write ]
+    [ run common/read_write.cpp         : : : $(CLASSIC_FLAT_DEF)               : flat_read_write ]
     [ run common/read_write.cpp         : : : $(LOOPHOLE_FLAT_DEF)              : flat_lh_read_write ]
-    [ run common/read_write.cpp         : : : <define>BOOST_PFR_TEST_PRECISE    : precise_read_write ]
+    [ run common/read_write.cpp         : : : $(CLASSIC_PREC_DEF)               : precise_read_write ]
     [ run common/read_write.cpp         : : : $(LOOPHOLE_PREC_DEF)              : precise_lh_read_write ]
 
-    [ run common/std_interactions.cpp   : : : <define>BOOST_PFR_TEST_FLAT       : flat_std_interactions ]
+    [ run common/std_interactions.cpp   : : : $(CLASSIC_FLAT_DEF)               : flat_std_interactions ]
     [ run common/std_interactions.cpp   : : : $(LOOPHOLE_FLAT_DEF)              : flat_lh_std_interactions ]
-    [ run common/std_interactions.cpp   : : : <define>BOOST_PFR_TEST_PRECISE    : precise_std_interactions ]
+    [ run common/std_interactions.cpp   : : : $(CLASSIC_PREC_DEF)               : precise_std_interactions ]
     [ run common/std_interactions.cpp   : : : $(LOOPHOLE_PREC_DEF)              : precise_lh_std_interactions ]
 
-    [ compile-fail common/private_fields.cpp : <define>BOOST_PFR_TEST_FLAT      : flat_private_fields ]
+    [ compile-fail common/private_fields.cpp : $(CLASSIC_FLAT_DEF)              : flat_private_fields ]
     [ compile-fail common/private_fields.cpp : $(LOOPHOLE_FLAT_DEF)             : flat_lh_private_fields ]
-    [ compile-fail common/private_fields.cpp : <define>BOOST_PFR_TEST_PRECISE   : precise_private_fields ]
+    [ compile-fail common/private_fields.cpp : $(CLASSIC_PREC_DEF)              : precise_private_fields ]
     [ compile-fail common/private_fields.cpp : $(LOOPHOLE_PREC_DEF)             : precise_lh_private_fields ]
 
-    [ compile-fail common/protected_fields.cpp : <define>BOOST_PFR_TEST_FLAT    : flat_protected_fields ]
+    [ compile-fail common/protected_fields.cpp : $(CLASSIC_FLAT_DEF)            : flat_protected_fields ]
     [ compile-fail common/protected_fields.cpp : $(LOOPHOLE_FLAT_DEF)           : flat_lh_protected_fields ]
-    [ compile-fail common/protected_fields.cpp : <define>BOOST_PFR_TEST_PRECISE : precise_protected_fields ]
+    [ compile-fail common/protected_fields.cpp : $(CLASSIC_PREC_DEF)            : precise_protected_fields ]
     [ compile-fail common/protected_fields.cpp : $(LOOPHOLE_PREC_DEF)           : precise_lh_protected_fields ]
 
-    [ compile-fail common/virtual_functions.cpp : <define>BOOST_PFR_TEST_FLAT   : flat_virtual_functions ]
+    [ compile-fail common/virtual_functions.cpp : $(CLASSIC_FLAT_DEF)           : flat_virtual_functions ]
     [ compile-fail common/virtual_functions.cpp : $(LOOPHOLE_FLAT_DEF)          : flat_lh_virtual_functions ]
-    [ compile-fail common/virtual_functions.cpp : <define>BOOST_PFR_TEST_PRECISE   : precise_virtual_functions ]
+    [ compile-fail common/virtual_functions.cpp : $(CLASSIC_PREC_DEF)              : precise_virtual_functions ]
     [ compile-fail common/virtual_functions.cpp : $(LOOPHOLE_PREC_DEF)          : precise_lh_virtual_functions ]
 
-    [ compile-fail common/non_std_layout.cpp : <define>BOOST_PFR_TEST_FLAT      : flat_non_standard_layout ]
+    [ compile-fail common/non_std_layout.cpp : $(CLASSIC_FLAT_DEF)              : flat_non_standard_layout ]
     [ compile-fail common/non_std_layout.cpp : $(LOOPHOLE_FLAT_DEF)             : flat_lh_non_standard_layout ]
-    [ run common/non_std_layout.cpp     : : : <define>BOOST_PFR_TEST_PRECISE    : precise_non_standard_layout ]
+    [ run common/non_std_layout.cpp     : : : $(CLASSIC_PREC_DEF)               : precise_non_standard_layout ]
     [ run common/non_std_layout.cpp     : : : $(LOOPHOLE_PREC_DEF)              : precise_lh_non_standard_layout ]
 
 

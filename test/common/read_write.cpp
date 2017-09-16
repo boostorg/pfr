@@ -116,7 +116,7 @@ int main() {
         "{1, 2, 3, 4, {with_operator}}"
     );
 
-#if BOOST_PFR_USE_CPP17
+#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
     struct test4 {
         int f0;
         std::string f1;

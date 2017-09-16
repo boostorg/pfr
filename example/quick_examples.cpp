@@ -65,7 +65,7 @@ void test_examples() {
     std::cout << "boost::pfr::flat_structure_tie(var) :\n" << var << '\n';
   }
 
-#if BOOST_PFR_USE_CPP17
+#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
   {
 //[pfr_quick_examples_ops
     struct test { std::string f1; std::string_view f2; };
@@ -137,7 +137,7 @@ void test_examples() {
 //]
   }
 
-#if BOOST_PFR_USE_CPP17
+#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
   {
     bar var{'A', {777, 3.141593}};
 //[pfr_quick_examples_get_1
@@ -172,7 +172,7 @@ void test_examples() {
     std::cout << "boost::pfr::flat_get<1>(var.f) outputs:\n" << var << '\n';
   }
 
-#if BOOST_PFR_USE_CPP17
+#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
   {
     bar var{'A', {777, 3.141593}};
 //[pfr_quick_examples_structure_to_tuple
@@ -192,7 +192,7 @@ void test_examples() {
     std::cout << "boost::pfr::flat_structure_to_tuple(var) :\n" << var << '\n';
   }
 
-#if BOOST_PFR_USE_CPP17
+#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
   {
     bar var{'A', {777, 3.141593}};
 //[pfr_quick_examples_structure_tie

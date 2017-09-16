@@ -20,9 +20,9 @@ static_assert(std::is_same<
 >::value, "");
 
 
-// Requires C++17:
+// Requires C++17 or Loophole enabled:
 //<-
-#if BOOST_PFR_USE_CPP17 //->
+#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE //->
 static_assert(std::is_same<
     boost::pfr::tuple_element_t<1, foo_t>,      // Precise reflection.
     nested_t
