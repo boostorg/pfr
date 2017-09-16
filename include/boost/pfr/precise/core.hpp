@@ -27,7 +27,7 @@ namespace boost { namespace pfr {
 
 /// \brief Returns reference or const reference to a field with index `I` in aggregate T.
 ///
-/// \b Requires: C++17 or \flatpod{C++14 flat POD}.
+/// \b Requires: C++17 or \flatpod{C++14 flat POD or C++14 with not disabled Loophole}.
 ///
 /// \rcast14
 ///
@@ -53,7 +53,7 @@ constexpr decltype(auto) get(T& val) noexcept {
 
 /// \brief `tuple_element` has a `typedef type-of-a-field-with-index-I-in-aggregate-T type;`
 ///
-/// \b Requires: C++17 or \flatpod{C++14 flat POD}.
+/// \b Requires: C++17 or \flatpod{C++14 flat POD or C++14 with not disabled Loophole}.
 ///
 /// \b Example:
 /// \code
@@ -65,7 +65,7 @@ using tuple_element = detail::sequence_tuple::tuple_element<I, decltype( ::boost
 
 /// \brief Type of a field with index `I` in aggregate `T`.
 ///
-/// \b Requires: C++17 or \flatpod{C++14 flat POD}.
+/// \b Requires: C++17 or \flatpod{C++14 flat POD or C++14 with not disabled Loophole}.
 ///
 /// \b Example:
 /// \code
@@ -77,7 +77,7 @@ using tuple_element_t = typename tuple_element<I, T>::type;
 
 /// \brief Creates an `std::tuple` from an aggregate T.
 ///
-/// \b Requires: C++17 or \flatpod{C++14 flat POD}.
+/// \b Requires: C++17 or \flatpod{C++14 flat POD or C++14 with not disabled Loophole}.
 ///
 /// \rcast14
 ///
@@ -99,7 +99,7 @@ constexpr auto structure_to_tuple(const T& val) noexcept {
 
 /// \brief Creates an `std::tuple` with lvalue references to fields of an aggregate T.
 ///
-/// \b Requires: C++17 or \flatpod{C++14 flat POD}.
+/// \b Requires: C++17 or \flatpod{C++14 flat POD or C++14 with not disabled Loophole}.
 ///
 /// \rcast14
 ///

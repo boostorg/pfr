@@ -16,7 +16,7 @@
 #endif
 
 #ifndef BOOST_PFR_USE_LOOPHOLE
-#   define BOOST_PFR_USE_LOOPHOLE 0
+#   define BOOST_PFR_USE_LOOPHOLE 1
 #endif
 
 #ifndef BOOST_PFR_USE_CPP17
