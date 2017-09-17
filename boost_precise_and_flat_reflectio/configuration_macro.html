@@ -1,0 +1,106 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Configuration Macro</title>
+<link rel="stylesheet" href="http://www.boost.org/doc/libs/1_63_0/doc/src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.Precise and Flat Reflection 1.0">
+<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.Precise and Flat Reflection 1.0">
+<link rel="prev" href="short_examples_for_the_impatient.html" title="Short Examples for the Impatient">
+<link rel="next" href="requirements_and_limitations.html" title="Requirements and Limitations">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="http://www.boost.org/doc/libs/1_63_0/boost.png"></td>
+<td align="center"><a href="http://www.boost.org/doc/libs/1_63_0/index.html">Home</a></td>
+<td align="center"><a href="http://www.boost.org/doc/libs/1_63_0/libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="http://www.boost.org/doc/libs/1_63_0/more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="short_examples_for_the_impatient.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="requirements_and_limitations.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="boost_precise_and_flat_reflectio.configuration_macro"></a><a class="link" href="configuration_macro.html" title="Configuration Macro">Configuration
+    Macro</a>
+</h2></div></div></div>
+<p>
+      By default Boost.PFR <span class="bold"><strong>auto-detects your compiler abilities</strong></span>
+      and automatically defines the configuration macro into appropriate values.
+      If you wish to override that behavior, just define:
+    </p>
+<div class="table">
+<a name="boost_precise_and_flat_reflectio.configuration_macro.linkmacro"></a><p class="title"><b>Table&#160;1.2.&#160;Macros</b></p>
+<div class="table-contents"><table class="table" summary="Macros">
+<colgroup>
+<col>
+<col>
+</colgroup>
+<thead><tr>
+<th>
+              <p>
+                Macro name
+              </p>
+            </th>
+<th>
+              <p>
+                Effect
+              </p>
+            </th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+              <p>
+                <span class="bold"><strong>BOOST_PFR_USE_CPP17</strong></span>
+              </p>
+            </td>
+<td>
+              <p>
+                Define to <code class="computeroutput"><span class="number">1</span></code> if you wish
+                to use structured bindings and other C++17 features for reflection.
+                Define to <code class="computeroutput"><span class="number">0</span></code> otherwize.
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+              <p>
+                <span class="bold"><strong>BOOST_PFR_USE_LOOPHOLE</strong></span>
+              </p>
+            </td>
+<td>
+              <p>
+                Define to <code class="computeroutput"><span class="number">1</span></code> if you wish
+                to exploit <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#2118" target="_top">CWG
+                2118</a> for reflection. Define to <code class="computeroutput"><span class="number">0</span></code>
+                otherwize.
+              </p>
+            </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<br class="table-break"><p>
+      Note that disabling <span class="bold"><strong>Loophole</strong></span> in C++14 significantly
+      limitates the reflection abilities of the library. See next section for more
+      info.
+    </p>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2016, 2017 Antony Polukhin<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="short_examples_for_the_impatient.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="requirements_and_limitations.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>

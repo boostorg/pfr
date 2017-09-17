@@ -127,34 +127,17 @@
         are <span class="bold"><strong>precise</strong></span> and are declared in <code class="computeroutput"><span class="identifier">boost</span><span class="special">/</span><span class="identifier">pfr</span><span class="special">/</span><span class="identifier">precise</span><span class="comment">/*</span></code>. In previous example you've seen how the
         the flattening works.
       </p>
-<p>
-        Flat functions are more limited in their reflection capabilities, but guarantee
-        to not affect debug and release builds in C++14 mode (no additional code
-        would be produced).
-      </p>
-<p>
-        Precise functions have almost unlimited reflection capabilities, but may
-        produce additional code in C++14 mode in debug builds and even in release
-        builds (on old compilers or compilers with bad optimizers).
-      </p>
-<p>
-        Here's how to chose your functions:
-      </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
-            If you work only with POD types and wish them flattened - use <span class="bold"><strong>flat</strong></span> functions
-          </li>
-<li class="listitem">
-            If you use C++17 - use <span class="bold"><strong>precise</strong></span> functions
-          </li>
-<li class="listitem">
-            If you work only with flat POD types in C++14 - use <span class="bold"><strong>flat</strong></span>
+            If you wish types flattened - use <span class="bold"><strong>flat</strong></span>
             functions
           </li>
 <li class="listitem">
-            If you have modern compiler in C++14 mode and work with non-POD literal
-            types with some hierarchy - you are forced to use <span class="bold"><strong>precise</strong></span>
+            If you use types with C arrays - use <span class="bold"><strong>flat</strong></span>
             functions
+          </li>
+<li class="listitem">
+            Otherwise use <span class="bold"><strong>precise</strong></span> functions
           </li>
 </ul></div>
 </div>
