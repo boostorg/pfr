@@ -65,7 +65,7 @@ void test_examples() {
     std::cout << "boost::pfr::flat_structure_tie(var) :\n" << var << '\n';
   }
 
-#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
+#if BOOST_PFR_USE_CPP17
   {
 //[pfr_quick_examples_ops
     struct test { std::string f1; std::string_view f2; };
