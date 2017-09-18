@@ -25,7 +25,7 @@
 #include <type_traits>
 #include <utility>
 
-#include <boost/pfr/detail/cast_to_layout_compatible.hpp>
+#include <boost/pfr/detail/offset_based_getter.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
 #include <boost/pfr/detail/make_flat_tuple_of_references.hpp>
 #include <boost/pfr/detail/sequence_tuple.hpp>
@@ -101,8 +101,11 @@ auto tie_as_tuple_loophole_impl(T&& val) noexcept {
     using indexes = std::make_index_sequence<fields_count<type>()>;
     using tuple_type = typename loophole_type_list<type, indexes>::type;
 
+    offset_based_getter<type, tuple_type> getter;
+    
     return boost::pfr::detail::make_flat_tuple_of_references(
-        boost::pfr::detail::cast_to_layout_compatible<tuple_type>(std::forward<T>(val)),
+        std::forward<T>(val),
+        getter,
         size_t_<0>{},
         size_t_<tuple_type::size_v>{}
     );
@@ -120,7 +123,7 @@ auto tie_or_value(T&& val, std::enable_if_t<std::is_class< std::remove_reference
 
 template <class T>
 decltype(auto) tie_or_value(T&& val, std::enable_if_t<std::is_enum<std::remove_reference_t<T>>::value>* = 0) noexcept {
-    return boost::pfr::detail::cast_to_layout_compatible<
+    return static_cast<
         std::underlying_type_t<std::remove_reference_t<T> >
     >( std::forward<T>(val) );
 }
@@ -158,7 +161,7 @@ auto tie_as_flat_tuple(T&& t) {
     );
 
     return boost::pfr::detail::make_flat_tuple_of_references(
-        rec_tuples, size_t_<0>{}, size_t_<decltype(rec_tuples)::size_v>{}
+        rec_tuples, sequence_tuple_getter{}, size_t_<0>{}, size_t_<decltype(rec_tuples)::size_v>{}
     );
 }
 
