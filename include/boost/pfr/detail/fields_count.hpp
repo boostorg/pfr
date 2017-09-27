@@ -59,7 +59,8 @@ struct is_aggregate_initializable_n {
     static constexpr bool value =
            std::is_empty<T>::value
         || std::is_fundamental<T>::value
-        || is_not_constructible_n(std::make_index_sequence<N>{})
+        || (
+            is_not_constructible_n(std::make_index_sequence<N>{}) /*&& N*/)
     ;
 };
 
@@ -77,6 +78,11 @@ constexpr void detect_fields_count(std::size_t& count, size_t_<N>, size_t_<N>, l
     static_assert(
         is_aggregate_initializable_n<T, N>::value,
         "Types with user specified constructors (non-aggregate initializable types) are not supported."
+    );
+
+    static_assert(  // TODO: implement a greedy serach for such types
+        N != 0 || std::is_empty<T>::value || std::is_fundamental<T>::value,
+        "There's no way to detect fields count for a non default initilizable type."
     );
 
     count = N;
