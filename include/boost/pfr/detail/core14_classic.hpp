@@ -528,8 +528,14 @@ template <class T>
 auto tie_as_flat_tuple(T&& t) noexcept {
     using type = std::remove_const_t<std::remove_reference_t<T>>;
     using tuple_type = internal_tuple_with_same_alignment_t<type>;
+
+#if BOOST_PFR_NO_STRICT_ALIASING
+    sequence_tuple_getter getter;
+    auto & val = cast_to_layout_compatible<tuple_type>(std::forward<T>(t));
+#else
     offset_based_getter<type, tuple_type> getter;
     auto & val = std::forward<T>(t); // make it an lvalue
+#endif
     return boost::pfr::detail::make_flat_tuple_of_references(val, getter, size_t_<0>{}, size_t_<tuple_type::size_v>{});
 }
 
@@ -626,8 +632,13 @@ void for_each_field_in_depth(T&& t, F&& f, std::index_sequence<I0, I...>, identi
 template <class T, class F, class... Fields>
 void for_each_field_in_depth(T&& t, F&& f, std::index_sequence<>, identity<Fields>...) {
     using tuple_type = sequence_tuple::tuple<Fields...>;
+#if BOOST_PFR_NO_STRICT_ALIASING
+    sequence_tuple_getter getter;
+    auto & val = cast_to_layout_compatible<tuple_type>(std::forward<T>(t));
+#else
     offset_based_getter<std::remove_const_t<std::remove_reference_t<T>>, tuple_type> getter;
     auto & val = std::forward<T>(t); // make it an l-value
+#endif
     std::forward<F>(f)(
         boost::pfr::detail::make_flat_tuple_of_references(val, getter, size_t_<0>{}, size_t_<sizeof...(Fields)>{})
     );
