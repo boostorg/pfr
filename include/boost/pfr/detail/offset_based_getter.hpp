@@ -43,15 +43,18 @@ using tuple_of_aligned_storage_t = typename tuple_of_aligned_storage<T>::type;
  * Given a structure type and its sequence of members, we want to build a function
  * object "getter" that implements a version of `std::get` using offset arithmetic
  * and reinterpret_cast.
+ *
+ * typename U should be a user-defined struct
+ * typename S should be a sequence_tuple which is layout compatible with U
  */
 
-template <typename T, typename S>
+template <typename U, typename S>
 class offset_based_getter {
-  static_assert(sizeof(T) == sizeof(S), "Member sequence does not indicate correct size for struct type!");
-  static_assert(alignof(T) == alignof(S), "Member sequence does not indicate correct alignment for struct type!");
+  static_assert(sizeof(U) == sizeof(S), "Member sequence does not indicate correct size for struct type!");
+  static_assert(alignof(U) == alignof(S), "Member sequence does not indicate correct alignment for struct type!");
 
-  static_assert(!std::is_const<T>::value, "const should be stripped from user-defined type when using offset_based_getter or overload resolution will be ambiguous later, this indicates an error within pfr");
-  static_assert(!std::is_reference<T>::value, "reference should be stripped from user-defined type when using offset_based_getter or overload resolution will be ambiguous later, this indicates an error within pfr");
+  static_assert(!std::is_const<U>::value, "const should be stripped from user-defined type when using offset_based_getter or overload resolution will be ambiguous later, this indicates an error within pfr");
+  static_assert(!std::is_reference<U>::value, "reference should be stripped from user-defined type when using offset_based_getter or overload resolution will be ambiguous later, this indicates an error within pfr");
 
   // Get type of idx'th member
   template <std::size_t idx>
@@ -64,39 +67,46 @@ class offset_based_getter {
     // TODO: Do modern compilers optimize `layout` object out of the binary?
     // Ideally this pointer diff reduces to a constant and this call gets inlined.
     // But since we are doing reinterpret cast, I don't think we can use `constexpr` to ensure that.
+    //
     // However, since layout is a tuple of `char[]` basically, and has trivial initialization and is never accessed,
-    // it seems quite plausible to me taking the address will be optimized to a constant.
-    // Also that this is not undefined behavior if T and S indeed are layout compatible,
-    // since S and layout are definitely layout compatible.
+    // I think that it will get optimized out -- any write to its memory is a dead store.
+    //
+    // Also: this is not undefined behavior if U and S indeed are layout compatible,
+    // since S and layout have the same offsets for each corresponding members.
+    //
+    // It might be better if layout is a static constexpr object, and we take constexpr pointers to its members
+    // in this offset function. Then we do reinterpret_cast of the constexpr pointers and take their difference.
+    // It might make it even easier for the compiler to optimize this fcn to a constant,
+    // since the pointers are also constant expressions then.
 
     return reinterpret_cast<const char *>(&sequence_tuple::get<idx>(layout)) - reinterpret_cast<const char *>(&layout);
   }
 
   // Encapsulates offset arithmetic and reinterpret_cast
   template <std::size_t idx>
-  index_t<idx> * get_pointer(T * t) const {
-    return reinterpret_cast<index_t<idx> *>(reinterpret_cast<char *>(t) + offset<idx>());
+  index_t<idx> * get_pointer(U * u) const {
+    return reinterpret_cast<index_t<idx> *>(reinterpret_cast<char *>(u) + offset<idx>());
   }
 
   template <std::size_t idx>
-  const index_t<idx> * get_pointer(const T * t) const {
-    return reinterpret_cast<const index_t<idx> *>(reinterpret_cast<const char *>(t) + offset<idx>());
+  const index_t<idx> * get_pointer(const U * u) const {
+    return reinterpret_cast<const index_t<idx> *>(reinterpret_cast<const char *>(u) + offset<idx>());
   }
 
 public:
   template <std::size_t idx>
-  index_t<idx> & get(T & t, size_t_<idx>) const {
-    return *get_pointer<idx>(&t);
+  index_t<idx> & get(U & u, size_t_<idx>) const {
+    return *get_pointer<idx>(&u);
   }
 
   template <std::size_t idx>
-  index_t<idx> const & get(T const & t, size_t_<idx>) const {
-    return *get_pointer<idx>(&t);
+  index_t<idx> const & get(U const & u, size_t_<idx>) const {
+    return *get_pointer<idx>(&u);
   }
 
   template <std::size_t idx>
-  index_t<idx> && get(T && t, size_t_<idx>) const {
-    return std::move(*get_pointer<idx>(&t));
+  index_t<idx> && get(U && u, size_t_<idx>) const {
+    return std::move(*get_pointer<idx>(&u));
   }
 };
 
