@@ -58,10 +58,10 @@ test-suite pfr
     [ run common/non_std_layout.cpp     : : : $(CLASSIC_PREC_DEF)               : precise_non_standard_layout ]
     [ run common/non_std_layout.cpp     : : : $(LOOPHOLE_PREC_DEF)              : precise_lh_non_standard_layout ]
 
-    [ compile-fail common/non_default_constructible.cpp : $(CLASSIC_FLAT_DEF)  : flat_non_default_constructible ]
-    [ compile-fail common/non_default_constructible.cpp : $(LOOPHOLE_FLAT_DEF) : flat_lh_non_sdefault_constructible ]
-    [ compile-fail common/non_default_constructible.cpp : $(CLASSIC_PREC_DEF)  : precise_non_default_constructible ]
-    [ compile-fail common/non_default_constructible.cpp : $(LOOPHOLE_PREC_DEF) : precise_lh_non_default_constructible ]
+    [ compile-fail common/non_default_constructible.cpp : $(CLASSIC_FLAT_DEF)   : flat_non_default_constructible ]
+    [ compile-fail common/non_default_constructible.cpp : $(LOOPHOLE_FLAT_DEF)  : flat_lh_non_sdefault_constructible ]
+    [ run common/non_default_constructible.cpp : : : $(CLASSIC_PREC_DEF)        : precise_non_default_constructible ]
+    [ run common/non_default_constructible.cpp : : : $(LOOPHOLE_PREC_DEF)       : precise_lh_non_default_constructible ]
 
 
     ##### Tuple sizes

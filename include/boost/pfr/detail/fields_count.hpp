@@ -39,7 +39,7 @@ struct ubiq_constructor_except {
     template <class Type> constexpr operator std::enable_if_t<!std::is_same<T, Type>::value, Type&> () const noexcept; // Undefined
 };
 
-///////////////////// Hand-made is_aggregate_initializable_n<T> trait:
+///////////////////// Hand-made is_aggregate_initializable_n<T> trait
 
 // `std::is_constructible<T, ubiq_constructor_except<T>>` consumes a lot of time, so we made a separate lazy trait for it.
 template <std::size_t N, class T> struct is_single_field_and_aggregate_initializable: std::false_type {};
@@ -47,6 +47,9 @@ template <class T> struct is_single_field_and_aggregate_initializable<1, T>: std
     bool, !std::is_constructible<T, ubiq_constructor_except<T>>::value
 > {};
 
+// Hand-made is_aggregate<T> trait:
+// Aggregates could be constructed from `decltype(ubiq_constructor{I})...` but report that there's no constructor from `decltype(ubiq_constructor{I})...`
+// Special case for N == 1: `std::is_constructible<T, ubiq_constructor>` returns true if N == 1 and T is copy/move constructible.
 template <class T, std::size_t N>
 struct is_aggregate_initializable_n {
     template <std::size_t ...I>
@@ -59,51 +62,81 @@ struct is_aggregate_initializable_n {
     static constexpr bool value =
            std::is_empty<T>::value
         || std::is_fundamental<T>::value
-        || (
-            is_not_constructible_n(std::make_index_sequence<N>{}) /*&& N*/)
+        || is_not_constructible_n(std::make_index_sequence<N>{})
     ;
 };
 
-///////////////////// Methods for detecting max parameters for construction of T
-
+///////////////////// Helper for SFINAE on fields count
 template <class T, std::size_t... I>
 constexpr auto enable_if_constructible_helper(std::index_sequence<I...>) noexcept
     -> typename std::add_pointer<decltype(T{ ubiq_constructor{I}... })>::type;
 
+template <class T, std::size_t N, class /*Enable*/ = decltype( enable_if_constructible_helper<T>(std::make_index_sequence<N>()) ) >
+using enable_if_constructible_helper_t = std::size_t;
+
+///////////////////// Non greedy fields count search. Templates instantiation depth is log(sizeof(T)), templates instantiation count is log(sizeof(T)).
 template <class T, std::size_t N>
-constexpr void detect_fields_count(std::size_t& count, size_t_<N>, size_t_<N>, long) noexcept {
-    // Hand-made is_aggregate<T> trait:
-    // Aggregates could be constructed from `decltype(ubiq_constructor{I})...` but report that there's no constructor from `decltype(ubiq_constructor{I})...`
-    // Special case for N == 1: `std::is_constructible<T, ubiq_constructor>` returns true if N == 1 and T is copy/move constructible.
-    static_assert(
-        is_aggregate_initializable_n<T, N>::value,
-        "Types with user specified constructors (non-aggregate initializable types) are not supported."
-    );
-
-    static_assert(  // TODO: implement a greedy serach for such types
-        N != 0 || std::is_empty<T>::value || std::is_fundamental<T>::value,
-        "There's no way to detect fields count for a non default initilizable type."
-    );
-
-    count = N;
+constexpr std::size_t detect_fields_count(size_t_<N>, size_t_<N>, long) noexcept {
+    return N;
 }
 
 template <class T, std::size_t Begin, std::size_t Middle>
-constexpr void detect_fields_count(std::size_t& count, size_t_<Begin>, size_t_<Middle>, int) noexcept;
+constexpr std::size_t detect_fields_count(size_t_<Begin>, size_t_<Middle>, int) noexcept;
 
 template <class T, std::size_t Begin, std::size_t Middle>
-constexpr auto detect_fields_count(std::size_t& count, size_t_<Begin>, size_t_<Middle>, long) noexcept
-    -> decltype( enable_if_constructible_helper<T>(std::make_index_sequence<Middle>()) )
+constexpr auto detect_fields_count(size_t_<Begin>, size_t_<Middle>, long) noexcept
+    -> enable_if_constructible_helper_t<T, Middle>
 {
     constexpr std::size_t next = Middle + (Middle - Begin + 1) / 2;
-    detect_fields_count<T>(count, size_t_<Middle>{}, size_t_<next>{}, 1L);
-    return nullptr;
+    return detect_fields_count<T>(size_t_<Middle>{}, size_t_<next>{}, 1L);
 }
 
 template <class T, std::size_t Begin, std::size_t Middle>
-constexpr void detect_fields_count(std::size_t& count, size_t_<Begin>, size_t_<Middle>, int) noexcept {
+constexpr std::size_t detect_fields_count(size_t_<Begin>, size_t_<Middle>, int) noexcept {
     constexpr std::size_t next = (Begin + Middle) / 2;
-    detect_fields_count<T>(count, size_t_<Begin>{}, size_t_<next>{}, 1L);
+    return detect_fields_count<T>(size_t_<Begin>{}, size_t_<next>{}, 1L);
+}
+
+///////////////////// Greedy search. Templates instantiation depth is log(sizeof(T)), templates instantiation count is log(sizeof(T))*T in worst case.
+template <class T, std::size_t N>
+constexpr auto detect_fields_count_greedy_remember(size_t_<N>, long) noexcept
+    -> enable_if_constructible_helper_t<T, N>
+{
+    return N;
+}
+
+template <class T, std::size_t N>
+constexpr std::size_t detect_fields_count_greedy_remember(size_t_<N>, int) noexcept {
+    return 0;
+}
+
+template <class T, std::size_t N>
+constexpr std::size_t detect_fields_count_greedy(size_t_<N>, size_t_<N>) noexcept {
+    return detect_fields_count_greedy_remember<T>(size_t_<N>{}, 1L);
+}
+
+template <class T, std::size_t Begin, std::size_t Last>
+constexpr std::size_t detect_fields_count_greedy(size_t_<Begin>, size_t_<Last>) noexcept {
+    constexpr std::size_t middle = Begin + (Last - Begin) / 2;
+    constexpr std::size_t fields_count_big = detect_fields_count_greedy<T>(size_t_<middle + 1>{}, size_t_<Last>{});
+    constexpr std::size_t fields_count_small = detect_fields_count_greedy<T>(size_t_<Begin>{}, size_t_<fields_count_big ? Begin : middle>{});
+    return fields_count_big ? fields_count_big : fields_count_small;
+}
+
+///////////////////// Choosing between greedy and non greedy search.
+template <class T, std::size_t N>
+constexpr auto detect_fields_count_dispatch(size_t_<N>, long) noexcept
+    -> decltype(sizeof(T{}))
+{
+    return detect_fields_count<T>(size_t_<0>{}, size_t_<N / 2 + 1>{}, 1L);
+}
+
+template <class T, std::size_t N>
+constexpr std::size_t detect_fields_count_dispatch(size_t_<N>, int) noexcept {
+    // T is not default aggregate initialzable. It means that at least one of the members is not default constructible,
+    // so we have to check all the aggregate initializations for T up to N parameters and return the bigest succeeded
+    // (we can not use binary search for detecting fields count).
+    return detect_fields_count_greedy<T>(size_t_<0>{}, size_t_<N>{});
 }
 
 ///////////////////// Returns non-flattened fields count
@@ -135,10 +168,20 @@ constexpr std::size_t fields_count() noexcept {
 //    );
 //#endif
 
-    std::size_t res = 0u;
-    constexpr std::size_t next = (sizeof(T) * 8) / 2 + 1; // We multiply by 8 because we may have bitfields in T
-    detect_fields_count<T>(res, size_t_<0>{}, size_t_<next>{}, 1L);
-    return res;
+    constexpr std::size_t max_fields_count = (sizeof(T) * 8); // We multiply by 8 because we may have bitfields in T
+    constexpr std::size_t result = detect_fields_count_dispatch<T>(size_t_<max_fields_count>{}, 1L);
+
+    static_assert(
+        is_aggregate_initializable_n<T, result>::value,
+        "Types with user specified constructors (non-aggregate initializable types) are not supported."
+    );
+
+    static_assert(
+        result != 0 || std::is_empty<T>::value || std::is_fundamental<T>::value,
+        "Something went wrong. Please report this issue to the github along with the structure you're reflecting."
+    );
+
+    return result;
 }
 
 }}} // namespace boost::pfr::detail
