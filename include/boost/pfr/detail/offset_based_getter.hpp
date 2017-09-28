@@ -62,25 +62,32 @@ class offset_based_getter {
   using index_t = typename sequence_tuple::tuple_element<idx, S>::type;
   
   // Get offset of idx'th member
+  // Idea: Layout object has the same offsets as instance of S, so if S and U are layout compatible, then these offset
+  // calculations are correct.
   template <std::size_t idx>
   static std::ptrdiff_t offset() {
     constexpr tuple_of_aligned_storage_t<S> layout{};
-    // TODO: Do all targetted compilers optimize `layout` object out of the binary? (gcc and clang seem to do so)
-    // Ideally this pointer diff reduces to a constant and this call gets inlined.
-    // But since we are doing reinterpret cast, I don't think we can use `constexpr` to ensure that.
-    //
-    // However, since layout is a tuple of `char[]` basically, and has trivial initialization and is never accessed,
-    // I think that it will get optimized out -- any write to its memory is a dead store.
-    //
-    // Also: this is not undefined behavior if U and S indeed are layout compatible,
-    // since S and layout have the same offsets for each corresponding members.
-    //
-    // It might be better if layout is a static constexpr object, and we take constexpr pointers to its members
-    // in this offset function. Then we do reinterpret_cast of the constexpr pointers and take their difference.
-    // It might make it even easier for the compiler to optimize this fcn to a constant,
-    // since the pointers are also constant expressions then.
+    const auto * member = &sequence_tuple::get<idx>(layout);
 
-    return reinterpret_cast<const char *>(&sequence_tuple::get<idx>(layout)) - reinterpret_cast<const char *>(&layout);
+    /**
+     * The goal is that the layout object should ultimately get optimized out of the binary, and this function should
+     * get reduced to a constant and inlined.
+     *
+     * Unfortunately we can't do reinterpret_cast in a constexpr function but we can try to make it really easy to optimize.
+     *
+     * An alternative implementation is
+
+      static constexpr tuple_of_aligned_storage_t<S> layout{};
+      static constexpr const auto * member = &sequence_tuple::get<idx>(layout);
+
+     * gcc and clang don't seem to care but some other compilers might generate better code for one or the other.
+     * If `member` and `&layout` are constexpr then the function should be very easy to optimize to a constant.
+     * But if we take address of static object layout that may force it to exist and make it harder to ultimately
+     * eliminate from the binary.
+     * It needs testing, especially on msvc with which I am less familiar.
+     */
+
+    return reinterpret_cast<const char *>(member) - reinterpret_cast<const char *>(&layout);
   }
 
   // Encapsulates offset arithmetic and reinterpret_cast
