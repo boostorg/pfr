@@ -124,10 +124,14 @@ public:
     return *get_pointer<idx>(&u);
   }
 
+  /*
+  This overload was similarly commented out in cast_to_layout_compatible
+  
   template <std::size_t idx>
   index_t<idx> && get(U && u, size_t_<idx>) const {
     return std::move(*get_pointer<idx>(&u));
   }
+  */
 };
 
 
