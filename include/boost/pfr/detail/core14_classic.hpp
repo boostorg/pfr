@@ -526,7 +526,7 @@ constexpr bool is_flat_refelectable(std::index_sequence<I...>) noexcept {
 
 template <class T>
 auto tie_as_flat_tuple(T&& t) noexcept {
-    using type = std::remove_const_t<std::remove_reference_t<T>>;
+    using type = std::remove_cv_t<std::remove_reference_t<T>>;
     using tuple_type = internal_tuple_with_same_alignment_t<type>;
 
 #if BOOST_PFR_NO_STRICT_ALIASING
@@ -636,7 +636,7 @@ void for_each_field_in_depth(T&& t, F&& f, std::index_sequence<>, identity<Field
     sequence_tuple_getter getter;
     auto & val = cast_to_layout_compatible<tuple_type>(std::forward<T>(t));
 #else
-    offset_based_getter<std::remove_const_t<std::remove_reference_t<T>>, tuple_type> getter;
+    offset_based_getter<std::remove_cv_t<std::remove_reference_t<T>>, tuple_type> getter;
     auto & val = std::forward<T>(t); // make it an l-value
 #endif
     std::forward<F>(f)(

@@ -55,6 +55,7 @@ class offset_based_getter {
 
   static_assert(!std::is_const<U>::value, "const should be stripped from user-defined type when using offset_based_getter or overload resolution will be ambiguous later, this indicates an error within pfr");
   static_assert(!std::is_reference<U>::value, "reference should be stripped from user-defined type when using offset_based_getter or overload resolution will be ambiguous later, this indicates an error within pfr");
+  static_assert(!std::is_volatile<U>::value, "volatile should be stripped from user-defined type when using offset_based_getter or overload resolution will be ambiguous later. this indicates an error within pfr");
 
   // Get type of idx'th member
   template <std::size_t idx>
