@@ -64,7 +64,7 @@ class offset_based_getter {
   template <std::size_t idx>
   static std::ptrdiff_t offset() {
     constexpr tuple_of_aligned_storage_t<S> layout{};
-    // TODO: Do modern compilers optimize `layout` object out of the binary?
+    // TODO: Do all targetted compilers optimize `layout` object out of the binary? (gcc and clang seem to do so)
     // Ideally this pointer diff reduces to a constant and this call gets inlined.
     // But since we are doing reinterpret cast, I don't think we can use `constexpr` to ensure that.
     //
