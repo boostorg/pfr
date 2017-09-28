@@ -625,7 +625,7 @@ void for_each_field_in_depth(T&& t, F&& f, std::index_sequence<I0, I...>, identi
 template <class T, class F, class... Fields>
 void for_each_field_in_depth(T&& t, F&& f, std::index_sequence<>, identity<Fields>...) {
     using tuple_type = sequence_tuple::tuple<Fields...>;
-    offset_based_getter<std::remove_reference_t<T>, tuple_type> getter;
+    offset_based_getter<std::remove_const_t<std::remove_reference_t<T>>, tuple_type> getter;
     std::forward<F>(f)(
         boost::pfr::detail::make_flat_tuple_of_references(std::forward<T>(t), getter, size_t_<0>{}, size_t_<sizeof...(Fields)>{})
     );

@@ -15,11 +15,14 @@
 
 namespace boost { namespace pfr { namespace detail {
 
+template <std::size_t Index>
+using size_t_ = std::integral_constant<std::size_t, Index >;
+
 // Helper: Make a "getter" object corresponding to built-in tuple::get
 // For user-defined structures, the getter should be "offset_based_getter"
 struct sequence_tuple_getter {
   template <std::size_t idx, typename T>
-  decltype(auto) get(T && t) const {
+  decltype(auto) get(T && t, size_t_<idx>) const {
     return sequence_tuple::get<idx>(std::forward<T>(t));
   };
 };
@@ -82,7 +85,7 @@ constexpr sequence_tuple::tuple<> make_flat_tuple_of_references(Tuple&&, Getter&
 template <class Tuple, class Getter, std::size_t Begin>
 constexpr auto make_flat_tuple_of_references(Tuple&& t, Getter&& g, size_t_<Begin>, size_t_<1>) noexcept {
     return tie_as_tuple_with_references(
-        std::forward<Getter>(g).template get<Begin>(std::forward<Tuple>(t))
+        std::forward<Getter>(g).get(std::forward<Tuple>(t), size_t_<Begin>{})
     );
 }
 

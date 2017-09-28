@@ -17,6 +17,9 @@
 
 namespace boost { namespace pfr { namespace detail {
 
+template <std::size_t Index>
+using size_t_ = std::integral_constant<std::size_t, Index >;
+
 // Metafunction that replaces tuple<T1, T2, T3, ...> with
 // tuple<std::aligned_storage_t<sizeof(T1), alignof(T1)>, std::aligned_storage<sizeof(T2), alignof(T2)>, ...>
 //
@@ -46,6 +49,8 @@ template <typename T, typename S>
 class offset_based_getter {
   static_assert(sizeof(T) == sizeof(S), "Member sequence does not indicate correct size for struct type!");
   static_assert(alignof(T) == alignof(S), "Member sequence does not indicate correct alignment for struct type!");
+
+  static_assert(!std::is_const<T>::value, "const should be stripped from user-defined type when using offset_based_getter or overload resolution will be ambiguous later");
 
   // Get type of idx'th member
   template <std::size_t idx>
@@ -79,17 +84,17 @@ class offset_based_getter {
 
 public:
   template <std::size_t idx>
-  index_t<idx> & get(T & t) const {
+  index_t<idx> & get(T & t, size_t_<idx>) const {
     return *get_pointer<idx>(&t);
   }
 
   template <std::size_t idx>
-  index_t<idx> const & get(T const & t) const {
+  index_t<idx> const & get(T const & t, size_t_<idx>) const {
     return *get_pointer<idx>(&t);
   }
 
   template <std::size_t idx>
-  index_t<idx> && get(T && t) const {
+  index_t<idx> && get(T && t, size_t_<idx>) const {
     return std::move(*get_pointer<idx>(&t));
   }
 };
