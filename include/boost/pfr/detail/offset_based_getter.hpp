@@ -93,6 +93,16 @@ class offset_based_getter {
     return reinterpret_cast<const index_t<idx> *>(reinterpret_cast<const char *>(u) + offset<idx>());
   }
 
+  template <std::size_t idx>
+  volatile index_t<idx> * get_pointer(volatile U * u) const {
+    return reinterpret_cast<volatile index_t<idx> *>(reinterpret_cast<volatile char *>(u) + offset<idx>());
+  }
+
+  template <std::size_t idx>
+  const volatile index_t<idx> * get_pointer(const volatile U * u) const {
+    return reinterpret_cast<const volatile index_t<idx> *>(reinterpret_cast<const volatile char *>(u) + offset<idx>());
+  }
+
 public:
   template <std::size_t idx>
   index_t<idx> & get(U & u, size_t_<idx>) const {
@@ -101,6 +111,16 @@ public:
 
   template <std::size_t idx>
   index_t<idx> const & get(U const & u, size_t_<idx>) const {
+    return *get_pointer<idx>(&u);
+  }
+
+  template <std::size_t idx>
+  index_t<idx> volatile & get(U volatile & u, size_t_<idx>) const {
+    return *get_pointer<idx>(&u);
+  }
+
+  template <std::size_t idx>
+  index_t<idx> const volatile & get(U const volatile & u, size_t_<idx>) const {
     return *get_pointer<idx>(&u);
   }
 
