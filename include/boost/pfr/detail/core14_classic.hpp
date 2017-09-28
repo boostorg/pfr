@@ -525,10 +525,11 @@ constexpr bool is_flat_refelectable(std::index_sequence<I...>) noexcept {
 }
 
 template <class T>
-auto tie_as_flat_tuple(T&& val) noexcept {
+auto tie_as_flat_tuple(T&& t) noexcept {
     using type = std::remove_const_t<std::remove_reference_t<T>>;
     using tuple_type = internal_tuple_with_same_alignment_t<type>;
     offset_based_getter<type, tuple_type> getter;
+    auto & val = std::forward<T>(t); // make it an lvalue
     return boost::pfr::detail::make_flat_tuple_of_references(val, getter, size_t_<0>{}, size_t_<tuple_type::size_v>{});
 }
 
@@ -626,8 +627,9 @@ template <class T, class F, class... Fields>
 void for_each_field_in_depth(T&& t, F&& f, std::index_sequence<>, identity<Fields>...) {
     using tuple_type = sequence_tuple::tuple<Fields...>;
     offset_based_getter<std::remove_const_t<std::remove_reference_t<T>>, tuple_type> getter;
+    auto & val = std::forward<T>(t); // make it an l-value
     std::forward<F>(f)(
-        boost::pfr::detail::make_flat_tuple_of_references(std::forward<T>(t), getter, size_t_<0>{}, size_t_<sizeof...(Fields)>{})
+        boost::pfr::detail::make_flat_tuple_of_references(val, getter, size_t_<0>{}, size_t_<sizeof...(Fields)>{})
     );
 }
 
