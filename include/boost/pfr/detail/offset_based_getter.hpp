@@ -50,7 +50,8 @@ class offset_based_getter {
   static_assert(sizeof(T) == sizeof(S), "Member sequence does not indicate correct size for struct type!");
   static_assert(alignof(T) == alignof(S), "Member sequence does not indicate correct alignment for struct type!");
 
-  static_assert(!std::is_const<T>::value, "const should be stripped from user-defined type when using offset_based_getter or overload resolution will be ambiguous later");
+  static_assert(!std::is_const<T>::value, "const should be stripped from user-defined type when using offset_based_getter or overload resolution will be ambiguous later, this indicates an error within pfr");
+  static_assert(!std::is_reference<T>::value, "reference should be stripped from user-defined type when using offset_based_getter or overload resolution will be ambiguous later, this indicates an error within pfr");
 
   // Get type of idx'th member
   template <std::size_t idx>
