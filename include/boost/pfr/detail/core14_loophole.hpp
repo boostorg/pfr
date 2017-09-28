@@ -25,6 +25,7 @@
 #include <type_traits>
 #include <utility>
 
+#include <boost/pfr/detail/cast_to_layout_compatible.hpp> // still needed for enums
 #include <boost/pfr/detail/offset_based_getter.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
 #include <boost/pfr/detail/make_flat_tuple_of_references.hpp>
@@ -123,7 +124,7 @@ auto tie_or_value(T&& val, std::enable_if_t<std::is_class< std::remove_reference
 
 template <class T>
 decltype(auto) tie_or_value(T&& val, std::enable_if_t<std::is_enum<std::remove_reference_t<T>>::value>* = 0) noexcept {
-    return static_cast<
+    return cast_to_layout_compatible<
         std::underlying_type_t<std::remove_reference_t<T> >
     >( std::forward<T>(val) );
 }
