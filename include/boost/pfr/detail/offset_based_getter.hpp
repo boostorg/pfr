@@ -20,6 +20,14 @@ namespace boost { namespace pfr { namespace detail {
 template <std::size_t Index>
 using size_t_ = std::integral_constant<std::size_t, Index >;
 
+// Our own implementation of std::aligned_storage. On godbolt with MSVC, I have compilation errors
+// using the standard version, it seems the compiler cannot generate default ctor.
+
+template<std::size_t s, std::size_t a>
+struct internal_aligned_storage {
+   alignas(a) char storage_[s];
+};
+
 // Metafunction that replaces tuple<T1, T2, T3, ...> with
 // tuple<std::aligned_storage_t<sizeof(T1), alignof(T1)>, std::aligned_storage<sizeof(T2), alignof(T2)>, ...>
 //
@@ -31,7 +39,7 @@ struct tuple_of_aligned_storage;
 
 template <typename... Ts>
 struct tuple_of_aligned_storage<sequence_tuple::tuple<Ts...>> {
-  using type = sequence_tuple::tuple<std::aligned_storage_t<sizeof(Ts), alignof(Ts)>...>;
+  using type = sequence_tuple::tuple<internal_aligned_storage<sizeof(Ts), alignof(Ts)>...>;
 };
 
 // Note: If pfr has a typelist also, could also have an overload for that here
@@ -66,8 +74,8 @@ class offset_based_getter {
   // calculations are correct.
   template <std::size_t idx>
   static std::ptrdiff_t offset() {
-    constexpr tuple_of_aligned_storage_t<S> layout{};
-    const auto * member = &sequence_tuple::get<idx>(layout);
+    /* static */ /* constexpr */ tuple_of_aligned_storage_t<S> layout{};
+    /* static */ /* constexpr */ const auto * member = &sequence_tuple::get<idx>(layout);
 
     /**
      * The goal is that the layout object should ultimately get optimized out of the binary, and this function should
@@ -75,16 +83,15 @@ class offset_based_getter {
      *
      * Unfortunately we can't do reinterpret_cast in a constexpr function but we can try to make it really easy to optimize.
      *
-     * An alternative implementation is
-
-      static constexpr tuple_of_aligned_storage_t<S> layout{};
-      static constexpr const auto * member = &sequence_tuple::get<idx>(layout);
-
-     * gcc and clang don't seem to care but some other compilers might generate better code for one or the other.
+     * There are some possible variations using static and constexpr above, but on compilers I tested, gcc and clang
+     * seem to do the right thing always here, and constexpr here may trip up even early releases of MSVC2017.
+     *
      * If `member` and `&layout` are constexpr then the function should be very easy to optimize to a constant.
      * But if we take address of static object layout that may force it to exist and make it harder to ultimately
      * eliminate from the binary.
-     * It needs testing, especially on msvc with which I am less familiar.
+     *
+     * If layout is a stack object, its address is not constexpr, but most compilers should still be able to figure out
+     * that the difference of the two pointers is a constant.
      */
 
     return reinterpret_cast<const char *>(member) - reinterpret_cast<const char *>(&layout);
