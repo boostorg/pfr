@@ -29,8 +29,8 @@ struct some_person {
 int main() {
     some_person val{"Edgar Allan Poe", 1809};
 
-    std::cout << boost::pfr::get<0>(val)
-        << " was born in " << boost::pfr::get<1>(val);
+    std::cout << boost::pfr::get<0>(val)                // No macro!
+        << " was born in " << boost::pfr::get<1>(val);  // Works with any aggregate initializables!
 }
 ```
 Outputs:
