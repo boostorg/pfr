@@ -1,6 +1,6 @@
 # Precise and Flat Reflection (ex Magic Get, ex PODs Flat Reflection)
 
-This C++14 library is meant for accessing structure elements by index and providing other std::tuple like methods for user defined types.
+This C++14 library is meant for accessing structure elements by index and providing other std::tuple like methods for user defined types without any macro or boilerplate code.
 
 
 [Latest documentation](http://apolukhin.github.com/magic_get/index.html)
@@ -13,6 +13,30 @@ Branches        | Build         | Tests coverage | More info
 ----------------|-------------- | -------------- |-----------
 Develop:        | [![Build Status](https://travis-ci.org/apolukhin/magic_get.svg?branch=develop)](https://travis-ci.org/apolukhin/magic_get) <!-- [![Build status](https://ci.appveyor.com/api/projects/status/t6q6yhcabtk5b99l/branch/develop?svg=true)](https://ci.appveyor.com/project/apolukhin/boost-dll/branch/develop)  --> | [![Coverage Status](https://coveralls.io/repos/github/apolukhin/magic_get/badge.png?branch=develop)](https://coveralls.io/github/apolukhin/magic_get?branch=develop) | <!-- [details...](http://www.boost.org/development/tests/develop/developer/pfr.html)) -->
 Master:         | [![Build Status](https://travis-ci.org/apolukhin/magic_get.svg?branch=master)](https://travis-ci.org/apolukhin/magic_get) <!--  [![Build status](https://ci.appveyor.com/api/projects/status/t6q6yhcabtk5b99l/branch/master?svg=true)](https://ci.appveyor.com/project/apolukhin/boost-dll/branch/master)  --> | [![Coverage Status](https://coveralls.io/repos/github/apolukhin/magic_get/badge.png?branch=master)](https://coveralls.io/github/apolukhin/magic_get?branch=master) | <!-- [details...](http://www.boost.org/development/tests/master/developer/pfr.html)) -->
+
+### Motivating Example #0
+```c++
+// requires: C++14
+#include <iostream>
+#include <string>
+#include "boost/pfr.hpp"
+
+struct some_person {
+    std::string name;
+    unsigned birth_year;
+};
+
+int main() {
+    some_person val{"Edgar Allan Poe", 1809};
+
+    std::cout << boost::pfr::get<0>(val)
+        << " was born in " << boost::pfr::get<1>(val);
+}
+```
+Outputs:
+```
+Edgar Allan Poe was born in 1809
+```
 
 
 ### Motivating Example #1
