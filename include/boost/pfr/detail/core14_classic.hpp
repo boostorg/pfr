@@ -13,7 +13,7 @@
 #include <utility>      // metaprogramming stuff
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
-#include <boost/pfr/detail/cast_to_layout_compatible.hpp>
+#include <boost/pfr/detail/offset_based_getter.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
 #include <boost/pfr/detail/make_flat_tuple_of_references.hpp>
 #include <boost/pfr/detail/size_array.hpp>
@@ -525,10 +525,18 @@ constexpr bool is_flat_refelectable(std::index_sequence<I...>) noexcept {
 }
 
 template <class T>
-auto tie_as_flat_tuple(T&& val) noexcept {
-    typedef internal_tuple_with_same_alignment_t<std::remove_reference_t<T>> tuple_type;
-    auto& t = boost::pfr::detail::cast_to_layout_compatible<tuple_type>(std::forward<T>(val));
-    return boost::pfr::detail::make_flat_tuple_of_references(t, size_t_<0>{}, size_t_<tuple_type::size_v>{});
+auto tie_as_flat_tuple(T&& t) noexcept {
+    using type = std::remove_cv_t<std::remove_reference_t<T>>;
+    using tuple_type = internal_tuple_with_same_alignment_t<type>;
+
+#if BOOST_PFR_NO_STRICT_ALIASING
+    sequence_tuple_getter getter;
+    auto & val = cast_to_layout_compatible<tuple_type>(std::forward<T>(t));
+#else
+    offset_based_getter<type, tuple_type> getter;
+    auto & val = std::forward<T>(t); // make it an lvalue
+#endif
+    return boost::pfr::detail::make_flat_tuple_of_references(val, getter, size_t_<0>{}, size_t_<tuple_type::size_v>{});
 }
 
 #if !BOOST_PFR_USE_CPP17
@@ -623,9 +631,16 @@ void for_each_field_in_depth(T&& t, F&& f, std::index_sequence<I0, I...>, identi
 
 template <class T, class F, class... Fields>
 void for_each_field_in_depth(T&& t, F&& f, std::index_sequence<>, identity<Fields>...) {
-    auto& tuple = boost::pfr::detail::cast_to_layout_compatible< ::boost::pfr::detail::sequence_tuple::tuple<Fields...> >(std::forward<T>(t));
+    using tuple_type = sequence_tuple::tuple<Fields...>;
+#if BOOST_PFR_NO_STRICT_ALIASING
+    sequence_tuple_getter getter;
+    auto & val = cast_to_layout_compatible<tuple_type>(std::forward<T>(t));
+#else
+    offset_based_getter<std::remove_cv_t<std::remove_reference_t<T>>, tuple_type> getter;
+    auto & val = std::forward<T>(t); // make it an l-value
+#endif
     std::forward<F>(f)(
-        boost::pfr::detail::make_flat_tuple_of_references(tuple, size_t_<0>{}, size_t_<sizeof...(Fields)>{})
+        boost::pfr::detail::make_flat_tuple_of_references(val, getter, size_t_<0>{}, size_t_<sizeof...(Fields)>{})
     );
 }
 
