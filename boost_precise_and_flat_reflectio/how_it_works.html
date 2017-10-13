@@ -43,13 +43,16 @@
                 of user-provided structure
               </li>
 <li class="listitem">
-                at compile-time: create a tuple with exactly the same layout as in
-                user-provided structure
+                at compile-time: using knowledge from previous steps create a tuple
+                with exactly the same layout as in user-provided structure
               </li>
 <li class="listitem">
-                at run-time: <code class="computeroutput"><span class="keyword">reinterpret_cast</span></code>
-                a pointer to user-provided structure to the tuple pointer (this has
-                no runtime penalty)
+                at compile-time: find offsets for each field in user-provided structure
+                using the tuple from previous step
+              </li>
+<li class="listitem">
+                at run-time: get pointer to each field, knowing the structure address
+                and each field offset
               </li>
 <li class="listitem">
                 at run-time: a tuple of references to fields is returned =&gt; all
@@ -69,7 +72,7 @@
                       <div class="orderedlist"><ol class="orderedlist" type="a"><li class="listitem">
                             at compile-time: structured bindings are used to decompose
                             a type <code class="computeroutput"><span class="identifier">T</span></code>
-                            to known amount of fields fields
+                            to known amount of fields
                           </li></ol></div>
                     </li>
 <li class="listitem">
@@ -123,9 +126,17 @@
                             that is convertible to anything
                           </li>
 <li class="listitem">
-                            at run-time: <code class="computeroutput"><span class="keyword">reinterpret_cast</span></code>
-                            pointer to user-provided structure to the tuple pointer
-                            (this has no runtime penalty)
+                            at compile-time: using knowledge from previous steps
+                            create a tuple with exactly the same layout as in user-provided
+                            structure
+                          </li>
+<li class="listitem">
+                            at compile-time: find offsets for each field in user-provided
+                            structure using the tuple from previous step
+                          </li>
+<li class="listitem">
+                            at run-time: get pointer to each field, knowing the structure
+                            address and each field offset
                           </li>
 </ol></div>
                     </li>
@@ -139,7 +150,7 @@
         </li>
 </ul></div>
 <p>
-      Long description: <a href="https://www.youtube.com/watch?v=abdeAew3gmQ" target="_top">Antony
+      Long description of some basics: <a href="https://www.youtube.com/watch?v=abdeAew3gmQ" target="_top">Antony
       Polukhin: C++14 Reflections Without Macros, Markup nor External Tooling. </a>.
     </p>
 </div>
