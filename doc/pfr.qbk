@@ -309,7 +309,6 @@ Note that disabling [*Loophole] in C++14 significantly limitates the reflection 
 
 * T must be POD and must not contain references nor bitfields
 * Enums will be returned as their underlying type
-* All the methods that provide access to fields have a `reinterpret_cast` to an unrelated type. All the possible efforts and compiler specific tricks were used to avoid issues. But strictly speaking *this is an Undefined Behavior.
 
 C++14 [*precise] functions limitations with manually disabled [*Loophole](C++17 or not disabling Loophole fixes those):
 
@@ -325,14 +324,15 @@ Short description:
 * Flat functions:
     # at compile-time: use aggregate initialization to detect fields count in user-provided structure
     # at compile-time: make a structure that is convertible to anything and remeber types it has been converted to during aggregate initialization of user-provided structure
-    # at compile-time: create a tuple with exactly the same layout as in user-provided structure
-    # at run-time: `reinterpret_cast` a pointer to user-provided structure to the tuple pointer (this has no runtime penalty)
+    # at compile-time: using knowledge from previous steps create a tuple with exactly the same layout as in user-provided structure
+    # at compile-time: find offsets for each field in user-provided structure using the tuple from previous step
+    # at run-time: get pointer to each field, knowing the structure address and each field offset
     # at run-time: a tuple of references to fields is returned => all the tuple methods are available for the structure
 
 * Precise functions:
     # at compile-time: use aggregate initialization to detect fields count in user-provided structure
         * C++17:
-            # at compile-time: structured bindings are used to decompose a type `T` to known amount of fields fields
+            # at compile-time: structured bindings are used to decompose a type `T` to known amount of fields
         * C++14:
             # Same approach as with [*flat] functions
         * C++14 with disabled [*Loophole]:
@@ -341,10 +341,12 @@ Short description:
             # at run-time: `T` is constructed and field `I` is aggregate initialized using a separate instance of structure that is convertible to anything [note Additional care is taken to make sure that all the information about `T` is available to the compiler and that operations on `T` have no side effects, so the compiler can optimize away the unnecessary temporary objects.]
             # at compile-time: `I += 1`
             # at compile-time: if `I` does not equal fields count goto step [~c.] from inside of the conversion operator of the structure that is convertible to anything
-            # at run-time: `reinterpret_cast` pointer to user-provided structure to the tuple pointer (this has no runtime penalty)
+            # at compile-time: using knowledge from previous steps create a tuple with exactly the same layout as in user-provided structure
+            # at compile-time: find offsets for each field in user-provided structure using the tuple from previous step
+            # at run-time: get pointer to each field, knowing the structure address and each field offset
     # at run-time: a tuple of references to fields is returned => all the tuple methods are available for the structure
 
-Long description: [@https://www.youtube.com/watch?v=abdeAew3gmQ Antony Polukhin: C++14 Reflections Without Macros, Markup nor External Tooling. ].
+Long description of some basics: [@https://www.youtube.com/watch?v=abdeAew3gmQ Antony Polukhin: C++14 Reflections Without Macros, Markup nor External Tooling. ].
 
 [endsect]
 
@@ -353,6 +355,8 @@ Long description: [@https://www.youtube.com/watch?v=abdeAew3gmQ Antony Polukhin:
 Great thanks to Bruno Dutra for showing the technique to precisely reflect aggregate initializable type in C++14 [@https://github.com/apolukhin/magic_get/issues/5 Manual type registering/structured bindings might be unnecessary].
 
 Great thanks to Alexandr Poltavsky for initial implementation the [*Loophole] technique and for describing it [@http://alexpolt.github.io/type-loophole.html in his blog].
+
+Great thanks to Chris Beck for implementing the detect-offsets-and-get-field-address functionality that avoids Undefined Behavior of reinterpret_casting layout compatible structures.
 
 [endsect]
 
