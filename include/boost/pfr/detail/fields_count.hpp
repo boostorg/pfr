@@ -142,20 +142,27 @@ constexpr std::size_t detect_fields_count_dispatch(size_t_<N>, int) noexcept {
 ///////////////////// Returns non-flattened fields count
 template <class T>
 constexpr std::size_t fields_count() noexcept {
+    using type = std::remove_cv_t<T>;
+
     static_assert(
-        std::is_copy_constructible<std::remove_all_extents_t<T>>::value,
+        !std::is_reference<type>::value,
+        "Attempt to get fields count on a reference. This is not allowed because that could hide an issue and different library users expect different behavior in that case."
+    );
+
+    static_assert(
+        std::is_copy_constructible<std::remove_all_extents_t<type>>::value,
         "Type and each field in the type must be copy constructible."
     );
 
     static_assert(
-        !std::is_polymorphic<T>::value,
+        !std::is_polymorphic<type>::value,
         "Type must have no virtual function, because otherwise it is not aggregate initializable."
     );
 
 #ifdef __cpp_lib_is_aggregate
     static_assert(
-        std::is_aggregate<T>::value             // Does not return `true` for build in types.
-        || std::is_standard_layout<T>::value,   // Does not return `true` for structs that have non standard layout members.
+        std::is_aggregate<type>::value             // Does not return `true` for build in types.
+        || std::is_standard_layout<type>::value,   // Does not return `true` for structs that have non standard layout members.
         "Type must be aggregate initializable."
     );
 #endif
@@ -163,21 +170,21 @@ constexpr std::size_t fields_count() noexcept {
 // Can't use the following. See the non_std_layout.cpp test.
 //#if !BOOST_PFR_USE_CPP17
 //    static_assert(
-//        std::is_standard_layout<T>::value,   // Does not return `true` for structs that have non standard layout members.
+//        std::is_standard_layout<type>::value,   // Does not return `true` for structs that have non standard layout members.
 //        "Type must be aggregate initializable."
 //    );
 //#endif
 
-    constexpr std::size_t max_fields_count = (sizeof(T) * 8); // We multiply by 8 because we may have bitfields in T
-    constexpr std::size_t result = detect_fields_count_dispatch<T>(size_t_<max_fields_count>{}, 1L);
+    constexpr std::size_t max_fields_count = (sizeof(type) * 8); // We multiply by 8 because we may have bitfields in T
+    constexpr std::size_t result = detect_fields_count_dispatch<type>(size_t_<max_fields_count>{}, 1L);
 
     static_assert(
-        is_aggregate_initializable_n<T, result>::value,
+        is_aggregate_initializable_n<type, result>::value,
         "Types with user specified constructors (non-aggregate initializable types) are not supported."
     );
 
     static_assert(
-        result != 0 || std::is_empty<T>::value || std::is_fundamental<T>::value,
+        result != 0 || std::is_empty<type>::value || std::is_fundamental<type>::value || std::is_reference<type>::value,
         "Something went wrong. Please report this issue to the github along with the structure you're reflecting."
     );
 
