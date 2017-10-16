@@ -19,7 +19,7 @@ Master:         | [![Build Status](https://travis-ci.org/apolukhin/magic_get.svg
 // requires: C++14
 #include <iostream>
 #include <string>
-#include "boost/pfr.hpp"
+#include "boost/pfr/precise.hpp"
 
 struct some_person {
     std::string name;
@@ -43,7 +43,7 @@ Edgar Allan Poe was born in 1809
 ```c++
 // requires: C++14
 #include <iostream>
-#include "boost/pfr.hpp"
+#include "boost/pfr/precise.hpp"
 
 struct my_struct { // no ostream operator defined!
     int i;
@@ -71,7 +71,7 @@ my_struct has 3 fields: {100, H, 3.14159}
 ```c++
 // requires: C++14
 #include <iostream>
-#include "boost/pfr.hpp"
+#include "boost/pfr/precise.hpp"
 
 struct my_struct { // no ostream operator defined!
     std::string s;
@@ -97,7 +97,7 @@ my_struct has 2 fields: {"Das ist fantastisch!", 100}
 ### Requirements and Limitations
 
 General:
-* C++14 compatible compiler (GCC-5.0+, Clang, ...)
+* C++14 compatible compiler (GCC-5.0+, Clang, MSVC with /std:c++latest or /std:c++17, ...)
 * Static variables are ignored
 * T must be constexpr aggregate initializable and must not contain references nor bitfields
 

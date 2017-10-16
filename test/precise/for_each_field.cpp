@@ -44,7 +44,6 @@ struct reg {
     const int a;
     char b;
     const my_constexpr d;
-    void* e;
     const color f;
     const char* g;
 };
@@ -68,40 +67,40 @@ int main () {
     BOOST_TEST_EQ(control, 1);
 
     control = 0;
-    int array[100] = {};
+    int array[10] = {};
     boost::pfr::for_each_field(array, [&control](auto&& val, std::size_t i) {
         BOOST_TEST_EQ(i, control);
         (void)val;
         ++ control;
     });
-    BOOST_TEST_EQ(control, 100);
+    BOOST_TEST_EQ(control, 10);
 
     std::stringstream ss;
-    boost::pfr::for_each_field(reg{42, 'a', {}, nullptr, color::green, "hello world!"}, [&ss](auto&& val, std::size_t i) {
+    boost::pfr::for_each_field(reg{42, 'a', {}, color::green, "hello world!"}, [&ss](auto&& val, std::size_t i) {
         if (i) {
             ss << ", ";
         }
         ss << val;
     });
-    BOOST_TEST_EQ("42, a, {}, 0, green, hello world!", ss.str());
+    BOOST_TEST_EQ(std::string("42, a, {}, green, hello world!"), ss.str());
     ss.str("");
 
     control = 0;
-    boost::pfr::for_each_field(reg{42, 'a', {}, nullptr, color::green, "hello world!"}, [&ss, &control](auto&& val, auto i) {
-        if (decltype(i)::value) {
+    boost::pfr::for_each_field(reg{42, 'a', {}, color::green, "hello world!"}, [&ss, &control](auto&& val, auto i) {
+        if (!!decltype(i)::value) {
             ss << ", ";
         }
         BOOST_TEST_EQ(decltype(i)::value, control);
         ++ control;
         ss << val;
     });
-    BOOST_TEST_EQ("42, a, {}, 0, green, hello world!", ss.str());
+    BOOST_TEST_EQ(std::string("42, a, {}, green, hello world!"), ss.str());
     ss.str("");
 
-    boost::pfr::for_each_field(reg{42, 'a', {}, nullptr, color::green, "hello world!"}, [&ss](auto&& val) {
+    boost::pfr::for_each_field(reg{42, 'a', {}, color::green, "hello world!"}, [&ss](auto&& val) {
         ss << val << ' ';
     });
-    BOOST_TEST_EQ("42 a {} 0 green hello world! ", ss.str());
+    BOOST_TEST_EQ(std::string("42 a {} green hello world! "), ss.str());
     ss.str("");
 
     std::cout << '\n';
@@ -112,5 +111,3 @@ int main () {
 
     return boost::report_errors();
 }
-
-

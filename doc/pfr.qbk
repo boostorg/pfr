@@ -67,6 +67,8 @@ All the functions that have `flat_` prefix and are declared in `boost/pfr/flat/*
 * If you use types with C arrays - use [*flat] functions
 * Otherwise use [*precise] functions
 
+[warning MSVC currently supports only [*precise] functions and only in /std:c++latest or /std:c++17 modes.]
+
 [endsect]
 
 
