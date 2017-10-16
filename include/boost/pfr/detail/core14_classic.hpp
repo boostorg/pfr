@@ -534,7 +534,7 @@ auto tie_as_flat_tuple(T&& t) noexcept {
     auto & val = cast_to_layout_compatible<tuple_type>(std::forward<T>(t));
 #else
     offset_based_getter<type, tuple_type> getter;
-    auto & val = std::forward<T>(t); // make it an lvalue
+    auto & val = t;
 #endif
     return boost::pfr::detail::make_flat_tuple_of_references(val, getter, size_t_<0>{}, size_t_<tuple_type::size_v>{});
 }
@@ -637,7 +637,7 @@ void for_each_field_in_depth(T&& t, F&& f, std::index_sequence<>, identity<Field
     auto & val = cast_to_layout_compatible<tuple_type>(std::forward<T>(t));
 #else
     offset_based_getter<std::remove_cv_t<std::remove_reference_t<T>>, tuple_type> getter;
-    auto & val = std::forward<T>(t); // make it an l-value
+    auto & val = t;
 #endif
     std::forward<F>(f)(
         boost::pfr::detail::make_flat_tuple_of_references(val, getter, size_t_<0>{}, size_t_<sizeof...(Fields)>{})

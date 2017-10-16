@@ -56,9 +56,9 @@ struct tag {
     friend auto loophole(tag<T,N>);
 };
 
-// For returning non default constructible types.
+// For returning non default constructible types. Never used at runtime! GCC's std::declval may not be used in potentionally evaluated contexts, so it does not work here.
 template <class T> constexpr T& unsafe_declval_like() noexcept {
-    T* ptr = 0;
+    T* ptr = nullptr;
     return *ptr;
 }
 

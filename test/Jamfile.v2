@@ -76,43 +76,43 @@ test-suite pfr
 
 
     ##### Flat specific tests
-    [ run flat/core.cpp ]
-    [ run flat/flat_tuple_size.cpp ]
-    [ run flat/flat_motivating_example.cpp ]
-    [ run flat/flat_for_each_field.cpp ]
-    [ compile-fail flat/flat_tuple_size_on_non_aggregate.cpp ]
-    [ compile-fail flat/flat_tuple_size_on_bitfields.cpp ]
+    [ run flat/core.cpp                     : : : $(CLASSIC_FLAT_DEF) ]
+    [ run flat/flat_tuple_size.cpp          : : : $(CLASSIC_FLAT_DEF) ]
+    [ run flat/flat_motivating_example.cpp  : : : $(CLASSIC_FLAT_DEF) ]
+    [ run flat/flat_for_each_field.cpp      : : : $(CLASSIC_FLAT_DEF) ]
+    [ compile-fail flat/flat_tuple_size_on_non_aggregate.cpp    : $(CLASSIC_FLAT_DEF) ]
+    [ compile-fail flat/flat_tuple_size_on_bitfields.cpp        : $(CLASSIC_FLAT_DEF) ]
 
 
     ##### Precise specific tests
-    [ run precise/tuple_size.cpp : : : : precise_tuple_size ]
-    [ run precise/bitfields.cpp : : : : precise_tuple_size_on_bitfields ]
-    [ run precise/for_each_field.cpp : : : : precise_for_each_field ]
-    [ run precise/motivating_example0.cpp : : : : precise_motivating_example0 ]
-    [ run precise/motivating_example.cpp : : : : precise_motivating_example ]
-    [ run precise/motivating_example2.cpp : : : : precise_motivating_example2 ]
-    [ run precise/optional_like.cpp      : : : $(CLASSIC_PREC_DEF) : precise_optional_like ]
-    [ run precise/get_non_default_constructible.cpp      : : : $(CLASSIC_PREC_DEF) : precise_get_non_default_constructible ]
-    [ compile-fail precise/non_aggregate.cpp : : precise_non_aggregate ]
+    [ run precise/tuple_size.cpp                    : : : $(CLASSIC_PREC_DEF) : precise_tuple_size ]
+    [ run precise/bitfields.cpp                     : : : $(CLASSIC_PREC_DEF) : precise_tuple_size_on_bitfields ]
+    [ run precise/for_each_field.cpp                : : : $(CLASSIC_PREC_DEF) : precise_for_each_field ]
+    [ run precise/motivating_example0.cpp           : : : $(CLASSIC_PREC_DEF) : precise_motivating_example0 ]
+    [ run precise/motivating_example.cpp            : : : $(CLASSIC_PREC_DEF) : precise_motivating_example ]
+    [ run precise/motivating_example2.cpp           : : : $(CLASSIC_PREC_DEF) : precise_motivating_example2 ]
+    [ run precise/optional_like.cpp                 : : : $(CLASSIC_PREC_DEF) : precise_optional_like ]
+    [ run precise/get_non_default_constructible.cpp : : : $(CLASSIC_PREC_DEF) : precise_get_non_default_constructible ]
+    [ compile-fail precise/non_aggregate.cpp        : $(CLASSIC_PREC_DEF) : precise_non_aggregate ]
 
 
     ##### Loophole tests running precise and flat specific tests
-    [ run flat/core.cpp : : : $(LOOPHOLE_FLAT_DEF) : flat_lh_core ]
-    [ run flat/flat_tuple_size.cpp : : : $(LOOPHOLE_FLAT_DEF) : flat_lh_tuple_size ]
-    [ run flat/flat_motivating_example.cpp : : : $(LOOPHOLE_FLAT_DEF) : flat_lh_motivating_example ]
-    [ run flat/flat_for_each_field.cpp : : : $(LOOPHOLE_FLAT_DEF) : flat_lh_for_each_field ]
-    [ compile-fail flat/flat_tuple_size_on_non_aggregate.cpp : $(LOOPHOLE_FLAT_DEF) : flat_lh_tuple_size_on_non_aggregate ]
-    [ compile-fail flat/flat_tuple_size_on_bitfields.cpp : $(LOOPHOLE_FLAT_DEF) : flat_lh_tuple_size_on_bitfields ]
+    [ run flat/core.cpp                             : : : $(LOOPHOLE_FLAT_DEF) : flat_lh_core ]
+    [ run flat/flat_tuple_size.cpp                  : : : $(LOOPHOLE_FLAT_DEF) : flat_lh_tuple_size ]
+    [ run flat/flat_motivating_example.cpp          : : : $(LOOPHOLE_FLAT_DEF) : flat_lh_motivating_example ]
+    [ run flat/flat_for_each_field.cpp              : : : $(LOOPHOLE_FLAT_DEF) : flat_lh_for_each_field ]
+    [ compile-fail flat/flat_tuple_size_on_non_aggregate.cpp    : $(LOOPHOLE_FLAT_DEF) : flat_lh_tuple_size_on_non_aggregate ]
+    [ compile-fail flat/flat_tuple_size_on_bitfields.cpp        : $(LOOPHOLE_FLAT_DEF) : flat_lh_tuple_size_on_bitfields ]
 
-    [ run precise/tuple_size.cpp : : : $(LOOPHOLE_PREC_DEF) : precise_lh_tuple_size ]
-    [ run precise/bitfields.cpp : : : $(LOOPHOLE_PREC_DEF) : precise_lh_tuple_size_on_bitfields ]
-    [ run precise/for_each_field.cpp : : : $(LOOPHOLE_PREC_DEF) : precise_lh_for_each_field ]
-    [ run precise/motivating_example0.cpp : : : $(LOOPHOLE_PREC_DEF) : precise_lh_motivating_example0 ]
-    [ run precise/motivating_example.cpp : : : $(LOOPHOLE_PREC_DEF) : precise_lh_motivating_example ]
-    [ run precise/motivating_example2.cpp : : : $(LOOPHOLE_PREC_DEF) : precise_lh_motivating_example2 ]
-    [ run precise/optional_like.cpp      : : : $(LOOPHOLE_PREC_DEF) : precise_lh_optional_like ]
-    [ run precise/get_non_default_constructible.cpp      : : : $(LOOPHOLE_PREC_DEF) : precise_lh_get_non_default_constructible ]
-    [ compile-fail precise/non_aggregate.cpp : $(LOOPHOLE_PREC_DEF) : precise_lh_non_aggregate ]
+    [ run precise/tuple_size.cpp                    : : : $(LOOPHOLE_PREC_DEF) : precise_lh_tuple_size ]
+    [ run precise/bitfields.cpp                     : : : $(LOOPHOLE_PREC_DEF) : precise_lh_tuple_size_on_bitfields ]
+    [ run precise/for_each_field.cpp                : : : $(LOOPHOLE_PREC_DEF) : precise_lh_for_each_field ]
+    [ run precise/motivating_example0.cpp           : : : $(LOOPHOLE_PREC_DEF) : precise_lh_motivating_example0 ]
+    [ run precise/motivating_example.cpp            : : : $(LOOPHOLE_PREC_DEF) : precise_lh_motivating_example ]
+    [ run precise/motivating_example2.cpp           : : : $(LOOPHOLE_PREC_DEF) : precise_lh_motivating_example2 ]
+    [ run precise/optional_like.cpp                 : : : $(LOOPHOLE_PREC_DEF) : precise_lh_optional_like ]
+    [ run precise/get_non_default_constructible.cpp : : : $(LOOPHOLE_PREC_DEF) : precise_lh_get_non_default_constructible ]
+    [ compile-fail precise/non_aggregate.cpp        : $(LOOPHOLE_PREC_DEF) : precise_lh_non_aggregate ]
 
 
     # Examples from docs
