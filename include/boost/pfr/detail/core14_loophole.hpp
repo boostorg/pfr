@@ -56,12 +56,16 @@ struct tag {
     friend auto loophole(tag<T,N>);
 };
 
-//template <class T> T& fake_return() noexcept; // For returning non default constructible types
+// For returning non default constructible types.
+template <class T> constexpr T& unsafe_declval_like() noexcept {
+    T* ptr = 0;
+    return *ptr;
+}
 
 // The definitions of friend functions.
 template <class T, class U, std::size_t N, bool B>
 struct fn_def {
-    friend auto loophole(tag<T,N>) { return /*boost::pfr::detail::fake_return<*/ std::remove_all_extents_t<U>{} /*>()*/; }
+    friend auto loophole(tag<T,N>) { return boost::pfr::detail::unsafe_declval_like< std::remove_all_extents_t<U> >(); }
 };
 
 // This specialization is to avoid multiple definition errors.

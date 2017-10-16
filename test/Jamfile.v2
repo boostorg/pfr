@@ -91,8 +91,8 @@ test-suite pfr
     [ run precise/motivating_example0.cpp : : : : precise_motivating_example0 ]
     [ run precise/motivating_example.cpp : : : : precise_motivating_example ]
     [ run precise/motivating_example2.cpp : : : : precise_motivating_example2 ]
-    [ run precise/optional_like.cpp      : : : $(CLASSIC_PREC_DEF)               : precise_optional_like ]
-    [ run precise/optional_like.cpp      : : : $(LOOPHOLE_PREC_DEF)              : precise_lh_optional_like ]
+    [ run precise/optional_like.cpp      : : : $(CLASSIC_PREC_DEF) : precise_optional_like ]
+    [ run precise/get_non_default_constructible.cpp      : : : $(CLASSIC_PREC_DEF) : precise_get_non_default_constructible ]
     [ compile-fail precise/non_aggregate.cpp : : precise_non_aggregate ]
 
 
@@ -110,6 +110,8 @@ test-suite pfr
     [ run precise/motivating_example0.cpp : : : $(LOOPHOLE_PREC_DEF) : precise_lh_motivating_example0 ]
     [ run precise/motivating_example.cpp : : : $(LOOPHOLE_PREC_DEF) : precise_lh_motivating_example ]
     [ run precise/motivating_example2.cpp : : : $(LOOPHOLE_PREC_DEF) : precise_lh_motivating_example2 ]
+    [ run precise/optional_like.cpp      : : : $(LOOPHOLE_PREC_DEF) : precise_lh_optional_like ]
+    [ run precise/get_non_default_constructible.cpp      : : : $(LOOPHOLE_PREC_DEF) : precise_lh_get_non_default_constructible ]
     [ compile-fail precise/non_aggregate.cpp : $(LOOPHOLE_PREC_DEF) : precise_lh_non_aggregate ]
 
 

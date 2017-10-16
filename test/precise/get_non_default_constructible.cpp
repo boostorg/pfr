@@ -7,15 +7,15 @@
 #include <boost/core/lightweight_test.hpp>
 
 template <class T>
-struct optional_like {
+struct non_default_constructible {
     T val_;
 
-    optional_like() = default;
-    template <class U> optional_like(U&& v){}
+    non_default_constructible() = delete;
+    template <class U> non_default_constructible(U&& v){}
 };
 
 struct Foo {
-    optional_like<int> a;
+    non_default_constructible<int> a;
 };
 
 int main() {
