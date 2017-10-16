@@ -26,6 +26,9 @@
 #ifndef BOOST_PFR_USE_CPP17
 #   ifdef __cpp_structured_bindings
 #       define BOOST_PFR_USE_CPP17 1
+#   elif defined(_MSC_VER)
+#       warning PFR library supports MSVC compiler only with /std:c++latest or /std:c++17 flag. Assuming that you`ve used it. Define `BOOST_PFR_USE_CPP17` to 1 to suppress this warning.
+#       define BOOST_PFR_USE_CPP17 1
 #   else
 #       define BOOST_PFR_USE_CPP17 0
 #   endif

@@ -39,17 +39,17 @@ namespace boost { namespace pfr {
 /// \endcode
 template <class Char, class Traits, class T>
 void write(std::basic_ostream<Char, Traits>& out, const T& value) {
-    constexpr std::size_t fields_count = detail::fields_count<std::remove_reference_t<T>>();
+    constexpr std::size_t fields_count_val = boost::pfr::detail::fields_count<std::remove_reference_t<T>>();
     out << '{';
 #if BOOST_PFR_USE_CPP17
-    detail::print_impl<0, fields_count>::print(out, detail::tie_as_tuple(value));
+    detail::print_impl<0, fields_count_val>::print(out, detail::tie_as_tuple(value));
 #else
     ::boost::pfr::detail::for_each_field_dispatcher(
         value,
         [&out](const auto& val) {
-            detail::print_impl<0, fields_count>::print(out, val);
+            detail::print_impl<0, fields_count_val>::print(out, val);
         },
-        std::make_index_sequence<fields_count>{}
+        std::make_index_sequence<fields_count_val>{}
     );
 #endif
     out << '}';
@@ -73,7 +73,7 @@ void write(std::basic_ostream<Char, Traits>& out, const T& value) {
 /// \endcode
 template <class Char, class Traits, class T>
 void read(std::basic_istream<Char, Traits>& in, T& value) {
-    constexpr std::size_t fields_count = detail::fields_count<std::remove_reference_t<T>>();
+    constexpr std::size_t fields_count_val = boost::pfr::detail::fields_count<std::remove_reference_t<T>>();
 
     const auto prev_exceptions = in.exceptions();
     in.exceptions( typename std::basic_istream<Char, Traits>::iostate(0) );
@@ -84,14 +84,14 @@ void read(std::basic_istream<Char, Traits>& in, T& value) {
     if (parenthis != '{') in.setstate(std::basic_istream<Char, Traits>::failbit);
 
 #if BOOST_PFR_USE_CPP17
-    detail::read_impl<0, fields_count>::read(in, detail::tie_as_tuple(value));
+    detail::read_impl<0, fields_count_val>::read(in, detail::tie_as_tuple(value));
 #else
     ::boost::pfr::detail::for_each_field_dispatcher(
         value,
         [&in](const auto& val) {
-            detail::read_impl<0, fields_count>::read(in, val);
+            detail::read_impl<0, fields_count_val>::read(in, val);
         },
-        std::make_index_sequence<fields_count>{}
+        std::make_index_sequence<fields_count_val>{}
     );
 #endif
 

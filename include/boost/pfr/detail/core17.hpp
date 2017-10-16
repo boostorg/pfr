@@ -12,6 +12,8 @@
 
 namespace boost { namespace pfr { namespace detail {
 
+#ifndef _MSC_VER // MSVC fails to compile the following code, but compiles the structured bindings in core17_generated.hpp
+
 struct do_not_define_std_tuple_size_for_me {
     bool test1 = true;
 };
@@ -40,6 +42,7 @@ static_assert(
     "Your compiler can not handle C++17 structured bindings. Read the above comments for workarounds."
 );
 
+#endif // #ifndef _MSC_VER
 
 template <class T, class F, std::size_t... I>
 void for_each_field_dispatcher(T&& t, F&& f, std::index_sequence<I...>) {

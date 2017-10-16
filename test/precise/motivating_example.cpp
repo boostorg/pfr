@@ -1,6 +1,6 @@
 // requires: C++14
 #include <iostream>
-#include "boost/pfr.hpp"
+#include "boost/pfr/precise.hpp"
 
 struct my_struct { // no ostream operator defined!
     int i;

@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include "boost/pfr.hpp"
+#include "boost/pfr/precise.hpp"
 
 struct some_person {
     std::string name;

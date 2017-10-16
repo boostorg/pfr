@@ -5,9 +5,17 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 #
 
-local LOOPHOLE_FLAT_DEF = <define>BOOST_PFR_TEST_FLAT <define>BOOST_PFR_USE_LOOPHOLE=1 ;
-local CLASSIC_FLAT_DEF = <define>BOOST_PFR_TEST_FLAT <define>BOOST_PFR_USE_LOOPHOLE=0 ;
-local LOOPHOLE_PREC_DEF = <define>BOOST_PFR_TEST_PRECISE <define>BOOST_PFR_USE_LOOPHOLE=1 ;
+project
+    : source-location .
+    : requirements
+        <toolset>msvc:<cxxflags>"/std:c++latest"
+        <toolset>msvc:<define>BOOST_PFR_USE_CPP17=1
+    ;
+
+local DISABLE_ON_MSVC = <toolset>msvc:<build>no ;
+local LOOPHOLE_FLAT_DEF = <define>BOOST_PFR_TEST_FLAT <define>BOOST_PFR_USE_LOOPHOLE=1 $(DISABLE_ON_MSVC) ;
+local CLASSIC_FLAT_DEF = <define>BOOST_PFR_TEST_FLAT <define>BOOST_PFR_USE_LOOPHOLE=0 $(DISABLE_ON_MSVC) ;
+local LOOPHOLE_PREC_DEF = <define>BOOST_PFR_TEST_PRECISE <define>BOOST_PFR_USE_LOOPHOLE=1 $(DISABLE_ON_MSVC) ;
 local CLASSIC_PREC_DEF = <define>BOOST_PFR_TEST_PRECISE <define>BOOST_PFR_USE_LOOPHOLE=0 ;
 
 test-suite pfr
@@ -66,13 +74,13 @@ test-suite pfr
     [ compile-fail common/fields_count_on_reference.cpp ]
     [ run common/fields_count_on_const.cpp ]
 
-    ##### Tuple sizes
-    [ run common/test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=char : test_tuple_sizes_on_chars ]
-    [ run common/test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=int : test_tuple_sizes_on_ints ]
-    [ run common/test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=short : test_tuple_sizes_on_shorts ]
-    [ run common/test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=void* : test_tuple_sizes_on_voidptrs ]
-    [ run common/test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=std::size_t : test_tuple_sizes_on_size_ts ]
-    #[ run common/test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=char <define>BOOST_PFR_RUN_HUGE_TESTS : test_tuple_sizes_on_chars_huge ]
+    ##### Flat tuple sizes
+    [ run common/test_tuple_sizes_on.cpp : : : $(DISABLE_ON_MSVC) <define>BOOST_PFR_RUN_TEST_ON=char : test_tuple_sizes_on_chars ]
+    [ run common/test_tuple_sizes_on.cpp : : : $(DISABLE_ON_MSVC) <define>BOOST_PFR_RUN_TEST_ON=int : test_tuple_sizes_on_ints ]
+    [ run common/test_tuple_sizes_on.cpp : : : $(DISABLE_ON_MSVC) <define>BOOST_PFR_RUN_TEST_ON=short : test_tuple_sizes_on_shorts ]
+    [ run common/test_tuple_sizes_on.cpp : : : $(DISABLE_ON_MSVC) <define>BOOST_PFR_RUN_TEST_ON=void* : test_tuple_sizes_on_voidptrs ]
+    [ run common/test_tuple_sizes_on.cpp : : : $(DISABLE_ON_MSVC) <define>BOOST_PFR_RUN_TEST_ON=std::size_t : test_tuple_sizes_on_size_ts ]
+    #[ run common/test_tuple_sizes_on.cpp $(DISABLE_ON_MSVC)<define>BOOST_PFR_RUN_TEST_ON=char <define>BOOST_PFR_RUN_HUGE_TESTS : test_tuple_sizes_on_chars_huge ]
 
 
     ##### Flat specific tests
@@ -116,8 +124,8 @@ test-suite pfr
 
 
     # Examples from docs
-    [ run ../example/examples.cpp ]
-    [ run ../example/quick_examples.cpp ]
+    [ run ../example/examples.cpp : : : $(DISABLE_ON_MSVC) ]
+    [ run ../example/quick_examples.cpp : : : $(DISABLE_ON_MSVC) ]
   ;
 
 

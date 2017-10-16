@@ -5,11 +5,11 @@
 
 
 #ifdef BOOST_PFR_TEST_FLAT
-#include <boost/pfr/flat/global_ops.hpp>
-#endif
-
-#ifdef BOOST_PFR_TEST_PRECISE
-#include <boost/pfr/precise/global_ops.hpp>
+#   include <boost/pfr/flat/global_ops.hpp>
+#elif defined(BOOST_PFR_TEST_PRECISE)
+#   include <boost/pfr/precise/global_ops.hpp>
+#else
+#   error Misused test
 #endif
 
 

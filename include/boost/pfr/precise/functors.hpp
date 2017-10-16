@@ -248,17 +248,17 @@ template <class T> struct hash {
     ///
     /// \rcast14
     std::size_t operator()(const T& x) const {
-        constexpr std::size_t fields_count = detail::fields_count<std::remove_reference_t<T>>();
+        constexpr std::size_t fields_count_val = boost::pfr::detail::fields_count<std::remove_reference_t<T>>();
 #if BOOST_PFR_USE_CPP17
-        return detail::hash_impl<0, fields_count>::compute(detail::tie_as_tuple(x));
+        return detail::hash_impl<0, fields_count_val>::compute(detail::tie_as_tuple(x));
 #else
         std::size_t result = 0;
         ::boost::pfr::detail::for_each_field_dispatcher(
             x,
             [&result](const auto& lhs) {
-                result = detail::hash_impl<0, fields_count>::compute(lhs);
+                result = detail::hash_impl<0, fields_count_val>::compute(lhs);
             },
-            std::make_index_sequence<fields_count>{}
+            std::make_index_sequence<fields_count_val>{}
         );
 
         return result;

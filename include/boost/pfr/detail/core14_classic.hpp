@@ -46,6 +46,13 @@ template <class T> constexpr auto flat_array_of_type_ids() noexcept;
 namespace typeid_conversions {
 
 ///////////////////// Helper constants and typedefs
+
+#ifdef _MSC_VER
+#   pragma warning( push )
+    // '<<': check operator precedence for possible error; use parentheses to clarify precedence
+#   pragma warning( disable : 4554 ) 
+#endif
+
 constexpr std::size_t native_types_mask = 31;
 constexpr std::size_t bits_per_extension = 3;
 constexpr std::size_t extension_maks = (
@@ -97,6 +104,9 @@ using remove_1_ext = size_t_<
     ((Index & ~native_types_mask) << bits_per_extension) | (Index & native_types_mask)
 >;
 
+#ifdef _MSC_VER
+#   pragma warning( pop )
+#endif
 
 ///////////////////// Forward declarations
 

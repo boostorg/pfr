@@ -3,8 +3,13 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/pfr/flat/tuple_size.hpp>
-#include <boost/pfr/precise/tuple_size.hpp>
+#ifdef BOOST_PFR_TEST_PRECISE
+#   include <boost/pfr/precise/tuple_size.hpp>
+#elif defined(BOOST_PFR_TEST_FLAT)
+#   include <boost/pfr/flat/tuple_size.hpp>
+#else
+#   error Misused test
+#endif
 
 struct X {
     X(int) {}
@@ -34,8 +39,6 @@ int main() {
     static_assert(boost::pfr::tuple_size_v<S6> == 6, "");
 #elif defined(BOOST_PFR_TEST_FLAT)
     return boost::pfr::flat_tuple_size_v<S>;
-#else
-#   error Misused test
 #endif
 }
 

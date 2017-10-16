@@ -4,13 +4,13 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifdef BOOST_PFR_TEST_FLAT
-#include <boost/pfr/flat/functions_for.hpp>
-#define BOOST_PFR_TEST_FUNCTIONS_FOR BOOST_PFR_FLAT_FUNCTIONS_FOR
-#endif
-
-#ifdef BOOST_PFR_TEST_PRECISE
-#include <boost/pfr/precise/functions_for.hpp>
-#define BOOST_PFR_TEST_FUNCTIONS_FOR BOOST_PFR_PRECISE_FUNCTIONS_FOR
+#   include <boost/pfr/flat/functions_for.hpp>
+#   define BOOST_PFR_TEST_FUNCTIONS_FOR BOOST_PFR_FLAT_FUNCTIONS_FOR
+#elif defined(BOOST_PFR_TEST_PRECISE)
+#   include <boost/pfr/precise/functions_for.hpp>
+#   define BOOST_PFR_TEST_FUNCTIONS_FOR BOOST_PFR_PRECISE_FUNCTIONS_FOR
+#else
+#   error Misused test
 #endif
 
 #include <boost/core/lightweight_test.hpp>
