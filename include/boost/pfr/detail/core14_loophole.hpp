@@ -56,10 +56,12 @@ struct tag {
     friend auto loophole(tag<T,N>);
 };
 
+//template <class T> T& fake_return() noexcept; // For returning non default constructible types
+
 // The definitions of friend functions.
 template <class T, class U, std::size_t N, bool B>
 struct fn_def {
-    friend auto loophole(tag<T,N>) { return std::remove_all_extents_t<U>{}; }
+    friend auto loophole(tag<T,N>) { return /*boost::pfr::detail::fake_return<*/ std::remove_all_extents_t<U>{} /*>()*/; }
 };
 
 // This specialization is to avoid multiple definition errors.
@@ -77,7 +79,7 @@ struct loophole_ubiq {
     template<class U, std::size_t M, std::size_t = sizeof(loophole(tag<T,M>{})) > static char ins(int);
 
     template<class U, std::size_t = sizeof(fn_def<T, U, N, sizeof(ins<U, N>(0)) == sizeof(char)>)>
-    constexpr operator U() noexcept;
+    constexpr operator U&() const noexcept; // `const` here helps to avoid ambiguity in loophole instantiations. optional_like test validate that behavior.
 };
 
 
@@ -87,7 +89,8 @@ struct loophole_type_list;
 
 template <typename T, std::size_t... I>
 struct loophole_type_list< T, std::index_sequence<I...> >
-    : sequence_tuple::tuple< decltype(T{ loophole_ubiq<T, I>{}... }, 0) > // Instantiating loopholes.
+     // Instantiating loopholes:
+    : sequence_tuple::tuple< decltype(T{ loophole_ubiq<T, I>{}... }, 0) >
 {
     using type = sequence_tuple::tuple< decltype(loophole(tag<T, I>{}))... >;
 };
