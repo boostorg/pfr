@@ -87,14 +87,14 @@ template <class T, std::size_t Begin, std::size_t Middle>
 constexpr auto detect_fields_count(size_t_<Begin>, size_t_<Middle>, long) noexcept
     -> enable_if_constructible_helper_t<T, Middle>
 {
-    constexpr std::size_t next = Middle + (Middle - Begin + 1) / 2;
-    return detect_fields_count<T>(size_t_<Middle>{}, size_t_<next>{}, 1L);
+    using next_t = size_t_<Middle + (Middle - Begin + 1) / 2>;
+    return detect_fields_count<T>(size_t_<Middle>{}, next_t{}, 1L);
 }
 
 template <class T, std::size_t Begin, std::size_t Middle>
 constexpr std::size_t detect_fields_count(size_t_<Begin>, size_t_<Middle>, int) noexcept {
-    constexpr std::size_t next = (Begin + Middle) / 2;
-    return detect_fields_count<T>(size_t_<Begin>{}, size_t_<next>{}, 1L);
+    using next_t = size_t_<(Begin + Middle) / 2>;
+    return detect_fields_count<T>(size_t_<Begin>{}, next_t{}, 1L);
 }
 
 ///////////////////// Greedy search. Templates instantiation depth is log(sizeof(T)), templates instantiation count is log(sizeof(T))*T in worst case.

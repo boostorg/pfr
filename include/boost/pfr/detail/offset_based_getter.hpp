@@ -76,7 +76,7 @@ class offset_based_getter {
   template <std::size_t idx>
   static constexpr std::ptrdiff_t offset() noexcept {
     constexpr tuple_of_aligned_storage_t<S> layout{};
-    return &sequence_tuple::get<idx>(layout).storage_[0] - &sequence_tuple::get<0>(layout).storage_[0];;
+    return &sequence_tuple::get<idx>(layout).storage_[0] - &sequence_tuple::get<0>(layout).storage_[0];
   }
 
   // Encapsulates offset arithmetic and reinterpret_cast
