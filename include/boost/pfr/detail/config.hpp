@@ -11,7 +11,7 @@
 //  * MSVC++ 14.0 _MSC_VER == 1900 (Visual Studio 2015)
 //  * MSVC++ 12.0 _MSC_VER == 1800 (Visual Studio 2013)
 
-#if __cplusplus < 201402L && (!defined(_MSC_VER) || _MSC_VER <= 1900)
+#if __cplusplus < 201402L && (!defined(_MSC_VER) || _MSC_VER < 1900)
 #   error Boost.PFR library requires C++14.
 #endif
 
