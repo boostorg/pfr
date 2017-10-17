@@ -51,12 +51,12 @@ build_script:
     - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
     - bootstrap.bat
     - b2.exe headers
-    - cd %BOOST%/libs/%PROJECT_TO_TEST%/test
+    - cd %BOOST%/libs/%APPVEYOR_PROJECT_NAME%/test
 
 after_build:
 before_test:
 test_script:
-  - ..\..\..\b2.exe address-model=64 architecture=x86 toolset=msvc cxxflags="-DBOOST_TRAVISCI_BUILD" -sBOOST_BUILD_PATH=.
+    - ..\..\..\b2.exe address-model=64 architecture=x86 toolset=msvc cxxflags="-DBOOST_TRAVISCI_BUILD" -sBOOST_BUILD_PATH=.
 
 after_test:
 on_success:
