@@ -2,7 +2,7 @@
 # subject to the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #
-# Copyright Antony Polukhin 2016.
+# Copyright Antony Polukhin 2016-2016-2017.
 
 #
 # See https://svn.boost.org/trac/boost/wiki/TravisCoverals for description of this file
@@ -14,7 +14,7 @@ init:
     - set BRANCH_TO_TEST=%APPVEYOR_REPO_BRANCH%
     - set BOOST_REMOVE=pfr
 
-image: Visual Studio 2017
+image: Visual Studio 2017 Preview
 configuration: Debug
 platform: x64
 
