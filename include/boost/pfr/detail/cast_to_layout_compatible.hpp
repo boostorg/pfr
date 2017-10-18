@@ -11,6 +11,7 @@
 
 #include <type_traits>
 #include <utility>      // metaprogramming stuff
+#include <boost/pfr/detail/lr_value.hpp>
 
 namespace boost { namespace pfr { namespace detail {
 
@@ -60,13 +61,9 @@ MAY_ALIAS To& cast_to_layout_compatible(From& val) noexcept {
     static_assert_layout_compatible<To, From>();
     return *t;
 }
-/*
+
 template <class To, class From>
-MAY_ALIAS std::enable_if_t<std::is_rvalue_reference<From&&>::value, To&&> cast_to_layout_compatible(From&& val) noexcept {
-    MAY_ALIAS To* const t = reinterpret_cast<To*>( std::addressof(val) );
-    static_assert_layout_compatible<To, From>();
-    return std::move(*t);
-}*/
+MAY_ALIAS To&& cast_to_layout_compatible(rvalue_t<From> val) = delete;
 
 #undef MAY_ALIAS
 

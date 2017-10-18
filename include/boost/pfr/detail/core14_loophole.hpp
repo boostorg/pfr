@@ -30,6 +30,7 @@
 #include <boost/pfr/detail/fields_count.hpp>
 #include <boost/pfr/detail/make_flat_tuple_of_references.hpp>
 #include <boost/pfr/detail/sequence_tuple.hpp>
+#include <boost/pfr/detail/lr_value.hpp>
 
 
 #ifdef __clang__
@@ -101,7 +102,7 @@ struct loophole_type_list< T, std::index_sequence<I...> >
 
 
 template <class T>
-auto tie_as_tuple_loophole_impl(T&& lvalue) noexcept {
+auto tie_as_tuple_loophole_impl(lvalue_t<T> lvalue) noexcept {
     using type = std::remove_cv_t<std::remove_reference_t<T>>;
     using indexes = std::make_index_sequence<fields_count<type>()>;
     using tuple_type = typename loophole_type_list<type, indexes>::type;
@@ -115,21 +116,21 @@ auto tie_as_tuple_loophole_impl(T&& lvalue) noexcept {
 }
 
 // Forward declarations:
-template <class T> auto tie_as_tuple_recursively(T&& val) noexcept;
+template <class T> auto tie_as_tuple_recursively(rvalue_t<T> val) noexcept;
 
 template <class T>
-auto tie_or_value(T&& val, std::enable_if_t<std::is_class< std::remove_reference_t<T> >::value>* = 0) noexcept {
+auto tie_or_value(lvalue_t<T> val, std::enable_if_t<std::is_class< std::remove_reference_t<T> >::value>* = 0) noexcept {
     return boost::pfr::detail::tie_as_tuple_recursively(
-        boost::pfr::detail::tie_as_tuple_loophole_impl(std::forward<T>(val))
+        boost::pfr::detail::tie_as_tuple_loophole_impl(val)
     );
 }
 
 template <class T>
-decltype(auto) tie_or_value(T&& lvalue, std::enable_if_t<std::is_enum<std::remove_reference_t<T>>::value>* = 0) noexcept {
+decltype(auto) tie_or_value(lvalue_t<T> val, std::enable_if_t<std::is_enum<std::remove_reference_t<T>>::value>* = 0) noexcept {
     // This is compatible with the pre-loophole implementation, and tests, but IIUC it violates strict aliasing unfortunately
     return cast_to_layout_compatible<
         std::underlying_type_t<std::remove_reference_t<T> >
-    >(lvalue);
+    >(val);
 #if 0
     // This "works", in that it's usable and it doesn't violate strict aliasing.
     // But it means we break compatibility and don't convert enum to underlying type.
@@ -138,12 +139,12 @@ decltype(auto) tie_or_value(T&& lvalue, std::enable_if_t<std::is_enum<std::remov
 }
 
 template <class T>
-decltype(auto) tie_or_value(T&& val, std::enable_if_t<!std::is_class< std::remove_reference_t<T> >::value && !std::is_enum< std::remove_reference_t<T> >::value>* = 0) noexcept {
-    return std::forward<T>(val);
+decltype(auto) tie_or_value(lvalue_t<T> val, std::enable_if_t<!std::is_class< std::remove_reference_t<T> >::value && !std::is_enum< std::remove_reference_t<T> >::value>* = 0) noexcept {
+    return val;
 }
 
 template <class T, std::size_t... I>
-auto tie_as_tuple_recursively_impl(T&& tup, std::index_sequence<I...> ) noexcept
+auto tie_as_tuple_recursively_impl(lvalue_t<T> tup, std::index_sequence<I...> ) noexcept
     ->  sequence_tuple::tuple<
             decltype(boost::pfr::detail::tie_or_value(
                 sequence_tuple::get<I>(std::forward<T>(tup))
@@ -152,21 +153,21 @@ auto tie_as_tuple_recursively_impl(T&& tup, std::index_sequence<I...> ) noexcept
 {
     return {
         boost::pfr::detail::tie_or_value(
-            sequence_tuple::get<I>(std::forward<T>(tup))
+            sequence_tuple::get<I>(tup)
         )...
     };
 }
 
 template <class T>
-auto tie_as_tuple_recursively(T&& tup) noexcept {
+auto tie_as_tuple_recursively(rvalue_t<T> tup) noexcept {
     using indexes = std::make_index_sequence<T::size_v>;
-    return boost::pfr::detail::tie_as_tuple_recursively_impl(std::forward<T>(tup), indexes{});
+    return boost::pfr::detail::tie_as_tuple_recursively_impl(tup, indexes{});
 }
 
 template <class T>
-auto tie_as_flat_tuple(T&& t) {
+auto tie_as_flat_tuple(lvalue_t<T> t) {
     auto rec_tuples = boost::pfr::detail::tie_as_tuple_recursively(
-        boost::pfr::detail::tie_as_tuple_loophole_impl(std::forward<T>(t))
+        boost::pfr::detail::tie_as_tuple_loophole_impl(t)
     );
 
     return boost::pfr::detail::make_flat_tuple_of_references(
@@ -177,16 +178,16 @@ auto tie_as_flat_tuple(T&& t) {
 
 #if !BOOST_PFR_USE_CPP17
 template <class T>
-auto tie_as_tuple(T&& val) noexcept {
+auto tie_as_tuple(lvalue_t<T> val) noexcept {
     return boost::pfr::detail::tie_as_tuple_loophole_impl(
-        std::forward<T>(val)
+        val
     );
 }
 
 template <class T, class F, std::size_t... I>
-void for_each_field_dispatcher(T&& t, F&& f, std::index_sequence<I...>) {
+void for_each_field_dispatcher(lvalue_t<T> t, F&& f, std::index_sequence<I...>) {
     std::forward<F>(f)(
-        boost::pfr::detail::tie_as_tuple_loophole_impl(std::forward<T>(t))
+        boost::pfr::detail::tie_as_tuple_loophole_impl(t)
     );
 }
 

@@ -127,10 +127,12 @@ auto flat_structure_tie(T& val /* @cond */, std::enable_if_t< std::is_trivially_
 /// \endcode
 template <class T, class F>
 void flat_for_each_field(T&& value, F&& func) {
+    auto tup = detail::tie_as_flat_tuple(value);
     ::boost::pfr::detail::for_each_field_impl(
-        detail::tie_as_flat_tuple(std::forward<T>(value)),
+        tup,
         std::forward<F>(func),
-        std::make_index_sequence< flat_tuple_size_v<T> >{}
+        std::make_index_sequence< flat_tuple_size_v<T> >{},
+        std::is_rvalue_reference<T&&>{}
     );
 }
 

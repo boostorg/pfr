@@ -143,16 +143,17 @@ void for_each_field(T&& value, F&& func) {
     constexpr std::size_t fields_count_val = boost::pfr::detail::fields_count<std::remove_reference_t<T>>();
 
     ::boost::pfr::detail::for_each_field_dispatcher(
-        std::forward<T>(value),
+        value,
         [f = std::forward<F>(func)](auto&& t) mutable {
             // MSVC related workaround. It's lambdas do not capture constexprs.
             constexpr std::size_t fields_count_val_in_lambda
                 = boost::pfr::detail::fields_count<std::remove_reference_t<T>>();
 
             ::boost::pfr::detail::for_each_field_impl(
-                std::forward<decltype(t)>(t),
+                t,
                 std::forward<F>(f),
-                std::make_index_sequence<fields_count_val_in_lambda>{}
+                std::make_index_sequence<fields_count_val_in_lambda>{},
+                std::is_rvalue_reference<T&&>{}
             );
         },
         std::make_index_sequence<fields_count_val>{}

@@ -11,6 +11,7 @@
 
 #include <utility>      // metaprogramming stuff
 #include <boost/pfr/detail/sequence_tuple.hpp>
+#include <boost/pfr/detail/lr_value.hpp>
 
 
 namespace boost { namespace pfr { namespace detail {
@@ -22,24 +23,24 @@ using size_t_ = std::integral_constant<std::size_t, Index >;
 // For user-defined structures, the getter should be "offset_based_getter"
 struct sequence_tuple_getter {
   template <std::size_t idx, typename T>
-  decltype(auto) get(T && t, size_t_<idx>) const {
-    return sequence_tuple::get<idx>(std::forward<T>(t));
+  decltype(auto) get(lvalue_t<T> t, size_t_<idx>) const noexcept {
+    return sequence_tuple::get<idx>(t);
   };
 };
 
 
 template <class Tuple, class Getter, std::size_t Begin, std::size_t Size>
-constexpr auto make_flat_tuple_of_references(Tuple&&, Getter&&, size_t_<Begin>, size_t_<Size>) noexcept;
+constexpr auto make_flat_tuple_of_references(lvalue_t<Tuple>, const Getter&, size_t_<Begin>, size_t_<Size>) noexcept;
 
 template <class Tuple, class Getter, std::size_t Begin>
-constexpr sequence_tuple::tuple<> make_flat_tuple_of_references(Tuple&&, Getter&&, size_t_<Begin>, size_t_<0>) noexcept;
+constexpr sequence_tuple::tuple<> make_flat_tuple_of_references(lvalue_t<Tuple>, const Getter&, size_t_<Begin>, size_t_<0>) noexcept;
 
 template <class Tuple, class Getter, std::size_t Begin>
-constexpr auto make_flat_tuple_of_references(Tuple&&, Getter&&, size_t_<Begin>, size_t_<1>) noexcept;
+constexpr auto make_flat_tuple_of_references(lvalue_t<Tuple>, const Getter&, size_t_<Begin>, size_t_<1>) noexcept;
 
 template <class... T>
-constexpr auto tie_as_tuple_with_references(T&&... args) noexcept {
-    return sequence_tuple::tuple<T&...>{ std::forward<T>(args)... };
+constexpr auto tie_as_tuple_with_references(lvalue_t<T>... args) noexcept {
+    return sequence_tuple::tuple<T&...>{ args... };
 }
 
 template <class... T>
@@ -69,23 +70,23 @@ constexpr auto my_tuple_cat(const Tuple1& t1, const Tuple2& t2) noexcept {
 }
 
 template <class Tuple, class Getter, std::size_t Begin, std::size_t Size>
-constexpr auto make_flat_tuple_of_references(Tuple&& t, Getter&& g, size_t_<Begin>, size_t_<Size>) noexcept {
+constexpr auto make_flat_tuple_of_references(lvalue_t<Tuple> t, const Getter& g, size_t_<Begin>, size_t_<Size>) noexcept {
     constexpr std::size_t next_size = Size / 2;
     return my_tuple_cat(
-        make_flat_tuple_of_references(std::forward<Tuple>(t), std::forward<Getter>(g), size_t_<Begin>{}, size_t_<next_size>{}),
-        make_flat_tuple_of_references(std::forward<Tuple>(t), std::forward<Getter>(g), size_t_<Begin + Size / 2>{}, size_t_<Size - next_size>{})
+        make_flat_tuple_of_references(t, g, size_t_<Begin>{}, size_t_<next_size>{}),
+        make_flat_tuple_of_references(t, g, size_t_<Begin + Size / 2>{}, size_t_<Size - next_size>{})
     );
 }
 
 template <class Tuple, class Getter, std::size_t Begin>
-constexpr sequence_tuple::tuple<> make_flat_tuple_of_references(Tuple&&, Getter&&, size_t_<Begin>, size_t_<0>) noexcept {
+constexpr sequence_tuple::tuple<> make_flat_tuple_of_references(lvalue_t<Tuple>, const Getter&, size_t_<Begin>, size_t_<0>) noexcept {
     return {};
 }
 
 template <class Tuple, class Getter, std::size_t Begin>
-constexpr auto make_flat_tuple_of_references(Tuple&& t, Getter&& g, size_t_<Begin>, size_t_<1>) noexcept {
+constexpr auto make_flat_tuple_of_references(lvalue_t<Tuple> t, const Getter& g, size_t_<Begin>, size_t_<1>) noexcept {
     return tie_as_tuple_with_references(
-        std::forward<Getter>(g).get(std::forward<Tuple>(t), size_t_<Begin>{})
+        g.get(t, size_t_<Begin>{})
     );
 }
 

@@ -12,6 +12,7 @@
 #include <type_traits>
 #include <utility>
 #include <boost/pfr/detail/sequence_tuple.hpp>
+#include <boost/pfr/detail/lr_value.hpp>
 
 
 namespace boost { namespace pfr { namespace detail {
@@ -121,14 +122,9 @@ public:
     return *this_t::get_pointer<idx>(std::addressof(u));
   }
 
-  /*
-  This overload was similarly commented out in cast_to_layout_compatible
-
+  // rvalues must no be used here, to avoid template instantiation bloats.
   template <std::size_t idx>
-  index_t<idx> && get(U && u, size_t_<idx>) const noexcept {
-    return std::move(*this_t::get_pointer<idx>(std::addressof(u)));
-  }
-  */
+  index_t<idx> && get(rvalue_t<U> u, size_t_<idx>) const = delete;
 };
 
 

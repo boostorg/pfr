@@ -9,6 +9,7 @@
 
 #include <boost/pfr/detail/core17_generated.hpp>
 #include <boost/pfr/detail/for_each_field_impl.hpp>
+#include <boost/pfr/detail/lr_value.hpp>
 
 namespace boost { namespace pfr { namespace detail {
 
@@ -45,9 +46,9 @@ static_assert(
 #endif // #ifndef _MSC_VER
 
 template <class T, class F, std::size_t... I>
-void for_each_field_dispatcher(T&& t, F&& f, std::index_sequence<I...>) {
+void for_each_field_dispatcher(lvalue_t<T> t, F&& f, std::index_sequence<I...>) {
     std::forward<F>(f)(
-        detail::tie_as_tuple(std::forward<T>(t))
+        detail::tie_as_tuple(t)
     );
 }
 
