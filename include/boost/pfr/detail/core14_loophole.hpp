@@ -101,19 +101,14 @@ struct loophole_type_list< T, std::index_sequence<I...> >
 
 
 template <class T>
-auto tie_as_tuple_loophole_impl(T&& val) noexcept {
+auto tie_as_tuple_loophole_impl(T&& lvalue) noexcept {
     using type = std::remove_cv_t<std::remove_reference_t<T>>;
     using indexes = std::make_index_sequence<fields_count<type>()>;
     using tuple_type = typename loophole_type_list<type, indexes>::type;
 
     return boost::pfr::detail::make_flat_tuple_of_references(
-#if BOOST_PFR_NO_STRICT_ALIASING
-        cast_to_layout_compatible<tuple_type>(std::forward<T>(val)),
-        sequence_tuple_getter{},
-#else
-        std::forward<T>(val),
+        lvalue,
         offset_based_getter<type, tuple_type>{},
-#endif
         size_t_<0>{},
         size_t_<tuple_type::size_v>{}
     );
@@ -130,17 +125,15 @@ auto tie_or_value(T&& val, std::enable_if_t<std::is_class< std::remove_reference
 }
 
 template <class T>
-decltype(auto) tie_or_value(T&& val, std::enable_if_t<std::is_enum<std::remove_reference_t<T>>::value>* = 0) noexcept {
-    // FIXME
-#if 1 || BOOST_PFR_NO_STRICT_ALIASING
+decltype(auto) tie_or_value(T&& lvalue, std::enable_if_t<std::is_enum<std::remove_reference_t<T>>::value>* = 0) noexcept {
     // This is compatible with the pre-loophole implementation, and tests, but IIUC it violates strict aliasing unfortunately
     return cast_to_layout_compatible<
         std::underlying_type_t<std::remove_reference_t<T> >
-    >( std::forward<T>(val) );
-#else
+    >(lvalue);
+#if 0
     // This "works", in that it's usable and it doesn't violate strict aliasing.
     // But it means we break compatibility and don't convert enum to underlying type.
-    return std::forward<T>(val);
+    return val;
 #endif
 }
 
