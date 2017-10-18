@@ -8,11 +8,16 @@
 #pragma once
 
 // Reminder:
+//  * MSVC++ 1?.? _MSC_VER >  1900 (Visual Studio 2017)
 //  * MSVC++ 14.0 _MSC_VER == 1900 (Visual Studio 2015)
 //  * MSVC++ 12.0 _MSC_VER == 1800 (Visual Studio 2013)
 
-#if __cplusplus < 201402L && (!defined(_MSC_VER) || _MSC_VER < 1900)
-#   error Boost.PFR library requires C++14.
+#if defined(_MSC_VER)
+#   if _MSC_VER <= 1900
+#       error Boost.PFR library requires MSVC with c++17 support (Visual Studio 2017 or later).
+#   endif
+#elif __cplusplus < 201402L
+#   error Boost.PFR library requires at least C++14.
 #endif
 
 #ifndef BOOST_PFR_USE_LOOPHOLE
