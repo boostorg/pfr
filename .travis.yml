@@ -40,7 +40,7 @@ env:
         # Note that "--coverage -fsanitize=address,leak,undefined -DBOOST_TRAVISCI_BUILD" are added automatically lower in code
         - CXX_FLAGS="-std=c++1y" LINK_FLAGS="" TOOLSET=gcc-6
         #- CXX_FLAGS="-std=c++11 -stdlib=libc++" LINK_FLAGS="-stdlib=libc++" TOOLSET=clang
-        #- CXX_FLAGS="-std=c++1y -stdlib=libc++" LINK_FLAGS="-stdlib=libc++" TOOLSET=clang
+        - CXX_FLAGS="-std=c++14 -stdlib=libc++" LINK_FLAGS="-stdlib=libc++" TOOLSET=clang-3.9
 
 ###############################################################################################################
 # From this point and below code is same for all the Boost libs
@@ -52,13 +52,14 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
+    - llvm-toolchain-trusty-3.9
     - git-core
     packages:
     - git
     - python-yaml
     - gcc-6
     - g++-6
-    - clang
+    - clang-3.9
     - libc++-dev
 
 before_install:
