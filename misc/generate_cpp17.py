@@ -35,7 +35,6 @@ PROLOGUE = """// Copyright (c) 2016-2017 Antony Polukhin
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
-#include <boost/pfr/detail/lr_value.hpp>
 
 namespace boost { namespace pfr { namespace detail {
 
@@ -45,19 +44,19 @@ constexpr auto make_tuple_of_references(Args&&... args) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T&& /*val*/, size_t_<0>) noexcept {
+constexpr auto tie_as_tuple(T& /*val*/, size_t_<0>) noexcept {
   return sequence_tuple::tuple<>{};
 }
 
 template <class T>
-constexpr auto tie_as_tuple(lvalue_t<T> val, size_t_<1>, std::enable_if_t<std::is_class< std::remove_cv_t<T> >::value>* = 0) noexcept {
+constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<std::is_class< std::remove_cv_t<T> >::value>* = 0) noexcept {
   auto& [a] = val;
   return ::boost::pfr::detail::make_tuple_of_references(a);
 }
 
 
 template <class T>
-constexpr auto tie_as_tuple(lvalue_t<T> val, size_t_<1>, std::enable_if_t<!std::is_class< std::remove_cv_t<T> >::value>* = 0) noexcept {
+constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<!std::is_class< std::remove_cv_t<T> >::value>* = 0) noexcept {
   return ::boost::pfr::detail::make_tuple_of_references( val );
 }
 
@@ -68,7 +67,7 @@ EPILOGUE = """
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template <class T>
-constexpr auto tie_as_tuple(lvalue_t<T> val) noexcept {
+constexpr auto tie_as_tuple(T& val) noexcept {
   typedef size_t_<fields_count<T>()> fields_count_tag;
   return boost::pfr::detail::tie_as_tuple(val, fields_count_tag{});
 }
@@ -85,7 +84,7 @@ generate_sfinae_attempts = False
 if generate_sfinae_attempts:
     print """
     template <class T, std::size_t I>
-    constexpr auto tie_as_tuple(lvalue_t<T> val, size_t_<I>) noexcept {
+    constexpr auto tie_as_tuple(T& val, size_t_<I>) noexcept {
       return tie_as_tuple(val, size_t_<I - 1>{});
     }
     """
@@ -106,7 +105,7 @@ for i in xrange(1, funcs_count):
     indexes += ascii_letters[i % max_args_on_a_line]
 
     print "template <class T>"
-    print "constexpr auto tie_as_tuple(T&& val, size_t_<" + str(i + 1) + ">) noexcept {"
+    print "constexpr auto tie_as_tuple(T& val, size_t_<" + str(i + 1) + ">) noexcept {"
     if i < max_args_on_a_line:
         print "  auto& [" + indexes.strip() + "] = val;"
         print "  return ::boost::pfr::detail::make_tuple_of_references(" + indexes.strip() + ");"
@@ -123,7 +122,7 @@ for i in xrange(1, funcs_count):
 
     if generate_sfinae_attempts:
         print "template <class T>"
-        print "constexpr auto tie_as_tuple(T&& val, size_t_<" + str(i + 1) + "> v) noexcept"
+        print "constexpr auto tie_as_tuple(T& val, size_t_<" + str(i + 1) + "> v) noexcept"
         print "  ->decltype( ::boost::pfr::detail::tie_as_tuple0(std::forward<T>(val), v) )"
         print "{ return ::boost::pfr::detail::tie_as_tuple0(std::forward<T>(val), v); }\n"
 

@@ -11,7 +11,7 @@
 
 #include <type_traits>
 #include <utility>      // metaprogramming stuff
-#include <boost/pfr/detail/lr_value.hpp>
+#include <boost/pfr/detail/rvalue_t.hpp>
 
 namespace boost { namespace pfr { namespace detail {
 
@@ -62,8 +62,10 @@ MAY_ALIAS To& cast_to_layout_compatible(From& val) noexcept {
     return *t;
 }
 
+#ifdef BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING
 template <class To, class From>
-MAY_ALIAS To&& cast_to_layout_compatible(rvalue_t<From> val) = delete;
+To&& cast_to_layout_compatible(rvalue_t<From> val) noexcept = delete;
+#endif
 
 #undef MAY_ALIAS
 

@@ -115,9 +115,6 @@ constexpr decltype(auto) get(tuple<T...>&& t) noexcept {
     return get_impl<N>(std::move(t));
 }
 
-// TODO: Shouldn't this be std::remove_reference_t ??
-// Or better, implemented using variadic templates to extract I'th parameter
-// exactly?
 template <std::size_t I, class T>
 using tuple_element = std::remove_reference< decltype(
         ::boost::pfr::detail::sequence_tuple::get<I>( std::declval<T>() )

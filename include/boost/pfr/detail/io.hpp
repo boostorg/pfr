@@ -46,13 +46,6 @@ struct print_impl {
         out << quoted_helper(boost::pfr::detail::sequence_tuple::get<I>(value));
         print_impl<I + 1, N>::print(out, value);
     }
-
-    template <class Stream, class T>
-    static void print (Stream& out, const std::string& value) {
-        if (!!I) out << ", ";
-        out << std::quoted( boost::pfr::detail::sequence_tuple::get<I>(value) );
-        print_impl<I + 1, N>::print(out, value);
-    }
 };
 
 template <std::size_t I>

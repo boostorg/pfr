@@ -17,7 +17,7 @@
 #include <boost/pfr/detail/fields_count.hpp>
 #include <boost/pfr/detail/make_flat_tuple_of_references.hpp>
 #include <boost/pfr/detail/size_array.hpp>
-#include <boost/pfr/detail/lr_value.hpp>
+#include <boost/pfr/detail/rvalue_t.hpp>
 
 #ifdef __clang__
 #   pragma clang diagnostic push
@@ -536,7 +536,7 @@ constexpr bool is_flat_refelectable(std::index_sequence<I...>) noexcept {
 }
 
 template <class T>
-auto tie_as_flat_tuple(lvalue_t<T> lvalue) noexcept {
+auto tie_as_flat_tuple(T& lvalue) noexcept {
     using type = std::remove_cv_t<T>;
     using tuple_type = internal_tuple_with_same_alignment_t<type>;
 
@@ -547,7 +547,7 @@ auto tie_as_flat_tuple(lvalue_t<T> lvalue) noexcept {
 #if !BOOST_PFR_USE_CPP17
 
 template <class T>
-auto tie_as_tuple(lvalue_t<T> val) noexcept {
+auto tie_as_tuple(T& val) noexcept {
     typedef T type;
     static_assert(
         boost::pfr::detail::is_flat_refelectable<type>( std::make_index_sequence<fields_count<type>()>{} ),
@@ -590,10 +590,10 @@ struct is_constexpr_aggregate_initializable { // TODO: try to fix it
 
 
 template <class T, class F, std::size_t I0, std::size_t... I, class... Fields>
-void for_each_field_in_depth(lvalue_t<T> t, F&& f, std::index_sequence<I0, I...>, identity<Fields>...);
+void for_each_field_in_depth(T& t, F&& f, std::index_sequence<I0, I...>, identity<Fields>...);
 
 template <class T, class F, class... Fields>
-void for_each_field_in_depth(lvalue_t<T> t, F&& f, std::index_sequence<>, identity<Fields>...);
+void for_each_field_in_depth(T& t, F&& f, std::index_sequence<>, identity<Fields>...);
 
 template <class T, class F, class IndexSeq, class... Fields>
 struct next_step {
@@ -615,7 +615,7 @@ struct next_step {
 };
 
 template <class T, class F, std::size_t I0, std::size_t... I, class... Fields>
-void for_each_field_in_depth(lvalue_t<T> t, F&& f, std::index_sequence<I0, I...>, identity<Fields>...) {
+void for_each_field_in_depth(T& t, F&& f, std::index_sequence<I0, I...>, identity<Fields>...) {
     (void)std::add_const_t<std::remove_reference_t<T>>{
         Fields{}...,
         next_step<T, F, std::index_sequence<I...>, Fields...>{t, f},
@@ -624,7 +624,7 @@ void for_each_field_in_depth(lvalue_t<T> t, F&& f, std::index_sequence<I0, I...>
 }
 
 template <class T, class F, class... Fields>
-void for_each_field_in_depth(lvalue_t<T> lvalue, F&& f, std::index_sequence<>, identity<Fields>...) {
+void for_each_field_in_depth(T& lvalue, F&& f, std::index_sequence<>, identity<Fields>...) {
     using tuple_type = sequence_tuple::tuple<Fields...>;
 
     offset_based_getter<std::remove_cv_t<std::remove_reference_t<T>>, tuple_type> getter;
@@ -634,7 +634,7 @@ void for_each_field_in_depth(lvalue_t<T> lvalue, F&& f, std::index_sequence<>, i
 }
 
 template <class T, class F, std::size_t... I>
-void for_each_field_dispatcher_1(lvalue_t<T> t, F&& f, std::index_sequence<I...>, std::true_type /*is_flat_refelectable*/) {
+void for_each_field_dispatcher_1(T& t, F&& f, std::index_sequence<I...>, std::true_type /*is_flat_refelectable*/) {
     std::forward<F>(f)(
         boost::pfr::detail::tie_as_flat_tuple(t)
     );
@@ -642,7 +642,7 @@ void for_each_field_dispatcher_1(lvalue_t<T> t, F&& f, std::index_sequence<I...>
 
 
 template <class T, class F, std::size_t... I>
-void for_each_field_dispatcher_1(lvalue_t<T> t, F&& f, std::index_sequence<I...>, std::false_type /*is_flat_refelectable*/) {
+void for_each_field_dispatcher_1(T& t, F&& f, std::index_sequence<I...>, std::false_type /*is_flat_refelectable*/) {
     boost::pfr::detail::for_each_field_in_depth(
         t,
         std::forward<F>(f),
@@ -651,7 +651,7 @@ void for_each_field_dispatcher_1(lvalue_t<T> t, F&& f, std::index_sequence<I...>
 }
 
 template <class T, class F, std::size_t... I>
-void for_each_field_dispatcher(lvalue_t<T> t, F&& f, std::index_sequence<I...>) {
+void for_each_field_dispatcher(T& t, F&& f, std::index_sequence<I...>) {
     /// Compile time error at this point means that you have called `for_each_field` or some other non-flat function or operator for a
     /// type that is not constexpr aggregate initializable.
     ///

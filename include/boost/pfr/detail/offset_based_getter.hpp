@@ -12,7 +12,7 @@
 #include <type_traits>
 #include <utility>
 #include <boost/pfr/detail/sequence_tuple.hpp>
-#include <boost/pfr/detail/lr_value.hpp>
+#include <boost/pfr/detail/rvalue_t.hpp>
 
 
 namespace boost { namespace pfr { namespace detail {

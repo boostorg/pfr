@@ -9,7 +9,7 @@
 
 #include <boost/pfr/detail/core17_generated.hpp>
 #include <boost/pfr/detail/for_each_field_impl.hpp>
-#include <boost/pfr/detail/lr_value.hpp>
+#include <boost/pfr/detail/rvalue_t.hpp>
 
 namespace boost { namespace pfr { namespace detail {
 
@@ -21,7 +21,8 @@ struct do_not_define_std_tuple_size_for_me {
 
 template <class T>
 constexpr bool do_structured_bindings_work() noexcept { // ******************************************* IN CASE OF ERROR READ THE FOLLOWING LINES IN boost/pfr/detail/core17.hpp FILE:
-    const auto& [a] = T{}; // ******************************************* IN CASE OF ERROR READ THE FOLLOWING LINES IN boost/pfr/detail/core17.hpp FILE:
+    T val{};
+    const auto& [a] = val; // ******************************************* IN CASE OF ERROR READ THE FOLLOWING LINES IN boost/pfr/detail/core17.hpp FILE:
 
     /****************************************************************************
     *
@@ -46,7 +47,7 @@ static_assert(
 #endif // #ifndef _MSC_VER
 
 template <class T, class F, std::size_t... I>
-void for_each_field_dispatcher(lvalue_t<T> t, F&& f, std::index_sequence<I...>) {
+void for_each_field_dispatcher(T& t, F&& f, std::index_sequence<I...>) {
     std::forward<F>(f)(
         detail::tie_as_tuple(t)
     );

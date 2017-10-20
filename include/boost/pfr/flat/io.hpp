@@ -59,7 +59,9 @@ void flat_read(std::basic_istream<Char, Traits>& in, T& value) {
     char parenthis = {};
     in >> parenthis;
     if (parenthis != '{') in.setstate(std::basic_istream<Char, Traits>::failbit);
-    detail::read_impl<0, flat_tuple_size_v<T> >::read(in, detail::tie_as_flat_tuple(value));
+
+    auto tuple = detail::tie_as_flat_tuple(value);
+    detail::read_impl<0, flat_tuple_size_v<T> >::read(in, tuple);
 
     in >> parenthis;
     if (parenthis != '}') in.setstate(std::basic_istream<Char, Traits>::failbit);

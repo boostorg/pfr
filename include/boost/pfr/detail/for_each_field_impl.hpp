@@ -12,7 +12,7 @@
 #include <utility>      // metaprogramming stuff
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
-#include <boost/pfr/detail/lr_value.hpp>
+#include <boost/pfr/detail/rvalue_t.hpp>
 
 namespace boost { namespace pfr { namespace detail {
 
@@ -30,7 +30,7 @@ void for_each_field_impl_apply(T&& v, F&& f, I /*i*/, int) {
 }
 
 template <class T, class F, std::size_t... I>
-void for_each_field_impl(lvalue_t<T> t, F&& f, std::index_sequence<I...>, std::false_type /*move_values*/) {
+void for_each_field_impl(T& t, F&& f, std::index_sequence<I...>, std::false_type /*move_values*/) {
      const int v[] = {(
          for_each_field_impl_apply(sequence_tuple::get<I>(t), std::forward<F>(f), size_t_<I>{}, 1L),
          0
@@ -40,7 +40,7 @@ void for_each_field_impl(lvalue_t<T> t, F&& f, std::index_sequence<I...>, std::f
 
 
 template <class T, class F, std::size_t... I>
-void for_each_field_impl(lvalue_t<T> t, F&& f, std::index_sequence<I...>, std::true_type /*move_values*/) {
+void for_each_field_impl(T& t, F&& f, std::index_sequence<I...>, std::true_type /*move_values*/) {
      const int v[] = {(
          for_each_field_impl_apply(sequence_tuple::get<I>(std::move(t)), std::forward<F>(f), size_t_<I>{}, 1L),
          0
