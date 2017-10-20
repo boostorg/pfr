@@ -10,6 +10,7 @@ project
     : requirements
         <toolset>msvc:<cxxflags>"/std:c++latest"
         <toolset>msvc:<define>BOOST_PFR_USE_CPP17=1
+	<define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1
     ;
 
 local DISABLE_ON_MSVC = <toolset>msvc:<build>no ;

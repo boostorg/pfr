@@ -95,7 +95,7 @@ my_struct has 2 fields: {"Das ist fantastisch!", 100}
 ### Requirements and Limitations
 
 General:
-* C++14 compatible compiler (GCC-5.0+, Clang, MSVC with /std:c++latest or /std:c++17, ...)
+* C++14 compatible compiler (GCC-5.0+, Clang, Visual Studio 2017 with /std:c++latest or /std:c++17, ...)
 * Static variables are ignored
 * T must be constexpr aggregate initializable and must not contain references nor bitfields
 
