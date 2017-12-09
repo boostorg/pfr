@@ -14,17 +14,27 @@
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/core14.hpp>
 
+//for flat_tuple_size, see below
+#ifdef _MSC_VER
+constexpr std::size_t size_v = 4;
+#endif
+
 namespace boost { namespace pfr {
 
 /// \brief Has a static const member variable `value` that contains fields count in a \flattening{flattened} T.
 ///
+/// \note (Giperion): On MSVC not working properly (compiler not support correctly)
 /// \b Example:
 /// \code
 ///     std::array<int, boost::pfr::flat_tuple_size<my_structure>::value > a;
 /// \endcode
-template <class T>
-using flat_tuple_size = boost::pfr::detail::size_t_<decltype(boost::pfr::detail::tie_as_flat_tuple(std::declval<T&>()))::size_v>;
-
+#ifdef _MSC_VER
+	template <class T>
+	using flat_tuple_size = boost::pfr::detail::size_t_<size_v>;
+#else
+	template <class T>
+	using flat_tuple_size = boost::pfr::detail::size_t_<decltype(boost::pfr::detail::tie_as_flat_tuple(std::declval<T&>()))::size_v>;
+#endif
 
 /// \brief `flat_tuple_size_v` is a template variable that contains fields count in a \flattening{flattened} T.
 ///
