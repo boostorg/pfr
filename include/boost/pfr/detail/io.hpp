@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2017 Antony Polukhin
+// Copyright (c) 2016-2018 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,10 +13,11 @@
 #include <iosfwd>       // stream operators
 #include <iomanip>
 
-// Forward declaration
-namespace std {
-    template <class CharT, class Traits> class basic_string_view;
-}
+#if defined(__has_include)
+#   if __has_include(<string_view>) && BOOST_PFR_USE_CPP17
+#       include <string_view>
+#   endif
+#endif
 
 namespace boost { namespace pfr { namespace detail {
 
@@ -24,10 +25,14 @@ inline auto quoted_helper(const std::string& s) noexcept {
     return std::quoted(s);
 }
 
+#if defined(__has_include)
+#   if __has_include(<string_view>) && BOOST_PFR_USE_CPP17
 template <class CharT, class Traits>
 inline auto quoted_helper(const std::basic_string_view<CharT, Traits>& s) noexcept {
     return std::quoted(s);
 }
+#   endif
+#endif
 
 inline auto quoted_helper(std::string& s) noexcept {
     return std::quoted(s);
