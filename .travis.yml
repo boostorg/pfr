@@ -10,7 +10,7 @@
 #
 # File revision #7 (modified)
 
-sudo: false
+sudo: true
 language: cpp
 compiler:
     - gcc
