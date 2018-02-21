@@ -28,7 +28,7 @@ inline auto quoted_helper(const std::string& s) noexcept {
 #if defined(__has_include)
 #   if __has_include(<string_view>) && BOOST_PFR_USE_CPP17
 template <class CharT, class Traits>
-inline auto quoted_helper(const std::basic_string_view<CharT, Traits>& s) noexcept {
+inline auto quoted_helper(std::basic_string_view<CharT, Traits> s) noexcept {
     return std::quoted(s);
 }
 #   endif
