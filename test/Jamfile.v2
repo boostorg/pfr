@@ -59,8 +59,18 @@ test-suite pfr
 
     [ compile-fail common/virtual_functions.cpp : $(CLASSIC_FLAT_DEF)           : flat_virtual_functions ]
     [ compile-fail common/virtual_functions.cpp : $(LOOPHOLE_FLAT_DEF)          : flat_lh_virtual_functions ]
-    [ compile-fail common/virtual_functions.cpp : $(CLASSIC_PREC_DEF)              : precise_virtual_functions ]
+    [ compile-fail common/virtual_functions.cpp : $(CLASSIC_PREC_DEF)           : precise_virtual_functions ]
     [ compile-fail common/virtual_functions.cpp : $(LOOPHOLE_PREC_DEF)          : precise_lh_virtual_functions ]
+
+    [ compile-fail common/ops_unions.cpp : $(CLASSIC_FLAT_DEF)                  : flat_unions ]
+    [ compile-fail common/ops_unions.cpp : $(LOOPHOLE_FLAT_DEF)                 : flat_lh_unions ]
+    [ compile-fail common/ops_unions.cpp : $(CLASSIC_PREC_DEF)                  : precise_unions ]
+    [ compile-fail common/ops_unions.cpp : $(LOOPHOLE_PREC_DEF)                 : precise_lh_unions ]
+
+    [ compile-fail common/ops_unrestricted_unions.cpp : $(CLASSIC_FLAT_DEF)     : flat_unrestricted_unions ]
+    [ compile-fail common/ops_unrestricted_unions.cpp : $(LOOPHOLE_FLAT_DEF)    : flat_lh_unrestricted_unions ]
+    [ compile-fail common/ops_unrestricted_unions.cpp : $(CLASSIC_PREC_DEF)     : precise_unrestricted_unions ]
+    [ compile-fail common/ops_unrestricted_unions.cpp : $(LOOPHOLE_PREC_DEF)    : precise_lh_unrestricted_unions ]
 
     [ compile-fail common/non_std_layout.cpp : $(CLASSIC_FLAT_DEF)              : flat_non_standard_layout ]
     [ compile-fail common/non_std_layout.cpp : $(LOOPHOLE_FLAT_DEF)             : flat_lh_non_standard_layout ]
