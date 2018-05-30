@@ -118,7 +118,8 @@ template <class Type> constexpr std::size_t type_to_id(identity<volatile Type*>)
 template <class Type> constexpr std::size_t type_to_id(identity<Type&>) noexcept;
 template <class Type> constexpr std::size_t type_to_id(identity<Type>, std::enable_if_t<std::is_enum<Type>::value>* = 0) noexcept;
 template <class Type> constexpr std::size_t type_to_id(identity<Type>, std::enable_if_t<std::is_empty<Type>::value>* = 0) noexcept;
-template <class Type> constexpr size_array<sizeof(Type) * 3> type_to_id(identity<Type>, std::enable_if_t<!std::is_enum<Type>::value && !std::is_empty<Type>::value>* = 0) noexcept;
+template <class Type> constexpr std::size_t type_to_id(identity<Type>, std::enable_if_t<std::is_union<Type>::value>* = 0) noexcept;
+template <class Type> constexpr size_array<sizeof(Type) * 3> type_to_id(identity<Type>, std::enable_if_t<!std::is_enum<Type>::value && !std::is_empty<Type>::value && !std::is_union<Type>::value>* = 0) noexcept;
 
 template <std::size_t Index> constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_const_ptr_type> = 0) noexcept;
 template <std::size_t Index> constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_ptr_type> = 0) noexcept;
@@ -232,7 +233,16 @@ constexpr std::size_t type_to_id(identity<Type>, std::enable_if_t<std::is_empty<
 }
 
 template <class Type>
-constexpr size_array<sizeof(Type) * 3> type_to_id(identity<Type>, std::enable_if_t<!std::is_enum<Type>::value && !std::is_empty<Type>::value>*) noexcept {
+constexpr std::size_t type_to_id(identity<Type>, std::enable_if_t<std::is_union<Type>::value>*) noexcept {
+    static_assert(
+        !std::is_union<Type>::value,
+        "For safety reasons it is forbidden to flat_ reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
+    );
+    return 0;
+}
+
+template <class Type>
+constexpr size_array<sizeof(Type) * 3> type_to_id(identity<Type>, std::enable_if_t<!std::is_enum<Type>::value && !std::is_empty<Type>::value && !std::is_union<Type>::value>*) noexcept {
     constexpr auto t = flat_array_of_type_ids<Type>();
     size_array<sizeof(Type) * 3> result {{tuple_begin_tag}};
     constexpr bool requires_tuplening = (

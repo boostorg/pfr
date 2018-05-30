@@ -99,13 +99,12 @@ int main() {
     };
     test_comparable_struct<local_comparable_struct>();
 
+#if defined(BOOST_PFR_TEST_PRECISE)
     struct local_comparable_struct_with_union {
         int i; short s; bool bl; int a,b,c,d,e; test_union u;
     };
     test_comparable_struct<local_comparable_struct_with_union>();
     
-    // TODO: static_assert that flat_ops do not work with unions!
-#if defined(BOOST_PFR_TEST_PRECISE) || BOOST_PFR_USE_LOOPHOLE
     // Making sure that test_union overloaded operations were called.
     BOOST_TEST_EQ(test_union_counter, 17);
 #endif
