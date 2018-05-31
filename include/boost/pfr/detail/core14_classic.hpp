@@ -547,6 +547,10 @@ constexpr bool is_flat_refelectable(std::index_sequence<I...>) noexcept {
 
 template <class T>
 auto tie_as_flat_tuple(T& lvalue) noexcept {
+    static_assert(
+        !std::is_union<T>::value,
+        "For safety reasons it is forbidden to flat_ reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
+    );
     using type = std::remove_cv_t<T>;
     using tuple_type = internal_tuple_with_same_alignment_t<type>;
 
@@ -558,9 +562,12 @@ auto tie_as_flat_tuple(T& lvalue) noexcept {
 
 template <class T>
 auto tie_as_tuple(T& val) noexcept {
-    typedef T type;
     static_assert(
-        boost::pfr::detail::is_flat_refelectable<type>( std::make_index_sequence<fields_count<type>()>{} ),
+        !std::is_union<T>::value,
+        "For safety reasons it is forbidden to reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
+    );
+    static_assert(
+        boost::pfr::detail::is_flat_refelectable<T>( std::make_index_sequence<boost::pfr::detail::fields_count<T>()>{} ),
         "Not possible in C++14 to represent that type without loosing information. Use boost::pfr::flat_ version, or change type definition, or enable C++17"
     );
     return boost::pfr::detail::tie_as_flat_tuple(val);
@@ -662,6 +669,11 @@ void for_each_field_dispatcher_1(T& t, F&& f, std::index_sequence<I...>, std::fa
 
 template <class T, class F, std::size_t... I>
 void for_each_field_dispatcher(T& t, F&& f, std::index_sequence<I...>) {
+    static_assert(
+        !std::is_union<T>::value,
+        "For safety reasons it is forbidden to reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
+    );
+
     /// Compile time error at this point means that you have called `for_each_field` or some other non-flat function or operator for a
     /// type that is not constexpr aggregate initializable.
     ///

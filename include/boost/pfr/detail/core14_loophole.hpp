@@ -139,7 +139,16 @@ decltype(auto) tie_or_value(T& val, std::enable_if_t<std::is_enum<std::remove_re
 }
 
 template <class T>
-decltype(auto) tie_or_value(T& val, std::enable_if_t<!std::is_class< std::remove_reference_t<T> >::value && !std::is_enum< std::remove_reference_t<T> >::value>* = 0) noexcept {
+auto tie_or_value(T& val, std::enable_if_t<std::is_union< std::remove_reference_t<T> >::value>* = 0) noexcept {
+    static_assert(
+        sizeof(T) && false,
+        "For safety reasons it is forbidden to flat_ reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
+    );
+    return 0;
+}
+
+template <class T>
+decltype(auto) tie_or_value(T& val, std::enable_if_t<!std::is_class< std::remove_reference_t<T> >::value && !std::is_enum< std::remove_reference_t<T> >::value && !std::is_union< std::remove_reference_t<T> >::value>* = 0) noexcept {
     return val;
 }
 
@@ -166,6 +175,10 @@ auto tie_as_tuple_recursively(rvalue_t<T> tup) noexcept {
 
 template <class T>
 auto tie_as_flat_tuple(T& t) {
+    static_assert(
+        !std::is_union<T>::value,
+        "For safety reasons it is forbidden to flat_ reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
+    );
     auto rec_tuples = boost::pfr::detail::tie_as_tuple_recursively(
         boost::pfr::detail::tie_as_tuple_loophole_impl(t)
     );
@@ -179,6 +192,10 @@ auto tie_as_flat_tuple(T& t) {
 #if !BOOST_PFR_USE_CPP17
 template <class T>
 auto tie_as_tuple(T& val) noexcept {
+    static_assert(
+        !std::is_union<T>::value,
+        "For safety reasons it is forbidden to reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
+    );
     return boost::pfr::detail::tie_as_tuple_loophole_impl(
         val
     );
@@ -186,6 +203,10 @@ auto tie_as_tuple(T& val) noexcept {
 
 template <class T, class F, std::size_t... I>
 void for_each_field_dispatcher(T& t, F&& f, std::index_sequence<I...>) {
+    static_assert(
+        !std::is_union<T>::value,
+        "For safety reasons it is forbidden to reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
+    );
     std::forward<F>(f)(
         boost::pfr::detail::tie_as_tuple_loophole_impl(t)
     );

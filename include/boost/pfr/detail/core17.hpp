@@ -48,6 +48,10 @@ static_assert(
 
 template <class T, class F, std::size_t... I>
 void for_each_field_dispatcher(T& t, F&& f, std::index_sequence<I...>) {
+    static_assert(
+        !std::is_union<T>::value,
+        "For safety reasons it is forbidden to reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
+    );
     std::forward<F>(f)(
         detail::tie_as_tuple(t)
     );

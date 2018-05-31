@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2017 Antony Polukhin
+// Copyright (c) 2016-2018 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -1028,6 +1028,10 @@ constexpr auto tie_as_tuple(T& val, size_t_<100>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val) noexcept {
+  static_assert(
+    !std::is_union<T>::value,
+    "For safety reasons it is forbidden to reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
+  );
   typedef size_t_<fields_count<T>()> fields_count_tag;
   return boost::pfr::detail::tie_as_tuple(val, fields_count_tag{});
 }

@@ -62,6 +62,11 @@ test-suite pfr
     [ compile-fail common/virtual_functions.cpp : $(CLASSIC_PREC_DEF)           : precise_virtual_functions ]
     [ compile-fail common/virtual_functions.cpp : $(LOOPHOLE_PREC_DEF)          : precise_lh_virtual_functions ]
 
+    [ compile-fail common/ops_on_union.cpp : $(CLASSIC_FLAT_DEF)                : flat_on_union ]
+    [ compile-fail common/ops_on_union.cpp : $(LOOPHOLE_FLAT_DEF)               : flat_lh_on_union ]
+    [ compile-fail common/ops_on_union.cpp : $(CLASSIC_PREC_DEF)                : precise_on_union ]
+    [ compile-fail common/ops_on_union.cpp : $(LOOPHOLE_PREC_DEF)               : precise_lh_on_union ]
+
     [ compile-fail common/ops_unions.cpp : $(CLASSIC_FLAT_DEF)                  : flat_unions ]
     [ compile-fail common/ops_unions.cpp : $(LOOPHOLE_FLAT_DEF)                 : flat_lh_unions ]
     [ compile-fail common/ops_unions.cpp : $(CLASSIC_PREC_DEF)                  : precise_unions ]
