@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Alexandr Poltavsky, Antony Polukhin.
+// Copyright (c) 2017-2018 Alexandr Poltavsky, Antony Polukhin.
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -142,7 +142,7 @@ template <class T>
 auto tie_or_value(T& val, std::enable_if_t<std::is_union< std::remove_reference_t<T> >::value>* = 0) noexcept {
     static_assert(
         sizeof(T) && false,
-        "For safety reasons it is forbidden to flat_ reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
+        "====================> Boost.PFR: For safety reasons it is forbidden to flat_ reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
     );
     return 0;
 }
@@ -177,7 +177,7 @@ template <class T>
 auto tie_as_flat_tuple(T& t) {
     static_assert(
         !std::is_union<T>::value,
-        "For safety reasons it is forbidden to flat_ reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
+        "====================> Boost.PFR: For safety reasons it is forbidden to flat_ reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
     );
     auto rec_tuples = boost::pfr::detail::tie_as_tuple_recursively(
         boost::pfr::detail::tie_as_tuple_loophole_impl(t)
@@ -194,7 +194,7 @@ template <class T>
 auto tie_as_tuple(T& val) noexcept {
     static_assert(
         !std::is_union<T>::value,
-        "For safety reasons it is forbidden to reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
+        "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
     );
     return boost::pfr::detail::tie_as_tuple_loophole_impl(
         val
@@ -205,7 +205,7 @@ template <class T, class F, std::size_t... I>
 void for_each_field_dispatcher(T& t, F&& f, std::index_sequence<I...>) {
     static_assert(
         !std::is_union<T>::value,
-        "For safety reasons it is forbidden to reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
+        "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
     );
     std::forward<F>(f)(
         boost::pfr::detail::tie_as_tuple_loophole_impl(t)

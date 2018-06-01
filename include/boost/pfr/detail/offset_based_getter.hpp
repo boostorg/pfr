@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Chris Beck
+// Copyright (c) 2017-2018 Chris Beck
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -60,12 +60,12 @@ template <typename U, typename S>
 class offset_based_getter {
   using this_t = offset_based_getter<U, S>;
 
-  static_assert(sizeof(U) == sizeof(S), "Member sequence does not indicate correct size for struct type!");
-  static_assert(alignof(U) == alignof(S), "Member sequence does not indicate correct alignment for struct type!");
+  static_assert(sizeof(U) == sizeof(S), "====================> Boost.PFR: Member sequence does not indicate correct size for struct type!");
+  static_assert(alignof(U) == alignof(S), "====================> Boost.PFR: Member sequence does not indicate correct alignment for struct type!");
 
-  static_assert(!std::is_const<U>::value, "const should be stripped from user-defined type when using offset_based_getter or overload resolution will be ambiguous later, this indicates an error within pfr");
-  static_assert(!std::is_reference<U>::value, "reference should be stripped from user-defined type when using offset_based_getter or overload resolution will be ambiguous later, this indicates an error within pfr");
-  static_assert(!std::is_volatile<U>::value, "volatile should be stripped from user-defined type when using offset_based_getter or overload resolution will be ambiguous later. this indicates an error within pfr");
+  static_assert(!std::is_const<U>::value, "====================> Boost.PFR: const should be stripped from user-defined type when using offset_based_getter or overload resolution will be ambiguous later, this indicates an error within pfr");
+  static_assert(!std::is_reference<U>::value, "====================> Boost.PFR: reference should be stripped from user-defined type when using offset_based_getter or overload resolution will be ambiguous later, this indicates an error within pfr");
+  static_assert(!std::is_volatile<U>::value, "====================> Boost.PFR: volatile should be stripped from user-defined type when using offset_based_getter or overload resolution will be ambiguous later. this indicates an error within pfr");
 
   // Get type of idx'th member
   template <std::size_t idx>

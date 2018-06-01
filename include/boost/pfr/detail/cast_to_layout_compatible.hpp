@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2017 Antony Polukhin
+// Copyright (c) 2016-2018 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -19,9 +19,9 @@ template <class T, class U>
 constexpr void static_assert_layout_compatible() noexcept {
     static_assert(
         std::alignment_of<T>::value == std::alignment_of<U>::value,
-        "Alignment check failed, probably your structure has user-defined alignment for the whole structure or for some of the fields."
+        "====================> Boost.PFR: Alignment check failed, probably your structure has user-defined alignment for the whole structure or for some of the fields."
     );
-    static_assert(sizeof(T) == sizeof(U), "Size check failed, probably your structure has bitfields or user-defined alignment.");
+    static_assert(sizeof(T) == sizeof(U), "====================> Boost.PFR: Size check failed, probably your structure has bitfields or user-defined alignment.");
 }
 
 /// @cond

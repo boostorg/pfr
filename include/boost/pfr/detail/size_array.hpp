@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2017 Antony Polukhin
+// Copyright (c) 2016-2018 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -68,7 +68,7 @@ struct size_array<0> {                         // libc++ misses constexpr on ope
 
 template <std::size_t I, std::size_t N>
 constexpr std::size_t get(const size_array<N>& a) noexcept {
-    static_assert(I < N, "Array index out of bounds");
+    static_assert(I < N, "====================> Boost.PFR: Array index out of bounds");
     return a.data[I];
 }
 

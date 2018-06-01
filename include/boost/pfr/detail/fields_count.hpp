@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2017 Antony Polukhin
+// Copyright (c) 2016-2018 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -146,24 +146,24 @@ constexpr std::size_t fields_count() noexcept {
 
     static_assert(
         !std::is_reference<type>::value,
-        "Attempt to get fields count on a reference. This is not allowed because that could hide an issue and different library users expect different behavior in that case."
+        "====================> Boost.PFR: Attempt to get fields count on a reference. This is not allowed because that could hide an issue and different library users expect different behavior in that case."
     );
 
     static_assert(
         std::is_copy_constructible<std::remove_all_extents_t<type>>::value,
-        "Type and each field in the type must be copy constructible."
+        "====================> Boost.PFR: Type and each field in the type must be copy constructible."
     );
 
     static_assert(
         !std::is_polymorphic<type>::value,
-        "Type must have no virtual function, because otherwise it is not aggregate initializable."
+        "====================> Boost.PFR: Type must have no virtual function, because otherwise it is not aggregate initializable."
     );
 
 #ifdef __cpp_lib_is_aggregate
     static_assert(
         std::is_aggregate<type>::value             // Does not return `true` for build in types.
         || std::is_standard_layout<type>::value,   // Does not return `true` for structs that have non standard layout members.
-        "Type must be aggregate initializable."
+        "====================> Boost.PFR: Type must be aggregate initializable."
     );
 #endif
 
@@ -180,12 +180,12 @@ constexpr std::size_t fields_count() noexcept {
 
     static_assert(
         is_aggregate_initializable_n<type, result>::value,
-        "Types with user specified constructors (non-aggregate initializable types) are not supported."
+        "====================> Boost.PFR: Types with user specified constructors (non-aggregate initializable types) are not supported."
     );
 
     static_assert(
         result != 0 || std::is_empty<type>::value || std::is_fundamental<type>::value || std::is_reference<type>::value,
-        "Something went wrong. Please report this issue to the github along with the structure you're reflecting."
+        "====================> Boost.PFR: Something went wrong. Please report this issue to the github along with the structure you're reflecting."
     );
 
     return result;
