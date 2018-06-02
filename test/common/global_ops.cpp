@@ -22,7 +22,7 @@
 #include <set>
 #include <string>
 
-#include <boost/functional/hash.hpp>
+#include <boost/container_hash/hash/hash.hpp>
 #include <unordered_set>
 
 template <class T>
