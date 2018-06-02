@@ -21,9 +21,11 @@
 #include <sstream>
 #include <set>
 #include <string>
-
-#include <boost/container_hash/hash/hash.hpp>
 #include <unordered_set>
+
+
+#define BOOST_HASH_NO_EXTENSIONS
+#include <boost/container_hash/hash.hpp>
 
 template <class T>
 void test_comparable_struct() {
