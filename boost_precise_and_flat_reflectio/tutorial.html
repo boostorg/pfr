@@ -34,6 +34,8 @@
       or Precise functions to chose</a></span></dt>
 <dt><span class="section"><a href="tutorial.html#boost_precise_and_flat_reflectio.tutorial.three_ways_of_getting_operators">Three
       ways of getting operators </a></span></dt>
+<dt><span class="section"><a href="tutorial.html#boost_precise_and_flat_reflectio.tutorial.reflection_of_unions">Reflection
+      of unions </a></span></dt>
 </dl></div>
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
@@ -254,10 +256,10 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><a class="link" href="../BOOST_PFR_FLAT_FUNCTIONS_FOR.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
+                  <code class="computeroutput"><a class="link" href="../BOOST_PF_idm45649874333232.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
                 </p>
                 <p>
-                  <code class="computeroutput"><a class="link" href="../BOOST_PFR_PRECISE_FUNCTIONS_FOR.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
+                  <code class="computeroutput"><a class="link" href="../BOOST_PF_idm45649874564784.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
                 </p>
               </td>
 <td>
@@ -371,8 +373,8 @@
 <span class="special">};</span>
 </pre>
 <p>
-        <span class="bold"><strong>2. <code class="computeroutput"><a class="link" href="../BOOST_PFR_FLAT_FUNCTIONS_FOR.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
-        and <code class="computeroutput"><a class="link" href="../BOOST_PFR_PRECISE_FUNCTIONS_FOR.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
+        <span class="bold"><strong>2. <code class="computeroutput"><a class="link" href="../BOOST_PF_idm45649874333232.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
+        and <code class="computeroutput"><a class="link" href="../BOOST_PF_idm45649874564784.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
         approach</strong></span>
       </p>
 <p>
@@ -395,7 +397,7 @@
 <p>
         Argument Dependant Lookup works well, <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">less</span></code>
         will find the operators for <code class="computeroutput"><span class="keyword">struct</span>
-        <span class="identifier">pair_like</span></code>. <code class="computeroutput"><a class="link" href="../BOOST_PFR_FLAT_FUNCTIONS_FOR.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR(T)</a></code>
+        <span class="identifier">pair_like</span></code>. <code class="computeroutput"><a class="link" href="../BOOST_PF_idm45649874333232.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR(T)</a></code>
         can not be used for local types, it must be called only once in namespace
         of <code class="computeroutput"><span class="identifier">T</span></code>. It does not respect
         conversion operators of <code class="computeroutput"><span class="identifier">T</span></code>,
@@ -439,6 +441,56 @@
         types will be also defined. <span class="bold"><strong>All conversion operators
         of all POD types won't be used during comparisons/streaming/hashing.</strong></span>
       </p>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_precise_and_flat_reflectio.tutorial.reflection_of_unions"></a><a class="link" href="tutorial.html#boost_precise_and_flat_reflectio.tutorial.reflection_of_unions" title="Reflection of unions">Reflection
+      of unions </a>
+</h3></div></div></div>
+<p>
+        With <span class="bold"><strong>precise</strong></span> reflection you could do reflection
+        if a type contains union. But be sure that operations for union are manually
+        defined:
+      </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">pfr</span><span class="special">/</span><span class="identifier">precise</span><span class="special">/</span><span class="identifier">ops</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+
+<span class="keyword">union</span> <span class="identifier">test_union</span> <span class="special">{</span>
+    <span class="keyword">int</span> <span class="identifier">i</span><span class="special">;</span>
+    <span class="keyword">float</span> <span class="identifier">f</span><span class="special">;</span>
+<span class="special">};</span>
+
+<span class="keyword">inline</span> <span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">==(</span><span class="identifier">test_union</span> <span class="identifier">l</span><span class="special">,</span> <span class="identifier">test_union</span> <span class="identifier">r</span><span class="special">)</span> <span class="keyword">noexcept</span><span class="special">;</span> <span class="comment">// Compile time error without this operator</span>
+
+
+<span class="keyword">struct</span> <span class="identifier">foo</span> <span class="special">{</span> <span class="keyword">int</span> <span class="identifier">i</span><span class="special">;</span> <span class="identifier">test_union</span> <span class="identifier">u</span><span class="special">;</span> <span class="special">};</span>
+
+<span class="keyword">bool</span> <span class="identifier">some_function</span><span class="special">(</span><span class="identifier">foo</span> <span class="identifier">f1</span><span class="special">,</span> <span class="identifier">foo</span> <span class="identifier">f2</span><span class="special">)</span> <span class="special">{</span>
+    <span class="keyword">using</span> <span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">ops</span><span class="special">;</span>
+    <span class="keyword">return</span> <span class="identifier">f1</span> <span class="special">==</span> <span class="identifier">f2</span><span class="special">;</span> <span class="comment">// OK</span>
+<span class="special">}</span>
+</pre>
+<p>
+        <span class="bold"><strong>Flat</strong></span> reflection of types that contain unions
+        is disabled. <span class="bold"><strong>Flat</strong></span> and <span class="bold"><strong>precise</strong></span>
+        reflection of unions is disabled for safety reasons. There's a way to reflect
+        the first member of a union and use it. Unfortunately there's no way to find
+        out <span class="bold"><strong>active</strong></span> member of a union. Accessing
+        an inactive union member is an Undefined Behavior. Using the first union
+        member for reflection could lead to disaster if it is some character pointer.
+        For example ostreaming <code class="computeroutput"><span class="keyword">union</span> <span class="special">{</span><span class="keyword">char</span><span class="special">*</span>
+        <span class="identifier">c</span><span class="special">;</span> <span class="keyword">long</span> <span class="keyword">long</span> <span class="identifier">ll</span><span class="special">;</span> <span class="special">}</span>
+        <span class="identifier">u</span><span class="special">;</span> <span class="identifier">u</span><span class="special">.</span><span class="identifier">ll</span><span class="special">=</span> <span class="number">1</span><span class="special">;</span></code>
+        will crash your program, as the active member is <code class="computeroutput"><span class="identifier">ll</span></code>
+        that holds <code class="computeroutput"><span class="number">1</span></code> but we are trying
+        to output a <code class="computeroutput"><span class="keyword">char</span><span class="special">*</span></code>.
+        This would cause an invalid pointer dereference.
+      </p>
+<p>
+        Any attempt to reflect unions leads to a compile time error. In many cases
+        a static assert is triggered that outputs the following message:
+      </p>
+<pre class="programlisting"><span class="identifier">error</span><span class="special">:</span> <span class="keyword">static_assert</span> <span class="identifier">failed</span> <span class="string">"====================&gt; Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."</span>
+</pre>
 </div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
