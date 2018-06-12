@@ -31,7 +31,7 @@
       POD member by index</a></span></dt>
 <dt><span class="section"><a href="tutorial.html#boost_precise_and_flat_reflectio.tutorial.flattening">Flattening</a></span></dt>
 <dt><span class="section"><a href="tutorial.html#boost_precise_and_flat_reflectio.tutorial.flat_or_precise_functions_to_cho">Flat
-      or Precise functions to chose</a></span></dt>
+      or Precise functions to choose</a></span></dt>
 <dt><span class="section"><a href="tutorial.html#boost_precise_and_flat_reflectio.tutorial.three_ways_of_getting_operators">Three
       ways of getting operators </a></span></dt>
 <dt><span class="section"><a href="tutorial.html#boost_precise_and_flat_reflectio.tutorial.reflection_of_unions">Reflection
@@ -119,8 +119,8 @@
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
-<a name="boost_precise_and_flat_reflectio.tutorial.flat_or_precise_functions_to_cho"></a><a class="link" href="tutorial.html#boost_precise_and_flat_reflectio.tutorial.flat_or_precise_functions_to_cho" title="Flat or Precise functions to chose">Flat
-      or Precise functions to chose</a>
+<a name="boost_precise_and_flat_reflectio.tutorial.flat_or_precise_functions_to_cho"></a><a class="link" href="tutorial.html#boost_precise_and_flat_reflectio.tutorial.flat_or_precise_functions_to_cho" title="Flat or Precise functions to choose">Flat
+      or Precise functions to choose</a>
 </h3></div></div></div>
 <p>
         All the functions that have <code class="computeroutput"><span class="identifier">flat_</span></code>
@@ -256,10 +256,10 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><a class="link" href="../BOOST_PF_idm45649874333232.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
+                  <code class="computeroutput"><a class="link" href="../BOOST_PF_idm45976384311328.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
                 </p>
                 <p>
-                  <code class="computeroutput"><a class="link" href="../BOOST_PF_idm45649874564784.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
+                  <code class="computeroutput"><a class="link" href="../BOOST_PF_idm45976384542928.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
                 </p>
               </td>
 <td>
@@ -373,8 +373,8 @@
 <span class="special">};</span>
 </pre>
 <p>
-        <span class="bold"><strong>2. <code class="computeroutput"><a class="link" href="../BOOST_PF_idm45649874333232.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
-        and <code class="computeroutput"><a class="link" href="../BOOST_PF_idm45649874564784.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
+        <span class="bold"><strong>2. <code class="computeroutput"><a class="link" href="../BOOST_PF_idm45976384311328.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
+        and <code class="computeroutput"><a class="link" href="../BOOST_PF_idm45976384542928.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
         approach</strong></span>
       </p>
 <p>
@@ -397,7 +397,7 @@
 <p>
         Argument Dependant Lookup works well, <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">less</span></code>
         will find the operators for <code class="computeroutput"><span class="keyword">struct</span>
-        <span class="identifier">pair_like</span></code>. <code class="computeroutput"><a class="link" href="../BOOST_PF_idm45649874333232.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR(T)</a></code>
+        <span class="identifier">pair_like</span></code>. <code class="computeroutput"><a class="link" href="../BOOST_PF_idm45976384311328.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR(T)</a></code>
         can not be used for local types, it must be called only once in namespace
         of <code class="computeroutput"><span class="identifier">T</span></code>. It does not respect
         conversion operators of <code class="computeroutput"><span class="identifier">T</span></code>,
@@ -483,7 +483,7 @@
         will crash your program, as the active member is <code class="computeroutput"><span class="identifier">ll</span></code>
         that holds <code class="computeroutput"><span class="number">1</span></code> but we are trying
         to output a <code class="computeroutput"><span class="keyword">char</span><span class="special">*</span></code>.
-        This would cause an invalid pointer dereference.
+        This would cause an invalid pointer2 dereference.
       </p>
 <p>
         Any attempt to reflect unions leads to a compile time error. In many cases
