@@ -236,7 +236,7 @@ template <class Type>
 constexpr std::size_t type_to_id(identity<Type>, std::enable_if_t<std::is_union<Type>::value>*) noexcept {
     static_assert(
         !std::is_union<Type>::value,
-        "====================> Boost.PFR: For safety reasons it is forbidden to flat_ reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
+        "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."
     );
     return 0;
 }
@@ -549,7 +549,7 @@ template <class T>
 auto tie_as_flat_tuple(T& lvalue) noexcept {
     static_assert(
         !std::is_union<T>::value,
-        "====================> Boost.PFR: For safety reasons it is forbidden to flat_ reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
+        "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."
     );
     using type = std::remove_cv_t<T>;
     using tuple_type = internal_tuple_with_same_alignment_t<type>;
@@ -564,7 +564,7 @@ template <class T>
 auto tie_as_tuple(T& val) noexcept {
     static_assert(
         !std::is_union<T>::value,
-        "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
+        "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."
     );
     static_assert(
         boost::pfr::detail::is_flat_refelectable<T>( std::make_index_sequence<boost::pfr::detail::fields_count<T>()>{} ),
@@ -671,7 +671,7 @@ template <class T, class F, std::size_t... I>
 void for_each_field_dispatcher(T& t, F&& f, std::index_sequence<I...>) {
     static_assert(
         !std::is_union<T>::value,
-        "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. It could lead to crashes (for example when attempting to output the union with inactive first `const char*` field)."
+        "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."
     );
 
     /// Compile time error at this point means that you have called `for_each_field` or some other non-flat function or operator for a

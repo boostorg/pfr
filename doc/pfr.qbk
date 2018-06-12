@@ -184,6 +184,41 @@ Argument Dependant Lookup works well, `std::less` will find the operators for `s
 
 [endsect]
 
+
+[section Reflection of unions ]
+
+With [*precise] reflection you could do reflection if a type contains union. But be sure that operations for union are manually defined:
+
+```
+#include <boost/pfr/precise/ops.hpp>
+
+union test_union {
+    int i;
+    float f;
+};
+
+inline bool operator==(test_union l, test_union r) noexcept; // Compile time error without this operator
+
+
+struct foo { int i; test_union u; };
+
+bool some_function(foo f1, foo f2) {
+    using namespace boost::pfr::ops;
+    return f1 == f2; // OK
+}
+
+```
+
+[*Flat] reflection of types that contain unions is disabled.
+[*Flat] and [*precise] reflection of unions is disabled for safety reasons. There's a way to reflect the first member of a union and use it. Unfortunately there's no way to find out [*active] member of a union. Accessing an inactive union member is an Undefined Behavior. Using the first union member for reflection could lead to disaster if it is some character pointer. For example ostreaming `union {char* c; long long ll; } u; u.ll= 1;` will crash your program, as the active member is `ll` that holds `1` but we are trying to output a `char*`. This would cause an invalid pointer dereference.
+
+Any attempt to reflect unions leads to a compile time error. In many cases a static assert is triggered that outputs the following message:
+
+```
+error: static_assert failed "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."
+```
+[endsect]
+
 [endsect]
 
 
