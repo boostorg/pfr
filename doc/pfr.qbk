@@ -60,7 +60,7 @@ Boost.Precise and Flat Reflection (Boost.PFR) adds following out-of-the-box func
 [section Flattening] [pfr_example_flattening] [pfr_example_flattening_2] [endsect]
 [/ [section Counting fields] [pfr_example_tuple_size] [endsect] ]
 
-[section Flat or Precise functions to chose]
+[section Flat or Precise functions to choose]
 All the functions that have `flat_` prefix and are declared in `boost/pfr/flat/*` headers the [*flat] functions, other function are [*precise] and are declared in `boost/pfr/precise/*`. In previous example you've seen how the the flattening works.
 
 * If you wish types flattened - use [*flat] functions
@@ -210,7 +210,7 @@ bool some_function(foo f1, foo f2) {
 ```
 
 [*Flat] reflection of types that contain unions is disabled.
-[*Flat] and [*precise] reflection of unions is disabled for safety reasons. There's a way to reflect the first member of a union and use it. Unfortunately there's no way to find out [*active] member of a union. Accessing an inactive union member is an Undefined Behavior. Using the first union member for reflection could lead to disaster if it is some character pointer. For example ostreaming `union {char* c; long long ll; } u; u.ll= 1;` will crash your program, as the active member is `ll` that holds `1` but we are trying to output a `char*`. This would cause an invalid pointer dereference.
+[*Flat] and [*precise] reflection of unions is disabled for safety reasons. There's a way to reflect the first member of a union and use it. Unfortunately there's no way to find out [*active] member of a union. Accessing an inactive union member is an Undefined Behavior. Using the first union member for reflection could lead to disaster if it is some character pointer. For example ostreaming `union {char* c; long long ll; } u; u.ll= 1;` will crash your program, as the active member is `ll` that holds `1` but we are trying to output a `char*`. This would cause an invalid pointer2 dereference.
 
 Any attempt to reflect unions leads to a compile time error. In many cases a static assert is triggered that outputs the following message:
 
