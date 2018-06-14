@@ -25,7 +25,7 @@ struct sequence_tuple_getter {
   template <std::size_t idx, typename TupleOfReferences>
   decltype(auto) get(const TupleOfReferences& t, size_t_<idx>) const noexcept {
     return sequence_tuple::get<idx>(t);
-  };
+  }
 };
 
 
