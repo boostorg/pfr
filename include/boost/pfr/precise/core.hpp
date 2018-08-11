@@ -15,6 +15,7 @@
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/stdtuple.hpp>
 #include <boost/pfr/detail/for_each_field_impl.hpp>
+#include <boost/pfr/detail/tie_tuple.hpp>
 
 #include <boost/pfr/precise/tuple_size.hpp>
 #if BOOST_PFR_USE_CPP17
@@ -159,6 +160,34 @@ void for_each_field(T&& value, F&& func) {
         std::make_index_sequence<fields_count_val>{}
     );
 }
+
+/// \brief Create a tuple of lvalue references capable of de-structuring
+/// assignment from fields of an aggregate T.
+///
+/// \b Example:
+/// \code
+///     auto f() {
+///       struct { int i, short s; } res { 5, 6 };
+///       return res;
+///     }
+///     auto [i, s] = f();
+///     tie(i, s) = f();
+/// \endcode
+template <typename... Elements>
+constexpr detail::tie_tuple<Elements...> tie(Elements&... args) noexcept {
+   return detail::tie_tuple<Elements...>(args...);
+}
+
+/// \brief Resolve ambiguity with std::ignore when used with boost::pfr::tie.
+///
+/// \b Example:
+/// \code
+///     using namespace boost::pfr;
+///     tie(i, ignore) = f();
+/// \endcode
+constexpr struct swallow_assign {
+    template <typename T> void operator= (T&&) const {};
+} ignore;
 
 }} // namespace boost::pfr
 
