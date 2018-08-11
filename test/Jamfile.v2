@@ -95,7 +95,7 @@ test-suite pfr
     [ run common/test_tuple_sizes_on.cpp : : : $(DISABLE_ON_MSVC) <define>BOOST_PFR_RUN_TEST_ON=int : test_tuple_sizes_on_ints ]
     [ run common/test_tuple_sizes_on.cpp : : : $(DISABLE_ON_MSVC) <define>BOOST_PFR_RUN_TEST_ON=short : test_tuple_sizes_on_shorts ]
     [ run common/test_tuple_sizes_on.cpp : : : $(DISABLE_ON_MSVC) <define>BOOST_PFR_RUN_TEST_ON=void* : test_tuple_sizes_on_voidptrs ]
-    [ run common/test_tuple_sizes_on.cpp : : : $(DISABLE_ON_MSVC) <define>BOOST_PFR_RUN_TEST_ON=std::size_t : test_tuple_sizes_on_size_ts ]
+    [ run common/test_tuple_sizes_on.cpp : : : $(DISABLE_ON_MSVC) <define>BOOST_PFR_RUN_TEST_ON="std::size_t" : test_tuple_sizes_on_size_ts ]
     #[ run common/test_tuple_sizes_on.cpp $(DISABLE_ON_MSVC)<define>BOOST_PFR_RUN_TEST_ON=char <define>BOOST_PFR_RUN_HUGE_TESTS : test_tuple_sizes_on_chars_huge ]
 
 
@@ -117,6 +117,7 @@ test-suite pfr
     [ run precise/motivating_example2.cpp           : : : $(CLASSIC_PREC_DEF) : precise_motivating_example2 ]
     [ run precise/optional_like.cpp                 : : : $(CLASSIC_PREC_DEF) : precise_optional_like ]
     [ run precise/get_non_default_constructible.cpp : : : $(CLASSIC_PREC_DEF) : precise_get_non_default_constructible ]
+    [ run precise/destructuring_tie.cpp             : : : $(CLASSIC_PREC_DEF) : precise_destructuring_tie ]
     [ compile-fail precise/non_aggregate.cpp        : $(CLASSIC_PREC_DEF) : precise_non_aggregate ]
 
 

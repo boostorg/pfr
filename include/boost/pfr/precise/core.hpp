@@ -175,7 +175,7 @@ void for_each_field(T&& value, F&& func) {
 /// \endcode
 template <typename... Elements>
 constexpr detail::tie_tuple<Elements...> tie(Elements&... args) noexcept {
-   return detail::tie_tuple<Elements...>(args...);
+    return detail::tie_tuple<Elements...>(args...);
 }
 
 /// \brief Resolve ambiguity with std::ignore when used with boost::pfr::tie.
@@ -186,7 +186,7 @@ constexpr detail::tie_tuple<Elements...> tie(Elements&... args) noexcept {
 ///     tie(i, ignore) = f();
 /// \endcode
 constexpr struct swallow_assign {
-    template <typename T> void operator= (T&&) const {};
+    template <typename T> void operator= (T&&) const {}
 } ignore;
 
 }} // namespace boost::pfr
