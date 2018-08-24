@@ -18,6 +18,9 @@
 #include <boost/pfr/detail/for_each_field_impl.hpp>
 #include <boost/pfr/flat/tuple_size.hpp>
 
+#include <boost/pfr/detail/flat_tie_from_structure_tuple.hpp>
+#include <boost/pfr/common/tie_ignore.hpp>
+
 namespace boost { namespace pfr {
 
 /// \brief Returns reference or const reference to a field with index `I` in \flattening{flattened} T.
@@ -134,6 +137,23 @@ void flat_for_each_field(T&& value, F&& func) {
         std::make_index_sequence< flat_tuple_size_v<T> >{},
         std::is_rvalue_reference<T&&>{}
     );
+}
+
+/// \brief Create a tuple of lvalue references capable of de-structuring
+/// assignment from \flattening{flattened} fields of an aggregate T.
+///
+/// \b Example:
+/// \code
+///     auto f() {
+///       struct { struct { int x, y } p; short s; } res { { 4, 5 }, 6 };
+///       return res;
+///     }
+///     auto [x, y, s] = flat_structure_tie(f());
+///     flat_tie_from_structure(x, y, s) = f();
+/// \endcode
+template <typename... Elements>
+constexpr detail::flat_tie_from_structure_tuple<Elements...> flat_tie_from_structure(Elements&... args) noexcept {
+    return detail::flat_tie_from_structure_tuple<Elements...>(args...);
 }
 
 }} // namespace boost::pfr

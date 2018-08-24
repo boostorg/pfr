@@ -26,9 +26,9 @@ auto parseLinePrefix(char const* line) {
           size_t byteCount, address, recordType; char const* rest;
      } res;
      using namespace boost::pfr;
-     tie (res.byteCount, line) = parseHex(line, 2);
-     tie (res.address, line) = parseHex(line, 4);
-     tie (res.recordType, line) = parseHex(line, 2);
+     tie_from_structure (res.byteCount, line) = parseHex(line, 2);
+     tie_from_structure (res.address, line) = parseHex(line, 4);
+     tie_from_structure (res.recordType, line) = parseHex(line, 2);
      res.rest = line;
      return res;
 }
@@ -49,10 +49,10 @@ int main()
     size_t val;
     using namespace boost::pfr;
 
-    tie (val, ignore) = parseHex("a73b");
+    tie_from_structure (val, ignore) = parseHex("a73b");
     check(val == 42811);
 
-    tie (ignore, line) = parseHex(line, 8);
+    tie_from_structure (ignore, line) = parseHex(line, 8);
     check(line == meta.rest);
 
     return errors;

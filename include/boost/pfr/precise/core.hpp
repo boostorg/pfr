@@ -15,7 +15,6 @@
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/stdtuple.hpp>
 #include <boost/pfr/detail/for_each_field_impl.hpp>
-#include <boost/pfr/detail/tie_tuple.hpp>
 
 #include <boost/pfr/precise/tuple_size.hpp>
 #if BOOST_PFR_USE_CPP17
@@ -23,6 +22,9 @@
 #else
 #   include <boost/pfr/detail/core14.hpp>
 #endif
+
+#include <boost/pfr/detail/tie_from_structure_tuple.hpp>
+#include <boost/pfr/common/tie_ignore.hpp>
 
 namespace boost { namespace pfr {
 
@@ -167,27 +169,16 @@ void for_each_field(T&& value, F&& func) {
 /// \b Example:
 /// \code
 ///     auto f() {
-///       struct { int i, short s; } res { 5, 6 };
+///       struct { struct { int x, y } p; short s; } res { { 4, 5 }, 6 };
 ///       return res;
 ///     }
-///     auto [i, s] = f();
-///     tie(i, s) = f();
+///     auto [p, s] = f();
+///     tie_from_structure(p, s) = f();
 /// \endcode
 template <typename... Elements>
-constexpr detail::tie_tuple<Elements...> tie(Elements&... args) noexcept {
-    return detail::tie_tuple<Elements...>(args...);
+constexpr detail::tie_from_structure_tuple<Elements...> tie_from_structure(Elements&... args) noexcept {
+    return detail::tie_from_structure_tuple<Elements...>(args...);
 }
-
-/// \brief Resolve ambiguity with std::ignore when used with boost::pfr::tie.
-///
-/// \b Example:
-/// \code
-///     using namespace boost::pfr;
-///     tie(i, ignore) = f();
-/// \endcode
-constexpr struct swallow_assign {
-    template <typename T> void operator= (T&&) const {}
-} ignore;
 
 }} // namespace boost::pfr
 
