@@ -14,6 +14,8 @@ auto line(point a, point b) {
 
 #include <boost/pfr/flat/core.hpp>
 
+#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
+
 int main()
 {
     int errors = 0;
@@ -41,3 +43,10 @@ int main()
 
     return errors;
 }
+
+#else // C++14 without loophole
+#include <iostream>
+int main(int, char** argv) {
+   std::cerr << argv[0] << ": Not supported in C++14 without reflection loophole.\n";
+}
+#endif

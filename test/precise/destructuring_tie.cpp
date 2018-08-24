@@ -21,6 +21,8 @@ auto parseHex(char const* p, size_t limit = ~0u) {
 
 #include <boost/pfr/precise/core.hpp>
 
+#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
+
 auto parseLinePrefix(char const* line) {
      struct {
           size_t byteCount, address, recordType; char const* rest;
@@ -57,3 +59,10 @@ int main()
 
     return errors;
 }
+
+#else // C++14 without loophole
+#include <iostream>
+int main(int, char** argv) {
+   std::cerr << argv[0] << ": Not supported in C++14 without reflection loophole.\n";
+}
+#endif
