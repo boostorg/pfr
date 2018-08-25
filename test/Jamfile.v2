@@ -104,7 +104,7 @@ test-suite pfr
     [ run flat/flat_tuple_size.cpp          : : : $(CLASSIC_FLAT_DEF) ]
     [ run flat/flat_motivating_example.cpp  : : : $(CLASSIC_FLAT_DEF) ]
     [ run flat/flat_for_each_field.cpp      : : : $(CLASSIC_FLAT_DEF) ]
-    [ run flat/destructuring_tie.cpp        : : : $(CLASSIC_PREC_DEF) ]
+    [ run flat/destructuring_tie.cpp        : : : $(CLASSIC_FLAT_DEF) ]
     [ compile-fail flat/flat_tuple_size_on_non_aggregate.cpp    : $(CLASSIC_FLAT_DEF) ]
     [ compile-fail flat/flat_tuple_size_on_bitfields.cpp        : $(CLASSIC_FLAT_DEF) ]
 
