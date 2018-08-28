@@ -7,6 +7,10 @@
 #define BOOST_PFR_DETAIL_FLAT_TIE_FROM_STRUCTURE_TUPLE_HPP
 #pragma once
 
+#include <boost/pfr/detail/stdtuple.hpp>
+#include <boost/pfr/flat/tuple_size.hpp>
+#include <boost/pfr/detail/core14.hpp>
+
 namespace boost { namespace pfr { namespace detail {
 
 /// \brief A `std::tuple` capable of de-structuring assignment used to support
@@ -20,10 +24,10 @@ struct flat_tie_from_structure_tuple : std::tuple<Elements&...> {
     using base = std::tuple<Elements&...>;
     using base::tuple;
     template <typename T>
-    constexpr flat_tie_from_structure_tuple& operator= (T&& t) {
+    constexpr flat_tie_from_structure_tuple& operator= (T const& t) {
         base::operator=(
             make_stdtiedtuple_from_tietuple(
-                tie_as_flat_tuple(std::forward<T>(t)),
+                detail::tie_as_flat_tuple(t),
                 std::make_index_sequence<flat_tuple_size_v<T>>()));
         return *this;
     }

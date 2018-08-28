@@ -23,6 +23,7 @@ int main()
     auto l = line({1, 2}, {3, 4});
     int t, a, b, c, d;
     using namespace boost::pfr;
+    using std::ignore;
 
     flat_tie_from_structure (t, a, b, c, d) = l;
     check(t == 123456);

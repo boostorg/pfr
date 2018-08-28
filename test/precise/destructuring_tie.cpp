@@ -51,10 +51,10 @@ int main()
     size_t val;
     using namespace boost::pfr;
 
-    tie_from_structure (val, ignore) = parseHex("a73b");
+    tie_from_structure (val, std::ignore) = parseHex("a73b");
     check(val == 42811);
 
-    tie_from_structure (ignore, line) = parseHex(line, 8);
+    tie_from_structure (std::ignore, line) = parseHex(line, 8);
     check(line == meta.rest);
 
     return errors;

@@ -24,7 +24,6 @@
 #endif
 
 #include <boost/pfr/detail/tie_from_structure_tuple.hpp>
-#include <boost/pfr/common/tie_ignore.hpp>
 
 namespace boost { namespace pfr {
 

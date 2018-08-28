@@ -19,7 +19,6 @@
 #include <boost/pfr/flat/tuple_size.hpp>
 
 #include <boost/pfr/detail/flat_tie_from_structure_tuple.hpp>
-#include <boost/pfr/common/tie_ignore.hpp>
 
 namespace boost { namespace pfr {
 

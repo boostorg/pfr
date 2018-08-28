@@ -7,6 +7,14 @@
 #define BOOST_PFR_DETAIL_TIE_FROM_STRUCTURE_TUPLE_HPP
 #pragma once
 
+#include <boost/pfr/detail/stdtuple.hpp>
+#include <boost/pfr/precise/tuple_size.hpp>
+#if BOOST_PFR_USE_CPP17
+#   include <boost/pfr/detail/core17.hpp>
+#else
+#   include <boost/pfr/detail/core14.hpp>
+#endif
+
 namespace boost { namespace pfr { namespace detail {
 
 /// \brief A `std::tuple` capable of de-structuring assignment used to support
@@ -22,7 +30,7 @@ struct tie_from_structure_tuple : std::tuple<Elements&...> {
     constexpr tie_from_structure_tuple& operator= (T const& t) {
         base::operator=(
             make_stdtiedtuple_from_tietuple(
-                tie_as_tuple(t),
+                detail::tie_as_tuple(t),
                 std::make_index_sequence<tuple_size_v<T>>()));
         return *this;
     }
