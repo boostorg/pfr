@@ -23,6 +23,8 @@
 #   include <boost/pfr/detail/core14.hpp>
 #endif
 
+#include <boost/pfr/detail/tie_from_structure_tuple.hpp>
+
 namespace boost { namespace pfr {
 
 /// \brief Returns reference or const reference to a field with index `I` in aggregate T.
@@ -158,6 +160,23 @@ void for_each_field(T&& value, F&& func) {
         },
         std::make_index_sequence<fields_count_val>{}
     );
+}
+
+/// \brief Create a tuple of lvalue references capable of de-structuring
+/// assignment from fields of an aggregate T.
+///
+/// \b Example:
+/// \code
+///     auto f() {
+///       struct { struct { int x, y } p; short s; } res { { 4, 5 }, 6 };
+///       return res;
+///     }
+///     auto [p, s] = f();
+///     tie_from_structure(p, s) = f();
+/// \endcode
+template <typename... Elements>
+constexpr detail::tie_from_structure_tuple<Elements...> tie_from_structure(Elements&... args) noexcept {
+    return detail::tie_from_structure_tuple<Elements...>(args...);
 }
 
 }} // namespace boost::pfr
