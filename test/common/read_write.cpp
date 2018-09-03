@@ -33,15 +33,6 @@ namespace boost { namespace test {
 }}
 #endif
 
-template <class T0, class T1>
-bool five_field_eq(const T0& lhs, const T1& rhs) {
-    return lhs.f0 == rhs.f0
-        && lhs.f1 == rhs.f1
-        && lhs.f2 == rhs.f2
-        && lhs.f3 == rhs.f3
-        && lhs.f4 == rhs.f4
-    ;
-}
 
 
 
@@ -51,7 +42,11 @@ void test_write_read(const T& value) {
     std::stringstream ss;
     boost::test::write(ss, value);
     boost::test::read(ss, result);
-    BOOST_TEST(five_field_eq(value, result));
+    BOOST_TEST_EQ(value.f0, result.f0);
+    BOOST_TEST_EQ(value.f1, result.f1);
+    BOOST_TEST_EQ(value.f2, result.f2);
+    BOOST_TEST_EQ(value.f3, result.f3);
+    BOOST_TEST_EQ(value.f4, result.f4);
 }
 
 template <class T>
