@@ -9,6 +9,7 @@
 
 #include <boost/pfr/detail/config.hpp>
 
+#include <climits>      // CHAR_BIT
 #include <type_traits>
 #include <utility>      // metaprogramming stuff
 
@@ -175,7 +176,7 @@ constexpr std::size_t fields_count() noexcept {
 //    );
 //#endif
 
-    constexpr std::size_t max_fields_count = (sizeof(type) * 8); // We multiply by 8 because we may have bitfields in T
+    constexpr std::size_t max_fields_count = (sizeof(type) * CHAR_BIT); // We multiply by CHAR_BIT because the type may have bitfields in T
     constexpr std::size_t result = detect_fields_count_dispatch<type>(size_t_<max_fields_count>{}, 1L);
 
     static_assert(
