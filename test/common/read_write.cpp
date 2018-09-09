@@ -111,8 +111,8 @@ int main() {
         "{1, 2, 3, 4, {with_operator}}"
     );
 
-#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE \
-    !defined(_MSC_VER) /* TODO: Strange errors https://ci.appveyor.com/project/apolukhin/magic-get/build/1.65.108-develop */
+#if (BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE) \
+    !defined(_MSC_VER) /* TODO: remove after fixing strange errors https://ci.appveyor.com/project/apolukhin/magic-get/build/1.65.108-develop */
     struct test4 {
         int f0;
         std::string f1;
