@@ -1,0 +1,63 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<title>Function template tie_from_structure</title>
+<link rel="stylesheet" href="http://www.boost.org/doc/libs/1_63_0/doc/src/boostbook.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Precise and Flat Reflection 1.0">
+<link rel="up" href="../../boost_precise_and_flat_reflectio/reference.html#header.boost.pfr.precise.core_hpp" title="Header &lt;boost/pfr/precise/core.hpp&gt;">
+<link rel="prev" href="for_each_field.html" title="Function template for_each_field">
+<link rel="next" href="../../BOOST_PF_idm46342995637200.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table cellpadding="2" width="100%"><tr>
+<td valign="top"><img alt="Boost C++ Libraries" width="277" height="86" src="http://www.boost.org/doc/libs/1_63_0/boost.png"></td>
+<td align="center"><a href="http://www.boost.org/doc/libs/1_63_0/index.html">Home</a></td>
+<td align="center"><a href="http://www.boost.org/doc/libs/1_63_0/libs/libraries.htm">Libraries</a></td>
+<td align="center"><a href="http://www.boost.org/users/people.html">People</a></td>
+<td align="center"><a href="http://www.boost.org/users/faq.html">FAQ</a></td>
+<td align="center"><a href="http://www.boost.org/doc/libs/1_63_0/more/index.htm">More</a></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="for_each_field.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_precise_and_flat_reflectio/reference.html#header.boost.pfr.precise.core_hpp"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../../BOOST_PF_idm46342995637200.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/next.png" alt="Next"></a>
+</div>
+<div class="refentry">
+<a name="boost.pfr.tie_from_structure"></a><div class="titlepage"></div>
+<div class="refnamediv">
+<h2><span class="refentrytitle">Function template tie_from_structure</span></h2>
+<p>boost::pfr::tie_from_structure &#8212; Create a tuple of lvalue references capable of de-structuring assignment from fields of an aggregate T. </p>
+</div>
+<h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
+<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../../boost_precise_and_flat_reflectio/reference.html#header.boost.pfr.precise.core_hpp" title="Header &lt;boost/pfr/precise/core.hpp&gt;">boost/pfr/precise/core.hpp</a>&gt;
+
+</span>
+<span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span><span class="special">...</span> Elements<span class="special">&gt;</span> 
+  <span class="emphasis"><em><span class="identifier">unspecified</span></em></span> <span class="identifier">tie_from_structure</span><span class="special">(</span><span class="identifier">Elements</span> <span class="special">&amp;</span><span class="special">...</span> args<span class="special">)</span><span class="special">;</span></pre></div>
+<div class="refsect1">
+<a name="idm46000931571824"></a><h2>Description</h2>
+<p><span class="bold"><strong>Example:</strong></span> </p>
+<pre class="programlisting"><span class="keyword">auto</span> <span class="identifier">f</span><span class="special">(</span><span class="special">)</span> <span class="special">{</span>
+  <span class="keyword">struct</span> <span class="special">{</span> <span class="keyword">struct</span> <span class="special">{</span> <span class="keyword">int</span> <span class="identifier">x</span><span class="special">,</span> <span class="identifier">y</span> <span class="special">}</span> <span class="identifier">p</span><span class="special">;</span> <span class="keyword">short</span> <span class="identifier">s</span><span class="special">;</span> <span class="special">}</span> <span class="identifier">res</span> <span class="special">{</span> <span class="special">{</span> <span class="number">4</span><span class="special">,</span> <span class="number">5</span> <span class="special">}</span><span class="special">,</span> <span class="number">6</span> <span class="special">}</span><span class="special">;</span>
+  <span class="keyword">return</span> <span class="identifier">res</span><span class="special">;</span>
+<span class="special">}</span>
+<span class="keyword">auto</span> <span class="special">[</span><span class="identifier">p</span><span class="special">,</span> <span class="identifier">s</span><span class="special">]</span> <span class="special">=</span> <span class="identifier">f</span><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+<span class="identifier">tie_from_structure</span><span class="special">(</span><span class="identifier">p</span><span class="special">,</span> <span class="identifier">s</span><span class="special">)</span> <span class="special">=</span> <span class="identifier">f</span><span class="special">(</span><span class="special">)</span><span class="special">;</span>
+</pre>
+<p> </p>
+</div>
+</div>
+<table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
+<td align="left"></td>
+<td align="right"><div class="copyright-footer">Copyright &#169; 2016-2018 Antony Polukhin<p>
+        Distributed under the Boost Software License, Version 1.0. (See accompanying
+        file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
+      </p>
+</div></td>
+</tr></table>
+<hr>
+<div class="spirit-nav">
+<a accesskey="p" href="for_each_field.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_precise_and_flat_reflectio/reference.html#header.boost.pfr.precise.core_hpp"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="../../BOOST_PF_idm46342995637200.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/next.png" alt="Next"></a>
+</div>
+</body>
+</html>
