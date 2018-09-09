@@ -112,7 +112,7 @@ int main() {
     );
 
 #if (BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE) \
-    !defined(_MSC_VER) /* TODO: remove after fixing strange errors https://ci.appveyor.com/project/apolukhin/magic-get/build/1.65.108-develop */
+    && !defined(_MSC_VER) /* TODO: remove after fixing strange errors https://ci.appveyor.com/project/apolukhin/magic-get/build/1.65.108-develop */
     struct test4 {
         int f0;
         std::string f1;
