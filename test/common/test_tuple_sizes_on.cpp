@@ -56,7 +56,14 @@ void test_counts_on_multiple_chars_impl() {
     static_assert(flat_tuple_size_v<t1_0> == CountInT, "");
     static_assert(flat_tuple_size_v<T1> == CountInT, "");
     static_assert(flat_tuple_size_v<std::conditional_t<std::is_fundamental<T1>::value, T1*, void*> > == 1, "");
+#if !defined(__GNUC__) || __GNUC__ != 8
+    // GCC-8 has big problems with this test:
+    //    error: ‘constexpr ubiq_constructor::operator Type&() const [with Type = test_counts_on_multiple_chars()::t2*]’,
+    //    declared using local type ‘test_counts_on_multiple_chars()::t2’, is used but never defined [-fpermissive]
+    //
+    // Fixed in GCC-9.
     static_assert(tuple_size_v<T1*> == 1, "");
+#endif
 
     struct t1_0_1 { t1_0 t1; };
     static_assert(flat_tuple_size_v<t1_0_1> == CountInT, "");
