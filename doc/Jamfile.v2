@@ -33,8 +33,7 @@ local doxygen_params =
             \"flattening{1}=\\xmlonly<link linkend='boost_precise_and_flat_reflectio.tutorial.flattening'>\\1</link>\\endxmlonly\" \\
             \"podops=\\b See \\b Also: \\xmlonly<link linkend='boost_precise_and_flat_reflectio.tutorial.three_ways_of_getting_operators'>Three ways of getting operators</link>\\endxmlonly\" \\
             \"constexprinit{1}=\\xmlonly<link linkend='boost_precise_and_flat_reflectio.requirements_and_limitations'>\\1</link>\\endxmlonly\" \\
-            \"rcast=\\b Misc: Reinterpret casts unrelated types.\" \\
-            \"rcast14=\\b Misc: Reinterpret casts unrelated types in C++14 only. May have overhead in C++14 only on non-optimizing compilers.\" \\
+            \"rcast=\\b Note: If reflecting structures with enums may `reinterpret_cast` enum to a reference to underlying type.\" \\
             \"flatpod{1}=\\xmlonly<link linkend='boost_precise_and_flat_reflectio.requirements_and_limitations'>\\1</link>\\endxmlonly\" \\
         "
     ;

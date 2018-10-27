@@ -29,8 +29,6 @@ namespace boost { namespace pfr {
 ///
 /// \b Requires: C++17 or \constexprinit{C++14 constexpr aggregate intializable type}.
 ///
-/// \rcast14
-///
 /// \b Example:
 /// \code
 ///     struct my_struct { int i, short s; };
@@ -58,8 +56,6 @@ void write(std::basic_ostream<Char, Traits>& out, const T& value) {
 /// Reads aggregate `value` from stream `in`
 ///
 /// \b Requires: C++17 or \constexprinit{C++14 constexpr aggregate intializable type}.
-///
-/// \rcast14
 ///
 /// \b Example:
 /// \code

@@ -31,8 +31,6 @@ namespace boost { namespace pfr {
 ///
 /// \b Requires: C++17 or \flatpod{C++14 flat POD or C++14 with not disabled Loophole}.
 ///
-/// \rcast14
-///
 /// \b Example:
 /// \code
 ///     struct my_struct { int i, short s; };
@@ -81,8 +79,6 @@ using tuple_element_t = typename tuple_element<I, T>::type;
 ///
 /// \b Requires: C++17 or \flatpod{C++14 flat POD or C++14 with not disabled Loophole}.
 ///
-/// \rcast14
-///
 /// \b Example:
 /// \code
 ///     struct my_struct { int i, short s; };
@@ -102,8 +98,6 @@ constexpr auto structure_to_tuple(const T& val) noexcept {
 /// \brief Creates an `std::tuple` with lvalue references to fields of an aggregate T.
 ///
 /// \b Requires: C++17 or \flatpod{C++14 flat POD or C++14 with not disabled Loophole}.
-///
-/// \rcast14
 ///
 /// \b Example:
 /// \code
@@ -130,8 +124,6 @@ constexpr auto structure_tie(T& val) noexcept {
 ///     * any_return_type func(U&& value, I i)  // Here I is an `std::integral_constant<size_t, field_index>`
 ///
 /// \param value To each field of this variable will be the `func` applied.
-///
-/// \rcast14
 ///
 /// \b Example:
 /// \code

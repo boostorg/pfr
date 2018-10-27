@@ -31,8 +31,6 @@
 ///     std::cout << s1 << std::endl; // Outputs: {0, 1, H, e, l, l, o, , , 0, 6, 7, 8, 9, 10, 11}
 /// \endcode
 ///
-/// \rcast14
-///
 /// \podops for other ways to define operators and more details.
 ///
 /// \b This \b header \b defines:
