@@ -34,9 +34,8 @@
 </span>
 <span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> T<span class="special">&gt;</span> <span class="keyword">constexpr</span> <span class="keyword">auto</span> <span class="identifier">structure_to_tuple</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span> val<span class="special">)</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idm46000931704464"></a><h2>Description</h2>
+<a name="idm46509074979680"></a><h2>Description</h2>
 <p><span class="bold"><strong>Requires:</strong></span> C++17 or <a class="link" href="../../boost_precise_and_flat_reflectio/requirements_and_limitations.html" title="Requirements and Limitations">C++14 flat POD or C++14 with not disabled Loophole</a>.</p>
-<p><span class="bold"><strong>Misc:</strong></span> Reinterpret casts unrelated types in C++14 only. May have overhead in C++14 only on non-optimizing compilers.</p>
 <p><span class="bold"><strong>Example:</strong></span> </p>
 <pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">my_struct</span> <span class="special">{</span> <span class="keyword">int</span> <span class="identifier">i</span><span class="special">,</span> <span class="keyword">short</span> <span class="identifier">s</span><span class="special">;</span> <span class="special">}</span><span class="special">;</span>
 <span class="identifier">my_struct</span> <span class="identifier">s</span> <span class="special">{</span><span class="number">10</span><span class="special">,</span> <span class="number">11</span><span class="special">}</span><span class="special">;</span>

@@ -34,18 +34,18 @@
 </span><span class="keyword">template</span><span class="special">&lt;</span><span class="keyword">typename</span> T <span class="special">=</span> <span class="keyword">void</span><span class="special">&gt;</span> 
 <span class="keyword">struct</span> <a class="link" href="flat_less.html" title="Struct template flat_less">flat_less</a> <span class="special">{</span>
 
-  <span class="comment">// <a class="link" href="flat_less.html#idm46342995353760-bb">public member functions</a></span>
-  <span class="keyword">bool</span> <a class="link" href="flat_less.html#idm46342995353264-bb"><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span></a><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span>
+  <span class="comment">// <a class="link" href="flat_less.html#idm45186061679584-bb">public member functions</a></span>
+  <span class="keyword">bool</span> <a class="link" href="flat_less.html#idm45186061679088-bb"><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span></a><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span>
 <span class="special">}</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idm46000929571520"></a><h2>Description</h2>
+<a name="idm46509072849792"></a><h2>Description</h2>
 <div class="refsect2">
-<a name="idm46000929571104"></a><h3>
-<a name="idm46342995353760-bb"></a><code class="computeroutput">flat_less</code> public member functions</h3>
+<a name="idm46509072849376"></a><h3>
+<a name="idm45186061679584-bb"></a><code class="computeroutput">flat_less</code> public member functions</h3>
 <div class="orderedlist"><ol class="orderedlist" type="1"><li class="listitem">
-<pre class="literallayout"><span class="keyword">bool</span> <a name="idm46342995353264-bb"></a><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span> x<span class="special">,</span> <span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span> y<span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span></pre>
+<pre class="literallayout"><span class="keyword">bool</span> <a name="idm45186061679088-bb"></a><span class="keyword">operator</span><span class="special">(</span><span class="special">)</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span> x<span class="special">,</span> <span class="keyword">const</span> <span class="identifier">T</span> <span class="special">&amp;</span> y<span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span><span class="special">;</span></pre>
 <p>
-<span class="bold"><strong>Misc:</strong></span> Reinterpret casts unrelated types. </p>
+<span class="bold"><strong>Note:</strong></span> If reflecting structures with enums may <code class="computeroutput">reinterpret_cast</code> enum to a reference to underlying type. </p>
 <div class="variablelist"><table border="0">
 <col align="left" valign="top">
 <tbody><tr>
