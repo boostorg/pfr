@@ -103,7 +103,7 @@ constexpr auto structure_to_tuple(const T& val) noexcept {
 /// \code
 ///     struct my_struct { int i, short s; };
 ///     my_struct s;
-///     tie(s) = std::tuple<int, short>{10, 11};
+///     structure_tie(s) = std::tuple<int, short>{10, 11};
 ///     assert(s.s == 11);
 /// \endcode
 template <class T>
