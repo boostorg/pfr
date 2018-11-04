@@ -47,6 +47,11 @@ test-suite pfr
     [ run common/std_interactions.cpp   : : : $(CLASSIC_PREC_DEF)               : precise_std_interactions ]
     [ run common/std_interactions.cpp   : : : $(LOOPHOLE_PREC_DEF)              : precise_lh_std_interactions ]
 
+    [ compile-fail common/movable_and_lvalue_references.cpp : $(CLASSIC_FLAT_DEF)   : flat_movable_and_lvalue_references ]
+    [ compile-fail common/movable_and_lvalue_references.cpp : $(LOOPHOLE_FLAT_DEF)  : flat_lh_movable_and_lvalue_references ]
+    [ compile-fail common/movable_and_lvalue_references.cpp : $(CLASSIC_PREC_DEF)   : precise_movable_and_lvalue_references ]
+    [ compile-fail common/movable_and_lvalue_references.cpp : $(LOOPHOLE_PREC_DEF)  : precise_lh_movable_and_lvalue_references ]
+
     [ compile-fail common/private_fields.cpp : $(CLASSIC_FLAT_DEF)              : flat_private_fields ]
     [ compile-fail common/private_fields.cpp : $(LOOPHOLE_FLAT_DEF)             : flat_lh_private_fields ]
     [ compile-fail common/private_fields.cpp : $(CLASSIC_PREC_DEF)              : precise_private_fields ]
@@ -86,6 +91,16 @@ test-suite pfr
     [ compile-fail common/non_default_constructible.cpp : $(LOOPHOLE_FLAT_DEF)  : flat_lh_non_sdefault_constructible ]
     [ run common/non_default_constructible.cpp : : : $(CLASSIC_PREC_DEF)        : precise_non_default_constructible ]
     [ run common/non_default_constructible.cpp : : : $(LOOPHOLE_PREC_DEF)       : precise_lh_non_default_constructible ]
+
+    [ compile-fail common/non_copyable_but_movable.cpp : $(CLASSIC_FLAT_DEF)    : flat_non_copyable_but_movable ]
+    [ compile-fail common/non_copyable_but_movable.cpp : $(LOOPHOLE_FLAT_DEF)   : flat_lh_non_copyable_but_movable ]
+    [ run common/non_copyable_but_movable.cpp : : : $(CLASSIC_PREC_DEF)         : precise_non_copyable_but_movable ]
+    [ run common/non_copyable_but_movable.cpp : : : $(LOOPHOLE_PREC_DEF)        : precise_lh_non_copyable_but_movable ]
+
+    [ compile-fail common/non_default_constructible_non_copyable_but_movable.cpp : $(CLASSIC_FLAT_DEF)    : flat_non_default_constructible_non_copyable_but_movable ]
+    [ compile-fail common/non_default_constructible_non_copyable_but_movable.cpp : $(LOOPHOLE_FLAT_DEF)   : flat_lh_non_default_constructible_non_copyable_but_movable ]
+    [ run common/non_default_constructible_non_copyable_but_movable.cpp : : : $(CLASSIC_PREC_DEF)         : precise_non_default_constructible_non_copyable_but_movable ]
+    [ run common/non_default_constructible_non_copyable_but_movable.cpp : : : $(LOOPHOLE_PREC_DEF)        : precise_lh_non_default_constructible_non_copyable_but_movable ]
 
     [ compile-fail common/fields_count_on_reference.cpp ]
     [ run common/fields_count_on_const.cpp ]

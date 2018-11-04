@@ -28,49 +28,65 @@ template <std::size_t Index>
 using size_t_ = std::integral_constant<std::size_t, Index >;
 
 ///////////////////// Structure that can be converted to reference to anything
-struct ubiq_constructor {
+struct ubiq_lref_constructor {
     std::size_t ignore;
     template <class Type> constexpr operator Type&() const noexcept; // Undefined, allows initialization of reference fields (T& and const T&)
-    //template <class Type> constexpr operator Type&&() const noexcept; // Undefined, allows initialization of rvalue reference fields and move-only types
+};
+
+///////////////////// Structure that can be converted to rvalue reference to anything
+struct ubiq_rref_constructor {
+    std::size_t ignore;
+    template <class Type> constexpr operator Type&&() const noexcept; // Undefined, allows initialization of rvalue reference fields and move-only types
 };
 
 ///////////////////// Structure that can be converted to reference to anything except reference to T
-template <class T>
+template <class T, bool IsCopyConstructible>
 struct ubiq_constructor_except {
     template <class Type> constexpr operator std::enable_if_t<!std::is_same<T, Type>::value, Type&> () const noexcept; // Undefined
 };
+
+template <class T>
+struct ubiq_constructor_except<T, false> {
+    template <class Type> constexpr operator std::enable_if_t<!std::is_same<T, Type>::value, Type&&> () const noexcept; // Undefined
+};
+
 
 ///////////////////// Hand-made is_aggregate_initializable_n<T> trait
 
 // `std::is_constructible<T, ubiq_constructor_except<T>>` consumes a lot of time, so we made a separate lazy trait for it.
 template <std::size_t N, class T> struct is_single_field_and_aggregate_initializable: std::false_type {};
 template <class T> struct is_single_field_and_aggregate_initializable<1, T>: std::integral_constant<
-    bool, !std::is_constructible<T, ubiq_constructor_except<T>>::value
+    bool, !std::is_constructible<T, ubiq_constructor_except<T, std::is_copy_constructible<T>::value>>::value
 > {};
 
 // Hand-made is_aggregate<T> trait:
-// Aggregates could be constructed from `decltype(ubiq_constructor{I})...` but report that there's no constructor from `decltype(ubiq_constructor{I})...`
-// Special case for N == 1: `std::is_constructible<T, ubiq_constructor>` returns true if N == 1 and T is copy/move constructible.
+// Aggregates could be constructed from `decltype(ubiq_?ref_constructor{I})...` but report that there's no constructor from `decltype(ubiq_?ref_constructor{I})...`
+// Special case for N == 1: `std::is_constructible<T, ubiq_?ref_constructor>` returns true if N == 1 and T is copy/move constructible.
 template <class T, std::size_t N>
 struct is_aggregate_initializable_n {
     template <std::size_t ...I>
     static constexpr bool is_not_constructible_n(std::index_sequence<I...>) noexcept {
-        return !std::is_constructible<T, decltype(ubiq_constructor{I})...>::value
+        return (!std::is_constructible<T, decltype(ubiq_lref_constructor{I})...>::value && !std::is_constructible<T, decltype(ubiq_rref_constructor{I})...>::value)
             || is_single_field_and_aggregate_initializable<N, T>::value
         ;
     }
 
     static constexpr bool value =
            std::is_empty<T>::value
+        || std::is_array<T>::value
         || std::is_fundamental<T>::value
         || is_not_constructible_n(std::make_index_sequence<N>{})
     ;
 };
 
 ///////////////////// Helper for SFINAE on fields count
-template <class T, std::size_t... I>
+template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<std::is_copy_constructible<T>::value>::type>
 constexpr auto enable_if_constructible_helper(std::index_sequence<I...>) noexcept
-    -> typename std::add_pointer<decltype(T{ ubiq_constructor{I}... })>::type;
+    -> typename std::add_pointer<decltype(T{ ubiq_lref_constructor{I}... })>::type;
+
+template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<!std::is_copy_constructible<T>::value>::type>
+constexpr auto enable_if_constructible_helper(std::index_sequence<I...>) noexcept
+    -> typename std::add_pointer<decltype(T{ ubiq_rref_constructor{I}... })>::type;
 
 template <class T, std::size_t N, class /*Enable*/ = decltype( enable_if_constructible_helper<T>(std::make_index_sequence<N>()) ) >
 using enable_if_constructible_helper_t = std::size_t;
@@ -124,16 +140,23 @@ constexpr std::size_t detect_fields_count_greedy(size_t_<Begin>, size_t_<Last>) 
     return fields_count_big ? fields_count_big : fields_count_small;
 }
 
-///////////////////// Choosing between greedy and non greedy search.
+///////////////////// Choosing between array size, greedy and non greedy search.
 template <class T, std::size_t N>
-constexpr auto detect_fields_count_dispatch(size_t_<N>, long) noexcept
+constexpr auto detect_fields_count_dispatch(size_t_<N>, long, long) noexcept
+    -> typename std::enable_if<std::is_array<T>::value, std::size_t>::type
+{
+    return sizeof(T) / sizeof(typename std::remove_all_extents<T>::type);
+}
+
+template <class T, std::size_t N>
+constexpr auto detect_fields_count_dispatch(size_t_<N>, long, int) noexcept
     -> decltype(sizeof(T{}))
 {
     return detect_fields_count<T>(size_t_<0>{}, size_t_<N / 2 + 1>{}, 1L);
 }
 
 template <class T, std::size_t N>
-constexpr std::size_t detect_fields_count_dispatch(size_t_<N>, int) noexcept {
+constexpr std::size_t detect_fields_count_dispatch(size_t_<N>, int, int) noexcept {
     // T is not default aggregate initialzable. It means that at least one of the members is not default constructible,
     // so we have to check all the aggregate initializations for T up to N parameters and return the bigest succeeded
     // (we can not use binary search for detecting fields count).
@@ -151,8 +174,11 @@ constexpr std::size_t fields_count() noexcept {
     );
 
     static_assert(
-        std::is_copy_constructible<std::remove_all_extents_t<type>>::value,
-        "====================> Boost.PFR: Type and each field in the type must be copy constructible."
+        std::is_copy_constructible<std::remove_all_extents_t<type>>::value || (
+            std::is_move_constructible<std::remove_all_extents_t<type>>::value
+            && std::is_move_assignable<std::remove_all_extents_t<type>>::value
+        ),
+        "====================> Boost.PFR: Type and each field in the type must be copy constructible (or move constructible and move assignable)."
     );
 
     static_assert(
@@ -177,7 +203,7 @@ constexpr std::size_t fields_count() noexcept {
 //#endif
 
     constexpr std::size_t max_fields_count = (sizeof(type) * CHAR_BIT); // We multiply by CHAR_BIT because the type may have bitfields in T
-    constexpr std::size_t result = detect_fields_count_dispatch<type>(size_t_<max_fields_count>{}, 1L);
+    constexpr std::size_t result = detect_fields_count_dispatch<type>(size_t_<max_fields_count>{}, 1L, 1L);
 
     static_assert(
         is_aggregate_initializable_n<type, result>::value,
@@ -186,7 +212,7 @@ constexpr std::size_t fields_count() noexcept {
 
     static_assert(
         result != 0 || std::is_empty<type>::value || std::is_fundamental<type>::value || std::is_reference<type>::value,
-        "====================> Boost.PFR: Something went wrong. Please report this issue to the github along with the structure you're reflecting."
+        "====================> Boost.PFR: If there's no other failed static asserts then something went wrong. Please report this issue to the github along with the structure you're reflecting."
     );
 
     return result;
