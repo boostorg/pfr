@@ -26,7 +26,7 @@ struct flat_tie_from_structure_tuple : std::tuple<Elements&...> {
     template <typename T>
     constexpr flat_tie_from_structure_tuple& operator= (T const& t) {
         base::operator=(
-            make_stdtiedtuple_from_tietuple(
+            detail::make_stdtiedtuple_from_tietuple(
                 detail::tie_as_flat_tuple(t),
                 std::make_index_sequence<flat_tuple_size_v<T>>()));
         return *this;

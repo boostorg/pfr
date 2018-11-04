@@ -122,7 +122,7 @@ public:
     return *this_t::get_pointer<idx>(std::addressof(u));
   }
 
-  // rvalues must no be used here, to avoid template instantiation bloats.
+  // rvalues must not be used here, to avoid template instantiation bloats.
   template <std::size_t idx>
   index_t<idx> && get(rvalue_t<U> u, size_t_<idx>) const = delete;
 };

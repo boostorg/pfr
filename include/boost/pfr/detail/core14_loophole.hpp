@@ -128,7 +128,7 @@ auto tie_or_value(T& val, std::enable_if_t<std::is_class< std::remove_reference_
 template <class T>
 decltype(auto) tie_or_value(T& val, std::enable_if_t<std::is_enum<std::remove_reference_t<T>>::value>* = 0) noexcept {
     // This is compatible with the pre-loophole implementation, and tests, but IIUC it violates strict aliasing unfortunately
-    return cast_to_layout_compatible<
+    return detail::cast_to_layout_compatible<
         std::underlying_type_t<std::remove_reference_t<T> >
     >(val);
 #if 0

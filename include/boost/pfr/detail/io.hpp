@@ -48,7 +48,7 @@ struct print_impl {
     template <class Stream, class T>
     static void print (Stream& out, const T& value) {
         if (!!I) out << ", ";
-        out << quoted_helper(boost::pfr::detail::sequence_tuple::get<I>(value));
+        out << detail::quoted_helper(boost::pfr::detail::sequence_tuple::get<I>(value));
         print_impl<I + 1, N>::print(out, value);
     }
 };
@@ -70,7 +70,7 @@ struct read_impl {
             in >> ignore;
             if (ignore != ' ')  in.setstate(Stream::failbit);
         }
-        in >> quoted_helper( boost::pfr::detail::sequence_tuple::get<I>(value) );
+        in >> detail::quoted_helper( boost::pfr::detail::sequence_tuple::get<I>(value) );
         read_impl<I + 1, N>::read(in, value);
     }
 };

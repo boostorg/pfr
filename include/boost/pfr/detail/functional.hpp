@@ -52,9 +52,8 @@ namespace boost { namespace pfr { namespace detail {
     struct less_impl {
         template <class T, class U>
         constexpr static bool cmp(const T& v1, const U& v2) noexcept {
-            using ::boost::pfr::detail::sequence_tuple::get;
-            return get<I>(v1) < get<I>(v2)
-                || (get<I>(v1) == get<I>(v2) && less_impl<I + 1, N>::cmp(v1, v2));
+            return sequence_tuple::get<I>(v1) < sequence_tuple::get<I>(v2)
+                || (sequence_tuple::get<I>(v1) == sequence_tuple::get<I>(v2) && less_impl<I + 1, N>::cmp(v1, v2));
         }
     };
 
@@ -70,9 +69,8 @@ namespace boost { namespace pfr { namespace detail {
     struct less_equal_impl {
         template <class T, class U>
         constexpr static bool cmp(const T& v1, const U& v2) noexcept {
-            using ::boost::pfr::detail::sequence_tuple::get;
-            return get<I>(v1) < get<I>(v2)
-                || (get<I>(v1) == get<I>(v2) && less_equal_impl<I + 1, N>::cmp(v1, v2));
+            return sequence_tuple::get<I>(v1) < sequence_tuple::get<I>(v2)
+                || (sequence_tuple::get<I>(v1) == sequence_tuple::get<I>(v2) && less_equal_impl<I + 1, N>::cmp(v1, v2));
         }
     };
 
@@ -88,9 +86,8 @@ namespace boost { namespace pfr { namespace detail {
     struct greater_impl {
         template <class T, class U>
         constexpr static bool cmp(const T& v1, const U& v2) noexcept {
-            using ::boost::pfr::detail::sequence_tuple::get;
-            return get<I>(v1) > get<I>(v2)
-                || (get<I>(v1) == get<I>(v2) && greater_impl<I + 1, N>::cmp(v1, v2));
+            return sequence_tuple::get<I>(v1) > sequence_tuple::get<I>(v2)
+                || (sequence_tuple::get<I>(v1) == sequence_tuple::get<I>(v2) && greater_impl<I + 1, N>::cmp(v1, v2));
         }
     };
 
@@ -106,9 +103,8 @@ namespace boost { namespace pfr { namespace detail {
     struct greater_equal_impl {
         template <class T, class U>
         constexpr static bool cmp(const T& v1, const U& v2) noexcept {
-            using ::boost::pfr::detail::sequence_tuple::get;
-            return get<I>(v1) > get<I>(v2)
-                || (get<I>(v1) == get<I>(v2) && greater_equal_impl<I + 1, N>::cmp(v1, v2));
+            return sequence_tuple::get<I>(v1) > sequence_tuple::get<I>(v2)
+                || (sequence_tuple::get<I>(v1) == sequence_tuple::get<I>(v2) && greater_equal_impl<I + 1, N>::cmp(v1, v2));
         }
     };
 
@@ -131,7 +127,7 @@ namespace boost { namespace pfr { namespace detail {
         constexpr static std::size_t compute(const T& val) noexcept {
             typedef std::decay_t<typename detail::sequence_tuple::tuple_element<I, T>::type> elem_t;
             std::size_t h = std::hash<elem_t>()( ::boost::pfr::detail::sequence_tuple::get<I>(val) );
-            hash_combine(h, hash_impl<I + 1, N>::compute(val) );
+            detail::hash_combine(h, hash_impl<I + 1, N>::compute(val) );
             return h;
         }
     };

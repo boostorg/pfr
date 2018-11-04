@@ -105,13 +105,13 @@ constexpr auto detect_fields_count(size_t_<Begin>, size_t_<Middle>, long) noexce
     -> enable_if_constructible_helper_t<T, Middle>
 {
     using next_t = size_t_<Middle + (Middle - Begin + 1) / 2>;
-    return detect_fields_count<T>(size_t_<Middle>{}, next_t{}, 1L);
+    return detail::detect_fields_count<T>(size_t_<Middle>{}, next_t{}, 1L);
 }
 
 template <class T, std::size_t Begin, std::size_t Middle>
 constexpr std::size_t detect_fields_count(size_t_<Begin>, size_t_<Middle>, int) noexcept {
     using next_t = size_t_<(Begin + Middle) / 2>;
-    return detect_fields_count<T>(size_t_<Begin>{}, next_t{}, 1L);
+    return detail::detect_fields_count<T>(size_t_<Begin>{}, next_t{}, 1L);
 }
 
 ///////////////////// Greedy search. Templates instantiation depth is log(sizeof(T)), templates instantiation count is log(sizeof(T))*T in worst case.
@@ -129,14 +129,14 @@ constexpr std::size_t detect_fields_count_greedy_remember(size_t_<N>, int) noexc
 
 template <class T, std::size_t N>
 constexpr std::size_t detect_fields_count_greedy(size_t_<N>, size_t_<N>) noexcept {
-    return detect_fields_count_greedy_remember<T>(size_t_<N>{}, 1L);
+    return detail::detect_fields_count_greedy_remember<T>(size_t_<N>{}, 1L);
 }
 
 template <class T, std::size_t Begin, std::size_t Last>
 constexpr std::size_t detect_fields_count_greedy(size_t_<Begin>, size_t_<Last>) noexcept {
     constexpr std::size_t middle = Begin + (Last - Begin) / 2;
-    constexpr std::size_t fields_count_big = detect_fields_count_greedy<T>(size_t_<middle + 1>{}, size_t_<Last>{});
-    constexpr std::size_t fields_count_small = detect_fields_count_greedy<T>(size_t_<Begin>{}, size_t_<fields_count_big ? Begin : middle>{});
+    constexpr std::size_t fields_count_big = detail::detect_fields_count_greedy<T>(size_t_<middle + 1>{}, size_t_<Last>{});
+    constexpr std::size_t fields_count_small = detail::detect_fields_count_greedy<T>(size_t_<Begin>{}, size_t_<fields_count_big ? Begin : middle>{});
     return fields_count_big ? fields_count_big : fields_count_small;
 }
 
@@ -152,7 +152,7 @@ template <class T, std::size_t N>
 constexpr auto detect_fields_count_dispatch(size_t_<N>, long, int) noexcept
     -> decltype(sizeof(T{}))
 {
-    return detect_fields_count<T>(size_t_<0>{}, size_t_<N / 2 + 1>{}, 1L);
+    return detail::detect_fields_count<T>(size_t_<0>{}, size_t_<N / 2 + 1>{}, 1L);
 }
 
 template <class T, std::size_t N>
@@ -160,7 +160,7 @@ constexpr std::size_t detect_fields_count_dispatch(size_t_<N>, int, int) noexcep
     // T is not default aggregate initialzable. It means that at least one of the members is not default constructible,
     // so we have to check all the aggregate initializations for T up to N parameters and return the bigest succeeded
     // (we can not use binary search for detecting fields count).
-    return detect_fields_count_greedy<T>(size_t_<0>{}, size_t_<N>{});
+    return detail::detect_fields_count_greedy<T>(size_t_<0>{}, size_t_<N>{});
 }
 
 ///////////////////// Returns non-flattened fields count
@@ -203,7 +203,7 @@ constexpr std::size_t fields_count() noexcept {
 //#endif
 
     constexpr std::size_t max_fields_count = (sizeof(type) * CHAR_BIT); // We multiply by CHAR_BIT because the type may have bitfields in T
-    constexpr std::size_t result = detect_fields_count_dispatch<type>(size_t_<max_fields_count>{}, 1L, 1L);
+    constexpr std::size_t result = detail::detect_fields_count_dispatch<type>(size_t_<max_fields_count>{}, 1L, 1L);
 
     static_assert(
         is_aggregate_initializable_n<type, result>::value,

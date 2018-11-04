@@ -88,31 +88,31 @@ struct tuple: tuple_base<
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(tuple<T...>& t) noexcept {
     static_assert(N < tuple<T...>::size_v, "====================> Boost.PFR: Tuple index out of bounds");
-    return get_impl<N>(t);
+    return sequence_tuple::get_impl<N>(t);
 }
 
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(const tuple<T...>& t) noexcept {
     static_assert(N < tuple<T...>::size_v, "====================> Boost.PFR: Tuple index out of bounds");
-    return get_impl<N>(t);
+    return sequence_tuple::get_impl<N>(t);
 }
 
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(const volatile tuple<T...>& t) noexcept {
     static_assert(N < tuple<T...>::size_v, "====================> Boost.PFR: Tuple index out of bounds");
-    return get_impl<N>(t);
+    return sequence_tuple::get_impl<N>(t);
 }
 
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(volatile tuple<T...>& t) noexcept {
     static_assert(N < tuple<T...>::size_v, "====================> Boost.PFR: Tuple index out of bounds");
-    return get_impl<N>(t);
+    return sequence_tuple::get_impl<N>(t);
 }
 
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(tuple<T...>&& t) noexcept {
     static_assert(N < tuple<T...>::size_v, "====================> Boost.PFR: Tuple index out of bounds");
-    return get_impl<N>(std::move(t));
+    return sequence_tuple::get_impl<N>(std::move(t));
 }
 
 template <std::size_t I, class T>

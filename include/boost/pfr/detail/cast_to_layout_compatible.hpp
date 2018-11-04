@@ -35,14 +35,14 @@ constexpr void static_assert_layout_compatible() noexcept {
 template <class To, class From>
 MAY_ALIAS const To& cast_to_layout_compatible(const From& val) noexcept {
     MAY_ALIAS const To* const t = reinterpret_cast<const To*>( std::addressof(val) );
-    static_assert_layout_compatible<To, From>();
+    detail::static_assert_layout_compatible<To, From>();
     return *t;
 }
 
 template <class To, class From>
 MAY_ALIAS const volatile To& cast_to_layout_compatible(const volatile From& val) noexcept {
     MAY_ALIAS const volatile To* const t = reinterpret_cast<const volatile To*>( std::addressof(val) );
-    static_assert_layout_compatible<To, From>();
+    detail::static_assert_layout_compatible<To, From>();
     return *t;
 }
 
@@ -50,7 +50,7 @@ MAY_ALIAS const volatile To& cast_to_layout_compatible(const volatile From& val)
 template <class To, class From>
 MAY_ALIAS volatile To& cast_to_layout_compatible(volatile From& val) noexcept {
     MAY_ALIAS volatile To* const t = reinterpret_cast<volatile To*>( std::addressof(val) );
-    static_assert_layout_compatible<To, From>();
+    detail::static_assert_layout_compatible<To, From>();
     return *t;
 }
 
@@ -58,7 +58,7 @@ MAY_ALIAS volatile To& cast_to_layout_compatible(volatile From& val) noexcept {
 template <class To, class From>
 MAY_ALIAS To& cast_to_layout_compatible(From& val) noexcept {
     MAY_ALIAS To* const t = reinterpret_cast<To*>( std::addressof(val) );
-    static_assert_layout_compatible<To, From>();
+    detail::static_assert_layout_compatible<To, From>();
     return *t;
 }
 
