@@ -83,7 +83,7 @@ template <class T>
 auto flat_structure_to_tuple(const T& val) noexcept {
     return detail::make_stdtuple_from_tietuple(
         detail::tie_as_flat_tuple(val),
-        std::make_index_sequence< flat_tuple_size_v<T> >()
+        detail::make_index_sequence< flat_tuple_size_v<T> >()
     );
 }
 
@@ -105,7 +105,7 @@ template <class T>
 auto flat_structure_tie(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable<T, T>::value>* = 0 /* @endcond */) noexcept {
     return detail::make_stdtiedtuple_from_tietuple(
         detail::tie_as_flat_tuple(val),
-        std::make_index_sequence< flat_tuple_size_v<T> >()
+        detail::make_index_sequence< flat_tuple_size_v<T> >()
     );
 }
 
@@ -133,7 +133,7 @@ void flat_for_each_field(T&& value, F&& func) {
     ::boost::pfr::detail::for_each_field_impl(
         tup,
         std::forward<F>(func),
-        std::make_index_sequence< flat_tuple_size_v<T> >{},
+        detail::make_index_sequence< flat_tuple_size_v<T> >{},
         std::is_rvalue_reference<T&&>{}
     );
 }

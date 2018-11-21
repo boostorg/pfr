@@ -35,4 +35,9 @@
 #   endif
 #endif
 
+#ifndef BOOST_PFR_USE_STD_INTEGRAL_SEQUENCE
+// TODO Detect that standard make_integral_sequence is not broken
+#   define BOOST_PFR_USE_STD_INTEGRAL_SEQUENCE 0
+#endif
+
 #endif // BOOST_PFR_DETAIL_CONFIG_HPP

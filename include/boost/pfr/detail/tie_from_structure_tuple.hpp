@@ -31,7 +31,7 @@ struct tie_from_structure_tuple : std::tuple<Elements&...> {
         base::operator=(
             detail::make_stdtiedtuple_from_tietuple(
                 detail::tie_as_tuple(t),
-                std::make_index_sequence<tuple_size_v<T>>()));
+                make_index_sequence<tuple_size_v<T>>()));
         return *this;
     }
 };

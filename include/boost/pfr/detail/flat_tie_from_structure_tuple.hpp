@@ -10,6 +10,7 @@
 #include <boost/pfr/detail/stdtuple.hpp>
 #include <boost/pfr/flat/tuple_size.hpp>
 #include <boost/pfr/detail/core14.hpp>
+#include <boost/pfr/detail/make_integer_sequence.hpp>
 
 namespace boost { namespace pfr { namespace detail {
 
@@ -28,7 +29,7 @@ struct flat_tie_from_structure_tuple : std::tuple<Elements&...> {
         base::operator=(
             detail::make_stdtiedtuple_from_tietuple(
                 detail::tie_as_flat_tuple(t),
-                std::make_index_sequence<flat_tuple_size_v<T>>()));
+                make_index_sequence<flat_tuple_size_v<T>>()));
         return *this;
     }
 };

@@ -47,7 +47,7 @@ void write(std::basic_ostream<Char, Traits>& out, const T& value) {
         [&out](const auto& val) {
             detail::print_impl<0, fields_count_val>::print(out, val);
         },
-        std::make_index_sequence<fields_count_val>{}
+        detail::make_index_sequence<fields_count_val>{}
     );
 #endif
     out << '}';
@@ -87,7 +87,7 @@ void read(std::basic_istream<Char, Traits>& in, T& value) {
         [&in](const auto& val) {
             detail::read_impl<0, fields_count_val>::read(in, val);
         },
-        std::make_index_sequence<fields_count_val>{}
+        detail::make_index_sequence<fields_count_val>{}
     );
 #endif
 

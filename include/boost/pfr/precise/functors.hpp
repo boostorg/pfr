@@ -44,10 +44,10 @@ namespace detail {
                     [&result, &lhs](const auto& rhs) {
                         result = visitor_t::cmp(lhs, rhs);
                     },
-                    std::make_index_sequence<fields_count_rhs>{}
+                    detail::make_index_sequence<fields_count_rhs>{}
                 );
             },
-            std::make_index_sequence<fields_count_lhs>{}
+            detail::make_index_sequence<fields_count_lhs>{}
         );
 
         return result;
@@ -242,7 +242,7 @@ template <class T> struct hash {
             [&result](const auto& lhs) {
                 result = detail::hash_impl<0, fields_count_val>::compute(lhs);
             },
-            std::make_index_sequence<fields_count_val>{}
+            detail::make_index_sequence<fields_count_val>{}
         );
 
         return result;

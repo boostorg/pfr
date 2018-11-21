@@ -64,8 +64,8 @@ constexpr auto my_tuple_cat_impl(const Tuple1& t1, std::index_sequence<I1...>, c
 template <class Tuple1, class Tuple2>
 constexpr auto my_tuple_cat(const Tuple1& t1, const Tuple2& t2) noexcept {
     return detail::my_tuple_cat_impl(
-        t1, std::make_index_sequence< Tuple1::size_v >{},
-        t2, std::make_index_sequence< Tuple2::size_v >{}
+        t1, make_index_sequence< Tuple1::size_v >{},
+        t2, make_index_sequence< Tuple2::size_v >{}
     );
 }
 

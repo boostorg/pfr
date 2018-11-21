@@ -75,7 +75,7 @@ struct is_aggregate_initializable_n {
            std::is_empty<T>::value
         || std::is_array<T>::value
         || std::is_fundamental<T>::value
-        || is_not_constructible_n(std::make_index_sequence<N>{})
+        || is_not_constructible_n(make_index_sequence<N>{})
     ;
 };
 
@@ -88,7 +88,7 @@ template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<
 constexpr auto enable_if_constructible_helper(std::index_sequence<I...>) noexcept
     -> typename std::add_pointer<decltype(T{ ubiq_rref_constructor{I}... })>::type;
 
-template <class T, std::size_t N, class /*Enable*/ = decltype( enable_if_constructible_helper<T>(std::make_index_sequence<N>()) ) >
+template <class T, std::size_t N, class /*Enable*/ = decltype( enable_if_constructible_helper<T>(make_index_sequence<N>()) ) >
 using enable_if_constructible_helper_t = std::size_t;
 
 ///////////////////// Non greedy fields count search. Templates instantiation depth is log(sizeof(T)), templates instantiation count is log(sizeof(T)).
