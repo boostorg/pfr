@@ -89,7 +89,7 @@ using make_integer_sequence = std::make_integer_sequence<T, N>;
 template <std::size_t N>
 using make_index_sequence = std::make_index_sequence<N>;
 
-template <typenaem... T>
+template <typename... T>
 using index_sequence_for = std::index_sequence_for<T...>;
 
 #endif
