@@ -99,14 +99,14 @@ before_install:
   - echo "Testing $PROJECT_TO_TEST, to remove $BOOST/libs/$BOOST_REMOVE, testing branch $BOOST_BRANCH"
   - git clone -b $BOOST_BRANCH --depth 1 https://github.com/boostorg/boost.git $BOOST
   - cd $BOOST
-  - git submodule update --init --depth 1 tools/build tools/boostdep
+  - git submodule update --init --depth 1 tools/build tools/boostdep libs/type_index # DIFF: Added libs/type_index
 
   # Replacing Boost module with this project and installing Boost dependencies
   - rm -rf $BOOST/libs/$BOOST_REMOVE
   - mv $TRAVIS_BUILD_DIR $BOOST/libs/$PROJECT_TO_TEST
   - TRAVIS_BUILD_DIR=$BOOST/libs/$PROJECT_TO_TEST
   - python tools/boostdep/depinst/depinst.py --git_args "--depth 1 --jobs 2" $(basename $TRAVIS_BUILD_DIR)
-  - python tools/boostdep/depinst/depinst.py --git_args "--depth 1 --jobs 2" type_index # DIFF: Changed $(basename $TRAVIS_BUILD_DIR) to type_index
+  - python tools/boostdep/depinst/depinst.py --git_args "--depth 1 --jobs 2" type_index  # DIFF: Added line
   - git status
 
   # Adding missing toolsets and preparing Boost headers

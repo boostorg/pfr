@@ -57,7 +57,7 @@ before_build:
     - set BOOST=C:/boost-local
     - git clone -b %BOOST_BRANCH% --depth 1 https://github.com/boostorg/boost.git %BOOST%
     - cd %BOOST%
-    - git submodule update --init --depth 1 tools/build tools/boostdep
+    - git submodule update --init --depth 1 tools/build tools/boostdep libs/type_index # DIFF: Added libs/type_index
 
     - rm -rf %BOOST%/libs/%BOOST_REMOVE%
     - mv %APPVEYOR_BUILD_FOLDER% %BOOST%/libs/%APPVEYOR_PROJECT_NAME%
