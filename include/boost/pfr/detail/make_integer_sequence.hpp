@@ -11,6 +11,7 @@
 
 #include <type_traits>
 #include <utility>
+#include <cstddef>
 
 namespace boost { namespace pfr { namespace detail {
 
@@ -24,15 +25,11 @@ namespace boost { namespace pfr { namespace detail {
 
 #ifdef BOOST_PFR_USE_MAKE_INTEGER_SEQ_BUILTIN
 
-template <class T, T... Vals>
-struct memoize_integer_sequence {
-    using type = std::integer_sequence<T, Vals...>;
-};
+using std::integer_sequence;
 
-// Clang unable to use namespace qualified std::integer_sequence in __make_integer_seq,
-// so we use a helper structure here.
+// Clang unable to use namespace qualified std::integer_sequence in __make_integer_seq.
 template <typename T, T N>
-using make_integer_sequence = typename __make_integer_seq<memoize_integer_sequence, T, N>::type;
+using make_integer_sequence = __make_integer_seq<integer_sequence, T, N>;
 
 #undef BOOST_PFR_USE_MAKE_INTEGER_SEQ_BUILTIN
 
