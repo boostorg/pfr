@@ -29,7 +29,7 @@ struct flat_tie_from_structure_tuple : std::tuple<Elements&...> {
         base::operator=(
             detail::make_stdtiedtuple_from_tietuple(
                 detail::tie_as_flat_tuple(t),
-                make_index_sequence<flat_tuple_size_v<T>>()));
+                detail::make_index_sequence<flat_tuple_size_v<T>>()));
         return *this;
     }
 };

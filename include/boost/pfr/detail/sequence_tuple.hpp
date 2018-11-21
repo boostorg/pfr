@@ -76,11 +76,11 @@ constexpr T&& get_impl(base_from_member<N, T>&& t) noexcept {
 
 template <class ...Values>
 struct tuple: tuple_base<
-    index_sequence_for<Values...>,
+    detail::index_sequence_for<Values...>,
     Values...>
 {
     using tuple_base<
-        index_sequence_for<Values...>,
+        detail::index_sequence_for<Values...>,
         Values...
     >::tuple_base;
 };

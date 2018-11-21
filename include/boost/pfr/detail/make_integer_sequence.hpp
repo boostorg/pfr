@@ -16,12 +16,8 @@ namespace boost { namespace pfr { namespace detail {
 
 #if BOOST_PFR_USE_STD_INTEGRAL_SEQUENCE == 0
 
-template <typename... T>
+template <typename T, typename U>
 struct join_sequences;
-
-template <typename T, typename U, typename... V>
-struct join_sequences<T, U, V...>
-    : join_sequences< typename join_sequences<T, U>::type, V...> {};
 
 template <typename T, T... A, T... B>
 struct join_sequences<std::integer_sequence<T, A...>, std::integer_sequence<T, B...>> {
@@ -40,7 +36,6 @@ struct build_sequence_impl {
 
 template <typename T, T V>
 struct build_sequence_impl<T, V, V> {
-    static constexpr T size = 1;
     using type = std::integer_sequence<T, V>;
 };
 
