@@ -15,7 +15,7 @@
 namespace boost { namespace pfr { namespace detail {
 
 #if BOOST_PFR_USE_STD_INTEGRAL_SEQUENCE == 0
-constexpr ::std::size_t sequence_chunk_size = 128;
+constexpr ::std::size_t sequence_chunk_size = 1<<16;
 
 template <typename... T>
 struct join_sequences;
@@ -32,11 +32,17 @@ struct join_sequences<std::integer_sequence<T, A...>, std::integer_sequence<T, B
 template <typename T, T Min, T Max, T... Values>
 struct build_sequence_impl {
     static_assert(Min < Max, "Start of range must be less than it's end");
-    using type = typename build_sequence_impl<T, Min, Max - 1, Max, Values...>::type;
+    static constexpr T size = Max - Min;
+
+    using type = typename join_sequences<
+            typename build_sequence_impl<T, Min, Min + size / 2>::type,
+            typename build_sequence_impl<T, Min + size / 2 + 1, Max>::type
+        >::type;
 };
 
 template <typename T, T V, T... Values>
 struct build_sequence_impl<T, V, V, Values...> {
+    static constexpr T size = 1;
     using type = std::integer_sequence<T, V, Values...>;
 };
 
