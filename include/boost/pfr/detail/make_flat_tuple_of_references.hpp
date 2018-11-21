@@ -12,6 +12,7 @@
 #include <utility>      // metaprogramming stuff
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/rvalue_t.hpp>
+#include <boost/pfr/detail/make_integer_sequence.hpp>
 
 
 namespace boost { namespace pfr { namespace detail {

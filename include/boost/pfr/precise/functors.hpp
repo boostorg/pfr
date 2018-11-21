@@ -10,6 +10,7 @@
 #include <boost/pfr/detail/config.hpp>
 
 #include <boost/pfr/detail/functional.hpp>
+#include <boost/pfr/detail/make_integer_sequence.hpp>
 #if BOOST_PFR_USE_CPP17
 #   include <boost/pfr/detail/core17.hpp>
 #else

@@ -16,6 +16,7 @@
 #include <boost/pfr/detail/stdtuple.hpp>
 #include <boost/pfr/detail/core14.hpp>
 #include <boost/pfr/detail/for_each_field_impl.hpp>
+#include <boost/pfr/detail/make_integer_sequence.hpp>
 #include <boost/pfr/flat/tuple_size.hpp>
 
 #include <boost/pfr/detail/flat_tie_from_structure_tuple.hpp>

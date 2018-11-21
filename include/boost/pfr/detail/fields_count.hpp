@@ -8,6 +8,7 @@
 #pragma once
 
 #include <boost/pfr/detail/config.hpp>
+#include <boost/pfr/detail/make_integer_sequence.hpp>
 
 #include <climits>      // CHAR_BIT
 #include <type_traits>

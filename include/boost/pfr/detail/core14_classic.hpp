@@ -16,6 +16,7 @@
 #include <boost/pfr/detail/offset_based_getter.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
 #include <boost/pfr/detail/make_flat_tuple_of_references.hpp>
+#include <boost/pfr/detail/make_integer_sequence.hpp>
 #include <boost/pfr/detail/size_array.hpp>
 #include <boost/pfr/detail/rvalue_t.hpp>
 

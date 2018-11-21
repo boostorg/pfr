@@ -9,6 +9,7 @@
 
 #include <boost/pfr/detail/stdtuple.hpp>
 #include <boost/pfr/precise/tuple_size.hpp>
+#include <boost/pfr/detail/make_integer_sequence.hpp>
 #if BOOST_PFR_USE_CPP17
 #   include <boost/pfr/detail/core17.hpp>
 #else
