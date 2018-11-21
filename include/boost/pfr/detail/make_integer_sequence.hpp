@@ -14,7 +14,28 @@
 
 namespace boost { namespace pfr { namespace detail {
 
-#if BOOST_PFR_USE_STD_INTEGRAL_SEQUENCE == 0
+#if BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE == 0
+
+#ifdef __has_builtin
+#   if __has_builtin(__make_integer_seq)
+#       define BOOST_PFR_USE_MAKE_INTEGER_SEQ_BUILTIN
+#   endif
+#endif
+
+#ifdef BOOST_PFR_USE_MAKE_INTEGER_SEQ_BUILTIN
+
+template <typename T, T N>
+using make_integer_sequence = __make_integer_seq<std::integer_sequence, T, N>;
+
+template <std::size_t N>
+using make_index_sequence = make_integer_sequence<std::size_t, N>;
+
+template <typename... T>
+using index_sequence_for = make_index_sequence<sizeof...(T)>;
+
+#undef BOOST_PFR_USE_MAKE_INTEGER_SEQ_BUILTIN
+
+#else
 
 template <typename T, typename U>
 struct join_sequences;
@@ -56,7 +77,8 @@ using make_index_sequence = make_integer_sequence<std::size_t, N>;
 template <typename... T>
 using index_sequence_for = make_index_sequence<sizeof...(T)>;
 
-#else
+#endif // !defined BOOST_PFR_USE_MAKE_INTEGER_SEQ_BUILTIN
+#else // BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE == 1
 
 template <typename T, T N>
 using make_integer_sequence = std::make_integer_sequence<T, N>;
@@ -67,7 +89,7 @@ using make_index_sequence = std::make_index_sequence<N>;
 template <typename... T>
 using index_sequence_for = std::index_sequence_for<T...>;
 
-#endif
+#endif // BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE == 1
 
 }}} // namespace boost::pfr::detail
 
