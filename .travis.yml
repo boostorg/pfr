@@ -8,7 +8,7 @@
 # See https://svn.boost.org/trac/boost/wiki/TravisCoverals for description of this file
 # and how it can be used with Boost libraries.
 #
-# File revision #9
+# File revision #9 (with DIFF)
 
 sudo: false
 language: cpp
@@ -105,7 +105,7 @@ before_install:
   - rm -rf $BOOST/libs/$BOOST_REMOVE
   - mv $TRAVIS_BUILD_DIR $BOOST/libs/$PROJECT_TO_TEST
   - TRAVIS_BUILD_DIR=$BOOST/libs/$PROJECT_TO_TEST
-  - python tools/boostdep/depinst/depinst.py --git_args "--depth 1 --jobs 2" $(basename $TRAVIS_BUILD_DIR)
+  - python tools/boostdep/depinst/depinst.py --git_args "--depth 1 --jobs 2" type_index # DIFF: Changed $(basename $TRAVIS_BUILD_DIR) to type_index
   - git status
 
   # Adding missing toolsets and preparing Boost headers

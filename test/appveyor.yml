@@ -8,7 +8,7 @@
 # See https://svn.boost.org/trac/boost/wiki/TravisCoverals for description of this file
 # and how it can be used with Boost libraries.
 #
-# File revision #6
+# File revision #6 (with DIFF)
 
 init:
     - set BOOST_REMOVE=%APPVEYOR_PROJECT_NAME%         # Remove this folder from lib from full clone of Boost.
@@ -61,7 +61,7 @@ before_build:
 
     - rm -rf %BOOST%/libs/%BOOST_REMOVE%
     - mv %APPVEYOR_BUILD_FOLDER% %BOOST%/libs/%APPVEYOR_PROJECT_NAME%
-    - python tools/boostdep/depinst/depinst.py --git_args "--depth 1 --jobs 2" %APPVEYOR_PROJECT_NAME%
+    - python tools/boostdep/depinst/depinst.py --git_args "--depth 1 --jobs 2" type_index # DIFF: Changed %APPVEYOR_PROJECT_NAME% to type_index
 
 build_script:
     - cmd /c bootstrap
