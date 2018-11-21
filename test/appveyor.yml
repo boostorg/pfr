@@ -61,7 +61,8 @@ before_build:
 
     - rm -rf %BOOST%/libs/%BOOST_REMOVE%
     - mv %APPVEYOR_BUILD_FOLDER% %BOOST%/libs/%APPVEYOR_PROJECT_NAME%
-    - python tools/boostdep/depinst/depinst.py --git_args "--depth 1 --jobs 2" type_index # DIFF: Changed %APPVEYOR_PROJECT_NAME% to type_index
+    - python tools/boostdep/depinst/depinst.py --git_args "--depth 1 --jobs 2" %APPVEYOR_PROJECT_NAME%
+    - python tools/boostdep/depinst/depinst.py --git_args "--depth 1 --jobs 2" type_index # DIFF: Added
 
 build_script:
     - cmd /c bootstrap

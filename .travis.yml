@@ -105,6 +105,7 @@ before_install:
   - rm -rf $BOOST/libs/$BOOST_REMOVE
   - mv $TRAVIS_BUILD_DIR $BOOST/libs/$PROJECT_TO_TEST
   - TRAVIS_BUILD_DIR=$BOOST/libs/$PROJECT_TO_TEST
+  - python tools/boostdep/depinst/depinst.py --git_args "--depth 1 --jobs 2" $(basename $TRAVIS_BUILD_DIR)
   - python tools/boostdep/depinst/depinst.py --git_args "--depth 1 --jobs 2" type_index # DIFF: Changed $(basename $TRAVIS_BUILD_DIR) to type_index
   - git status
 
