@@ -35,4 +35,14 @@
 #   endif
 #endif
 
+#ifndef BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE
+// Assume that libstdc++ since GCC-7.3 does not have linear instantiation depth in std::make_integral_sequence
+#   if defined( __GLIBCXX__) && __GLIBCXX__ >= 20180101
+#       define BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE 1
+//# elif other known working lib
+#   else
+#       define BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE 0
+#   endif
+#endif
+
 #endif // BOOST_PFR_DETAIL_CONFIG_HPP

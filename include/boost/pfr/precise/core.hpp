@@ -15,6 +15,7 @@
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/stdtuple.hpp>
 #include <boost/pfr/detail/for_each_field_impl.hpp>
+#include <boost/pfr/detail/make_integer_sequence.hpp>
 
 #include <boost/pfr/precise/tuple_size.hpp>
 #if BOOST_PFR_USE_CPP17
@@ -90,7 +91,7 @@ template <class T>
 constexpr auto structure_to_tuple(const T& val) noexcept {
     return detail::make_stdtuple_from_tietuple(
         detail::tie_as_tuple(val),
-        std::make_index_sequence< tuple_size_v<T> >()
+        detail::make_index_sequence< tuple_size_v<T> >()
     );
 }
 
@@ -110,7 +111,7 @@ template <class T>
 constexpr auto structure_tie(T& val) noexcept {
     return detail::make_stdtiedtuple_from_tietuple(
         detail::tie_as_tuple(val),
-        std::make_index_sequence< tuple_size_v<T> >()
+        detail::make_index_sequence< tuple_size_v<T> >()
     );
 }
 
@@ -146,11 +147,11 @@ void for_each_field(T&& value, F&& func) {
             ::boost::pfr::detail::for_each_field_impl(
                 t,
                 std::forward<F>(f),
-                std::make_index_sequence<fields_count_val_in_lambda>{},
+                detail::make_index_sequence<fields_count_val_in_lambda>{},
                 std::is_rvalue_reference<T&&>{}
             );
         },
-        std::make_index_sequence<fields_count_val>{}
+        detail::make_index_sequence<fields_count_val>{}
     );
 }
 

@@ -8,6 +8,7 @@
 #pragma once
 
 #include <boost/pfr/detail/config.hpp>
+#include <boost/pfr/detail/make_integer_sequence.hpp>
 
 #include <utility>      // metaprogramming stuff
 #include <cstddef>      // std::size_t
@@ -75,11 +76,11 @@ constexpr T&& get_impl(base_from_member<N, T>&& t) noexcept {
 
 template <class ...Values>
 struct tuple: tuple_base<
-    std::make_index_sequence<sizeof...(Values)>,
+    detail::index_sequence_for<Values...>,
     Values...>
 {
     using tuple_base<
-        std::make_index_sequence<sizeof...(Values)>,
+        detail::index_sequence_for<Values...>,
         Values...
     >::tuple_base;
 };

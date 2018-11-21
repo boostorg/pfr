@@ -16,6 +16,7 @@
 #include <boost/pfr/detail/offset_based_getter.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
 #include <boost/pfr/detail/make_flat_tuple_of_references.hpp>
+#include <boost/pfr/detail/make_integer_sequence.hpp>
 #include <boost/pfr/detail/size_array.hpp>
 #include <boost/pfr/detail/rvalue_t.hpp>
 
@@ -366,7 +367,7 @@ template <class T>
 constexpr size_array<sizeof(T) * 3> fields_count_and_type_ids_with_zeros() noexcept {
     size_array<sizeof(T) * 3> types{};
     constexpr std::size_t N = detail::fields_count<T>();
-    detail::flat_type_to_array_of_type_ids<T, N>(types.data, std::make_index_sequence<N>());
+    detail::flat_type_to_array_of_type_ids<T, N>(types.data, detail::make_index_sequence<N>());
     return types;
 }
 
@@ -417,7 +418,7 @@ constexpr auto prepare_subtuples(size_t_<typeid_conversions::tuple_end_tag>, siz
 template <class T, std::size_t I, std::size_t SubtupleLength>
 constexpr auto prepare_subtuples(size_t_<typeid_conversions::tuple_begin_tag>, size_t_<I>, size_t_<SubtupleLength>) noexcept {
     static_assert(SubtupleLength > 2, "====================> Boost.PFR: Internal error while representing nested field as tuple");
-    constexpr auto seq = std::make_index_sequence<SubtupleLength - 2>{};
+    constexpr auto seq = detail::make_index_sequence<SubtupleLength - 2>{};
     return detail::as_flat_tuple_impl<T>( detail::increment_index_sequence<I + 1>(seq) );
 }
 
@@ -496,7 +497,7 @@ constexpr auto as_flat_tuple_impl(std::index_sequence<First, I...>) noexcept {
 
     return detail::as_flat_tuple_impl_drop_helpers<T>(
         std::index_sequence<First, I...>{},
-        std::make_index_sequence< 1 + count_of_I - count_skips_in_array(First, First + count_of_I, a) >{}
+        detail::make_index_sequence< 1 + count_of_I - count_skips_in_array(First, First + count_of_I, a) >{}
     );
 }
 
@@ -507,7 +508,7 @@ constexpr auto internal_tuple_with_same_alignment() noexcept {
     static_assert(std::is_pod<type>::value, "====================> Boost.PFR: Type can not be used is flat_ functions, because it's not POD");
     static_assert(!std::is_reference<type>::value, "====================> Boost.PFR: Not applyable");
     constexpr auto res = detail::as_flat_tuple_impl<type>(
-        std::make_index_sequence< decltype(detail::flat_array_of_type_ids<type>())::size() >()
+        detail::make_index_sequence< decltype(detail::flat_array_of_type_ids<type>())::size() >()
     );
 
     return res;
@@ -566,7 +567,7 @@ auto tie_as_tuple(T& val) noexcept {
         "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."
     );
     static_assert(
-        boost::pfr::detail::is_flat_refelectable<T>( std::make_index_sequence<boost::pfr::detail::fields_count<T>()>{} ),
+        boost::pfr::detail::is_flat_refelectable<T>( detail::make_index_sequence<boost::pfr::detail::fields_count<T>()>{} ),
         "====================> Boost.PFR: Not possible in C++14 to represent that type without loosing information. Use boost::pfr::flat_ version, or change type definition, or enable C++17"
     );
     return boost::pfr::detail::tie_as_flat_tuple(val);

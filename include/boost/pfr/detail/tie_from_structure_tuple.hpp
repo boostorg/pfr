@@ -9,6 +9,7 @@
 
 #include <boost/pfr/detail/stdtuple.hpp>
 #include <boost/pfr/precise/tuple_size.hpp>
+#include <boost/pfr/detail/make_integer_sequence.hpp>
 #if BOOST_PFR_USE_CPP17
 #   include <boost/pfr/detail/core17.hpp>
 #else
@@ -31,7 +32,7 @@ struct tie_from_structure_tuple : std::tuple<Elements&...> {
         base::operator=(
             detail::make_stdtiedtuple_from_tietuple(
                 detail::tie_as_tuple(t),
-                std::make_index_sequence<tuple_size_v<T>>()));
+                detail::make_index_sequence<tuple_size_v<T>>()));
         return *this;
     }
 };

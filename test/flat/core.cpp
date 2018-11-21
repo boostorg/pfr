@@ -412,7 +412,7 @@ void test_and_debug_internals(std::index_sequence<I...>) {
     static_assert(
         std::is_same<
             decltype(boost::pfr::detail::as_flat_tuple_impl<type>(
-                std::make_index_sequence< decltype(boost::pfr::detail::flat_array_of_type_ids<type>())::size() >()
+                detail::make_index_sequence< decltype(boost::pfr::detail::flat_array_of_type_ids<type>())::size() >()
             )),
             boost::pfr::detail::sequence_tuple::tuple<boost::pfr::detail::sequence_tuple::tuple<short, char>, char, char>
         >::value,
@@ -420,7 +420,7 @@ void test_and_debug_internals(std::index_sequence<I...>) {
     );
 
     constexpr auto res = as_flat_tuple_impl<foo>(
-        std::make_index_sequence< decltype(flat_array_of_type_ids<foo>())::size() >()
+        detail::make_index_sequence< decltype(flat_array_of_type_ids<foo>())::size() >()
     );
     auto afoo = flat_array_of_type_ids<foo>();
     std::cerr << "\n\n";
@@ -690,7 +690,7 @@ int main() {
     static_assert(tuple_size<decltype(i_2dimens)>::value == 4, "");
     static_assert(flat_tuple_size<decltype(i_2dimens)>::value == 4, "");
 
-    test_and_debug_internals(std::make_index_sequence<6>{});
+    test_and_debug_internals(detail::make_index_sequence<6>{});
     test_alignment_with_nested_structure();
     another_test_with_unusual_alignment();
 
