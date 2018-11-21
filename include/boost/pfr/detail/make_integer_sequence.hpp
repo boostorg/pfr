@@ -15,7 +15,6 @@
 namespace boost { namespace pfr { namespace detail {
 
 #if BOOST_PFR_USE_STD_INTEGRAL_SEQUENCE == 0
-constexpr ::std::size_t sequence_chunk_size = 1<<16;
 
 template <typename... T>
 struct join_sequences;
@@ -29,43 +28,24 @@ struct join_sequences<std::integer_sequence<T, A...>, std::integer_sequence<T, B
     using type = std::integer_sequence<T, A..., B...>;
 };
 
-template <typename T, T Min, T Max, T... Values>
+template <typename T, T Min, T Max>
 struct build_sequence_impl {
     static_assert(Min < Max, "Start of range must be less than it's end");
     static constexpr T size = Max - Min;
-
     using type = typename join_sequences<
             typename build_sequence_impl<T, Min, Min + size / 2>::type,
             typename build_sequence_impl<T, Min + size / 2 + 1, Max>::type
         >::type;
 };
 
-template <typename T, T V, T... Values>
-struct build_sequence_impl<T, V, V, Values...> {
+template <typename T, T V>
+struct build_sequence_impl<T, V, V> {
     static constexpr T size = 1;
-    using type = std::integer_sequence<T, V, Values...>;
+    using type = std::integer_sequence<T, V>;
 };
-
-template <typename T, T Min, T Max>
-struct build_sequence;
-
-template <typename T, T Min, T Max>
-struct split_sequence_helper {
-    using type = typename join_sequences<
-            typename build_sequence_impl<T, Min, Min + sequence_chunk_size - 1>::type,
-            typename build_sequence<T, Min + sequence_chunk_size, Max>::type
-        >::type;
-};
-
-template <typename T, T Min, T Max>
-struct build_sequence : std::conditional<
-        (Max - Min < sequence_chunk_size),
-        build_sequence_impl<T, Min, Max>,
-        split_sequence_helper<T, Min, Max>
-    >::type {};
 
 template <typename T, std::size_t N>
-struct make_integer_sequence_impl : build_sequence<T, 0, N - 1> {};
+struct make_integer_sequence_impl : build_sequence_impl<T, 0, N - 1> {};
 
 template <typename T>
 struct make_integer_sequence_impl<T, 0> {
