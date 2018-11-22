@@ -29,8 +29,7 @@ skip_tags: true
 environment:
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      TOOLSET: msvc-14.1 # clang-win has problems with structured bindings - it can not correclty use std::tuple_size
-      CXXSTD: 17
+      TOOLSET: msvc # clang-win has problems with structured bindings - it can not correclty use std::tuple_size
       ADDRMD: 32,64
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
       ADDPATH: C:\cygwin\bin;
