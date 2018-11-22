@@ -68,13 +68,13 @@ matrix:
 #          sources: ubuntu-toolchain-r-test
 #          packages: g++-8
 
-    - env: B2_ARGS='cxxstd=14,1z toolset=clang-4 cxxflags="--coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined -DBOOST_TRAVISCI_BUILD" linkflags="--coverage -fsanitize=address,leak,undefined"'
-      name: "Clang-4"
+    - env: B2_ARGS='cxxstd=14,1z toolset=clang-6 cxxflags="--coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined -DBOOST_TRAVISCI_BUILD" linkflags="--coverage -fsanitize=address,leak,undefined"'
+      name: "Clang-6"
       sudo: required # Required by leak sanitizer
       addons:
         apt:
-          sources: llvm-toolchain-trusty-4.0
-          packages: clang-4.0
+          sources: llvm-toolchain-trusty-6.0
+          packages: clang-6.0
 
     - env: B2_ARGS='cxxstd=14 toolset=clang-libc++ cxxflags="--coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined -DBOOST_TRAVISCI_BUILD" linkflags="--coverage -fsanitize=address,leak,undefined"'
       name: "Clang-3.8, libc++"
