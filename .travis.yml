@@ -73,8 +73,12 @@ matrix:
       sudo: required # Required by leak sanitizer
       addons:
         apt:
-          sources: llvm-toolchain-trusty-5.0
-          packages: clang-5.0
+          sources:
+          - llvm-toolchain-trusty-5.0
+          - ubuntu-toolchain-r-test
+          packages:
+          - clang-5.0
+          - libstdc++-6-dev
 
     - env: B2_ARGS='cxxstd=14 toolset=clang-libc++ cxxflags="--coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined -DBOOST_TRAVISCI_BUILD" linkflags="--coverage -fsanitize=address,leak,undefined"'
       name: "Clang-3.8, libc++"
