@@ -32,6 +32,9 @@ namespace boost { namespace pfr { namespace detail {
 
 ///////////////////// General utility stuff
 
+template <std::size_t Index>
+using size_t_ = std::integral_constant<std::size_t, Index >;
+
 template <class T> struct identity{
     typedef T type;
 };
