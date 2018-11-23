@@ -17,6 +17,13 @@ namespace boost { namespace pfr { namespace detail {
 
 #if BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE == 0
 
+#ifdef __clang__
+// Clang may have problems with finding correct standard library, so we just define our own integer_sequence.
+template <class T, T... I> struct integer_sequence {};
+#else
+using std::integer_sequence;
+#endif
+
 #ifdef __has_builtin
 #   if __has_builtin(__make_integer_seq)
 #       define BOOST_PFR_USE_MAKE_INTEGER_SEQ_BUILTIN
@@ -25,7 +32,6 @@ namespace boost { namespace pfr { namespace detail {
 
 #ifdef BOOST_PFR_USE_MAKE_INTEGER_SEQ_BUILTIN
 
-using std::integer_sequence;
 
 // Clang unable to use namespace qualified std::integer_sequence in __make_integer_seq.
 template <typename T, T N>
