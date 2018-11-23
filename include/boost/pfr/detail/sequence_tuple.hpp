@@ -27,7 +27,7 @@ struct tuple_base;
 
 
 template <std::size_t... I, class ...Tail>
-struct tuple_base< std::index_sequence<I...>, Tail... >
+struct tuple_base< detail::index_sequence<I...>, Tail... >
     : base_from_member<I , Tail>...
 {
     static constexpr std::size_t size_v = sizeof...(I);
@@ -44,7 +44,7 @@ struct tuple_base< std::index_sequence<I...>, Tail... >
 };
 
 template <>
-struct tuple_base<std::index_sequence<> > {
+struct tuple_base<detail::index_sequence<> > {
     static constexpr std::size_t size_v = 0;
 };
 

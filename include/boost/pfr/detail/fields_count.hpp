@@ -66,7 +66,7 @@ template <class T> struct is_single_field_and_aggregate_initializable<1, T>: std
 template <class T, std::size_t N>
 struct is_aggregate_initializable_n {
     template <std::size_t ...I>
-    static constexpr bool is_not_constructible_n(std::index_sequence<I...>) noexcept {
+    static constexpr bool is_not_constructible_n(detail::index_sequence<I...>) noexcept {
         return (!std::is_constructible<T, decltype(ubiq_lref_constructor{I})...>::value && !std::is_constructible<T, decltype(ubiq_rref_constructor{I})...>::value)
             || is_single_field_and_aggregate_initializable<N, T>::value
         ;
@@ -82,11 +82,11 @@ struct is_aggregate_initializable_n {
 
 ///////////////////// Helper for SFINAE on fields count
 template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<std::is_copy_constructible<T>::value>::type>
-constexpr auto enable_if_constructible_helper(std::index_sequence<I...>) noexcept
+constexpr auto enable_if_constructible_helper(detail::index_sequence<I...>) noexcept
     -> typename std::add_pointer<decltype(T{ ubiq_lref_constructor{I}... })>::type;
 
 template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<!std::is_copy_constructible<T>::value>::type>
-constexpr auto enable_if_constructible_helper(std::index_sequence<I...>) noexcept
+constexpr auto enable_if_constructible_helper(detail::index_sequence<I...>) noexcept
     -> typename std::add_pointer<decltype(T{ ubiq_rref_constructor{I}... })>::type;
 
 template <class T, std::size_t N, class /*Enable*/ = decltype( enable_if_constructible_helper<T>(detail::make_index_sequence<N>()) ) >

@@ -55,7 +55,7 @@ constexpr decltype(auto) tie_as_tuple_with_references(const detail::sequence_tup
 }
 
 template <class Tuple1, std::size_t... I1, class Tuple2, std::size_t... I2>
-constexpr auto my_tuple_cat_impl(const Tuple1& t1, std::index_sequence<I1...>, const Tuple2& t2, std::index_sequence<I2...>) noexcept {
+constexpr auto my_tuple_cat_impl(const Tuple1& t1, detail::index_sequence<I1...>, const Tuple2& t2, detail::index_sequence<I2...>) noexcept {
     return detail::tie_as_tuple_with_references(
         sequence_tuple::get<I1>(t1)...,
         sequence_tuple::get<I2>(t2)...
