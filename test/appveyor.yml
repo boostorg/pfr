@@ -39,10 +39,10 @@ environment:
       ADDPATH: C:\cygwin64\bin;
       TOOLSET: gcc
       CXXSTD: 14,1z
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
-      ADDPATH: C:\mingw\bin;
-      TOOLSET: gcc
-      CXXSTD: 14,1z
+#    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
+#      ADDPATH: C:\mingw\bin;
+#      TOOLSET: gcc
+#      CXXSTD: 14,1z
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
       ADDPATH: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin;
       TOOLSET: gcc
