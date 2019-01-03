@@ -75,7 +75,7 @@ struct fn_def_rref {
 };
 
 
-// This specialization is to avoid multiple definition errors.
+// Those specializations are to avoid multiple definition errors.
 template <class T, class U, std::size_t N>
 struct fn_def_lref<T, U, N, true> {};
 

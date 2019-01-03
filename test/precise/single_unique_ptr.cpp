@@ -13,9 +13,19 @@ struct Message {
   std::unique_ptr<int> data;
 };
 
+struct Message2 {
+  std::unique_ptr<int> data41 = std::make_unique<int>(41);
+  std::unique_ptr<int> data42 = std::make_unique<int>(42);
+};
+
 int main() {
   Message message;
   auto& ptr = boost::pfr::get<0>(message);
   BOOST_TEST(ptr == nullptr);
+
+  Message2 message2;
+  auto& ptr2 = boost::pfr::get<1>(message2);
+  BOOST_TEST_EQ(*ptr2, 42);
+
   return boost::report_errors();
 }
