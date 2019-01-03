@@ -136,8 +136,8 @@ auto tie_as_tuple_loophole_impl(T& lvalue) noexcept {
     using indexes = detail::make_index_sequence<fields_count<type>()>;
     using tuple_type = typename std::conditional_t<
       std::is_copy_constructible<std::remove_all_extents_t<T>>::value,
-      std::conditional<sizeof(T), loophole_type_list_lref<type, indexes>, void >, // lazy evaluation
-      std::conditional<sizeof(T), loophole_type_list_rref<type, indexes>, void >  // lazy evaluation
+      std::conditional< !!sizeof(T), loophole_type_list_lref<type, indexes>, void >, // lazy evaluation
+      std::conditional< !!sizeof(T), loophole_type_list_rref<type, indexes>, void >  // lazy evaluation
     >::type::type;
 
     return boost::pfr::detail::make_flat_tuple_of_references(
