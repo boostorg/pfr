@@ -137,7 +137,7 @@ test-suite pfr
     [ run precise/get_non_default_constructible.cpp : : : $(CLASSIC_PREC_DEF) : precise_get_non_default_constructible ]
     [ run precise/destructuring_tie.cpp             : : : $(CLASSIC_PREC_DEF) : precise_destructuring_tie ]
     [ run precise/error_pfr_c1202.cpp               : : : $(CLASSIC_PREC_DEF) : precise_c1202_issue21 ]
-    [ compile-fail precise/single_unique_ptr.cpp    : $(CLASSIC_PREC_DEF) : precise_single_unique_ptr ]
+    [ compile-fail precise/single_unique_ptr.cpp    : $(CLASSIC_PREC_DEF) : precise_unique_ptr ]
     [ compile-fail precise/non_aggregate.cpp        : $(CLASSIC_PREC_DEF) : precise_non_aggregate ]
 
 
@@ -158,7 +158,7 @@ test-suite pfr
     [ run precise/optional_like.cpp                 : : : $(LOOPHOLE_PREC_DEF) : precise_lh_optional_like ]
     [ run precise/get_non_default_constructible.cpp : : : $(LOOPHOLE_PREC_DEF) : precise_lh_get_non_default_constructible ]
     [ run precise/error_pfr_c1202.cpp               : : : $(LOOPHOLE_PREC_DEF) : precise_lh_c1202_issue21 ]
-    [ run precise/single_unique_ptr.cpp             : : : $(LOOPHOLE_PREC_DEF) : precise_lh_single_unique_ptr ]
+    [ run precise/single_unique_ptr.cpp             : : : $(LOOPHOLE_PREC_DEF) : precise_lh_unique_ptr ]
     [ compile-fail precise/non_aggregate.cpp        : $(LOOPHOLE_PREC_DEF) : precise_lh_non_aggregate ]
 
 
