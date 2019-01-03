@@ -66,13 +66,21 @@ template <class T> constexpr T& unsafe_declval_like() noexcept {
 
 // The definitions of friend functions.
 template <class T, class U, std::size_t N, bool B>
-struct fn_def {
+struct fn_def_lref {
     friend auto loophole(tag<T,N>) { return boost::pfr::detail::unsafe_declval_like< std::remove_all_extents_t<U> >(); }
 };
+template <class T, class U, std::size_t N, bool B>
+struct fn_def_rref {
+    friend auto loophole(tag<T,N>) { return std::move(boost::pfr::detail::unsafe_declval_like< std::remove_all_extents_t<U> >()); }
+};
+
 
 // This specialization is to avoid multiple definition errors.
 template <class T, class U, std::size_t N>
-struct fn_def<T, U, N, true> {};
+struct fn_def_lref<T, U, N, true> {};
+
+template <class T, class U, std::size_t N>
+struct fn_def_rref<T, U, N, true> {};
 
 
 // This has a templated conversion operator which in turn triggers instantiations.
@@ -80,33 +88,57 @@ struct fn_def<T, U, N, true> {};
 // arguments are "cached" (I think). To fix that I provide a U template parameter to
 // the ins functions which do the detection using constexpr friend functions and SFINAE.
 template <class T, std::size_t N>
-struct loophole_ubiq {
+struct loophole_ubiq_lref {
     template<class U, std::size_t M> static std::size_t ins(...);
     template<class U, std::size_t M, std::size_t = sizeof(loophole(tag<T,M>{})) > static char ins(int);
 
-    template<class U, std::size_t = sizeof(fn_def<T, U, N, sizeof(ins<U, N>(0)) == sizeof(char)>)>
+    template<class U, std::size_t = sizeof(fn_def_lref<T, U, N, sizeof(ins<U, N>(0)) == sizeof(char)>)>
     constexpr operator U&() const noexcept; // `const` here helps to avoid ambiguity in loophole instantiations. optional_like test validate that behavior.
+};
+
+template <class T, std::size_t N>
+struct loophole_ubiq_rref {
+    template<class U, std::size_t M> static std::size_t ins(...);
+    template<class U, std::size_t M, std::size_t = sizeof(loophole(tag<T,M>{})) > static char ins(int);
+
+    template<class U, std::size_t = sizeof(fn_def_rref<T, U, N, sizeof(ins<U, N>(0)) == sizeof(char)>)>
+    constexpr operator U&&() const noexcept; // `const` here helps to avoid ambiguity in loophole instantiations. optional_like test validate that behavior.
 };
 
 
 // This is a helper to turn a data structure into a tuple.
 template <class T, class U>
-struct loophole_type_list;
+struct loophole_type_list_lref;
 
 template <typename T, std::size_t... I>
-struct loophole_type_list< T, std::index_sequence<I...> >
+struct loophole_type_list_lref< T, std::index_sequence<I...> >
      // Instantiating loopholes:
-    : sequence_tuple::tuple< decltype(T{ loophole_ubiq<T, I>{}... }, 0) >
+    : sequence_tuple::tuple< decltype(T{ loophole_ubiq_lref<T, I>{}... }, 0) >
 {
     using type = sequence_tuple::tuple< decltype(loophole(tag<T, I>{}))... >;
 };
 
 
+template <class T, class U>
+struct loophole_type_list_rref;
+
+template <typename T, std::size_t... I>
+struct loophole_type_list_rref< T, std::index_sequence<I...> >
+     // Instantiating loopholes:
+    : sequence_tuple::tuple< decltype(T{ loophole_ubiq_rref<T, I>{}... }, 0) >
+{
+    using type = sequence_tuple::tuple< decltype(loophole(tag<T, I>{}))... >;
+};
+
 template <class T>
 auto tie_as_tuple_loophole_impl(T& lvalue) noexcept {
     using type = std::remove_cv_t<std::remove_reference_t<T>>;
     using indexes = detail::make_index_sequence<fields_count<type>()>;
-    using tuple_type = typename loophole_type_list<type, indexes>::type;
+    using tuple_type = typename std::conditional_t<
+      std::is_copy_constructible<std::remove_all_extents_t<T>>::value,
+      std::conditional<sizeof(T), loophole_type_list_lref<type, indexes>, void >, // lazy evaluation
+      std::conditional<sizeof(T), loophole_type_list_rref<type, indexes>, void >  // lazy evaluation
+    >::type::type;
 
     return boost::pfr::detail::make_flat_tuple_of_references(
         lvalue,

@@ -95,14 +95,14 @@ test-suite pfr
     [ run common/non_default_constructible.cpp : : : $(LOOPHOLE_PREC_DEF)       : precise_lh_non_default_constructible ]
 
     [ compile-fail common/non_copyable_but_movable.cpp : $(CLASSIC_FLAT_DEF)    : flat_non_copyable_but_movable ]
-    [ compile-fail common/non_copyable_but_movable.cpp : $(LOOPHOLE_FLAT_DEF)   : flat_lh_non_copyable_but_movable ]
+    [ run common/non_copyable_but_movable.cpp : : : $(LOOPHOLE_FLAT_DEF)        : flat_lh_non_copyable_but_movable ]
     [ run common/non_copyable_but_movable.cpp : : : $(CLASSIC_PREC_DEF)         : precise_non_copyable_but_movable ]
     [ run common/non_copyable_but_movable.cpp : : : $(LOOPHOLE_PREC_DEF)        : precise_lh_non_copyable_but_movable ]
 
-    [ compile-fail common/non_default_constructible_non_copyable_but_movable.cpp : $(CLASSIC_FLAT_DEF)    : flat_non_dc_non_cop_but_movable ]
-    [ compile-fail common/non_default_constructible_non_copyable_but_movable.cpp : $(LOOPHOLE_FLAT_DEF)   : flat_lh_non_dc_non_cop_but_movable ]
-    [ run common/non_default_constructible_non_copyable_but_movable.cpp : : : $(CLASSIC_PREC_DEF)         : precise_non_dc_non_cop_but_movable ]
-    [ run common/non_default_constructible_non_copyable_but_movable.cpp : : : $(LOOPHOLE_PREC_DEF)        : precise_lh_non_dc_non_cop_but_movable ]
+    [ compile-fail common/non_default_constructible_non_copyable_but_movable.cpp : $(CLASSIC_FLAT_DEF) : flat_non_dc_non_cop_but_mov ]
+    [ run common/non_default_constructible_non_copyable_but_movable.cpp : : : $(LOOPHOLE_FLAT_DEF)     : flat_lh_non_dc_non_cop_but_mov ]
+    [ run common/non_default_constructible_non_copyable_but_movable.cpp : : : $(CLASSIC_PREC_DEF)      : precise_non_dc_non_cop_but_mov ]
+    [ run common/non_default_constructible_non_copyable_but_movable.cpp : : : $(LOOPHOLE_PREC_DEF)     : precise_lh_non_dc_non_cop_but_mov ]
 
     [ compile-fail common/fields_count_on_reference.cpp ]
     [ run common/fields_count_on_const.cpp ]
@@ -137,6 +137,7 @@ test-suite pfr
     [ run precise/get_non_default_constructible.cpp : : : $(CLASSIC_PREC_DEF) : precise_get_non_default_constructible ]
     [ run precise/destructuring_tie.cpp             : : : $(CLASSIC_PREC_DEF) : precise_destructuring_tie ]
     [ run precise/error_pfr_c1202.cpp               : : : $(CLASSIC_PREC_DEF) : precise_c1202_issue21 ]
+    [ compile-fail precise/single_unique_ptr.cpp    : $(CLASSIC_PREC_DEF) : precise_single_unique_ptr ]
     [ compile-fail precise/non_aggregate.cpp        : $(CLASSIC_PREC_DEF) : precise_non_aggregate ]
 
 
@@ -156,7 +157,8 @@ test-suite pfr
     [ run precise/motivating_example2.cpp           : : : $(LOOPHOLE_PREC_DEF) : precise_lh_motivating_example2 ]
     [ run precise/optional_like.cpp                 : : : $(LOOPHOLE_PREC_DEF) : precise_lh_optional_like ]
     [ run precise/get_non_default_constructible.cpp : : : $(LOOPHOLE_PREC_DEF) : precise_lh_get_non_default_constructible ]
-    [ run precise/error_pfr_c1202.cpp               : : : $(CLASSIC_PREC_DEF) : precise_lh_c1202_issue21 ]
+    [ run precise/error_pfr_c1202.cpp               : : : $(LOOPHOLE_PREC_DEF) : precise_lh_c1202_issue21 ]
+    [ run precise/single_unique_ptr.cpp             : : : $(LOOPHOLE_PREC_DEF) : precise_lh_single_unique_ptr ]
     [ compile-fail precise/non_aggregate.cpp        : $(LOOPHOLE_PREC_DEF) : precise_lh_non_aggregate ]
 
 
