@@ -130,15 +130,26 @@ struct loophole_type_list_rref< T, std::index_sequence<I...> >
     using type = sequence_tuple::tuple< decltype(loophole(tag<T, I>{}))... >;
 };
 
+
+// Lazily returns loophole_type_list_{lr}ref.
+template <bool IsCopyConstructible /*= true*/, class T, class U>
+struct loophole_type_list_selector {
+    using type = loophole_type_list_lref<T, U>;
+};
+
+template <class T, class U>
+struct loophole_type_list_selector<false /*IsCopyConstructible*/, T, U> {
+    using type = loophole_type_list_rref<T, U>;
+};
+
 template <class T>
 auto tie_as_tuple_loophole_impl(T& lvalue) noexcept {
     using type = std::remove_cv_t<std::remove_reference_t<T>>;
     using indexes = detail::make_index_sequence<fields_count<type>()>;
-    using tuple_type = typename std::conditional_t<
-      std::is_copy_constructible<std::remove_all_extents_t<T>>::value,
-      std::conditional< !!sizeof(T), loophole_type_list_lref<type, indexes>, void >, // lazy evaluation
-      std::conditional< !!sizeof(T), loophole_type_list_rref<type, indexes>, void >  // lazy evaluation
-    >::type::type;
+    using loophole_type_list = typename detail::loophole_type_list_selector<
+        std::is_copy_constructible<std::remove_all_extents_t<type>>::value, type, indexes
+    >::type;
+    using tuple_type = typename loophole_type_list::type;
 
     return boost::pfr::detail::make_flat_tuple_of_references(
         lvalue,
