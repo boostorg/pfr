@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2017 Antony Polukhin
+// Copyright (c) 2016-2019 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -38,6 +38,8 @@
 #ifndef BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE
 // Assume that libstdc++ since GCC-7.3 does not have linear instantiation depth in std::make_integral_sequence
 #   if defined( __GLIBCXX__) && __GLIBCXX__ >= 20180101
+#       define BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE 1
+#   elif defined(_MSC_VER)
 #       define BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE 1
 //# elif other known working lib
 #   else

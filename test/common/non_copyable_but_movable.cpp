@@ -11,6 +11,8 @@
 #   error Misused test
 #endif
 
+#include <boost/core/lightweight_test.hpp>
+
 struct X {
     X() = default;
     X(X&&) = default;
@@ -43,7 +45,9 @@ int main() {
     struct S6 { X x0; X x1; X x2; X x3; X x4;  X x5;};
     static_assert(boost::pfr::tuple_size_v<S6> == 6, "");
 #elif defined(BOOST_PFR_TEST_FLAT)
-    return boost::pfr::flat_tuple_size_v<S>;
+    BOOST_TEST_EQ(boost::pfr::flat_tuple_size_v<S>, 1); // Empty structs are discarded
 #endif
+
+    return boost::report_errors();
 }
 
