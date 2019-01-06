@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2016-2017 Antony Polukhin
+# Copyright (c) 2016-2019 Antony Polukhin
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -13,7 +13,7 @@ import string
 # Skipping some letters that may produce keywords or are hard to read, or shadow template parameters
 ascii_letters = string.ascii_letters.replace("o", "").replace("O", "").replace("i", "").replace("I", "").replace("T", "")
 
-PROLOGUE = """// Copyright (c) 2016-2018 Antony Polukhin
+PROLOGUE = """// Copyright (c) 2016-2019 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
