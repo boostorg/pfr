@@ -2,7 +2,7 @@
 # subject to the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #
-# Copyright Antony Polukhin 2016-2018.
+# Copyright Antony Polukhin 2016-2019.
 
 #
 # See https://svn.boost.org/trac/boost/wiki/TravisCoverals for description of this file
@@ -28,6 +28,10 @@ skip_tags: true
 
 environment:
   matrix:
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      TOOLSET: msvc # clang-win has problems with structured bindings - it can not correclty use std::tuple_size
+      ADDRMD: 32,64
+      CXXSTD: 17,latest
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       TOOLSET: msvc # clang-win has problems with structured bindings - it can not correclty use std::tuple_size
       ADDRMD: 32,64
