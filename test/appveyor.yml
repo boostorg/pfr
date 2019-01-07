@@ -58,14 +58,14 @@ before_build:
     - echo "Testing %APPVEYOR_PROJECT_NAME%"
     # Cloning Boost libraries (fast nondeep cloning)
     - set BOOST=C:/boost-local
-    - git clone -b %BOOST_BRANCH% --depth 1 https://github.com/boostorg/boost.git %BOOST%
+    - git clone -b %BOOST_BRANCH% --depth 10 https://github.com/boostorg/boost.git %BOOST%
     - cd %BOOST%
-    - git submodule update --init --depth 1 tools/build tools/boostdep libs/type_index # DIFF: Added libs/type_index
+    - git submodule update --init --depth 10 tools/build tools/boostdep libs/type_index # DIFF: Added libs/type_index
 
     - rm -rf %BOOST%/libs/%BOOST_REMOVE%
     - mv %APPVEYOR_BUILD_FOLDER% %BOOST%/libs/%APPVEYOR_PROJECT_NAME%
-    - python tools/boostdep/depinst/depinst.py --git_args "--depth 1 --jobs 2" %APPVEYOR_PROJECT_NAME%
-    - python tools/boostdep/depinst/depinst.py --git_args "--depth 1 --jobs 2" type_index # DIFF: Added
+    - python tools/boostdep/depinst/depinst.py --git_args "--depth 10 --jobs 2" %APPVEYOR_PROJECT_NAME%
+    - python tools/boostdep/depinst/depinst.py --git_args "--depth 10 --jobs 2" type_index # DIFF: Added
 
 build_script:
     - cmd /c bootstrap
