@@ -139,8 +139,9 @@ test-suite pfr
     [ run precise/error_pfr_c1202.cpp               : : : $(CLASSIC_PREC_DEF) : precise_c1202_issue21 ]
     [ compile-fail precise/non_aggregate.cpp        : $(CLASSIC_PREC_DEF) : precise_non_aggregate ]
 
-    # This test may compile of fail depending on C++ Standard version.
-    #[ compile-fail precise/issue30.cpp              : : : $(CLASSIC_PREC_DEF) : precise_issue30 ]
+    # The following tests may compile of fail depending on C++ Standard version.
+    #[ compile-fail precise/issue30.cpp              : $(CLASSIC_PREC_DEF) : precise_issue30 ]
+    #[ compile-fail precise/issue33.cpp              : $(CLASSIC_PREC_DEF) : precise_issue33 ]
 
 
     ##### Loophole tests running precise and flat specific tests
@@ -161,6 +162,7 @@ test-suite pfr
     [ run precise/get_non_default_constructible.cpp : : : $(LOOPHOLE_PREC_DEF) : precise_lh_get_non_default_constructible ]
     [ run precise/error_pfr_c1202.cpp               : : : $(LOOPHOLE_PREC_DEF) : precise_lh_c1202_issue21 ]
     [ run precise/issue30.cpp                       : : : $(LOOPHOLE_PREC_DEF) : precise_lh_issue30 ]
+    [ run precise/issue33.cpp                       : : : $(LOOPHOLE_PREC_DEF) : precise_lh_issue33 ]
     [ compile-fail precise/non_aggregate.cpp        : $(LOOPHOLE_PREC_DEF) : precise_lh_non_aggregate ]
 
 

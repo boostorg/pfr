@@ -68,7 +68,16 @@ template <class T> constexpr T& unsafe_declval_like() noexcept {
 // The definitions of friend functions.
 template <class T, class U, std::size_t N, bool B>
 struct fn_def_lref {
-    friend auto loophole(tag<T,N>) { return boost::pfr::detail::unsafe_declval_like< std::remove_all_extents_t<U> >(); }
+    friend auto loophole(tag<T,N>) {
+        // Standard Library containers do not SFINAE on invalid copy constructor. Because of that std::vector<std::unique_ptr<int>> reports that it is copyable,
+        // which leads to an instantiation error at this place.
+        //
+        // To workaround the issue, we check that the type U is movable, and move it in that case.
+        using no_extents_t = std::remove_all_extents_t<U>;
+        return static_cast< std::conditional_t<std::is_move_constructible<no_extents_t>::value, no_extents_t&&, no_extents_t&> >(
+            boost::pfr::detail::unsafe_declval_like<no_extents_t>()
+        );
+    }
 };
 template <class T, class U, std::size_t N, bool B>
 struct fn_def_rref {
