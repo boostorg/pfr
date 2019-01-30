@@ -383,7 +383,8 @@ Short description:
             # at run-time: get pointer to each field, knowing the structure address and each field offset
     # at run-time: a tuple of references to fields is returned => all the tuple methods are available for the structure
 
-Long description of some basics: [@https://www.youtube.com/watch?v=abdeAew3gmQ Antony Polukhin: C++14 Reflections Without Macros, Markup nor External Tooling. ].
+Long description of some basics: [@https://youtu.be/UlNUNxLtBI0 Antony Polukhin: Better C++14 reflections].
+Long description of some basics of C++14 with disabled [*Loophole]: [@https://youtu.be/abdeAew3gmQ Antony Polukhin: C++14 Reflections Without Macros, Markup nor External Tooling].
 
 [endsect]
 
