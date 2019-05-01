@@ -1,4 +1,4 @@
-#  Copyright (C) 2016-2018, Antony Polukhin.
+#  Copyright (C) 2016-2019, Antony Polukhin.
 #
 # Use, modification and distribution is subject to the Boost Software License,
 # Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -16,9 +16,10 @@ project
     ;
 
 local DISABLE_ON_MSVC = <toolset>msvc:<build>no ;
-local LOOPHOLE_FLAT_DEF = <define>BOOST_PFR_TEST_FLAT <define>BOOST_PFR_USE_LOOPHOLE=1 $(DISABLE_ON_MSVC) ;
+local DISABLE_ON_CLANG8_PLUS = <toolset>clang-8:<build>no <toolset>clang-9:<build>no <toolset>clang-10:<build>no ;
+local LOOPHOLE_FLAT_DEF = <define>BOOST_PFR_TEST_FLAT <define>BOOST_PFR_USE_LOOPHOLE=1 $(DISABLE_ON_MSVC) $(DISABLE_ON_CLANG8_PLUS) ;
 local CLASSIC_FLAT_DEF = <define>BOOST_PFR_TEST_FLAT <define>BOOST_PFR_USE_LOOPHOLE=0 $(DISABLE_ON_MSVC) ;
-local LOOPHOLE_PREC_DEF = <define>BOOST_PFR_TEST_PRECISE <define>BOOST_PFR_USE_LOOPHOLE=1 $(DISABLE_ON_MSVC) ;
+local LOOPHOLE_PREC_DEF = <define>BOOST_PFR_TEST_PRECISE <define>BOOST_PFR_USE_LOOPHOLE=1 $(DISABLE_ON_MSVC) $(DISABLE_ON_CLANG8_PLUS) ;
 local CLASSIC_PREC_DEF = <define>BOOST_PFR_TEST_PRECISE <define>BOOST_PFR_USE_LOOPHOLE=0 ;
 
 test-suite pfr
