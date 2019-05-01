@@ -21,7 +21,9 @@
 #endif
 
 #ifndef BOOST_PFR_USE_LOOPHOLE
-#   define BOOST_PFR_USE_LOOPHOLE 1
+#   if !defined(__clang_major__) || __clang_major__ < 8
+#       define BOOST_PFR_USE_LOOPHOLE 1
+#   endif
 #endif
 
 #ifndef BOOST_PFR_USE_CPP17
