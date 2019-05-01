@@ -107,14 +107,14 @@ constexpr auto detect_fields_count(size_t_<Begin>, size_t_<Middle>, long) noexce
 {
     constexpr std::size_t next_v = Middle + (Middle - Begin + 1) / 2; // MSVC workaround from #21
     using next_t = size_t_<next_v>;
-    return detail::detect_fields_count<T, Middle, next_v>(size_t_<Middle>{}, next_t{}, 1L);
+    return detail::detect_fields_count<T, Middle>(size_t_<Middle>{}, next_t{}, 1L);
 }
 
 template <class T, std::size_t Begin, std::size_t Middle>
 constexpr std::size_t detect_fields_count(size_t_<Begin>, size_t_<Middle>, int) noexcept {
     constexpr std::size_t next_v = (Begin + Middle) / 2; // MSVC workaround from #21
     using next_t = size_t_<next_v>;
-    return detail::detect_fields_count<T, Begin, next_v>(size_t_<Begin>{}, next_t{}, 1L);
+    return detail::detect_fields_count<T, Begin>(size_t_<Begin>{}, next_t{}, 1L);
 }
 
 ///////////////////// Greedy search. Templates instantiation depth is log(sizeof(T)), templates instantiation count is log(sizeof(T))*T in worst case.
@@ -156,7 +156,7 @@ constexpr auto detect_fields_count_dispatch(size_t_<N>, long, int) noexcept
     -> decltype(sizeof(T{}))
 {
     constexpr std::size_t middle = N / 2 + 1;  // MSVC workaround from #21
-    return detail::detect_fields_count<T, 0, middle>(size_t_<0>{}, size_t_<middle>{}, 1L);
+    return detail::detect_fields_count<T, 0>(size_t_<0>{}, size_t_<middle>{}, 1L);
 }
 
 template <class T, std::size_t N>
@@ -164,7 +164,7 @@ constexpr std::size_t detect_fields_count_dispatch(size_t_<N>, int, int) noexcep
     // T is not default aggregate initialzable. It means that at least one of the members is not default constructible,
     // so we have to check all the aggregate initializations for T up to N parameters and return the bigest succeeded
     // (we can not use binary search for detecting fields count).
-    return detail::detect_fields_count_greedy<T, 0, N>(size_t_<0>{}, size_t_<N>{});
+    return detail::detect_fields_count_greedy<T, 0>(size_t_<0>{}, size_t_<N>{});
 }
 
 ///////////////////// Returns non-flattened fields count
