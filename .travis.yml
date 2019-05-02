@@ -76,8 +76,8 @@ matrix:
           sources: llvm-toolchain-trusty-6
           packages: clang-6.0
 
-    - env: B2_ARGS='cxxstd=14,1z toolset=clang-8 cxxflags="--coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined -DBOOST_TRAVISCI_BUILD" linkflags="--coverage -fsanitize=address,leak,undefined"'
-      name: "Clang-8"
+    - env: B2_ARGS='cxxstd=14,1z toolset=clang-8 cxxflags="-stdlib=libc++ --coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined -DBOOST_TRAVISCI_BUILD" linkflags="-stdlib=libc++ --coverage -fsanitize=address,leak,undefined"'
+      name: "Clang-8, libc++"
       sudo: required # Required by leak sanitizer
       addons:
         apt:
