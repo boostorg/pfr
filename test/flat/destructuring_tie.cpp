@@ -1,3 +1,12 @@
+// Copyright (c) 2018 Adam Butcher, Antony Polukhin
+// Copyright (c) 2019 Antony Polukhin
+//
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#include <boost/pfr/flat/core.hpp>
+#include <boost/core/lightweight_test.hpp>
+
 struct point {
    int x, y;
 };
@@ -10,44 +19,40 @@ auto line(point a, point b) {
    return res;
 }
 
-#define check(expr) if (!(expr)) { fprintf(stderr, "Failed assertion: %s\n", #expr); ++errors; }
-
-#include <boost/pfr/flat/core.hpp>
-
 #if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
 
-int main()
-{
-    int errors = 0;
-
+int main() {
     auto l = line({1, 2}, {3, 4});
     int t, a, b, c, d;
     using namespace boost::pfr;
     using std::ignore;
 
     flat_tie_from_structure (t, a, b, c, d) = l;
-    check(t == 123456);
-    check(a == 1);
-    check(b == 2);
-    check(c == 3);
-    check(d == 4);
+    BOOST_TEST_EQ(t, 123456);
+    BOOST_TEST_EQ(a, 1);
+    BOOST_TEST_EQ(b, 2);
+    BOOST_TEST_EQ(c, 3);
+    BOOST_TEST_EQ(d, 4);
 
     flat_tie_from_structure (ignore, ignore, a, b, c) = l;
-    check(a == 2);
-    check(b == 3);
-    check(c == 4);
+    BOOST_TEST_EQ(a, 2);
+    BOOST_TEST_EQ(b, 3);
+    BOOST_TEST_EQ(c, 4);
 
     flat_tie_from_structure (ignore, a, b, c, ignore) = l;
-    check(a == 1);
-    check(b == 2);
-    check(c == 3);
+    BOOST_TEST_EQ(a, 1);
+    BOOST_TEST_EQ(b, 2);
+    BOOST_TEST_EQ(c, 3);
 
-    return errors;
+    return boost::report_errors();
 }
 
 #else // C++14 without loophole
+
 #include <iostream>
 int main(int, char** argv) {
    std::cerr << argv[0] << ": Not supported in C++14 without reflection loophole.\n";
+   return 1;
 }
+
 #endif
