@@ -52,7 +52,6 @@ int main() {
 #include <iostream>
 int main(int, char** argv) {
    std::cerr << argv[0] << ": Not supported in C++14 without reflection loophole.\n";
-   return 1;
 }
 
 #endif
