@@ -28,7 +28,7 @@ namespace boost { namespace pfr { namespace detail {
 template <typename... Elements>
 struct tie_from_structure_tuple : std::tuple<Elements&...> {
     using base = std::tuple<Elements&...>;
-    using base::tuple;
+    using base::base;
 
     template <typename T>
     constexpr tie_from_structure_tuple& operator= (T const& t) {
