@@ -25,8 +25,8 @@ namespace boost { namespace pfr { namespace detail {
 /// \sa boost::pfr::tie_from_structure
 template <typename... Elements>
 struct tie_from_structure_tuple : std::tuple<Elements&...> {
-    using base = std::tuple<Elements&...>;
-    using base::tuple;
+    using tuple::tuple;
+
     template <typename T>
     constexpr tie_from_structure_tuple& operator= (T const& t) {
         base::operator=(
