@@ -82,7 +82,10 @@ matrix:
       addons:
         apt:
           sources: llvm-toolchain-trusty-8
-          packages: clang-8
+          packages:
+            - clang-8
+            - libc++-8-dev
+            - libc++abi-8-dev
 
     # Sanitizers disabled for this toolset as they started causing link troubles: 
     # hidden symbol `_ZNSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE11__recommendEm' isn't defined
