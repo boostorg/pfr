@@ -35,6 +35,11 @@ environment:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       TOOLSET: msvc # clang-win has problems with structured bindings - it can not correclty use std::tuple_size
       ADDRMD: 32,64
+      CXXSTD: 17,latest
+      CXXFLAGS: /permissive-
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      TOOLSET: msvc # clang-win has problems with structured bindings - it can not correclty use std::tuple_size
+      ADDRMD: 32,64
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       ADDPATH: C:\cygwin\bin;
       TOOLSET: gcc
@@ -79,7 +84,7 @@ test_script:
   - if not "%CXXSTD%" == "" set CXXSTD=cxxstd=%CXXSTD%
   - if not "%ADDRMD%" == "" set ADDRMD=address-model=%ADDRMD%
   - echo "Running command ..\..\..\b2 -j3 toolset=%TOOLSET% %CXXSTD% %ADDRMD% variant=debug,release"
-  - ..\..\..\b2.exe -j3 toolset=%TOOLSET% %CXXSTD% %ADDRMD% variant=debug,release cxxflags="-DBOOST_TRAVISCI_BUILD"
+  - ..\..\..\b2.exe -j3 toolset=%TOOLSET% %CXXSTD% %ADDRMD% variant=debug,release cxxflags="-DBOOST_TRAVISCI_BUILD %CXXFLAGS%"
 
 after_test:
 on_success:
