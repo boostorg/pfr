@@ -24,8 +24,8 @@ using size_t_ = std::integral_constant<std::size_t, Index >;
 // For user-defined structures, the getter should be "offset_based_getter"
 struct sequence_tuple_getter {
   template <std::size_t idx, typename TupleOfReferences>
-  decltype(auto) get(const TupleOfReferences& t, size_t_<idx>) const noexcept {
-    return sequence_tuple::get<idx>(t);
+  decltype(auto) get(TupleOfReferences&& t, size_t_<idx>) const noexcept {
+    return sequence_tuple::get<idx>(std::forward<TupleOfReferences>(t));
   }
 };
 
