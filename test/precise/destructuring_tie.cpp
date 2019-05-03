@@ -1,4 +1,13 @@
-#include <cstddef>
+// Copyright (c) 2018 Adam Butcher, Antony Polukhin
+// Copyright (c) 2019 Antony Polukhin
+//
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
+// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+#include <boost/pfr/precise/core.hpp>
+#include <boost/core/lightweight_test.hpp>
+
+#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
 
 auto parseHex(char const* p, size_t limit = ~0u) {
     struct { size_t val; char const* rest; } res = { 0, p };
@@ -19,10 +28,6 @@ auto parseHex(char const* p, size_t limit = ~0u) {
     return res;
 }
 
-#include <boost/pfr/precise/core.hpp>
-
-#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
-
 auto parseLinePrefix(char const* line) {
      struct {
           size_t byteCount, address, recordType; char const* rest;
@@ -35,34 +40,32 @@ auto parseLinePrefix(char const* line) {
      return res;
 }
 
-#define check(expr) if (!(expr)) { fprintf(stderr, "Failed assertion: %s\n", #expr); ++errors; }
-
-int main()
-{
-    int errors = 0;
-
+int main() {
     auto line = "0860E000616263646566000063";
     auto meta = parseLinePrefix(line);
-    check(meta.byteCount == 8);
-    check(meta.address == 24800);
-    check(meta.recordType == 0);
-    check(meta.rest == line + 8);
+    BOOST_TEST_EQ(meta.byteCount, 8);
+    BOOST_TEST_EQ(meta.address, 24800);
+    BOOST_TEST_EQ(meta.recordType, 0);
+    BOOST_TEST_EQ(meta.rest, line + 8);
 
     size_t val;
     using namespace boost::pfr;
 
     tie_from_structure (val, std::ignore) = parseHex("a73b");
-    check(val == 42811);
+    BOOST_TEST_EQ(val, 42811);
 
     tie_from_structure (std::ignore, line) = parseHex(line, 8);
-    check(line == meta.rest);
+    BOOST_TEST_EQ(line, meta.rest);
 
-    return errors;
+    return boost::report_errors();
 }
 
 #else // C++14 without loophole
+
 #include <iostream>
+
 int main(int, char** argv) {
    std::cerr << argv[0] << ": Not supported in C++14 without reflection loophole.\n";
 }
+
 #endif
