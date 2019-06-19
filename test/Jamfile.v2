@@ -25,6 +25,8 @@ local CLASSIC_PREC_DEF = <define>BOOST_PFR_TEST_PRECISE <define>BOOST_PFR_USE_LO
 test-suite pfr
   :
     ##### Common tests
+    [ run common/offset_based_getter.cpp ]
+
     [ run common/ops.cpp                : : : $(CLASSIC_FLAT_DEF)               : flat_ops ]
     [ run common/ops.cpp                : : : $(LOOPHOLE_FLAT_DEF)              : flat_lh_ops ]
     [ run common/ops.cpp                : : : $(CLASSIC_PREC_DEF)               : precise_ops ]
