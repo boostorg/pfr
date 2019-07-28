@@ -112,7 +112,10 @@ template <class T>
 struct uniform_comparator_less {
     bool operator()(const T& lhs, const T& rhs) const noexcept {
         using namespace boost::pfr::ops;    // Enables Boost.PFR operators usage in this scope.
-        return lhs < rhs;           // If T has operator< or conversion operator then will use it, otherwise will use boost::pfr::flat_less<T>.
+
+        // If T has operator< or conversion operator then will use it.
+        // Otherwise will use boost::pfr::flat_less<T>.
+        return lhs < rhs;
     }
 };
 ```
@@ -125,7 +128,10 @@ template <class T>
 struct uniform_comparator_less {
     bool operator()(const T& lhs, const T& rhs) const noexcept {
         using namespace flat_ops;
-        return std::less{}(lhs, rhs);   // Compile time error if T has neither operator< nor conversion operator to comparable type.
+
+        // Compile time error if T has neither operator< nor
+        // conversion operator to comparable type.
+        return std::less{}(lhs, rhs);
     }
 };
 ```
@@ -215,8 +221,10 @@ bool some_function(foo f1, foo f2) {
 Any attempt to reflect unions leads to a compile time error. In many cases a static assert is triggered that outputs the following message:
 
 ```
-error: static_assert failed "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."
+error: static_assert failed "====================> Boost.PFR: For safety reasons it is forbidden
+        to reflect unions. See `Reflection of unions` section in the docs for more info."
 ```
+
 [endsect]
 
 [endsect]
@@ -236,83 +244,83 @@ Following examples use definition from above:
     [ [pfr_quick_examples_flat_functors_uset] ]
     [ `my_uset` constains `var` ]
     [
-        [classref boost::pfr::flat_hash]
-    
-        [classref boost::pfr::flat_equal_to] 
+        [classref boost::pfr::flat_hash flat_hash]
+
+        [classref boost::pfr::flat_equal_to flat_equal_to]
     ]
 ][
     [ [pfr_quick_examples_flat_functors_set] ]
     [ `my_set` constains `var` ]
-    [ [classref boost::pfr::flat_less] ]
+    [ [classref boost::pfr::flat_less flat_less] ]
 ][
     [ [pfr_quick_examples_flat_ops] ]
     [ assert succeeds ]
-    [ [headerref boost/pfr/flat/ops.hpp using\u00A0namespace\u00A0boost::pfr::flat_ops;] ]
+    [ [headerref boost/pfr/flat/ops.hpp using\u00A0namespace\u00A0flat_ops;] ]
 ][
     [ [pfr_quick_examples_ops] ]
     [ assert succeeds ]
-    [ [headerref boost/pfr/precise/ops.hpp using\u00A0namespace\u00A0boost::pfr::ops;] ]
+    [ [headerref boost/pfr/precise/ops.hpp using\u00A0namespace\u00A0ops;] ]
 ][
     [ [pfr_quick_examples_flat_for_each] ]
     [ `var == {B, {778, 4.14159}}` ]
-    [ [funcref boost::pfr::flat_for_each_field] ]
+    [ [funcref boost::pfr::flat_for_each_field flat_for_each_field] ]
 ][
     [ [pfr_quick_examples_for_each] ]
     [ `var == {B, {787, 103.142}}` ]
-    [ [funcref boost::pfr::for_each_field] ]
+    [ [funcref boost::pfr::for_each_field for_each_field] ]
 ][
     [ [pfr_quick_examples_flat_for_each_idx] ]
     [ ```0: char
 1: int
 2: double
 ``` ]
-    [ [funcref boost::pfr::flat_for_each_field] ]
+    [ [funcref boost::pfr::flat_for_each_field flat_for_each_field] ]
 ][
     [ [pfr_quick_examples_for_each_idx] ]
     [ ```0: char
 1: quick_examples_ns::foo
 ``` ]
-    [ [funcref boost::pfr::for_each_field] ]
+    [ [funcref boost::pfr::for_each_field for_each_field] ]
 ][
     [ [pfr_quick_examples_tuple_size] ]
     [ `tuple_size: 2` ]
-    [ [classref boost::pfr::tuple_size] ]
+    [ [classref boost::pfr::tuple_size tuple_size] ]
 ][
     [ [pfr_quick_examples_flat_tuple_size] ]
     [ `flat_tuple_size: 3` ]
-    [ [classref boost::pfr::flat_tuple_size] ]
+    [ [classref boost::pfr::flat_tuple_size flat_tuple_size] ]
 ][
     [ [pfr_quick_examples_get_1] ]
     [ `var == {A {1, 2.0}}` ]
-    [ [funcref boost::pfr::get] ]
+    [ [funcref boost::pfr::get get] ]
 ][
     [ [pfr_quick_examples_flat_get_1] ]
     [ `var == {A, {1, 3.14159}}` ]
-    [ [funcref boost::pfr::flat_get] ]
+    [ [funcref boost::pfr::flat_get flat_get] ]
 ][
     [ [pfr_quick_examples_get_2] ]
     [ `var == {A, {777, 42.01}}` ]
-    [ [funcref boost::pfr::get] ]
+    [ [funcref boost::pfr::get get] ]
 ][
     [ [pfr_quick_examples_flat_get_2] ]
     [ `var == {A, {777, 42.01}}` ]
-    [ [funcref boost::pfr::flat_get] ]
+    [ [funcref boost::pfr::flat_get flat_get] ]
 ][
     [ [pfr_quick_examples_structure_to_tuple] ]
     [ `var == {A, {777, 3.14159}}` ]
-    [ [funcref boost::pfr::structure_to_tuple] ]
+    [ [funcref boost::pfr::structure_to_tuple structure_to_tuple] ]
 ][
     [ [pfr_quick_examples_flat_structure_to_tuple] ]
     [ `var == {A, {777, 3.14159}}` ]
-    [ [funcref boost::pfr::flat_structure_to_tuple] ]
+    [ [funcref boost::pfr::flat_structure_to_tuple flat_structure_to_tuple] ]
 ][
     [ [pfr_quick_examples_structure_tie] ]
     [ `var == {A, {1, 2.0}}` ]
-    [ [funcref boost::pfr::structure_tie] ]
+    [ [funcref boost::pfr::structure_tie structure_tie] ]
 ][
     [ [pfr_quick_examples_flat_structure_tie] ]
     [ `var == {C, {777, 3.14159}}` ]
-    [ [funcref boost::pfr::flat_structure_tie] ]
+    [ [funcref boost::pfr::flat_structure_tie flat_structure_tie] ]
 ]]
 
 
