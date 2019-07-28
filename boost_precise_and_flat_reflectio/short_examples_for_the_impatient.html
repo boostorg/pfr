@@ -75,7 +75,9 @@
 <tr>
 <td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="comment">// no `std::hash&lt;bar&gt;` or `bar::operator==(const bar&amp;)` defined</span>
-<span class="identifier">std</span><span class="special">::</span><span class="identifier">unordered_set</span><span class="special">&lt;</span><span class="identifier">bar</span><span class="special">,</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_hash</span><span class="special">&lt;</span><span class="identifier">bar</span><span class="special">&gt;,</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_equal_to</span><span class="special">&lt;&gt;&gt;</span> <span class="identifier">my_uset</span><span class="special">;</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">unordered_set</span><span class="special">&lt;</span>
+    <span class="identifier">bar</span><span class="special">,</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_hash</span><span class="special">&lt;</span><span class="identifier">bar</span><span class="special">&gt;,</span>
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_equal_to</span><span class="special">&lt;&gt;&gt;</span> <span class="identifier">my_uset</span><span class="special">;</span>
 <span class="identifier">my_uset</span><span class="special">.</span><span class="identifier">insert</span><span class="special">(</span><span class="identifier">var</span><span class="special">);</span>
 </pre>
             </td>
@@ -87,10 +89,10 @@
             </td>
 <td>
               <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_hash.html" title="Struct template flat_hash">boost::pfr::flat_hash</a></code>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_hash.html" title="Struct template flat_hash">flat_hash</a></code>
               </p>
               <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_equal_to.html" title="Struct template flat_equal_to">boost::pfr::flat_equal_to</a></code>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_equal_to.html" title="Struct template flat_equal_to">flat_equal_to</a></code>
               </p>
             </td>
 </tr>
@@ -109,7 +111,7 @@
             </td>
 <td>
               <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_less.html" title="Struct template flat_less">boost::pfr::flat_less</a></code>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_less.html" title="Struct template flat_less">flat_less</a></code>
               </p>
             </td>
 </tr>
@@ -126,7 +128,7 @@
             </td>
 <td>
               <p>
-                <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.flat.ops_hpp" title="Header &lt;boost/pfr/flat/ops.hpp&gt;">using&#160;namespace&#160;boost::pfr::flat_ops;</a></code>
+                <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.flat.ops_hpp" title="Header &lt;boost/pfr/flat/ops.hpp&gt;">using&#160;namespace&#160;flat_ops;</a></code>
               </p>
             </td>
 </tr>
@@ -144,7 +146,7 @@
             </td>
 <td>
               <p>
-                <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.precise.ops_hpp" title="Header &lt;boost/pfr/precise/ops.hpp&gt;">using&#160;namespace&#160;boost::pfr::ops;</a></code>
+                <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.precise.ops_hpp" title="Header &lt;boost/pfr/precise/ops.hpp&gt;">using&#160;namespace&#160;ops;</a></code>
               </p>
             </td>
 </tr>
@@ -164,13 +166,13 @@
             </td>
 <td>
               <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_for_each_field.html" title="Function template flat_for_each_field">boost::pfr::flat_for_each_field</a></code>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_for_each_field.html" title="Function template flat_for_each_field">flat_for_each_field</a></code>
               </p>
             </td>
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="comment">// incrementing first field on 1 and calling foo::operator+= for second field:</span>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="comment">// increments first field on 1, calls foo::operator+= for second field</span>
 <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">for_each_field</span><span class="special">(</span><span class="identifier">var</span><span class="special">,</span> <span class="special">[](</span><span class="keyword">auto</span><span class="special">&amp;</span> <span class="identifier">field</span><span class="special">)</span> <span class="special">{</span>
     <span class="identifier">field</span> <span class="special">+=</span> <span class="number">1</span><span class="special">;</span>
 <span class="special">});</span>
@@ -184,14 +186,15 @@
             </td>
 <td>
               <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/for_each_field.html" title="Function template for_each_field">boost::pfr::for_each_field</a></code>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/for_each_field.html" title="Function template for_each_field">for_each_field</a></code>
               </p>
             </td>
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_for_each_field</span><span class="special">(</span><span class="identifier">var</span><span class="special">,</span> <span class="special">[](</span><span class="keyword">const</span> <span class="keyword">auto</span><span class="special">&amp;</span> <span class="identifier">field</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span> <span class="identifier">idx</span><span class="special">)</span> <span class="special">{</span>
-    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">idx</span> <span class="special">&lt;&lt;</span> <span class="string">": "</span> <span class="special">&lt;&lt;</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">typeindex</span><span class="special">::</span><span class="identifier">type_id_runtime</span><span class="special">(</span><span class="identifier">field</span><span class="special">)</span> <span class="special">&lt;&lt;</span> <span class="char">'\n'</span><span class="special">;</span>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_for_each_field</span><span class="special">(</span><span class="identifier">var</span><span class="special">,</span> <span class="special">[](</span><span class="keyword">auto</span><span class="special">&amp;</span> <span class="identifier">field</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span> <span class="identifier">idx</span><span class="special">)</span> <span class="special">{</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">idx</span> <span class="special">&lt;&lt;</span> <span class="string">": "</span>
+        <span class="special">&lt;&lt;</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">typeindex</span><span class="special">::</span><span class="identifier">type_id_runtime</span><span class="special">(</span><span class="identifier">field</span><span class="special">)</span> <span class="special">&lt;&lt;</span> <span class="char">'\n'</span><span class="special">;</span>
 <span class="special">});</span>
 </pre>
             </td>
@@ -203,14 +206,15 @@
             </td>
 <td>
               <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_for_each_field.html" title="Function template flat_for_each_field">boost::pfr::flat_for_each_field</a></code>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_for_each_field.html" title="Function template flat_for_each_field">flat_for_each_field</a></code>
               </p>
             </td>
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">for_each_field</span><span class="special">(</span><span class="identifier">var</span><span class="special">,</span> <span class="special">[](</span><span class="keyword">const</span> <span class="keyword">auto</span><span class="special">&amp;</span> <span class="identifier">field</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span> <span class="identifier">idx</span><span class="special">)</span> <span class="special">{</span>
-    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">idx</span> <span class="special">&lt;&lt;</span> <span class="string">": "</span> <span class="special">&lt;&lt;</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">typeindex</span><span class="special">::</span><span class="identifier">type_id_runtime</span><span class="special">(</span><span class="identifier">field</span><span class="special">)</span> <span class="special">&lt;&lt;</span> <span class="char">'\n'</span><span class="special">;</span>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">for_each_field</span><span class="special">(</span><span class="identifier">var</span><span class="special">,</span> <span class="special">[](</span><span class="keyword">auto</span><span class="special">&amp;</span> <span class="identifier">field</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span> <span class="identifier">idx</span><span class="special">)</span> <span class="special">{</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="identifier">idx</span> <span class="special">&lt;&lt;</span> <span class="string">": "</span>
+        <span class="special">&lt;&lt;</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">typeindex</span><span class="special">::</span><span class="identifier">type_id_runtime</span><span class="special">(</span><span class="identifier">field</span><span class="special">)</span> <span class="special">&lt;&lt;</span> <span class="char">'\n'</span><span class="special">;</span>
 <span class="special">});</span>
 </pre>
             </td>
@@ -221,13 +225,14 @@
             </td>
 <td>
               <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/for_each_field.html" title="Function template for_each_field">boost::pfr::for_each_field</a></code>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/for_each_field.html" title="Function template for_each_field">for_each_field</a></code>
               </p>
             </td>
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"tuple_size: "</span> <span class="special">&lt;&lt;</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">tuple_size</span><span class="special">&lt;</span><span class="identifier">bar</span><span class="special">&gt;::</span><span class="identifier">value</span> <span class="special">&lt;&lt;</span> <span class="char">'\n'</span><span class="special">;</span>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"tuple_size: "</span>
+    <span class="special">&lt;&lt;</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">tuple_size</span><span class="special">&lt;</span><span class="identifier">bar</span><span class="special">&gt;::</span><span class="identifier">value</span> <span class="special">&lt;&lt;</span> <span class="char">'\n'</span><span class="special">;</span>
 </pre>
             </td>
 <td>
@@ -238,13 +243,14 @@
             </td>
 <td>
               <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/tuple_size.html" title="Type definition tuple_size">boost::pfr::tuple_size</a></code>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/tuple_size.html" title="Type definition tuple_size">tuple_size</a></code>
               </p>
             </td>
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"flat_tuple_size: "</span> <span class="special">&lt;&lt;</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_tuple_size</span><span class="special">&lt;</span><span class="identifier">bar</span><span class="special">&gt;::</span><span class="identifier">value</span> <span class="special">&lt;&lt;</span> <span class="char">'\n'</span><span class="special">;</span>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">cout</span> <span class="special">&lt;&lt;</span> <span class="string">"flat_tuple_size: "</span>
+    <span class="special">&lt;&lt;</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_tuple_size</span><span class="special">&lt;</span><span class="identifier">bar</span><span class="special">&gt;::</span><span class="identifier">value</span> <span class="special">&lt;&lt;</span> <span class="char">'\n'</span><span class="special">;</span>
 </pre>
             </td>
 <td>
@@ -255,7 +261,7 @@
             </td>
 <td>
               <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_tuple_size.html" title="Type definition flat_tuple_size">boost::pfr::flat_tuple_size</a></code>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_tuple_size.html" title="Type definition flat_tuple_size">flat_tuple_size</a></code>
               </p>
             </td>
 </tr>
@@ -273,7 +279,7 @@
             </td>
 <td>
               <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/get.html" title="Function get">boost::pfr::get</a></code>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/get.html" title="Function get">get</a></code>
               </p>
             </td>
 </tr>
@@ -290,7 +296,7 @@
             </td>
 <td>
               <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_get.html" title="Function flat_get">boost::pfr::flat_get</a></code>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_get.html" title="Function flat_get">flat_get</a></code>
               </p>
             </td>
 </tr>
@@ -307,7 +313,7 @@
             </td>
 <td>
               <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/get.html" title="Function get">boost::pfr::get</a></code>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/get.html" title="Function get">get</a></code>
               </p>
             </td>
 </tr>
@@ -324,13 +330,14 @@
             </td>
 <td>
               <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_get.html" title="Function flat_get">boost::pfr::flat_get</a></code>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_get.html" title="Function flat_get">flat_get</a></code>
               </p>
             </td>
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="keyword">char</span><span class="special">,</span> <span class="identifier">foo</span><span class="special">&gt;</span> <span class="identifier">t</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">structure_to_tuple</span><span class="special">(</span><span class="identifier">var</span><span class="special">);</span> <span class="comment">// C++17 is required</span>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="comment">// C++17 is required</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="keyword">char</span><span class="special">,</span> <span class="identifier">foo</span><span class="special">&gt;</span> <span class="identifier">t</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">structure_to_tuple</span><span class="special">(</span><span class="identifier">var</span><span class="special">);</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">t</span><span class="special">)</span> <span class="special">=</span> <span class="identifier">foo</span><span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">2</span><span class="special">};</span>
 </pre>
             </td>
@@ -342,7 +349,7 @@
             </td>
 <td>
               <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/structure_to_tuple.html" title="Function template structure_to_tuple">boost::pfr::structure_to_tuple</a></code>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/structure_to_tuple.html" title="Function template structure_to_tuple">structure_to_tuple</a></code>
               </p>
             </td>
 </tr>
@@ -360,13 +367,14 @@
             </td>
 <td>
               <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_structure_to_tuple.html" title="Function template flat_structure_to_tuple">boost::pfr::flat_structure_to_tuple</a></code>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_structure_to_tuple.html" title="Function template flat_structure_to_tuple">flat_structure_to_tuple</a></code>
               </p>
             </td>
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="keyword">char</span><span class="special">&amp;,</span> <span class="identifier">foo</span><span class="special">&amp;&gt;</span> <span class="identifier">t</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">structure_tie</span><span class="special">(</span><span class="identifier">var</span><span class="special">);</span> <span class="comment">// C++17 is required</span>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="comment">// C++17 is required</span>
+<span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="keyword">char</span><span class="special">&amp;,</span> <span class="identifier">foo</span><span class="special">&amp;&gt;</span> <span class="identifier">t</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">structure_tie</span><span class="special">(</span><span class="identifier">var</span><span class="special">);</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">t</span><span class="special">)</span> <span class="special">=</span> <span class="identifier">foo</span><span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">2</span><span class="special">};</span>
 </pre>
             </td>
@@ -378,7 +386,7 @@
             </td>
 <td>
               <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/structure_tie.html" title="Function template structure_tie">boost::pfr::structure_tie</a></code>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/structure_tie.html" title="Function template structure_tie">structure_tie</a></code>
               </p>
             </td>
 </tr>
@@ -396,7 +404,7 @@
             </td>
 <td>
               <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_structure_tie.html" title="Function template flat_structure_tie">boost::pfr::flat_structure_tie</a></code>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_structure_tie.html" title="Function template flat_structure_tie">flat_structure_tie</a></code>
               </p>
             </td>
 </tr>

@@ -256,10 +256,10 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><a class="link" href="../BOOST_PF_idm46539757054080.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
+                  <code class="computeroutput"><a class="link" href="../BOOST_PF_idm44791401350912.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
                 </p>
                 <p>
-                  <code class="computeroutput"><a class="link" href="../BOOST_PF_idm46539757300816.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
+                  <code class="computeroutput"><a class="link" href="../BOOST_PF_idm44791401597360.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
                 </p>
               </td>
 <td>
@@ -354,7 +354,10 @@
 <span class="keyword">struct</span> <span class="identifier">uniform_comparator_less</span> <span class="special">{</span>
     <span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">()(</span><span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;</span> <span class="identifier">lhs</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;</span> <span class="identifier">rhs</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span> <span class="special">{</span>
         <span class="keyword">using</span> <span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">ops</span><span class="special">;</span>    <span class="comment">// Enables Boost.PFR operators usage in this scope.</span>
-        <span class="keyword">return</span> <span class="identifier">lhs</span> <span class="special">&lt;</span> <span class="identifier">rhs</span><span class="special">;</span>           <span class="comment">// If T has operator&lt; or conversion operator then will use it, otherwise will use boost::pfr::flat_less&lt;T&gt;.</span>
+
+        <span class="comment">// If T has operator&lt; or conversion operator then will use it.</span>
+        <span class="comment">// Otherwise will use boost::pfr::flat_less&lt;T&gt;.</span>
+        <span class="keyword">return</span> <span class="identifier">lhs</span> <span class="special">&lt;</span> <span class="identifier">rhs</span><span class="special">;</span>
     <span class="special">}</span>
 <span class="special">};</span>
 </pre>
@@ -368,13 +371,16 @@
 <span class="keyword">struct</span> <span class="identifier">uniform_comparator_less</span> <span class="special">{</span>
     <span class="keyword">bool</span> <span class="keyword">operator</span><span class="special">()(</span><span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;</span> <span class="identifier">lhs</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;</span> <span class="identifier">rhs</span><span class="special">)</span> <span class="keyword">const</span> <span class="keyword">noexcept</span> <span class="special">{</span>
         <span class="keyword">using</span> <span class="keyword">namespace</span> <span class="identifier">flat_ops</span><span class="special">;</span>
-        <span class="keyword">return</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">less</span><span class="special">{}(</span><span class="identifier">lhs</span><span class="special">,</span> <span class="identifier">rhs</span><span class="special">);</span>   <span class="comment">// Compile time error if T has neither operator&lt; nor conversion operator to comparable type.</span>
+
+        <span class="comment">// Compile time error if T has neither operator&lt; nor</span>
+        <span class="comment">// conversion operator to comparable type.</span>
+        <span class="keyword">return</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">less</span><span class="special">{}(</span><span class="identifier">lhs</span><span class="special">,</span> <span class="identifier">rhs</span><span class="special">);</span>
     <span class="special">}</span>
 <span class="special">};</span>
 </pre>
 <p>
-        <span class="bold"><strong>2. <code class="computeroutput"><a class="link" href="../BOOST_PF_idm46539757054080.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
-        and <code class="computeroutput"><a class="link" href="../BOOST_PF_idm46539757300816.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
+        <span class="bold"><strong>2. <code class="computeroutput"><a class="link" href="../BOOST_PF_idm44791401350912.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
+        and <code class="computeroutput"><a class="link" href="../BOOST_PF_idm44791401597360.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
         approach</strong></span>
       </p>
 <p>
@@ -397,7 +403,7 @@
 <p>
         Argument Dependant Lookup works well, <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">less</span></code>
         will find the operators for <code class="computeroutput"><span class="keyword">struct</span>
-        <span class="identifier">pair_like</span></code>. <code class="computeroutput"><a class="link" href="../BOOST_PF_idm46539757054080.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR(T)</a></code>
+        <span class="identifier">pair_like</span></code>. <code class="computeroutput"><a class="link" href="../BOOST_PF_idm44791401350912.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR(T)</a></code>
         can not be used for local types, it must be called only once in namespace
         of <code class="computeroutput"><span class="identifier">T</span></code>. It does not respect
         conversion operators of <code class="computeroutput"><span class="identifier">T</span></code>,
@@ -489,7 +495,8 @@
         Any attempt to reflect unions leads to a compile time error. In many cases
         a static assert is triggered that outputs the following message:
       </p>
-<pre class="programlisting"><span class="identifier">error</span><span class="special">:</span> <span class="keyword">static_assert</span> <span class="identifier">failed</span> <span class="string">"====================&gt; Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."</span>
+<pre class="programlisting"><span class="identifier">error</span><span class="special">:</span> <span class="keyword">static_assert</span> <span class="identifier">failed</span> <span class="string">"====================&gt; Boost.PFR: For safety reasons it is forbidden
+        to reflect unions. See `Reflection of unions` section in the docs for more info."</span>
 </pre>
 </div>
 </div>

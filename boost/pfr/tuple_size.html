@@ -26,7 +26,7 @@
 <a name="boost.pfr.tuple_size"></a><div class="titlepage"></div>
 <div class="refnamediv">
 <h2><span class="refentrytitle">Type definition tuple_size</span></h2>
-<p>tuple_size &#8212; Has a static const member variable <code class="computeroutput">value</code> that contains fields count in a T. Works for any T that supports aggregate initialization even if T is not POD.  <a class="link" href="../../boost_precise_and_flat_reflectio/tutorial.html#boost_precise_and_flat_reflectio.tutorial.flattening" title="Flattening">Flattens</a> only multidimensional arrays. </p>
+<p>tuple_size</p>
 </div>
 <h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
 <div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../../boost_precise_and_flat_reflectio/reference.html#header.boost.pfr.precise.tuple_size_hpp" title="Header &lt;boost/pfr/precise/tuple_size.hpp&gt;">boost/pfr/precise/tuple_size.hpp</a>&gt;
@@ -34,7 +34,8 @@
 </span>
 <span class="keyword">typedef</span> <span class="emphasis"><em><span class="identifier">unspecified</span></em></span> <span class="identifier">tuple_size</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idm45996611989040"></a><h2>Description</h2>
+<a name="idm45387529541392"></a><h2>Description</h2>
+<p>Has a static const member variable <code class="computeroutput">value</code> that contains fields count in a T. Works for any T that supports aggregate initialization even if T is not POD.  <a class="link" href="../../boost_precise_and_flat_reflectio/tutorial.html#boost_precise_and_flat_reflectio.tutorial.flattening" title="Flattening">Flattens</a> only multidimensional arrays.</p>
 <p><span class="bold"><strong>Requires:</strong></span> C++14.</p>
 <p><span class="bold"><strong>Example:</strong></span> </p>
 <pre class="programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">array</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">,</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">tuple_size</span><span class="special">&lt;</span><span class="identifier">my_structure</span><span class="special">&gt;</span><span class="special">::</span><span class="identifier">value</span> <span class="special">&gt;</span> <span class="identifier">a</span><span class="special">;</span>
