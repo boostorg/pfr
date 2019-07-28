@@ -140,7 +140,14 @@ test-suite pfr
     [ run precise/get_non_default_constructible.cpp : : : $(CLASSIC_PREC_DEF) : precise_get_non_default_constructible ]
     [ run precise/destructuring_tie.cpp             : : : $(CLASSIC_PREC_DEF) : precise_destructuring_tie ]
     [ run precise/error_pfr_c1202.cpp               : : : $(CLASSIC_PREC_DEF) : precise_c1202_issue21 ]
-    [ compile-fail precise/non_aggregate.cpp        : $(CLASSIC_PREC_DEF) : precise_non_aggregate ]
+    [ compile-fail precise/non_aggregate.cpp        : $(CLASSIC_PREC_DEF)     : precise_non_aggregate ]
+
+    # See "Requirements and Limitations" section of the docs for info on following tests:
+    [ compile-fail precise/template_constructor.cpp   : $(CLASSIC_PREC_DEF) <cxxstd>17:<build>no : precise_template_constructor14 ]
+    [ compile-fail precise/template_unconstrained.cpp : $(CLASSIC_PREC_DEF) <cxxstd>17:<build>no : precise_template_unconstrained14 ]
+    [ run precise/template_constructor.cpp          : : : $(CLASSIC_PREC_DEF) <cxxstd>14:<build>no : precise_template_constructor ]
+    # TODO:
+    #[ run precise/template_unconstrained.cpp        : : : $(CLASSIC_PREC_DEF) <cxxstd>14:<build>no : precise_template_unconstrained ]
 
     # The following tests may compile of fail depending on C++ Standard version.
     #[ compile-fail precise/issue30.cpp              : $(CLASSIC_PREC_DEF) : precise_issue30 ]
@@ -167,6 +174,13 @@ test-suite pfr
     [ run precise/issue30.cpp                       : : : $(LOOPHOLE_PREC_DEF) : precise_lh_issue30 ]
     [ run precise/issue33.cpp                       : : : $(LOOPHOLE_PREC_DEF) : precise_lh_issue33 ]
     [ compile-fail precise/non_aggregate.cpp        : $(LOOPHOLE_PREC_DEF) : precise_lh_non_aggregate ]
+
+    # See "Requirements and Limitations" section of the docs for info on following tests:
+    [ compile-fail precise/template_constructor.cpp   : $(LOOPHOLE_PREC_DEF) <cxxstd>17:<build>no : precise_lh_template_constructor14 ]
+    [ compile-fail precise/template_unconstrained.cpp : $(LOOPHOLE_PREC_DEF) <cxxstd>17:<build>no : precise_lh_template_unconstrained14 ]
+    [ run precise/template_constructor.cpp   : : : $(LOOPHOLE_PREC_DEF) <cxxstd>14:<build>no : precise_lh_template_constructor ]
+    # TODO:
+    #[ run precise/template_unconstrained.cpp : : : $(LOOPHOLE_PREC_DEF) <cxxstd>14:<build>no : precise_lh_template_unconstrained ]
 
 
     # Examples from docs
