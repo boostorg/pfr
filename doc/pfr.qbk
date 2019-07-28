@@ -360,6 +360,11 @@ C++14 [*precise] functions limitations with manually disabled [*Loophole](C++17 
 * T must be constexpr aggregate initializable and all it's fields must be constexpr default constructible
 * [funcref boost::pfr::get], [funcref boost::pfr::structure_to_tuple], [funcref boost::pfr::structure_tie], [headerref boost/pfr/precise/core.hpp boost::pfr::tuple_element] require T to be a flat POD type
 
+
+[*C++14] limitation (C++17 fixes those):
+
+* Non of the member fields has a template constructor from one parameter
+
 [endsect]
 
 [section How it works]
