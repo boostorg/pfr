@@ -31,13 +31,13 @@ using size_t_ = std::integral_constant<std::size_t, Index >;
 ///////////////////// Structure that can be converted to reference to anything
 struct ubiq_lref_constructor {
     std::size_t ignore;
-    template <class Type> constexpr operator Type&() const noexcept; // Undefined, allows initialization of reference fields (T& and const T&)
+    template <class Type> /*constexpr*/ operator Type&() const noexcept; // Undefined, allows initialization of reference fields (T& and const T&)
 };
 
 ///////////////////// Structure that can be converted to rvalue reference to anything
 struct ubiq_rref_constructor {
     std::size_t ignore;
-    template <class Type> constexpr operator Type&&() const noexcept; // Undefined, allows initialization of rvalue reference fields and move-only types
+    template <class Type> /*constexpr*/ operator Type&&() const noexcept; // Undefined, allows initialization of rvalue reference fields and move-only types
 };
 
 ///////////////////// Structure that can be converted to reference to anything except reference to T
