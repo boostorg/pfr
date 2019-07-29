@@ -67,6 +67,7 @@ int main() {
         "Precise reflection with template constructors fails to work"
     );
 
+    /*
     static_assert(
         std::is_same<
             boost::pfr::tuple_element_t<2, aggregate_unconstrained>,
@@ -74,6 +75,7 @@ int main() {
         >::value,
         "Precise reflection with template constructors fails to work"
     );
+    */
 
     aggregate_unconstrained aggr{3, 4};
     return boost::pfr::get<1>(aggr).value_.value_ - 4;
