@@ -6,6 +6,7 @@
 #
 
 import testing ;
+import ../../config/checks/config : requires ;
 
 project
     : source-location .
@@ -13,6 +14,7 @@ project
         <toolset>msvc:<cxxflags>"/std:c++latest"
         <toolset>msvc:<define>BOOST_PFR_USE_CPP17=1
         <define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1
+        [ requires cxx14_constexpr ]
     ;
 
 local DISABLE_ON_MSVC = <toolset>msvc:<build>no ;
@@ -143,11 +145,11 @@ test-suite pfr
     [ compile-fail precise/non_aggregate.cpp        : $(CLASSIC_PREC_DEF)     : precise_non_aggregate ]
 
     # See "Requirements and Limitations" section of the docs for info on following tests:
-    [ compile-fail precise/template_constructor.cpp   : $(CLASSIC_PREC_DEF) <cxxstd>17:<build>no : precise_template_constructor14 ]
-    [ compile-fail precise/template_unconstrained.cpp : $(CLASSIC_PREC_DEF) <cxxstd>17:<build>no : precise_template_unconstrained14 ]
-    [ run precise/template_constructor.cpp          : : : $(CLASSIC_PREC_DEF) <cxxstd>14:<build>no : precise_template_constructor ]
+    #[ compile-fail precise/template_constructor.cpp   : $(CLASSIC_PREC_DEF) [ requires !cxx17_structured_bindings ] : precise_template_constructor14 ]
+    #[ compile-fail precise/template_unconstrained.cpp : $(CLASSIC_PREC_DEF) [ requires !cxx17_structured_bindings ] : precise_template_unconstrained14 ]
+    [ run precise/template_constructor.cpp          : : : $(CLASSIC_PREC_DEF) [ requires cxx17_structured_bindings ] : precise_template_constructor ]
     # TODO:
-    #[ run precise/template_unconstrained.cpp        : : : $(CLASSIC_PREC_DEF) <cxxstd>14:<build>no : precise_template_unconstrained ]
+    #[ run precise/template_unconstrained.cpp        : : : $(CLASSIC_PREC_DEF) [ requires cxx17_structured_bindings ] : precise_template_unconstrained ]
 
     # The following tests may compile of fail depending on C++ Standard version.
     #[ compile-fail precise/issue30.cpp              : $(CLASSIC_PREC_DEF) : precise_issue30 ]
@@ -176,11 +178,11 @@ test-suite pfr
     [ compile-fail precise/non_aggregate.cpp        : $(LOOPHOLE_PREC_DEF) : precise_lh_non_aggregate ]
 
     # See "Requirements and Limitations" section of the docs for info on following tests:
-    [ compile-fail precise/template_constructor.cpp   : $(LOOPHOLE_PREC_DEF) <cxxstd>17:<build>no : precise_lh_template_constructor14 ]
-    [ compile-fail precise/template_unconstrained.cpp : $(LOOPHOLE_PREC_DEF) <cxxstd>17:<build>no : precise_lh_template_unconstrained14 ]
-    [ run precise/template_constructor.cpp   : : : $(LOOPHOLE_PREC_DEF) <cxxstd>14:<build>no : precise_lh_template_constructor ]
+    #[ compile-fail precise/template_constructor.cpp   : $(LOOPHOLE_PREC_DEF) [ requires !cxx17_structured_bindings ] : precise_lh_template_constructor14 ]
+    #[ compile-fail precise/template_unconstrained.cpp : $(LOOPHOLE_PREC_DEF) [ requires !cxx17_structured_bindings ] : precise_lh_template_unconstrained14 ]
+    [ run precise/template_constructor.cpp   : : : $(LOOPHOLE_PREC_DEF) [ requires cxx17_structured_bindings ] : precise_lh_template_constructor ]
     # TODO:
-    #[ run precise/template_unconstrained.cpp : : : $(LOOPHOLE_PREC_DEF) <cxxstd>14:<build>no : precise_lh_template_unconstrained ]
+    #[ run precise/template_unconstrained.cpp : : : $(LOOPHOLE_PREC_DEF) [ requires cxx17_structured_bindings ] : precise_lh_template_unconstrained ]
 
 
     # Examples from docs
