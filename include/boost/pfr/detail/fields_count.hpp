@@ -122,7 +122,7 @@ constexpr auto detect_fields_count(detail::multi_element_range, long) noexcept
 
 template <class T, std::size_t Begin, std::size_t Middle>
 constexpr std::size_t detect_fields_count(detail::multi_element_range, int) noexcept {
-    constexpr std::size_t next_v = (Begin + Middle) / 2;
+    constexpr std::size_t next_v = Begin + (Middle - Begin) / 2;
     return detail::detect_fields_count<T, Begin, next_v>(detail::is_one_element_range<Begin, next_v>{}, 1L);
 }
 
