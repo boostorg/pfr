@@ -45,6 +45,14 @@ matrix:
 #          sources: ubuntu-toolchain-r-test
 #          packages: g++-6
 
+    - env: B2_ARGS='cxxstd=14,17,2a toolset=gcc-10 cxxflags="--coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined -DBOOST_TRAVISCI_BUILD" linkflags="--coverage  -lasan -lubsan"'
+      name: "GCC-10"
+      sudo: required # Required by leak sanitizer
+      addons:
+        apt:
+          sources: ubuntu-toolchain-r-test
+          packages: g++-10
+
     - env: B2_ARGS='cxxstd=14,17,2a toolset=gcc-8 cxxflags="--coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined -DBOOST_TRAVISCI_BUILD" linkflags="--coverage  -lasan -lubsan"'
       name: "GCC-8"
       sudo: required # Required by leak sanitizer
