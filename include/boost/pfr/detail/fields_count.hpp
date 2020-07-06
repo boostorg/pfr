@@ -73,7 +73,7 @@ template <class T, std::size_t N>
 struct is_aggregate_initializable_n {
     template <std::size_t ...I>
     static constexpr bool is_not_constructible_n(std::index_sequence<I...>) noexcept {
-#if defined(__cpp_aggregate_paren_init) || (defined(__GNUC__) && __GNUC__ >= 10)
+#if defined(__cpp_aggregate_paren_init)
         typedef size_t_<N> fields_count_tag;
 
         // ====================> Boost.PFR: Compile time error at this point means that the type T is not
