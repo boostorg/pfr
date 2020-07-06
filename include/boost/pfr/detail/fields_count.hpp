@@ -68,12 +68,12 @@ template <class T, std::size_t N>
 struct is_aggregate_initializable_n {
     template <std::size_t ...I>
     static constexpr bool is_not_constructible_n(std::index_sequence<I...>) noexcept {
-#ifndef __cpp_aggregate_paren_init
+#if defined(__cpp_aggregate_paren_init) || (defined(__GNUC__) && __GNUC__ >= 10)
+        return true;
+#else
         return (!std::is_constructible<T, decltype(ubiq_lref_constructor{I})...>::value && !std::is_constructible<T, decltype(ubiq_rref_constructor{I})...>::value)
             || is_single_field_and_aggregate_initializable<N, T>::value
         ;
-#else
-        return true;
 #endif
     }
 
