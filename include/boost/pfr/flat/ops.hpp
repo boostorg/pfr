@@ -47,7 +47,7 @@ namespace detail {
 ///////////////////// Helper typedef that it used by all the enable_flat_not_*_comp_t
     template <template <class, class> class Detector, class T>
     using enable_flat_not_comp_base_t = typename std::enable_if<
-        not_appliable<Detector, T const&, T const&>::value && std::is_pod<T>::value,
+        not_appliable<Detector, T const&, T const&>::value && std::is_trivial<T>::value && std::is_standard_layout<T>::value,
         bool
     >::type;
 
@@ -62,13 +62,15 @@ namespace detail {
 
     template <class Stream, class Type>
     using enable_flat_not_ostreamable_t = typename std::enable_if<
-        not_appliable<ostreamable_detector, Stream&, Type const&>::value && std::is_pod<Type>::value,
+        not_appliable<ostreamable_detector, Stream&, Type const&>::value && std::is_trivial<Type>::value
+          && std::is_standard_layout<Type>::value,
         Stream&
     >::type;
 
     template <class Stream, class Type>
     using enable_flat_not_istreamable_t = typename std::enable_if<
-        not_appliable<istreamable_detector, Stream&, Type&>::value && std::is_pod<Type>::value,
+        not_appliable<istreamable_detector, Stream&, Type&>::value && std::is_trivial<Type>::value
+          && std::is_standard_layout<Type>::value,
         Stream&
     >::type;
 } // namespace detail

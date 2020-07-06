@@ -61,15 +61,20 @@ template <class T> struct is_single_field_and_aggregate_initializable<1, T>: std
 > {};
 
 // Hand-made is_aggregate<T> trait:
-// Aggregates could be constructed from `decltype(ubiq_?ref_constructor{I})...` but report that there's no constructor from `decltype(ubiq_?ref_constructor{I})...`
+// Before C++20 aggregates could be constructed from `decltype(ubiq_?ref_constructor{I})...` but type traits report that
+// there's no constructor from `decltype(ubiq_?ref_constructor{I})...`
 // Special case for N == 1: `std::is_constructible<T, ubiq_?ref_constructor>` returns true if N == 1 and T is copy/move constructible.
 template <class T, std::size_t N>
 struct is_aggregate_initializable_n {
     template <std::size_t ...I>
     static constexpr bool is_not_constructible_n(std::index_sequence<I...>) noexcept {
+#ifndef __cpp_aggregate_paren_init
         return (!std::is_constructible<T, decltype(ubiq_lref_constructor{I})...>::value && !std::is_constructible<T, decltype(ubiq_rref_constructor{I})...>::value)
             || is_single_field_and_aggregate_initializable<N, T>::value
         ;
+#else
+        return true;
+#endif
     }
 
     static constexpr bool value =
