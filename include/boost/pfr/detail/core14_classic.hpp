@@ -508,7 +508,10 @@ template <class T>
 constexpr auto internal_tuple_with_same_alignment() noexcept {
     typedef typename std::remove_cv<T>::type type;
 
-    static_assert(std::is_pod<type>::value, "====================> Boost.PFR: Type can not be used is flat_ functions, because it's not POD");
+    static_assert(
+        std::is_trivial<type>::value && std::is_standard_layout<type>::value,
+        "====================> Boost.PFR: Type can not be used is flat_ functions, because it's not POD"
+    );
     static_assert(!std::is_reference<type>::value, "====================> Boost.PFR: Not applyable");
     constexpr auto res = detail::as_flat_tuple_impl<type>(
         detail::make_index_sequence< decltype(detail::flat_array_of_type_ids<type>())::size() >()
