@@ -24,6 +24,14 @@ matrix:
 #          sources: ubuntu-toolchain-r-test
 #          packages: g++-6
 
+    - env: B2_ARGS='cxxstd=14,17,2a toolset=gcc-10 cxxflags="--coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined -DBOOST_TRAVISCI_BUILD" linkflags="--coverage  -lasan -lubsan"'
+      name: "GCC-10"
+      sudo: required # Required by leak sanitizer
+      addons:
+        apt:
+          sources: ubuntu-toolchain-r-test
+          packages: g++-10
+
     - env: B2_ARGS='cxxstd=14,17,2a toolset=gcc-8 cxxflags="--coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined -DBOOST_TRAVISCI_BUILD" linkflags="--coverage  -lasan -lubsan"'
       name: "GCC-8"
       sudo: required # Required by leak sanitizer
@@ -55,16 +63,16 @@ matrix:
           sources: llvm-toolchain-trusty-6
           packages: clang-6.0
 
-    - env: B2_ARGS='cxxstd=14,1z toolset=clang-8 cxxflags="-stdlib=libc++ --coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined -DBOOST_TRAVISCI_BUILD" linkflags="-stdlib=libc++ --coverage -fsanitize=address,leak,undefined"'
-      name: "Clang-8, libc++"
+    - env: B2_ARGS='cxxstd=14,1z toolset=clang-10 cxxflags="-stdlib=libc++ --coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined -DBOOST_TRAVISCI_BUILD" linkflags="-stdlib=libc++ --coverage -fsanitize=address,leak,undefined"'
+      name: "Clang-10, libc++"
       sudo: required # Required by leak sanitizer
       addons:
         apt:
-          sources: llvm-toolchain-trusty-8
+          sources: llvm-toolchain-bionic-10
           packages:
-            - clang-8
-            - libc++-8-dev
-            - libc++abi-8-dev
+            - clang-10
+            - libc++-10-dev
+            - libc++abi-10-dev
 
     # Sanitizers disabled for this toolset as they started causing link troubles: 
     # hidden symbol `_ZNSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE11__recommendEm' isn't defined
@@ -135,6 +143,7 @@ before_install:
     echo "using clang : 6 : clang++-6.0 ;" >> ~/user-config.jam
     echo "using clang : 7 : clang++-7.0 ;" >> ~/user-config.jam
     echo "using clang : 8 : clang++-8 ;" >> ~/user-config.jam
+    echo "using clang : 10 : clang++-10 ;" >> ~/user-config.jam
     echo "using clang : libc++ : clang++-libc++ ;" >> ~/user-config.jam
   - cd $BOOST/libs/$PROJECT_TO_TEST/test/
 
