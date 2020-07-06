@@ -240,8 +240,11 @@ template <class T> struct hash {
         std::size_t result = 0;
         ::boost::pfr::detail::for_each_field_dispatcher(
             x,
-            [&result, fields_count_val](const auto& lhs) {
-                result = detail::hash_impl<0, fields_count_val>::compute(lhs);
+            [&result](const auto& lhs) {
+                // We can not reuse `fields_count_val` in lambda because compilers had issues with
+                // passing constexpr variables into lambdas. Computing is again is the most portable solution.
+                constexpr std::size_t fields_count_val_lambda = boost::pfr::detail::fields_count<std::remove_reference_t<T>>();
+                result = detail::hash_impl<0, fields_count_val_lambda>::compute(lhs);
             },
             detail::make_index_sequence<fields_count_val>{}
         );
