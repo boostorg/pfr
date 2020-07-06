@@ -8,6 +8,7 @@
 #define BOOST_PFR_DETAIL_CORE17_HPP
 
 #include <boost/pfr/detail/core17_generated.hpp>
+#include <boost/pfr/detail/fields_count.hpp>
 #include <boost/pfr/detail/for_each_field_impl.hpp>
 #include <boost/pfr/detail/rvalue_t.hpp>
 

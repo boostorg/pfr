@@ -20,7 +20,6 @@
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/size_t_.hpp>
-#include <boost/pfr/detail/fields_count.hpp>
 
 namespace boost { namespace pfr { namespace detail {
 
