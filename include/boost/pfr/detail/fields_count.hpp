@@ -9,6 +9,7 @@
 
 #include <boost/pfr/detail/config.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
+#include <boost/pfr/detail/size_t_.hpp>
 
 #if defined(__cpp_aggregate_paren_init) || (defined(__GNUC__) && __GNUC__ >= 10)
 #include <boost/pfr/detail/core17_generated.hpp>

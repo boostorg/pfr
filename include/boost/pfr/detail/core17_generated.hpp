@@ -14,6 +14,7 @@
 #pragma once
 
 #include <boost/pfr/detail/config.hpp>
+#include <boost/pfr/detail/size_t_.hpp>
 
 #if !BOOST_PFR_USE_CPP17
 #   error C++17 is required for this header.
