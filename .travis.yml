@@ -12,6 +12,7 @@
 
 language: cpp
 os: linux
+dist: bionic
 
 # `--coverage` flags required to generate coverage info for Coveralls
 matrix:
