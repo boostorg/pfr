@@ -2,7 +2,7 @@
 # subject to the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 #
-# Copyright Antony Polukhin 2014-2019.
+# Copyright Antony Polukhin 2014-2020.
 
 #
 # See https://svn.boost.org/trac/boost/wiki/TravisCoverals for description of this file
@@ -10,30 +10,8 @@
 #
 # File revision #9 (with DIFF)
 
-sudo: false
 language: cpp
 os: linux
-
-env:
-  global:
-    # Autodetect Boost branch by using the following code: - BOOST_BRANCH=$TRAVIS_BRANCH
-    # or just directly specify it
-    - BOOST_BRANCH=develop && [ "$TRAVIS_BRANCH" == "master" ] && BOOST_BRANCH=master || true
-
-    # Files, which coverage results must be ignored (files from other projects).
-    # Example: - IGNORE_COVERAGE='*/boost/progress.hpp */filesystem/src/*'
-    - IGNORE_COVERAGE=''
-
-    # Explicitly remove the following library from Boost. This may be useful, if you're for example running Travis
-    # from `Boost.DLL` repo, while Boost already has `dll`.
-    #
-    # By default is eaual to - BOOST_REMOVE=$(basename $TRAVIS_BUILD_DIR)
-    # This will force to use local repo content, instead of the Boost's default.
-    - BOOST_REMOVE=$(basename $TRAVIS_BUILD_DIR)
-
-    # Global options for sanitizers
-    - UBSAN_OPTIONS=print_stacktrace=1
-    - LSAN_OPTIONS=verbosity=1:log_threads=1
 
 # `--coverage` flags required to generate coverage info for Coveralls
 matrix:
@@ -108,6 +86,24 @@ addons:
     - python-yaml
 
 before_install:
+  # Autodetect Boost branch by using the following code: - BOOST_BRANCH=$TRAVIS_BRANCH
+  # or just directly specify it
+  - BOOST_BRANCH=develop && [ "$TRAVIS_BRANCH" == "master" ] && BOOST_BRANCH=master || true
+
+  # Files, which coverage results must be ignored (files from other projects).
+  # Example: - IGNORE_COVERAGE='*/boost/progress.hpp */filesystem/src/*'
+  - IGNORE_COVERAGE=''
+
+  # Explicitly remove the following library from Boost. This may be useful, if you're for example running Travis
+  # from `Boost.DLL` repo, while Boost already has `dll`.
+  #
+  # By default is eaual to - BOOST_REMOVE=$(basename $TRAVIS_BUILD_DIR)
+  # This will force to use local repo content, instead of the Boost's default.
+  - BOOST_REMOVE=$(basename $TRAVIS_BUILD_DIR)
+
+  # Global options for sanitizers
+  - UBSAN_OPTIONS=print_stacktrace=1
+  - LSAN_OPTIONS=verbosity=1:log_threads=1
   # Set this to the name of the library
   - PROJECT_TO_TEST=`basename $TRAVIS_BUILD_DIR`
 
