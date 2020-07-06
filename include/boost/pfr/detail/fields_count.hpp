@@ -10,6 +10,10 @@
 #include <boost/pfr/detail/config.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 
+#if defined(__cpp_aggregate_paren_init) || (defined(__GNUC__) && __GNUC__ >= 10)
+#include <boost/pfr/detail/core_17_generated.hpp>
+#endif
+
 #include <climits>      // CHAR_BIT
 #include <type_traits>
 #include <utility>      // metaprogramming stuff
@@ -69,7 +73,13 @@ struct is_aggregate_initializable_n {
     template <std::size_t ...I>
     static constexpr bool is_not_constructible_n(std::index_sequence<I...>) noexcept {
 #if defined(__cpp_aggregate_paren_init) || (defined(__GNUC__) && __GNUC__ >= 10)
-        return true;
+        typedef size_t_<N> fields_count_tag;
+
+        // ====================> Boost.PFR: Compile time error at this point means that the type T is not
+        // aggregate initializable (or that it is impossible to detect fields count).
+        using type = decltype(boost::pfr::detail::tie_as_tuple(std::declval<const T&>(), fields_count_tag{}));
+
+        return sizeof(type);
 #else
         return (!std::is_constructible<T, decltype(ubiq_lref_constructor{I})...>::value && !std::is_constructible<T, decltype(ubiq_rref_constructor{I})...>::value)
             || is_single_field_and_aggregate_initializable<N, T>::value
