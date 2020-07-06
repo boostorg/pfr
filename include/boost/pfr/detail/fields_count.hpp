@@ -27,14 +27,16 @@ namespace boost { namespace pfr { namespace detail {
 
 ///////////////////// General utility stuff
 
+// Helper structure to avoid copy construction calls
+struct anchor{};
+
 // C++20 introduced __cpp_aggregate_paren_init and std::is_constructible_v<aggregate, field1, field1> started returning true
 // for aggreagates. Fortunately, brace elision does not work with round parentheses. Putting an aggreagate into an aggregate
-// brings back the C++17 behavior, std::is_constructible_v<force_aggregate_init<aggregate>, field1, field1> returns false.
+// brings back the C++17 behavior, std::is_constructible_v<force_aggregate_init<aggregate>, field1, field1, anchor> returns false.
 template <class T>
 struct force_aggregate_init {
-    force_aggregate_init(const force_aggregate_init&) = delete;
-
     T data;
+    anchor a;
 };
 
 ///////////////////// Structure that can be converted to reference to anything
@@ -68,7 +70,7 @@ struct ubiq_constructor_except<T, false> {
 // `std::is_constructible<T, ubiq_constructor_except<T>>` consumes a lot of time, so we made a separate lazy trait for it.
 template <std::size_t N, class T> struct is_single_field_and_aggregate_initializable: std::false_type {};
 template <class T> struct is_single_field_and_aggregate_initializable<1, T>: std::integral_constant<
-    bool, !std::is_constructible<force_aggregate_init<T>, ubiq_constructor_except<T, std::is_copy_constructible<T>::value>>::value
+    bool, !std::is_constructible<force_aggregate_init<T>, ubiq_constructor_except<T, std::is_copy_constructible<T>::value>, anchor>::value
 > {};
 
 // Hand-made is_aggregate<T> trait:
@@ -80,7 +82,7 @@ struct is_aggregate_initializable_n {
     template <std::size_t ...I>
     static constexpr bool is_not_constructible_n(std::index_sequence<I...>) noexcept {
 #ifdef __cpp_aggregate_paren_init
-        return !std::is_constructible<force_aggregate_init<T>, decltype(ubiq_constructor_except<T, std::is_copy_constructible<T>::value>{I})...>::value
+        return !std::is_constructible<force_aggregate_init<T>, decltype(ubiq_constructor_except<T, std::is_copy_constructible<T>::value>{I})..., anchor>::value
             || is_single_field_and_aggregate_initializable<N, T>::value
         ;
 #else
