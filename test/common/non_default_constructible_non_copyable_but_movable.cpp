@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Antony Polukhin
+// Copyright (c) 2018-2020 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -49,7 +49,8 @@ int main() {
     struct S6 { X x0; X x1; X x2; X x3; X x4;  X x5;};
     static_assert(boost::pfr::tuple_size_v<S6> == 6, "");
 #elif defined(BOOST_PFR_TEST_FLAT)
-    BOOST_TEST_EQ(boost::pfr::flat_tuple_size_v<S>, 1); // Empty structs are discarded
+    // Does not compile since GCC-10. Result is quite strange on compilers where the code compiles:
+    //BOOST_TEST_EQ(boost::pfr::flat_tuple_size_v<S>, 1); // Empty structs are discarded
 #endif
 
     return boost::report_errors();
