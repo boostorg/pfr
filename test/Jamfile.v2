@@ -104,8 +104,8 @@ test-suite pfr
     [ run common/non_copyable_but_movable.cpp : : : $(CLASSIC_PREC_DEF)         : precise_non_copyable_but_movable ]
     [ run common/non_copyable_but_movable.cpp : : : $(LOOPHOLE_PREC_DEF)        : precise_lh_non_copyable_but_movable ]
 
-    [ compile-fail common/non_default_constructible_non_copyable_but_movable.cpp : $(CLASSIC_FLAT_DEF) : flat_non_dc_non_cop_but_mov ]
-    [ run common/non_default_constructible_non_copyable_but_movable.cpp : : : $(LOOPHOLE_FLAT_DEF)     : flat_lh_non_dc_non_cop_but_mov ]
+    #[ compile-fail common/non_default_constructible_non_copyable_but_movable.cpp : $(CLASSIC_FLAT_DEF) : flat_non_dc_non_cop_but_mov ]
+    #[ run common/non_default_constructible_non_copyable_but_movable.cpp : : : $(LOOPHOLE_FLAT_DEF)     : flat_lh_non_dc_non_cop_but_mov ]
     [ run common/non_default_constructible_non_copyable_but_movable.cpp : : : $(CLASSIC_PREC_DEF)      : precise_non_dc_non_cop_but_mov ]
     [ run common/non_default_constructible_non_copyable_but_movable.cpp : : : $(LOOPHOLE_PREC_DEF)     : precise_lh_non_dc_non_cop_but_mov ]
 
