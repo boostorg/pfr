@@ -78,9 +78,10 @@ struct is_aggregate_initializable_n {
 
         // ====================> Boost.PFR: Compile time error at this point means that the type T is not
         // aggregate initializable (or that it is impossible to detect fields count).
-        using type = decltype(boost::pfr::detail::tie_as_tuple(std::declval<const T&>(), fields_count_tag{}));
+        using tuple_type = decltype(boost::pfr::detail::tie_as_tuple(std::declval<const T&>(), fields_count_tag{}));
+        constexpr std::size_t computed_n = tuple_type::size_v;
 
-        return sizeof(type);
+        return computed_n == N;
 #else
         return (!std::is_constructible<T, decltype(ubiq_lref_constructor{I})...>::value && !std::is_constructible<T, decltype(ubiq_rref_constructor{I})...>::value)
             || is_single_field_and_aggregate_initializable<N, T>::value
