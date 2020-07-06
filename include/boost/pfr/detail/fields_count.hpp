@@ -11,10 +11,6 @@
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 #include <boost/pfr/detail/size_t_.hpp>
 
-#if defined(__cpp_aggregate_paren_init)
-#include <boost/pfr/detail/core17_generated.hpp>
-#endif
-
 #include <climits>      // CHAR_BIT
 #include <type_traits>
 #include <utility>      // metaprogramming stuff
@@ -30,8 +26,16 @@
 namespace boost { namespace pfr { namespace detail {
 
 ///////////////////// General utility stuff
-template <std::size_t Index>
-using size_t_ = std::integral_constant<std::size_t, Index >;
+
+// C++20 introduced __cpp_aggregate_paren_init and std::is_constructible_v<aggregate, field1, field1> started returning true
+// for aggreagates. Fortunately, brace elision does not work with round parentheses. Putting an aggreagate into an aggregate
+// brings back the C++17 behavior, std::is_constructible_v<force_aggregate_init<aggregate>, field1, field1> returns false.
+template <class T>
+struct force_aggregate_init {
+    force_aggregate_init(const force_aggregate_init&) = delete;
+
+    T data;
+};
 
 ///////////////////// Structure that can be converted to reference to anything
 struct ubiq_lref_constructor {
@@ -48,11 +52,13 @@ struct ubiq_rref_constructor {
 ///////////////////// Structure that can be converted to reference to anything except reference to T
 template <class T, bool IsCopyConstructible>
 struct ubiq_constructor_except {
+    std::size_t ignore;
     template <class Type> constexpr operator std::enable_if_t<!std::is_same<T, Type>::value, Type&> () const noexcept; // Undefined
 };
 
 template <class T>
 struct ubiq_constructor_except<T, false> {
+    std::size_t ignore;
     template <class Type> constexpr operator std::enable_if_t<!std::is_same<T, Type>::value, Type&&> () const noexcept; // Undefined
 };
 
@@ -62,7 +68,7 @@ struct ubiq_constructor_except<T, false> {
 // `std::is_constructible<T, ubiq_constructor_except<T>>` consumes a lot of time, so we made a separate lazy trait for it.
 template <std::size_t N, class T> struct is_single_field_and_aggregate_initializable: std::false_type {};
 template <class T> struct is_single_field_and_aggregate_initializable<1, T>: std::integral_constant<
-    bool, !std::is_constructible<T, ubiq_constructor_except<T, std::is_copy_constructible<T>::value>>::value
+    bool, !std::is_constructible<force_aggregate_init<T>, ubiq_constructor_except<T, std::is_copy_constructible<T>::value>>::value
 > {};
 
 // Hand-made is_aggregate<T> trait:
@@ -73,15 +79,10 @@ template <class T, std::size_t N>
 struct is_aggregate_initializable_n {
     template <std::size_t ...I>
     static constexpr bool is_not_constructible_n(std::index_sequence<I...>) noexcept {
-#if defined(__cpp_aggregate_paren_init)
-        typedef size_t_<N> fields_count_tag;
-
-        // ====================> Boost.PFR: Compile time error at this point means that the type T is not
-        // aggregate initializable (or that it is impossible to detect fields count).
-        using tuple_type = decltype(boost::pfr::detail::tie_as_tuple(std::declval<const T&>(), fields_count_tag{}));
-        constexpr std::size_t computed_n = tuple_type::size_v;
-
-        return computed_n == N;
+#ifdef __cpp_aggregate_paren_init
+        return !std::is_constructible<force_aggregate_init<T>, decltype(ubiq_constructor_except<T, std::is_copy_constructible<T>::value>{I})...>::value
+            || is_single_field_and_aggregate_initializable<N, T>::value
+        ;
 #else
         return (!std::is_constructible<T, decltype(ubiq_lref_constructor{I})...>::value && !std::is_constructible<T, decltype(ubiq_rref_constructor{I})...>::value)
             || is_single_field_and_aggregate_initializable<N, T>::value
