@@ -135,7 +135,7 @@ namespace ops {
     }
 
     template <class T>
-    static std::enable_if_t<std::is_pod<T>::value, std::size_t> hash_value(const T& value) noexcept {
+    static std::enable_if_t<std::is_trivial<T>::value, std::size_t> hash_value(const T& value) noexcept {
         return hash<T>{}(value);
     }
 

@@ -11,10 +11,11 @@
 #   error Misused test
 #endif
 
+#include <type_traits>
+
 #include <boost/core/lightweight_test.hpp>
 
 struct X {
-    X() = delete;
     X(X&&) = default;
     X(const X&) = delete;
 
@@ -22,6 +23,9 @@ struct X {
     X& operator=(const X&) = delete;
 };
 struct S { X x0; X x1; int x2; X x3; };
+
+static_assert(!std::is_default_constructible<X>::value, "");
+static_assert(!std::is_default_constructible<S>::value, "");
 
 int main() {
 #ifdef BOOST_PFR_TEST_PRECISE
