@@ -44,6 +44,16 @@ static_assert(
 );
 #endif // #ifndef _MSC_VER
 
+template <class T>
+constexpr auto tie_as_tuple(T& val) noexcept {
+  static_assert(
+    !std::is_union<T>::value,
+    "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."
+  );
+  typedef size_t_<boost::pfr::detail::fields_count<T>()> fields_count_tag;
+  return boost::pfr::detail::tie_as_tuple(val, fields_count_tag{});
+}
+
 template <class T, class F, std::size_t... I>
 void for_each_field_dispatcher(T& t, F&& f, std::index_sequence<I...>) {
     static_assert(
