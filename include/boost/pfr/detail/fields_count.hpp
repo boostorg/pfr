@@ -25,20 +25,6 @@
 
 namespace boost { namespace pfr { namespace detail {
 
-///////////////////// General utility stuff
-
-// Helper structure to avoid copy construction calls
-struct anchor{};
-
-// C++20 introduced __cpp_aggregate_paren_init and std::is_constructible_v<aggregate, field1, field1> started returning true
-// for aggreagates. Fortunately, brace elision does not work with round parentheses. Putting an aggreagate into an aggregate
-// brings back the C++17 behavior, std::is_constructible_v<force_aggregate_init<aggregate>, field1, field1, anchor> returns false.
-template <class T>
-struct force_aggregate_init {
-    T data;
-    anchor a;
-};
-
 ///////////////////// Structure that can be converted to reference to anything
 struct ubiq_lref_constructor {
     std::size_t ignore;
@@ -51,7 +37,11 @@ struct ubiq_rref_constructor {
     template <class Type> /*constexpr*/ operator Type&&() const noexcept; // Undefined, allows initialization of rvalue reference fields and move-only types
 };
 
-///////////////////// Structure that can be converted to reference to anything except reference to T
+
+#ifndef __cpp_lib_is_aggregate
+///////////////////// Hand-made is_aggregate_initializable_n<T> trait
+
+// Structure that can be converted to reference to anything except reference to T
 template <class T, bool IsCopyConstructible>
 struct ubiq_constructor_except {
     std::size_t ignore;
@@ -65,12 +55,10 @@ struct ubiq_constructor_except<T, false> {
 };
 
 
-///////////////////// Hand-made is_aggregate_initializable_n<T> trait
-
 // `std::is_constructible<T, ubiq_constructor_except<T>>` consumes a lot of time, so we made a separate lazy trait for it.
 template <std::size_t N, class T> struct is_single_field_and_aggregate_initializable: std::false_type {};
 template <class T> struct is_single_field_and_aggregate_initializable<1, T>: std::integral_constant<
-    bool, !std::is_constructible<force_aggregate_init<T>, ubiq_constructor_except<T, std::is_copy_constructible<T>::value>, anchor>::value
+    bool, !std::is_constructible<T, ubiq_constructor_except<T, std::is_copy_constructible<T>::value>, anchor>::value
 > {};
 
 // Hand-made is_aggregate<T> trait:
@@ -81,15 +69,9 @@ template <class T, std::size_t N>
 struct is_aggregate_initializable_n {
     template <std::size_t ...I>
     static constexpr bool is_not_constructible_n(std::index_sequence<I...>) noexcept {
-#ifdef __cpp_aggregate_paren_init
-        return !std::is_constructible<force_aggregate_init<T>, decltype(ubiq_constructor_except<T, std::is_copy_constructible<T>::value>{I})..., anchor>::value
-            || is_single_field_and_aggregate_initializable<N, T>::value
-        ;
-#else
         return (!std::is_constructible<T, decltype(ubiq_lref_constructor{I})...>::value && !std::is_constructible<T, decltype(ubiq_rref_constructor{I})...>::value)
             || is_single_field_and_aggregate_initializable<N, T>::value
         ;
-#endif
     }
 
     static constexpr bool value =
@@ -99,6 +81,8 @@ struct is_aggregate_initializable_n {
         || is_not_constructible_n(detail::make_index_sequence<N>{})
     ;
 };
+
+#endif // #ifndef __cpp_lib_is_aggregate
 
 ///////////////////// Helper for SFINAE on fields count
 template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<std::is_copy_constructible<T>::value>::type>
