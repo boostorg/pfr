@@ -58,7 +58,7 @@ struct ubiq_constructor_except<T, false> {
 // `std::is_constructible<T, ubiq_constructor_except<T>>` consumes a lot of time, so we made a separate lazy trait for it.
 template <std::size_t N, class T> struct is_single_field_and_aggregate_initializable: std::false_type {};
 template <class T> struct is_single_field_and_aggregate_initializable<1, T>: std::integral_constant<
-    bool, !std::is_constructible<T, ubiq_constructor_except<T, std::is_copy_constructible<T>::value>, anchor>::value
+    bool, !std::is_constructible<T, ubiq_constructor_except<T, std::is_copy_constructible<T>::value>>::value
 > {};
 
 // Hand-made is_aggregate<T> trait:
