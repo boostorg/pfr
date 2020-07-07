@@ -11,7 +11,8 @@
 
 namespace boost { namespace pfr { namespace detail {
 ///////////////////// `value` is true if Detector<Tleft, Tright> does not compile (SFINAE)
-	struct success{};
+    struct success{};
+
     template <template <class, class> class Detector, class Tleft, class Tright>
     struct not_appliable {
         static constexpr bool value = std::is_same<
