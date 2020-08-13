@@ -10,6 +10,7 @@
 #include <boost/pfr/detail/config.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 #include <boost/pfr/detail/size_t_.hpp>
+#include <boost/pfr/detail/unsafe_declval.hpp>
 
 #include <climits>      // CHAR_BIT
 #include <type_traits>
@@ -28,13 +29,15 @@ namespace boost { namespace pfr { namespace detail {
 ///////////////////// Structure that can be converted to reference to anything
 struct ubiq_lref_constructor {
     std::size_t ignore;
-    template <class Type> /*constexpr*/ operator Type&() const noexcept; // Undefined, allows initialization of reference fields (T& and const T&)
+    template <class Type> constexpr operator Type&() const noexcept {  // Allows initialization of reference fields (T& and const T&)
+        return detail::unsafe_declval<Type&>();
+    };
 };
 
 ///////////////////// Structure that can be converted to rvalue reference to anything
 struct ubiq_rref_constructor {
     std::size_t ignore;
-    template <class Type> /*constexpr*/ operator Type&&() const noexcept; // Undefined, allows initialization of rvalue reference fields and move-only types
+    template <class Type> /*constexpr*/ operator Type&&() const noexcept {}; // Allows initialization of rvalue reference fields and move-only types
 };
 
 

@@ -33,6 +33,7 @@
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/rvalue_t.hpp>
+#include <boost/pfr/detail/unsafe_declval.hpp>
 
 
 #ifdef __clang__
@@ -59,12 +60,6 @@ struct tag {
     friend auto loophole(tag<T,N>);
 };
 
-// For returning non default constructible types. Never used at runtime! GCC's std::declval may not be used in potentionally evaluated contexts, so it does not work here.
-template <class T> constexpr T& unsafe_declval_like() noexcept {
-    T* ptr = nullptr;
-    return *ptr;
-}
-
 // The definitions of friend functions.
 template <class T, class U, std::size_t N, bool B>
 struct fn_def_lref {
@@ -75,13 +70,13 @@ struct fn_def_lref {
         // To workaround the issue, we check that the type U is movable, and move it in that case.
         using no_extents_t = std::remove_all_extents_t<U>;
         return static_cast< std::conditional_t<std::is_move_constructible<no_extents_t>::value, no_extents_t&&, no_extents_t&> >(
-            boost::pfr::detail::unsafe_declval_like<no_extents_t>()
+            boost::pfr::detail::unsafe_declval<no_extents_t&>()
         );
     }
 };
 template <class T, class U, std::size_t N, bool B>
 struct fn_def_rref {
-    friend auto loophole(tag<T,N>) { return std::move(boost::pfr::detail::unsafe_declval_like< std::remove_all_extents_t<U> >()); }
+    friend auto loophole(tag<T,N>) { return std::move(boost::pfr::detail::unsafe_declval< std::remove_all_extents_t<U>& >()); }
 };
 
 
