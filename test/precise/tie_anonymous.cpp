@@ -9,15 +9,15 @@
 
 namespace testing {
 
-struct non_anon {
-    int i;
-};
-
 namespace {
 
+struct other_anon {
+    int data;
+};
+
 struct anon {
-    non_anon a;
-    non_anon b;
+    other_anon a;
+    other_anon b;
 };
 
 void test_in_anon_ns() {
@@ -25,8 +25,8 @@ void test_in_anon_ns() {
     
     auto v = boost::pfr::structure_tie(x);
     
-    BOOST_TEST_EQ(std::get<0>(v).i, 1);
-    BOOST_TEST_EQ(std::get<1>(v).i, 2);
+    BOOST_TEST_EQ(std::get<0>(v).data, 1);
+    BOOST_TEST_EQ(std::get<1>(v).data, 2);
 }
 
 } // anonymous namespace
@@ -36,8 +36,8 @@ void test_in_non_non_ns() {
     
     auto v = boost::pfr::structure_tie(x);
     
-    BOOST_TEST_EQ(std::get<0>(v).i, 1);
-    BOOST_TEST_EQ(std::get<1>(v).i, 2);
+    BOOST_TEST_EQ(std::get<0>(v).data, 1);
+    BOOST_TEST_EQ(std::get<1>(v).data, 2);
 }
 
 } // namespace testing
