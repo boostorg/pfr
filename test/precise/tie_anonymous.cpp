@@ -7,6 +7,8 @@
 
 #include <boost/pfr/precise/ops.hpp>
 
+#include <string>
+
 #if defined(__has_include)
 #   if __has_include(<optional>)
 #       include <optional>
