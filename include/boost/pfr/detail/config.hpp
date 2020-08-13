@@ -49,4 +49,15 @@
 #   endif
 #endif
 
+#if defined(__has_cpp_attribute)
+#   if __has_cpp_attribute(maybe_unused)
+#       define BOOST_PFR_MAYBE_UNUSED [[maybe_unused]]
+#   endif
+#endif
+
+#ifndef BOOST_PFR_MAYBE_UNUSED
+#   define BOOST_PFR_MAYBE_UNUSED
+#endif
+
+
 #endif // BOOST_PFR_DETAIL_CONFIG_HPP

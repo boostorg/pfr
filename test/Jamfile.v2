@@ -1,4 +1,4 @@
-#  Copyright (C) 2016-2019, Antony Polukhin.
+#  Copyright (C) 2016-2020, Antony Polukhin.
 #
 # Use, modification and distribution is subject to the Boost Software License,
 # Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -143,6 +143,7 @@ test-suite pfr
     [ run precise/destructuring_tie.cpp             : : : $(CLASSIC_PREC_DEF) : precise_destructuring_tie ]
     [ run precise/error_pfr_c1202.cpp               : : : $(CLASSIC_PREC_DEF) : precise_c1202_issue21 ]
     [ compile-fail precise/non_aggregate.cpp        : $(CLASSIC_PREC_DEF)     : precise_non_aggregate ]
+    [ run precise/tie_anonymous.cpp                 : : : $(CLASSIC_PREC_DEF) [ requires cxx17_structured_bindings ] : precise_tie_anonymous ]
 
     # See "Requirements and Limitations" section of the docs for info on following tests:
     #[ compile-fail precise/template_constructor.cpp   : $(CLASSIC_PREC_DEF) [ requires !cxx17_structured_bindings ] : precise_template_constructor14 ]
@@ -176,6 +177,7 @@ test-suite pfr
     [ run precise/issue30.cpp                       : : : $(LOOPHOLE_PREC_DEF) : precise_lh_issue30 ]
     [ run precise/issue33.cpp                       : : : $(LOOPHOLE_PREC_DEF) : precise_lh_issue33 ]
     [ compile-fail precise/non_aggregate.cpp        : $(LOOPHOLE_PREC_DEF) : precise_lh_non_aggregate ]
+    [ run precise/tie_anonymous.cpp                 : : : $(LOOPHOLE_PREC_DEF) [ requires cxx17_structured_bindings ] : precise_lh_tie_anonymous ]
 
     # See "Requirements and Limitations" section of the docs for info on following tests:
     #[ compile-fail precise/template_constructor.cpp   : $(LOOPHOLE_PREC_DEF) [ requires !cxx17_structured_bindings ] : precise_lh_template_constructor14 ]

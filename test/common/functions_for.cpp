@@ -39,10 +39,11 @@ struct comparable_struct {
 
 BOOST_PFR_TEST_FUNCTIONS_FOR(comparable_struct)
 
-void test_comparable_struct() {
-    comparable_struct s1 {0, 1, false, 6,7,8,9,10,11};
-    comparable_struct s2 = s1;
-    comparable_struct s3 {0, 1, false, 6,7,8,9,10,11111};
+template <typename Struct>
+void test_some_comparable_struct() {
+    Struct s1 {0, 1, false, 6,7,8,9,10,11};
+    Struct s2 = s1;
+    Struct s3 {0, 1, false, 6,7,8,9,10,11111};
     BOOST_TEST_EQ(s1, s2);
     BOOST_TEST(s1 <= s2);
     BOOST_TEST(s1 >= s2);
@@ -56,7 +57,7 @@ void test_comparable_struct() {
 
     std::cout << s1 << std::endl;
 
-    comparable_struct s4;
+    Struct s4;
     std::stringstream ss;
     ss.exceptions ( std::ios::failbit);
     ss << s1;
@@ -65,6 +66,10 @@ void test_comparable_struct() {
     BOOST_TEST_EQ(s1, s4);
     int i = 1, j = 2;
     BOOST_TEST_NE(i, j);
+}
+
+void test_comparable_struct() {
+    test_some_comparable_struct<comparable_struct>();
 }
 
 struct empty { operator std::string() { return "empty{}"; } };
@@ -105,12 +110,58 @@ void test_implicit_conversions() {
     BOOST_TEST_EQ(ss.str(), "{}"); // Breaks implicit conversion for types marked with BOOST_PFR_TEST_FUNCTIONS_FOR
 }
 
+namespace {
+
+struct anonymous_comparable_struct {
+    int i; short s; bool bl; int a,b,c,d,e,f;
+};
+
+BOOST_PFR_TEST_FUNCTIONS_FOR(anonymous_comparable_struct)
+
+
+struct other_anonymous_struct {
+    anonymous_comparable_struct a,b;
+};
+
+BOOST_PFR_TEST_FUNCTIONS_FOR(other_anonymous_struct)
+
+}
+
+namespace std {
+template <>
+struct hash<anonymous_comparable_struct> {
+    std::size_t operator()(const anonymous_comparable_struct& val) const noexcept {
+        return hash_value(val);
+    }
+};
+}
+
+namespace {
+
+void test_anonymous_comparable_struct() {
+    test_some_comparable_struct<anonymous_comparable_struct>();
+}
+
+void test_nested_anonymous_comparable_struct() {
+    other_anonymous_struct s1{
+        {0, 1, false, 6,7,8,9,10,11},
+        {0, 1, false, 6,7,8,9,10,11},
+    };
+    auto s2 = s1;
+
+    BOOST_TEST_EQ(s1, s2);
+}
+
+}
+
 int main() {
     test_comparable_struct();
     test_empty_struct();
     test_with_contatiners<std::less<>>();
     test_with_contatiners<std::greater<>>();
     test_implicit_conversions();
+    test_anonymous_comparable_struct();
+    test_nested_anonymous_comparable_struct();
     return boost::report_errors();
 }
 

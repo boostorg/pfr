@@ -11,7 +11,7 @@ struct non_default_constructible {
     T val_;
 
     non_default_constructible() = delete;
-    template <class U> non_default_constructible(U&& v){}
+    template <class U> non_default_constructible(U&& /*v*/){}
 };
 
 struct Foo {

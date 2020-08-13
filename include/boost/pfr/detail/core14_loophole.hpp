@@ -193,7 +193,7 @@ decltype(auto) tie_or_value(T& val, std::enable_if_t<std::is_enum<std::remove_re
 }
 
 template <class T>
-auto tie_or_value(T& val, std::enable_if_t<std::is_union< std::remove_reference_t<T> >::value>* = 0) noexcept {
+auto tie_or_value(T& /*val*/, std::enable_if_t<std::is_union< std::remove_reference_t<T> >::value>* = 0) noexcept {
     static_assert(
         sizeof(T) && false,
         "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."

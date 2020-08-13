@@ -11,7 +11,7 @@ struct optional_like {
     T val_;
 
     optional_like() = default;
-    template <class U> optional_like(U&& v){}
+    template <class U> optional_like(U&& /*v*/){}
 };
 
 struct Foo {

@@ -122,7 +122,5 @@ void test_counts_on_multiple_chars() {
 
 int main() {
     test_counts_on_multiple_chars< BOOST_PFR_RUN_TEST_ON >();
-
-    return 0;
 }
 
