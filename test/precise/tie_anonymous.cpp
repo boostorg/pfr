@@ -59,7 +59,7 @@ void test_in_anon_ns() {
     BOOST_TEST_EQ(std::get<1>(v).data, 2);
 
 #ifdef __cpp_lib_optional
-    other_anon_with_optional opt{"test"};
+    other_anon_with_optional opt{"test", {}, {}, {}};
     auto opt_val = boost::pfr::structure_tie(opt);
     BOOST_TEST_EQ(std::get<0>(opt_val), "test");
 #endif
@@ -76,7 +76,7 @@ void test_in_non_non_ns() {
     BOOST_TEST_EQ(std::get<1>(v).data, 2);
 
 #ifdef __cpp_lib_optional
-    other_anon_with_optional opt{"test again"};
+    other_anon_with_optional opt{"test again", {}, {}, {}};
     auto opt_val = boost::pfr::structure_tie(opt);
     BOOST_TEST_EQ(std::get<0>(opt_val), "test again");
 #endif
