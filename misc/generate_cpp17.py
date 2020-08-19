@@ -64,22 +64,18 @@ constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<!std::is_class<
 
 ############################################################################################################################
 EPILOGUE = """
+template <class T, std::size_t I>
+constexpr void tie_as_tuple(T& val, size_t_<I>) noexcept {
+  static_assert(sizeof(T) && false,
+                "====================> Boost.PFR: Too many fields in a structure T. Regenerate include/boost/pfr/detail/core17_generated.hpp file for appropriate count of fields. For example: `python ./misc/generate_cpp17.py 300 > include/boost/pfr/detail/core17_generated.hpp`");
+}
+
 }}} // namespace boost::pfr::detail
 
 #endif // BOOST_PFR_DETAIL_CORE17_GENERATED_HPP
 """
 
 ############################################################################################################################
-generate_sfinae_attempts = False
-
-
-if generate_sfinae_attempts:
-    print """
-    template <class T, std::size_t I>
-    constexpr auto tie_as_tuple(T& val, size_t_<I>) noexcept {
-      return tie_as_tuple(val, size_t_<I - 1>{});
-    }
-    """
 
 
 indexes = "    a"
@@ -111,11 +107,5 @@ for i in xrange(1, funcs_count):
         print "  );"
 
     print "}\n"
-
-    if generate_sfinae_attempts:
-        print "template <class T>"
-        print "constexpr auto tie_as_tuple(T& val, size_t_<" + str(i + 1) + "> v) noexcept"
-        print "  ->decltype( ::boost::pfr::detail::tie_as_tuple0(std::forward<T>(val), v) )"
-        print "{ return ::boost::pfr::detail::tie_as_tuple0(std::forward<T>(val), v); }\n"
 
 print EPILOGUE

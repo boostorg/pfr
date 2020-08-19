@@ -1024,6 +1024,12 @@ constexpr auto tie_as_tuple(T& val, size_t_<100>) noexcept {
 }
 
 
+template <class T, std::size_t I>
+constexpr void tie_as_tuple(T& val, size_t_<I>) noexcept {
+  static_assert(sizeof(T) && false,
+                "====================> Boost.PFR: Too many fields in a structure T. Regenerate include/boost/pfr/detail/core17_generated.hpp file for appropriate count of fields. For example: `python ./misc/generate_cpp17.py 300 > include/boost/pfr/detail/core17_generated.hpp`");
+}
+
 }}} // namespace boost::pfr::detail
 
 #endif // BOOST_PFR_DETAIL_CORE17_GENERATED_HPP
