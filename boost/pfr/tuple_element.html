@@ -1,12 +1,12 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Type definition tuple_element</title>
 <link rel="stylesheet" href="http://www.boost.org/doc/libs/1_63_0/doc/src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
-<link rel="home" href="../../index.html" title="Chapter&#160;1.&#160;Boost.Precise and Flat Reflection 1.0">
-<link rel="up" href="../../boost_precise_and_flat_reflectio/reference.html#header.boost.pfr.precise.core_hpp" title="Header &lt;boost/pfr/precise/core.hpp&gt;">
-<link rel="prev" href="../../boost_precise_and_flat_reflectio/reference.html" title="Reference">
+<link rel="home" href="../../index.html" title="Chapter 1. Boost.PFR 1.0">
+<link rel="up" href="../../boost_pfr/reference.html#header.boost.pfr.precise.core_hpp" title="Header &lt;boost/pfr/precise/core.hpp&gt;">
+<link rel="prev" href="../../boost_pfr/reference.html" title="Reference">
 <link rel="next" href="tuple_element_t.html" title="Type definition tuple_element_t">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -20,22 +20,22 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="../../boost_precise_and_flat_reflectio/reference.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_precise_and_flat_reflectio/reference.html#header.boost.pfr.precise.core_hpp"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="tuple_element_t.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="../../boost_pfr/reference.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_pfr/reference.html#header.boost.pfr.precise.core_hpp"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="tuple_element_t.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="refentry">
 <a name="boost.pfr.tuple_element"></a><div class="titlepage"></div>
 <div class="refnamediv">
 <h2><span class="refentrytitle">Type definition tuple_element</span></h2>
-<p>tuple_element &#8212; <code class="computeroutput">tuple_element</code> has a <code class="computeroutput">typedef type-of-a-field-with-index-I-in-aggregate-T type;</code></p>
+<p>tuple_element — <code class="computeroutput">tuple_element</code> has a <code class="computeroutput">typedef type-of-a-field-with-index-I-in-aggregate-T type;</code></p>
 </div>
 <h2 xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv-title">Synopsis</h2>
-<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../../boost_precise_and_flat_reflectio/reference.html#header.boost.pfr.precise.core_hpp" title="Header &lt;boost/pfr/precise/core.hpp&gt;">boost/pfr/precise/core.hpp</a>&gt;
+<div xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="refsynopsisdiv"><pre class="synopsis"><span class="comment">// In header: &lt;<a class="link" href="../../boost_pfr/reference.html#header.boost.pfr.precise.core_hpp" title="Header &lt;boost/pfr/precise/core.hpp&gt;">boost/pfr/precise/core.hpp</a>&gt;
 
 </span>
 <span class="keyword">typedef</span> <span class="emphasis"><em><span class="identifier">unspecified</span></em></span> <span class="identifier">tuple_element</span><span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idm45527556680800"></a><h2>Description</h2>
-<p><span class="bold"><strong>Requires:</strong></span> C++17 or <a class="link" href="../../boost_precise_and_flat_reflectio/requirements_and_limitations.html" title="Requirements and Limitations">C++14 flat POD or C++14 with not disabled Loophole</a>.</p>
+<a name="idm45522472274032"></a><h2>Description</h2>
+<p><span class="bold"><strong>Requires:</strong></span> C++17 or <a class="link" href="../../">C++14 flat POD or C++14 with not disabled Loophole</a>.</p>
 <p><span class="bold"><strong>Example:</strong></span> </p>
 <pre class="programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">vector</span><span class="special">&lt;</span>  <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">tuple_element</span><span class="special">&lt;</span><span class="number">0</span><span class="special">,</span> <span class="identifier">my_structure</span><span class="special">&gt;</span><span class="special">::</span><span class="identifier">type</span>  <span class="special">&gt;</span> <span class="identifier">v</span><span class="special">;</span>
 </pre>
@@ -44,7 +44,7 @@
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2016-2020 Antony Polukhin<p>
+<td align="right"><div class="copyright-footer">Copyright © 2016-2020 Antony Polukhin<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>
@@ -52,7 +52,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="../../boost_precise_and_flat_reflectio/reference.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_precise_and_flat_reflectio/reference.html#header.boost.pfr.precise.core_hpp"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="tuple_element_t.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="../../boost_pfr/reference.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../../boost_pfr/reference.html#header.boost.pfr.precise.core_hpp"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../../index.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="tuple_element_t.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

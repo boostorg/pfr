@@ -1,13 +1,13 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Short Examples for the Impatient</title>
 <link rel="stylesheet" href="http://www.boost.org/doc/libs/1_63_0/doc/src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
-<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.Precise and Flat Reflection 1.0">
-<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.Precise and Flat Reflection 1.0">
-<link rel="prev" href="tutorial.html" title="Tutorial">
-<link rel="next" href="configuration_macro.html" title="Configuration Macro">
+<link rel="home" href="../index.html" title="Chapter 1. Boost.PFR 1.0">
+<link rel="up" href="../index.html" title="Chapter 1. Boost.PFR 1.0">
+<link rel="prev" href="../index.html" title="Chapter 1. Boost.PFR 1.0">
+<link rel="next" href="tutorial.html" title="Tutorial">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -20,13 +20,16 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="tutorial.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="configuration_macro.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="../index.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="tutorial.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/next.png" alt="Next"></a>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h2 class="title" style="clear: both">
-<a name="boost_precise_and_flat_reflectio.short_examples_for_the_impatient"></a><a class="link" href="short_examples_for_the_impatient.html" title="Short Examples for the Impatient">Short
-    Examples for the Impatient</a>
+<a name="boost_pfr.short_examples_for_the_impatient"></a><a class="link" href="short_examples_for_the_impatient.html" title="Short Examples for the Impatient">Short Examples
+    for the Impatient</a>
 </h2></div></div></div>
+<p>
+      Examples in the table use the following definition:
+    </p>
 <pre class="programlisting"><span class="keyword">struct</span> <span class="identifier">foo</span> <span class="special">{</span>
     <span class="keyword">int</span> <span class="identifier">integer</span><span class="special">;</span>
     <span class="keyword">double</span> <span class="identifier">real</span><span class="special">;</span>
@@ -44,11 +47,8 @@
 
 <span class="identifier">bar</span> <span class="identifier">var</span><span class="special">{</span><span class="char">'A'</span><span class="special">,</span> <span class="special">{</span><span class="number">777</span><span class="special">,</span> <span class="number">3.141593</span><span class="special">}};</span>
 </pre>
-<p>
-      Following examples use definition from above:
-    </p>
 <div class="informaltable">
-<a name="boost_precise_and_flat_reflectio.short_examples_for_the_impatient.quick_examples"></a><table class="table">
+<a name="boost_pfr.short_examples_for_the_impatient.quick_examples"></a><table class="table">
 <colgroup>
 <col>
 <col>
@@ -72,6 +72,75 @@
             </th>
 </tr></thead>
 <tbody>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">var</span><span class="special">)</span> <span class="special">=</span> <span class="identifier">foo</span><span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">2</span><span class="special">};</span> <span class="comment">// C++17 or Loophole is required</span>
+</pre>
+            </td>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">var</span> <span class="special">==</span>
+                <span class="special">{</span><span class="identifier">A</span>
+                <span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">2.0</span><span class="special">}}</span></code>
+              </p>
+            </td>
+<td>
+              <p>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/get.html" title="Function get">get</a></code>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">var</span><span class="special">)</span> <span class="special">=</span> <span class="number">1</span><span class="special">;</span>
+</pre>
+            </td>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">var</span> <span class="special">==</span>
+                <span class="special">{</span><span class="identifier">A</span><span class="special">,</span> <span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">3.14159</span><span class="special">}}</span></code>
+              </p>
+            </td>
+<td>
+              <p>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_get.html" title="Function flat_get">flat_get</a></code>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">var</span><span class="special">.</span><span class="identifier">f</span><span class="special">)</span> <span class="special">=</span> <span class="number">42.01</span><span class="special">;</span>
+</pre>
+            </td>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">var</span> <span class="special">==</span>
+                <span class="special">{</span><span class="identifier">A</span><span class="special">,</span> <span class="special">{</span><span class="number">777</span><span class="special">,</span> <span class="number">42.01</span><span class="special">}}</span></code>
+              </p>
+            </td>
+<td>
+              <p>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/get.html" title="Function get">get</a></code>
+              </p>
+            </td>
+</tr>
+<tr>
+<td>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">var</span><span class="special">.</span><span class="identifier">f</span><span class="special">)</span> <span class="special">=</span> <span class="number">42.01</span><span class="special">;</span>
+</pre>
+            </td>
+<td>
+              <p>
+                <code class="computeroutput"><span class="identifier">var</span> <span class="special">==</span>
+                <span class="special">{</span><span class="identifier">A</span><span class="special">,</span> <span class="special">{</span><span class="number">777</span><span class="special">,</span> <span class="number">42.01</span><span class="special">}}</span></code>
+              </p>
+            </td>
+<td>
+              <p>
+                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_get.html" title="Function flat_get">flat_get</a></code>
+              </p>
+            </td>
+</tr>
 <tr>
 <td>
 <pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="comment">// no `std::hash&lt;bar&gt;` or `bar::operator==(const bar&amp;)` defined</span>
@@ -128,7 +197,7 @@
             </td>
 <td>
               <p>
-                <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.flat.ops_hpp" title="Header &lt;boost/pfr/flat/ops.hpp&gt;">using&#160;namespace&#160;flat_ops;</a></code>
+                <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.flat.ops_hpp" title="Header &lt;boost/pfr/flat/ops.hpp&gt;">using namespace flat_ops;</a></code>
               </p>
             </td>
 </tr>
@@ -146,7 +215,7 @@
             </td>
 <td>
               <p>
-                <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.precise.ops_hpp" title="Header &lt;boost/pfr/precise/ops.hpp&gt;">using&#160;namespace&#160;ops;</a></code>
+                <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.precise.ops_hpp" title="Header &lt;boost/pfr/precise/ops.hpp&gt;">using namespace ops;</a></code>
               </p>
             </td>
 </tr>
@@ -267,76 +336,7 @@
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">var</span><span class="special">)</span> <span class="special">=</span> <span class="identifier">foo</span><span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">2</span><span class="special">};</span> <span class="comment">// C++17 is required</span>
-</pre>
-            </td>
-<td>
-              <p>
-                <code class="computeroutput"><span class="identifier">var</span> <span class="special">==</span>
-                <span class="special">{</span><span class="identifier">A</span>
-                <span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">2.0</span><span class="special">}}</span></code>
-              </p>
-            </td>
-<td>
-              <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/get.html" title="Function get">get</a></code>
-              </p>
-            </td>
-</tr>
-<tr>
-<td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">var</span><span class="special">)</span> <span class="special">=</span> <span class="number">1</span><span class="special">;</span>
-</pre>
-            </td>
-<td>
-              <p>
-                <code class="computeroutput"><span class="identifier">var</span> <span class="special">==</span>
-                <span class="special">{</span><span class="identifier">A</span><span class="special">,</span> <span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">3.14159</span><span class="special">}}</span></code>
-              </p>
-            </td>
-<td>
-              <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_get.html" title="Function flat_get">flat_get</a></code>
-              </p>
-            </td>
-</tr>
-<tr>
-<td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">var</span><span class="special">.</span><span class="identifier">f</span><span class="special">)</span> <span class="special">=</span> <span class="number">42.01</span><span class="special">;</span>
-</pre>
-            </td>
-<td>
-              <p>
-                <code class="computeroutput"><span class="identifier">var</span> <span class="special">==</span>
-                <span class="special">{</span><span class="identifier">A</span><span class="special">,</span> <span class="special">{</span><span class="number">777</span><span class="special">,</span> <span class="number">42.01</span><span class="special">}}</span></code>
-              </p>
-            </td>
-<td>
-              <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/get.html" title="Function get">get</a></code>
-              </p>
-            </td>
-</tr>
-<tr>
-<td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">flat_get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">var</span><span class="special">.</span><span class="identifier">f</span><span class="special">)</span> <span class="special">=</span> <span class="number">42.01</span><span class="special">;</span>
-</pre>
-            </td>
-<td>
-              <p>
-                <code class="computeroutput"><span class="identifier">var</span> <span class="special">==</span>
-                <span class="special">{</span><span class="identifier">A</span><span class="special">,</span> <span class="special">{</span><span class="number">777</span><span class="special">,</span> <span class="number">42.01</span><span class="special">}}</span></code>
-              </p>
-            </td>
-<td>
-              <p>
-                <code class="computeroutput"><a class="link" href="../boost/pfr/flat_get.html" title="Function flat_get">flat_get</a></code>
-              </p>
-            </td>
-</tr>
-<tr>
-<td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="comment">// C++17 is required</span>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="comment">// C++17 or Loophole is required</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="keyword">char</span><span class="special">,</span> <span class="identifier">foo</span><span class="special">&gt;</span> <span class="identifier">t</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">structure_to_tuple</span><span class="special">(</span><span class="identifier">var</span><span class="special">);</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">t</span><span class="special">)</span> <span class="special">=</span> <span class="identifier">foo</span><span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">2</span><span class="special">};</span>
 </pre>
@@ -373,7 +373,7 @@
 </tr>
 <tr>
 <td>
-<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="comment">// C++17 is required</span>
+<pre xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" class="table-programlisting"><span class="comment">// C++17 or Loophole is required</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">tuple</span><span class="special">&lt;</span><span class="keyword">char</span><span class="special">&amp;,</span> <span class="identifier">foo</span><span class="special">&amp;&gt;</span> <span class="identifier">t</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">structure_tie</span><span class="special">(</span><span class="identifier">var</span><span class="special">);</span>
 <span class="identifier">std</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">t</span><span class="special">)</span> <span class="special">=</span> <span class="identifier">foo</span><span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">2</span><span class="special">};</span>
 </pre>
@@ -414,7 +414,7 @@
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2016-2020 Antony Polukhin<p>
+<td align="right"><div class="copyright-footer">Copyright © 2016-2020 Antony Polukhin<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>
@@ -422,7 +422,7 @@
 </tr></table>
 <hr>
 <div class="spirit-nav">
-<a accesskey="p" href="tutorial.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="configuration_macro.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/next.png" alt="Next"></a>
+<a accesskey="p" href="../index.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/prev.png" alt="Prev"></a><a accesskey="u" href="../index.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/up.png" alt="Up"></a><a accesskey="h" href="../index.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/home.png" alt="Home"></a><a accesskey="n" href="tutorial.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/next.png" alt="Next"></a>
 </div>
 </body>
 </html>

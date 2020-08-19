@@ -1,11 +1,11 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<title>Chapter&#160;1.&#160;Boost.Precise and Flat Reflection 1.0</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Chapter 1. Boost.PFR 1.0</title>
 <link rel="stylesheet" href="http://www.boost.org/doc/libs/1_63_0/doc/src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
-<link rel="home" href="index.html" title="Chapter&#160;1.&#160;Boost.Precise and Flat Reflection 1.0">
-<link rel="next" href="boost_precise_and_flat_reflectio/tutorial.html" title="Tutorial">
+<link rel="home" href="index.html" title="Chapter 1. Boost.PFR 1.0">
+<link rel="next" href="boost_pfr/short_examples_for_the_impatient.html" title="Short Examples for the Impatient">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
 <table cellpadding="2" width="100%"><tr>
@@ -17,14 +17,14 @@
 <td align="center"><a href="http://www.boost.org/doc/libs/1_63_0/more/index.htm">More</a></td>
 </tr></table>
 <hr>
-<div class="spirit-nav"><a accesskey="n" href="boost_precise_and_flat_reflectio/tutorial.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/next.png" alt="Next"></a></div>
+<div class="spirit-nav"><a accesskey="n" href="boost_pfr/short_examples_for_the_impatient.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/next.png" alt="Next"></a></div>
 <div class="chapter">
 <div class="titlepage"><div>
 <div><h2 class="title">
-<a name="boost_precise_and_flat_reflectio"></a>Chapter&#160;1.&#160;Boost.Precise and Flat Reflection 1.0</h2></div>
-<div><p class="copyright">Copyright &#169; 2016-2020 Antony Polukhin</p></div>
+<a name="boost_pfr"></a>Chapter 1. Boost.PFR 1.0</h2></div>
+<div><p class="copyright">Copyright © 2016-2020 Antony Polukhin</p></div>
 <div><div class="legalnotice">
-<a name="boost_precise_and_flat_reflectio.legal"></a><p>
+<a name="boost_pfr.legal"></a><p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>
@@ -33,38 +33,36 @@
 <div class="toc">
 <p><b>Table of Contents</b></p>
 <dl>
-<dt><span class="section"><a href="index.html#boost_precise_and_flat_reflectio.motivation">Motivation</a></span></dt>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/tutorial.html">Tutorial</a></span></dt>
+<dt><span class="section"><a href="index.html#boost_pfr.motivation">Motivation</a></span></dt>
+<dt><span class="section"><a href="boost_pfr/short_examples_for_the_impatient.html">Short Examples
+    for the Impatient</a></span></dt>
+<dt><span class="section"><a href="boost_pfr/tutorial.html">Tutorial</a></span></dt>
 <dd><dl>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/tutorial.html#boost_precise_and_flat_reflectio.tutorial.accessing_pod_member_by_index">Accessing
-      POD member by index</a></span></dt>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/tutorial.html#boost_precise_and_flat_reflectio.tutorial.flattening">Flattening</a></span></dt>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/tutorial.html#boost_precise_and_flat_reflectio.tutorial.flat_or_precise_functions_to_cho">Flat
+<dt><span class="section"><a href="boost_pfr/tutorial.html#boost_pfr.tutorial.accessing_structure_member_by_in">Accessing
+      structure member by index</a></span></dt>
+<dt><span class="section"><a href="boost_pfr/tutorial.html#boost_pfr.tutorial.flattening">Flattening</a></span></dt>
+<dt><span class="section"><a href="boost_pfr/tutorial.html#boost_pfr.tutorial.flat_or_precise_functions_to_cho">Flat
       or Precise functions to choose</a></span></dt>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/tutorial.html#boost_precise_and_flat_reflectio.tutorial.three_ways_of_getting_operators">Three
+<dt><span class="section"><a href="boost_pfr/tutorial.html#boost_pfr.tutorial.three_ways_of_getting_operators">Three
       ways of getting operators </a></span></dt>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/tutorial.html#boost_precise_and_flat_reflectio.tutorial.reflection_of_unions">Reflection
-      of unions </a></span></dt>
+<dt><span class="section"><a href="boost_pfr/tutorial.html#boost_pfr.tutorial.reflection_of_unions">Reflection of
+      unions </a></span></dt>
 </dl></dd>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/short_examples_for_the_impatient.html">Short
-    Examples for the Impatient</a></span></dt>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/configuration_macro.html">Configuration
-    Macro</a></span></dt>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/requirements_and_limitations.html">Requirements
-    and Limitations</a></span></dt>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/how_it_works.html">How it works</a></span></dt>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/acknowledgements.html">Acknowledgements</a></span></dt>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/reference.html">Reference</a></span></dt>
+<dt><span class="section"><a href="boost_pfr/configuration_macro.html">Configuration Macro</a></span></dt>
+<dt><span class="section"><a href="boost_pfr/limitations.html">Limitations</a></span></dt>
+<dt><span class="section"><a href="boost_pfr/how_it_works.html">How it works</a></span></dt>
+<dt><span class="section"><a href="boost_pfr/acknowledgements.html">Acknowledgements</a></span></dt>
+<dt><span class="section"><a href="boost_pfr/reference.html">Reference</a></span></dt>
 <dd><dl>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/reference.html#precise_reflection">Precise Reflection</a></span></dt>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/reference.html#flat_reflection">Flat Reflection</a></span></dt>
-<dt><span class="section"><a href="boost_precise_and_flat_reflectio/reference.html#include_all">Include all</a></span></dt>
+<dt><span class="section"><a href="boost_pfr/reference.html#precise_reflection">Precise Reflection</a></span></dt>
+<dt><span class="section"><a href="boost_pfr/reference.html#flat_reflection">Flat Reflection</a></span></dt>
+<dt><span class="section"><a href="boost_pfr/reference.html#include_all">Include all</a></span></dt>
 </dl></dd>
 </dl>
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h2 class="title" style="clear: both">
-<a name="boost_precise_and_flat_reflectio.motivation"></a><a class="link" href="index.html#boost_precise_and_flat_reflectio.motivation" title="Motivation">Motivation</a>
+<a name="boost_pfr.motivation"></a><a class="link" href="index.html#boost_pfr.motivation" title="Motivation">Motivation</a>
 </h2></div></div></div>
 <p>
       In C++ we have:
@@ -81,7 +79,7 @@
 </ul></div>
 <p>
       This library provides tuple like methods for aggregate initializable structures,
-      making them usable in contexts were only tuples were useful.
+      making them usable in contexts where only tuples were useful.
     </p>
 <div class="note"><table border="0" summary="Note">
 <tr>
@@ -164,6 +162,11 @@
           methods to visit each field of the structure
         </li>
 </ul></div>
+<p>
+      PFR is a header only library that does not depend on Boost. You can just copy
+      the content of the "include" folder <a href="https://github.com/apolukhin/magic_get" target="_top">from
+      the github</a> into your project, and the library would work fine.
+    </p>
 <div class="warning"><table border="0" summary="Warning">
 <tr>
 <td rowspan="2" align="center" valign="top" width="25"><img alt="[Warning]" src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/warning.png"></td>
@@ -182,16 +185,26 @@
 <th align="left">Caution</th>
 </tr>
 <tr><td align="left" valign="top"><p>
-        This is a C++14 library! Pre C++14 compilers (C++11, C++03...) are not supported
+        Recommended C++ Standards are C++17 and above
+      </p></td></tr>
+</table></div>
+<div class="caution"><table border="0" summary="Caution">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Caution]" src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/caution.png"></td>
+<th align="left">Caution</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+        Library requires at least C++14! Pre C++14 compilers (C++11, C++03...) are
+        not supported
       </p></td></tr>
 </table></div>
 </div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
-<td align="left"><p><small>Last revised: January 18, 2020 at 10:59:15 GMT</small></p></td>
+<td align="left"><p><small>Last revised: August 19, 2020 at 20:01:31 GMT</small></p></td>
 <td align="right"><div class="copyright-footer"></div></td>
 </tr></table>
 <hr>
-<div class="spirit-nav"><a accesskey="n" href="boost_precise_and_flat_reflectio/tutorial.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/next.png" alt="Next"></a></div>
+<div class="spirit-nav"><a accesskey="n" href="boost_pfr/short_examples_for_the_impatient.html"><img src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/next.png" alt="Next"></a></div>
 </body>
 </html>

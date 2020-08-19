@@ -1,11 +1,11 @@
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<title>Requirements and Limitations</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Limitations</title>
 <link rel="stylesheet" href="http://www.boost.org/doc/libs/1_63_0/doc/src/boostbook.css" type="text/css">
 <meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
-<link rel="home" href="../index.html" title="Chapter&#160;1.&#160;Boost.Precise and Flat Reflection 1.0">
-<link rel="up" href="../index.html" title="Chapter&#160;1.&#160;Boost.Precise and Flat Reflection 1.0">
+<link rel="home" href="../index.html" title="Chapter 1. Boost.PFR 1.0">
+<link rel="up" href="../index.html" title="Chapter 1. Boost.PFR 1.0">
 <link rel="prev" href="configuration_macro.html" title="Configuration Macro">
 <link rel="next" href="how_it_works.html" title="How it works">
 </head>
@@ -24,69 +24,67 @@
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h2 class="title" style="clear: both">
-<a name="boost_precise_and_flat_reflectio.requirements_and_limitations"></a><a class="link" href="requirements_and_limitations.html" title="Requirements and Limitations">Requirements
-    and Limitations</a>
+<a name="boost_pfr.limitations"></a><a class="link" href="limitations.html" title="Limitations">Limitations</a>
 </h2></div></div></div>
-<div class="note"><table border="0" summary="Note">
-<tr>
-<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="http://www.boost.org/doc/libs/1_63_0/doc/src/images/note.png"></td>
-<th align="left">Note</th>
-</tr>
-<tr><td align="left" valign="top"><p>
-        Boost.PFR does not depend on any Boost library. You may use it's headers
-        even without Boost.
-      </p></td></tr>
-</table></div>
+<p>
+      The reflection has some limitations that depend on a C++ Standard and compiler
+      capabilities:
+    </p>
 <div class="itemizedlist"><ul class="itemizedlist" type="disc">
-<li class="listitem">
-          Boost.PFR <span class="bold"><strong>requires C++14 compatible compiler</strong></span>
-          (GCC-5.0+, Clang, ...)
-        </li>
 <li class="listitem">
           Static variables are ignored
         </li>
 <li class="listitem">
           T must be aggregate initializable
         </li>
+<li class="listitem">
+          Additional C++14 <span class="bold"><strong>only</strong></span> limitations (switch
+          to C++17 to remove all of those):
+          <div class="itemizedlist"><ul class="itemizedlist" type="circle">
+<li class="listitem">
+                Non of the member fields should have a template constructor from
+                one parameter.
+              </li>
+<li class="listitem">
+                Additional limitations if the <span class="bold"><strong>Loophole</strong></span>
+                as also disabled:
+                <div class="itemizedlist"><ul class="itemizedlist" type="square">
+<li class="listitem">
+                      <span class="bold"><strong>Flat</strong></span>:
+                      <div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+                            T must be POD and must not contain references nor bitfields
+                          </li>
+<li class="listitem">
+                            Enums will be returned as their underlying type
+                          </li>
 </ul></div>
-<p>
-      <span class="bold"><strong>Flat</strong></span> functions limitations:
-    </p>
-<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+                    </li>
 <li class="listitem">
-          T must be POD and must not contain references nor bitfields
-        </li>
+                      <span class="bold"><strong>Precise</strong></span>:
+                      <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
-          Enums will be returned as their underlying type
+                            T must be constexpr aggregate initializable and all it's
+                            fields must be constexpr default constructible
+                          </li>
+<li class="listitem">
+                            <code class="computeroutput"><a class="link" href="../boost/pfr/get.html" title="Function get">boost::pfr::get</a></code>,
+                            <code class="computeroutput"><a class="link" href="../boost/pfr/structure_to_tuple.html" title="Function template structure_to_tuple">boost::pfr::structure_to_tuple</a></code>,
+                            <code class="computeroutput"><a class="link" href="../boost/pfr/structure_tie.html" title="Function template structure_tie">boost::pfr::structure_tie</a></code>,
+                            <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.precise.core_hpp" title="Header &lt;boost/pfr/precise/core.hpp&gt;">boost::pfr::tuple_element</a></code>
+                            require T to be a flat POD type
+                          </li>
+</ul></div>
+                    </li>
+</ul></div>
+              </li>
+</ul></div>
         </li>
 </ul></div>
-<p>
-      C++14 <span class="bold"><strong>precise</strong></span> functions limitations with manually
-      disabled <span class="bold"><strong>Loophole</strong></span>(C++17 or not disabling Loophole
-      fixes those):
-    </p>
-<div class="itemizedlist"><ul class="itemizedlist" type="disc">
-<li class="listitem">
-          T must be constexpr aggregate initializable and all it's fields must be
-          constexpr default constructible
-        </li>
-<li class="listitem">
-          <code class="computeroutput"><a class="link" href="../boost/pfr/get.html" title="Function get">boost::pfr::get</a></code>, <code class="computeroutput"><a class="link" href="../boost/pfr/structure_to_tuple.html" title="Function template structure_to_tuple">boost::pfr::structure_to_tuple</a></code>,
-          <code class="computeroutput"><a class="link" href="../boost/pfr/structure_tie.html" title="Function template structure_tie">boost::pfr::structure_tie</a></code>,
-          <code class="computeroutput"><a class="link" href="reference.html#header.boost.pfr.precise.core_hpp" title="Header &lt;boost/pfr/precise/core.hpp&gt;">boost::pfr::tuple_element</a></code>
-          require T to be a flat POD type
-        </li>
-</ul></div>
-<p>
-      <span class="bold"><strong>C++14</strong></span> limitation (C++17 fixes those):
-    </p>
-<div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
-          Non of the member fields has a template constructor from one parameter
-        </li></ul></div>
 </div>
 <table xmlns:rev="http://www.cs.rpi.edu/~gregod/boost/tools/doc/revision" width="100%"><tr>
 <td align="left"></td>
-<td align="right"><div class="copyright-footer">Copyright &#169; 2016-2020 Antony Polukhin<p>
+<td align="right"><div class="copyright-footer">Copyright © 2016-2020 Antony Polukhin<p>
         Distributed under the Boost Software License, Version 1.0. (See accompanying
         file LICENSE_1_0.txt or copy at <a href="http://www.boost.org/LICENSE_1_0.txt" target="_top">http://www.boost.org/LICENSE_1_0.txt</a>)
       </p>
