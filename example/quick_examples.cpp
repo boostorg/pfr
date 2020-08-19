@@ -147,7 +147,7 @@ void test_examples() {
   {
     bar var{'A', {777, 3.141593}};
 //[pfr_quick_examples_get_1
-    boost::pfr::get<1>(var) = foo{1, 2}; // C++17 is required
+    boost::pfr::get<1>(var) = foo{1, 2}; // C++17 or Loophole is required
 //]
     std::cout << "boost::pfr::get<1>(var) outputs:\n" << var << '\n';
   }
@@ -182,7 +182,7 @@ void test_examples() {
   {
     bar var{'A', {777, 3.141593}};
 //[pfr_quick_examples_structure_to_tuple
-    // C++17 is required
+    // C++17 or Loophole is required
     std::tuple<char, foo> t = boost::pfr::structure_to_tuple(var);
     std::get<1>(t) = foo{1, 2};
 //]
@@ -203,7 +203,7 @@ void test_examples() {
   {
     bar var{'A', {777, 3.141593}};
 //[pfr_quick_examples_structure_tie
-    // C++17 is required
+    // C++17 or Loophole is required
     std::tuple<char&, foo&> t = boost::pfr::structure_tie(var);
     std::get<1>(t) = foo{1, 2};
 //]

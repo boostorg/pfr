@@ -1,4 +1,4 @@
-[library Boost.Precise and Flat Reflection
+[library Boost.PFR
     [quickbook 1.6]
     [version 1.0]
     [copyright 2016-2020 Antony Polukhin]
@@ -17,7 +17,7 @@ In C++ we have:
 * tuples - types that provide access to members by index. Those are useful for generic programming.
 * structures - types with named fields that do not provide access to members by index. Those are just easy to use.
 
-This library provides tuple like methods for aggregate initializable structures, making them usable in contexts were only tuples were useful.
+This library provides tuple like methods for aggregate initializable structures, making them usable in contexts where only tuples were useful.
 
 [note All you have to do is to add `#include <boost/pfr.hpp>`.
 
@@ -47,25 +47,130 @@ Boost.Precise and Flat Reflection (Boost.PFR) adds following out-of-the-box func
 * methods for cooperation with `std::tuple`
 * methods to visit each field of the structure
 
+PFR is a header only library that does not depend on Boost. You can just copy the content of the "include" folder [@https://github.com/apolukhin/magic_get from the github] into your project, and the library would work fine. 
 
 [warning This is not an official Boost library! It wasn't reviewed and can't be downloaded from www.boost.org. This library is available to the community to know real interest and get comments for refinement. The intention is to submit library to formal review, if community think that it is interesting!]
 
-[caution This is a C++14 library! Pre C++14 compilers (C++11, C++03...) are not supported]
+[caution Recommended C++ Standards are C++17 and above]
+
+[caution Library requires at least C++14! Pre C++14 compilers (C++11, C++03...) are not supported]
 
 [endsect]
 
+
+[section Short Examples for the Impatient]
+
+Examples in the table use the following definition:
+
+[import ../example/quick_examples.cpp]
+
+[pfr_quick_examples_structures]
+
+
+[table:quick_examples
+[[ Code snippet ] [ `var` content or output ] [ Function description: ]]
+[
+    [ [pfr_quick_examples_get_1] ]
+    [ `var == {A {1, 2.0}}` ]
+    [ [funcref boost::pfr::get get] ]
+][
+    [ [pfr_quick_examples_flat_get_1] ]
+    [ `var == {A, {1, 3.14159}}` ]
+    [ [funcref boost::pfr::flat_get flat_get] ]
+][
+    [ [pfr_quick_examples_get_2] ]
+    [ `var == {A, {777, 42.01}}` ]
+    [ [funcref boost::pfr::get get] ]
+][
+    [ [pfr_quick_examples_flat_get_2] ]
+    [ `var == {A, {777, 42.01}}` ]
+    [ [funcref boost::pfr::flat_get flat_get] ]
+][
+    [ [pfr_quick_examples_flat_functors_uset] ]
+    [ `my_uset` constains `var` ]
+    [
+        [classref boost::pfr::flat_hash flat_hash]
+
+        [classref boost::pfr::flat_equal_to flat_equal_to]
+    ]
+][
+    [ [pfr_quick_examples_flat_functors_set] ]
+    [ `my_set` constains `var` ]
+    [ [classref boost::pfr::flat_less flat_less] ]
+][
+    [ [pfr_quick_examples_flat_ops] ]
+    [ assert succeeds ]
+    [ [headerref boost/pfr/flat/ops.hpp using\u00A0namespace\u00A0flat_ops;] ]
+][
+    [ [pfr_quick_examples_ops] ]
+    [ assert succeeds ]
+    [ [headerref boost/pfr/precise/ops.hpp using\u00A0namespace\u00A0ops;] ]
+][
+    [ [pfr_quick_examples_flat_for_each] ]
+    [ `var == {B, {778, 4.14159}}` ]
+    [ [funcref boost::pfr::flat_for_each_field flat_for_each_field] ]
+][
+    [ [pfr_quick_examples_for_each] ]
+    [ `var == {B, {787, 103.142}}` ]
+    [ [funcref boost::pfr::for_each_field for_each_field] ]
+][
+    [ [pfr_quick_examples_flat_for_each_idx] ]
+    [ ```0: char
+1: int
+2: double
+``` ]
+    [ [funcref boost::pfr::flat_for_each_field flat_for_each_field] ]
+][
+    [ [pfr_quick_examples_for_each_idx] ]
+    [ ```0: char
+1: quick_examples_ns::foo
+``` ]
+    [ [funcref boost::pfr::for_each_field for_each_field] ]
+][
+    [ [pfr_quick_examples_tuple_size] ]
+    [ `tuple_size: 2` ]
+    [ [classref boost::pfr::tuple_size tuple_size] ]
+][
+    [ [pfr_quick_examples_flat_tuple_size] ]
+    [ `flat_tuple_size: 3` ]
+    [ [classref boost::pfr::flat_tuple_size flat_tuple_size] ]
+][
+    [ [pfr_quick_examples_structure_to_tuple] ]
+    [ `var == {A, {777, 3.14159}}` ]
+    [ [funcref boost::pfr::structure_to_tuple structure_to_tuple] ]
+][
+    [ [pfr_quick_examples_flat_structure_to_tuple] ]
+    [ `var == {A, {777, 3.14159}}` ]
+    [ [funcref boost::pfr::flat_structure_to_tuple flat_structure_to_tuple] ]
+][
+    [ [pfr_quick_examples_structure_tie] ]
+    [ `var == {A, {1, 2.0}}` ]
+    [ [funcref boost::pfr::structure_tie structure_tie] ]
+][
+    [ [pfr_quick_examples_flat_structure_tie] ]
+    [ `var == {C, {777, 3.14159}}` ]
+    [ [funcref boost::pfr::flat_structure_tie flat_structure_tie] ]
+]]
+
+
+[endsect]
+
+
 [section Tutorial]
 
-[section Accessing POD member by index] [pfr_example_get] [endsect]
+[section Accessing structure member by index] [pfr_example_get] [endsect]
 [section Flattening] [pfr_example_flattening] [pfr_example_flattening_2] [endsect]
 [/ [section Counting fields] [pfr_example_tuple_size] [endsect] ]
 
 [section Flat or Precise functions to choose]
-All the functions that have `flat_` prefix and are declared in `boost/pfr/flat/*` headers the [*flat] functions, other function are [*precise] and are declared in `boost/pfr/precise/*`. In previous example you've seen how the the flattening works.
+All the functions that have `flat_` prefix and are declared in `boost/pfr/flat/*` headers are the [*flat] functions, other function are [*precise] and are declared in `boost/pfr/precise/*`. In previous example you've seen how the the flattening works.
 
-* If you wish types flattened - use [*flat] functions
-* If you use types with C arrays - use [*flat] functions
-* Otherwise use [*precise] functions
+Use [*flat] functions if you:
+
+* wish types flattened
+* or you reflect types with C arrays
+
+For all the other cases prefer [*precise] functions.
 
 [warning MSVC currently supports only [*precise] functions and only in /std:c++latest or /std:c++17 modes.]
 
@@ -78,7 +183,7 @@ There are three ways to start using Boost.PFR hashing, comparison and streaming 
 
 [table:flat_ops_comp Different approaches for operators
     [[ Approach
-    ][ Defines operators in global namespace ][ Defined operators could be found by ADL ][ Works for local types ][ Usable localy, without affecting code from other scopes ][ Ignores implicit conversion operators ][ Respects user defined operators ]]
+    ][ Defines operators in global namespace ][ Defined operators could be found by ADL ][ Works for local types ][ Usable locally, without affecting code from other scopes ][ Ignores implicit conversion operators ][ Respects user defined operators ]]
 
     [[
         [headerref boost/pfr/precise/ops.hpp using\u00A0namespace\u00A0boost::pfr::ops;]
@@ -138,7 +243,7 @@ struct uniform_comparator_less {
 
 [*2. [macroref BOOST_PFR_FLAT_FUNCTIONS_FOR] and [macroref BOOST_PFR_PRECISE_FUNCTIONS_FOR] approach]
 
-This method is good if you're writing POD structure and wish to define operators for that structure.
+This method is good if you're writing a structure and wish to define operators for that structure.
 ```
 #include <boost/pfr/flat/functions_for.hpp>
 
@@ -186,7 +291,7 @@ struct pair_like {
 assert(pair_like{1, 2} < pair_like{1, 3});
 ```
 Argument Dependant Lookup works well, `std::less` will find the operators for `struct pair_like`. Operators for local types will be also defined.
-*All conversion operators of all POD types won't be used during comparisons/streaming/hashing.*
+*All conversion operators of types are not used during comparisons/streaming/hashing.*
 
 [endsect]
 
@@ -229,104 +334,6 @@ error: static_assert failed "====================> Boost.PFR: For safety reasons
 
 [endsect]
 
-
-[section Short Examples for the Impatient]
-
-[import ../example/quick_examples.cpp]
-
-[pfr_quick_examples_structures]
-
-Following examples use definition from above:
-
-[table:quick_examples
-[[ Code snippet ] [ `var` content or output ] [ Function description: ]]
-[
-    [ [pfr_quick_examples_flat_functors_uset] ]
-    [ `my_uset` constains `var` ]
-    [
-        [classref boost::pfr::flat_hash flat_hash]
-
-        [classref boost::pfr::flat_equal_to flat_equal_to]
-    ]
-][
-    [ [pfr_quick_examples_flat_functors_set] ]
-    [ `my_set` constains `var` ]
-    [ [classref boost::pfr::flat_less flat_less] ]
-][
-    [ [pfr_quick_examples_flat_ops] ]
-    [ assert succeeds ]
-    [ [headerref boost/pfr/flat/ops.hpp using\u00A0namespace\u00A0flat_ops;] ]
-][
-    [ [pfr_quick_examples_ops] ]
-    [ assert succeeds ]
-    [ [headerref boost/pfr/precise/ops.hpp using\u00A0namespace\u00A0ops;] ]
-][
-    [ [pfr_quick_examples_flat_for_each] ]
-    [ `var == {B, {778, 4.14159}}` ]
-    [ [funcref boost::pfr::flat_for_each_field flat_for_each_field] ]
-][
-    [ [pfr_quick_examples_for_each] ]
-    [ `var == {B, {787, 103.142}}` ]
-    [ [funcref boost::pfr::for_each_field for_each_field] ]
-][
-    [ [pfr_quick_examples_flat_for_each_idx] ]
-    [ ```0: char
-1: int
-2: double
-``` ]
-    [ [funcref boost::pfr::flat_for_each_field flat_for_each_field] ]
-][
-    [ [pfr_quick_examples_for_each_idx] ]
-    [ ```0: char
-1: quick_examples_ns::foo
-``` ]
-    [ [funcref boost::pfr::for_each_field for_each_field] ]
-][
-    [ [pfr_quick_examples_tuple_size] ]
-    [ `tuple_size: 2` ]
-    [ [classref boost::pfr::tuple_size tuple_size] ]
-][
-    [ [pfr_quick_examples_flat_tuple_size] ]
-    [ `flat_tuple_size: 3` ]
-    [ [classref boost::pfr::flat_tuple_size flat_tuple_size] ]
-][
-    [ [pfr_quick_examples_get_1] ]
-    [ `var == {A {1, 2.0}}` ]
-    [ [funcref boost::pfr::get get] ]
-][
-    [ [pfr_quick_examples_flat_get_1] ]
-    [ `var == {A, {1, 3.14159}}` ]
-    [ [funcref boost::pfr::flat_get flat_get] ]
-][
-    [ [pfr_quick_examples_get_2] ]
-    [ `var == {A, {777, 42.01}}` ]
-    [ [funcref boost::pfr::get get] ]
-][
-    [ [pfr_quick_examples_flat_get_2] ]
-    [ `var == {A, {777, 42.01}}` ]
-    [ [funcref boost::pfr::flat_get flat_get] ]
-][
-    [ [pfr_quick_examples_structure_to_tuple] ]
-    [ `var == {A, {777, 3.14159}}` ]
-    [ [funcref boost::pfr::structure_to_tuple structure_to_tuple] ]
-][
-    [ [pfr_quick_examples_flat_structure_to_tuple] ]
-    [ `var == {A, {777, 3.14159}}` ]
-    [ [funcref boost::pfr::flat_structure_to_tuple flat_structure_to_tuple] ]
-][
-    [ [pfr_quick_examples_structure_tie] ]
-    [ `var == {A, {1, 2.0}}` ]
-    [ [funcref boost::pfr::structure_tie structure_tie] ]
-][
-    [ [pfr_quick_examples_flat_structure_tie] ]
-    [ `var == {C, {777, 3.14159}}` ]
-    [ [funcref boost::pfr::flat_structure_tie flat_structure_tie] ]
-]]
-
-
-[endsect]
-
-
 [section Configuration Macro]
 
 By default Boost.PFR [*auto-detects your compiler abilities] and automatically defines the configuration macro into appropriate values. If you wish to override that behavior, just define:
@@ -334,36 +341,30 @@ By default Boost.PFR [*auto-detects your compiler abilities] and automatically d
     [[Macro name] [Effect]]
     [[*BOOST_PFR_USE_CPP17*] [Define to `1` if you wish to use structured bindings and other C++17 features for reflection. Define to `0` otherwize.]]
     [[*BOOST_PFR_USE_LOOPHOLE*] [Define to `1` if you wish to exploit [@http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#2118 CWG 2118] for reflection. Define to `0` otherwize.]]
+    [[*BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE*] [Define to `0` if you are hit by the template instantiation depth issues with `std::make_integer_sequence` and wish to use PFR version of that metafunction. Define to `1` otherwize. ]]
 ]
 
-Note that disabling [*Loophole] in C++14 significantly limitates the reflection abilities of the library. See next section for more info.
+Note that disabling [*Loophole] in C++14 significantly limits the reflection abilities of the library. See next section for more info.
 
 
 [endsect]
 
 
-[section Requirements and Limitations]
+[section Limitations]
 
-[note Boost.PFR does not depend on any Boost library. You may use it's headers even without Boost. ]
+The reflection has some limitations that depend on a C++ Standard and compiler capabilities:
 
-* Boost.PFR *requires C++14 compatible compiler* (GCC-5.0+, Clang, ...)
 * Static variables are ignored
 * T must be aggregate initializable
-
-[*Flat] functions limitations:
-
-* T must be POD and must not contain references nor bitfields
-* Enums will be returned as their underlying type
-
-C++14 [*precise] functions limitations with manually disabled [*Loophole](C++17 or not disabling Loophole fixes those):
-
-* T must be constexpr aggregate initializable and all it's fields must be constexpr default constructible
-* [funcref boost::pfr::get], [funcref boost::pfr::structure_to_tuple], [funcref boost::pfr::structure_tie], [headerref boost/pfr/precise/core.hpp boost::pfr::tuple_element] require T to be a flat POD type
-
-
-[*C++14] limitation (C++17 fixes those):
-
-* Non of the member fields has a template constructor from one parameter
+* Additional C++14 [*only] limitations (switch to C++17 to remove all of those):
+    * Non of the member fields should have a template constructor from one parameter.
+    * Additional limitations if the [*Loophole] as also disabled: 
+        * [*Flat]:
+            * T must be POD and must not contain references nor bitfields
+            * Enums will be returned as their underlying type
+        * [*Precise]:
+            * T must be constexpr aggregate initializable and all it's fields must be constexpr default constructible
+            * [funcref boost::pfr::get], [funcref boost::pfr::structure_to_tuple], [funcref boost::pfr::structure_tie], [headerref boost/pfr/precise/core.hpp boost::pfr::tuple_element] require T to be a flat POD type
 
 [endsect]
 
@@ -373,7 +374,7 @@ Short description:
 
 * Flat functions:
     # at compile-time: use aggregate initialization to detect fields count in user-provided structure
-    # at compile-time: make a structure that is convertible to anything and remeber types it has been converted to during aggregate initialization of user-provided structure
+    # at compile-time: make a structure that is convertible to anything and remember types it has been converted to during aggregate initialization of user-provided structure
     # at compile-time: using knowledge from previous steps create a tuple with exactly the same layout as in user-provided structure
     # at compile-time: find offsets for each field in user-provided structure using the tuple from previous step
     # at run-time: get pointer to each field, knowing the structure address and each field offset
