@@ -17,7 +17,7 @@ init:
 # From this point and below code is same for all the Boost libs
 ###############################################################################################################
 
-version: 1.64.{build}-{branch}
+version: 1.74.{build}-{branch}
  
 # branches to build
 branches:
@@ -28,6 +28,10 @@ skip_tags: true
 
 environment:
   matrix:
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      TOOLSET: msvc # clang-win has problems with structured bindings - it can not correclty use std::tuple_size
+      ADDRMD: 32,64
+      CXXSTD: 14,17,latest
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       TOOLSET: msvc # clang-win has problems with structured bindings - it can not correclty use std::tuple_size
       ADDRMD: 32,64
