@@ -17,7 +17,7 @@ project
         [ requires cxx14_constexpr ]
     ;
 
-local DISABLE_ON_MSVC = ; # <toolset>msvc:<build>no ;
+local DISABLE_ON_MSVC = <toolset>msvc:<build>no ;
 local DISABLE_ON_CLANG8_PLUS = <toolset>clang-8:<build>no <toolset>clang-9:<build>no <toolset>clang-10:<build>no ;
 local LOOPHOLE_FLAT_DEF = <define>BOOST_PFR_TEST_FLAT <define>BOOST_PFR_USE_LOOPHOLE=1 $(DISABLE_ON_MSVC) $(DISABLE_ON_CLANG8_PLUS) ;
 local CLASSIC_FLAT_DEF = <define>BOOST_PFR_TEST_FLAT <define>BOOST_PFR_USE_LOOPHOLE=0 $(DISABLE_ON_MSVC) ;
