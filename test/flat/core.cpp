@@ -235,7 +235,7 @@ void test_pods_with_int_operators() {
     using namespace flat_ops;
 
     std::stringstream ss;
-    ss << std::is_pod<int>{};
+    ss << std::is_standard_layout<int>{};
     int i = 0;
     ss >> i;
     BOOST_TEST_EQ(i, 1);
