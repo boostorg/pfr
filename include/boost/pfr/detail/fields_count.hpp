@@ -221,7 +221,7 @@ constexpr std::size_t fields_count() noexcept {
 
 #ifdef __cpp_lib_is_aggregate
     static_assert(
-        std::is_aggregate<type>::value             // Does not return `true` for build in types.
+        std::is_aggregate<type>::value             // Does not return `true` for built-in types.
         || std::is_scalar<type>::value,
         "====================> Boost.PFR: Type must be aggregate initializable."
     );
