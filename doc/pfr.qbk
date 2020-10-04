@@ -36,18 +36,18 @@ As an example:
 [pfr_intro]
 
 
-Boost.Precise and Flat Reflection (Boost.PFR) adds following out-of-the-box functionality for aggregate initializable structures:
+Boost.Precise and Flat Reflection (Boost.PFR) adds the following out-of-the-box functionality for aggregate initializable structures:
 
 * comparison operators
 * heterogeneous comparators
 * hash
 * stream operators
 * access to members by index
-* member reflections
+* member type retrieval
 * methods for cooperation with `std::tuple`
 * methods to visit each field of the structure
 
-PFR is a header only library that does not depend on Boost. You can just copy the content of the "include" folder [@https://github.com/apolukhin/magic_get from the github] into your project, and the library would work fine. 
+PFR is a header only library that does not depend on Boost. You can just copy the content of the "include" folder [@https://github.com/apolukhin/magic_get from the github] into your project, and the library will work fine.
 
 [warning This is not an official Boost library! It wasn't reviewed and can't be downloaded from www.boost.org. This library is available to the community to know real interest and get comments for refinement. The intention is to submit library to formal review, if community think that it is interesting!]
 
@@ -87,7 +87,7 @@ Examples in the table use the following definition:
     [ [funcref boost::pfr::flat_get flat_get] ]
 ][
     [ [pfr_quick_examples_flat_functors_uset] ]
-    [ `my_uset` constains `var` ]
+    [ `my_uset` contains `var` ]
     [
         [classref boost::pfr::flat_hash flat_hash]
 
@@ -95,7 +95,7 @@ Examples in the table use the following definition:
     ]
 ][
     [ [pfr_quick_examples_flat_functors_set] ]
-    [ `my_set` constains `var` ]
+    [ `my_set` contains `var` ]
     [ [classref boost::pfr::flat_less flat_less] ]
 ][
     [ [pfr_quick_examples_flat_ops] ]
@@ -162,7 +162,7 @@ Examples in the table use the following definition:
 [section Flattening] [pfr_example_flattening] [pfr_example_flattening_2] [endsect]
 [/ [section Counting fields] [pfr_example_tuple_size] [endsect] ]
 
-[section Flat or Precise functions to choose]
+[section Should I use Flat or Precise functions?]
 All the functions that have `flat_` prefix and are declared in `boost/pfr/flat/*` headers are the [*flat] functions, other function are [*precise] and are declared in `boost/pfr/precise/*`. In previous example you've seen how the the flattening works.
 
 Use [*flat] functions if you:
@@ -179,7 +179,7 @@ For all the other cases prefer [*precise] functions.
 
 [section Three ways of getting operators ]
 
-There are three ways to start using Boost.PFR hashing, comparison and streaming operators for type `T` in your code. Each method has it's own drawbacks and suits own cases.
+There are three ways to start using Boost.PFR hashing, comparison and streaming for type `T` in your code. Each method has its own drawbacks and suits own cases.
 
 [table:flat_ops_comp Different approaches for operators
     [[ Approach
@@ -201,14 +201,14 @@ There are three ways to start using Boost.PFR hashing, comparison and streaming 
         [headerref boost/pfr/flat/global_ops.hpp]
 
         [headerref boost/pfr/precise/global_ops.hpp]
-    ][ yes ][ yes ][ yes ][ no, but could be limited to translation unit ][ yes all ][ yes ]]
+    ][ yes ][ no ][ yes ][ no, but could be limited to translation unit ][ yes all ][ yes ]]
 ]
 
 More detailed description follows:
 
 [*1. [headerref boost/pfr/precise/ops.hpp `using namespace boost::pfr::ops;`] and [headerref boost/pfr/flat/ops.hpp `using namespace boost::pfr::flat_ops;`] approach]
 
-This method is good if you're writing generic algorithms and need to use operators from Boost.PFR only if there's no operators defined for the type:
+This method is good if you're writing generic algorithms and need to use operators from Boost.PFR only if there are no operators defined for the type:
 
 ```
 #include <boost/pfr/precise/ops.hpp>
@@ -258,8 +258,8 @@ BOOST_PFR_FLAT_FUNCTIONS_FOR(pair_like)   // Defines operators
 
 assert(pair_like{1, 2} < pair_like{1, 3});
 ```
-Argument Dependant Lookup works well, `std::less` will find the operators for `struct pair_like`. [macroref BOOST_PFR_FLAT_FUNCTIONS_FOR BOOST_PFR_FLAT_FUNCTIONS_FOR(T)]
-can not be used for local types, it must be called only once in namespace of `T`. It does not respect conversion operators of `T`, so for example the following code
+Argument Dependant Lookup works well. `std::less` will find the operators for `struct pair_like`. [macroref BOOST_PFR_FLAT_FUNCTIONS_FOR BOOST_PFR_FLAT_FUNCTIONS_FOR(T)]
+can not be used for local types. It must be called only once in namespace of `T`. It does not respect conversion operators of `T`, so for example the following code
 will output different values:
 ```
 #include <boost/pfr/flat/functions_for.hpp>
@@ -339,8 +339,8 @@ error: static_assert failed "====================> Boost.PFR: For safety reasons
 By default Boost.PFR [*auto-detects your compiler abilities] and automatically defines the configuration macro into appropriate values. If you wish to override that behavior, just define:
 [table:linkmacro Macros
     [[Macro name] [Effect]]
-    [[*BOOST_PFR_USE_CPP17*] [Define to `1` if you wish to use structured bindings and other C++17 features for reflection. Define to `0` otherwize.]]
-    [[*BOOST_PFR_USE_LOOPHOLE*] [Define to `1` if you wish to exploit [@http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#2118 CWG 2118] for reflection. Define to `0` otherwize.]]
+    [[*BOOST_PFR_USE_CPP17*] [Define to `1` if you wish to use structured bindings and other C++17 features for reflection. Define to `0` otherwise.]]
+    [[*BOOST_PFR_USE_LOOPHOLE*] [Define to `1` if you wish to exploit [@http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#2118 CWG 2118] for reflection. Define to `0` otherwise.]]
     [[*BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE*] [Define to `0` if you are hit by the template instantiation depth issues with `std::make_integer_sequence` and wish to use PFR version of that metafunction. Define to `1` otherwize. ]]
 ]
 
@@ -355,7 +355,8 @@ Note that disabling [*Loophole] in C++14 significantly limits the reflection abi
 The reflection has some limitations that depend on a C++ Standard and compiler capabilities:
 
 * Static variables are ignored
-* T must be aggregate initializable
+* T must be aggregate initializable without empty base classes
+* if T contains C arrays or it is inherited from non-empty type then the result of reflection may differ depending on the C++ version and library configuration
 * Additional C++14 [*only] limitations (switch to C++17 to remove all of those):
     * Non of the member fields should have a template constructor from one parameter.
     * Additional limitations if the [*Loophole] as also disabled: 
@@ -363,7 +364,7 @@ The reflection has some limitations that depend on a C++ Standard and compiler c
             * T must be POD and must not contain references nor bitfields
             * Enums will be returned as their underlying type
         * [*Precise]:
-            * T must be constexpr aggregate initializable and all it's fields must be constexpr default constructible
+            * T must be constexpr aggregate initializable and all its fields must be constexpr default constructible
             * [funcref boost::pfr::get], [funcref boost::pfr::structure_to_tuple], [funcref boost::pfr::structure_tie], [headerref boost/pfr/precise/core.hpp boost::pfr::tuple_element] require T to be a flat POD type
 
 [endsect]
