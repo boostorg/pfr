@@ -30,8 +30,8 @@
 <dt><span class="section"><a href="tutorial.html#boost_pfr.tutorial.accessing_structure_member_by_in">Accessing
       structure member by index</a></span></dt>
 <dt><span class="section"><a href="tutorial.html#boost_pfr.tutorial.flattening">Flattening</a></span></dt>
-<dt><span class="section"><a href="tutorial.html#boost_pfr.tutorial.flat_or_precise_functions_to_cho">Flat
-      or Precise functions to choose</a></span></dt>
+<dt><span class="section"><a href="tutorial.html#boost_pfr.tutorial.should_i_use_flat_or_precise_fun">Should
+      I use Flat or Precise functions?</a></span></dt>
 <dt><span class="section"><a href="tutorial.html#boost_pfr.tutorial.three_ways_of_getting_operators">Three
       ways of getting operators </a></span></dt>
 <dt><span class="section"><a href="tutorial.html#boost_pfr.tutorial.reflection_of_unions">Reflection of
@@ -119,8 +119,8 @@
 </div>
 <div class="section">
 <div class="titlepage"><div><div><h3 class="title">
-<a name="boost_pfr.tutorial.flat_or_precise_functions_to_cho"></a><a class="link" href="tutorial.html#boost_pfr.tutorial.flat_or_precise_functions_to_cho" title="Flat or Precise functions to choose">Flat
-      or Precise functions to choose</a>
+<a name="boost_pfr.tutorial.should_i_use_flat_or_precise_fun"></a><a class="link" href="tutorial.html#boost_pfr.tutorial.should_i_use_flat_or_precise_fun" title="Should I use Flat or Precise functions?">Should
+      I use Flat or Precise functions?</a>
 </h3></div></div></div>
 <p>
         All the functions that have <code class="computeroutput"><span class="identifier">flat_</span></code>
@@ -161,8 +161,8 @@
 </h3></div></div></div>
 <p>
         There are three ways to start using Boost.PFR hashing, comparison and streaming
-        operators for type <code class="computeroutput"><span class="identifier">T</span></code> in your
-        code. Each method has it's own drawbacks and suits own cases.
+        for type <code class="computeroutput"><span class="identifier">T</span></code> in your code.
+        Each method has its own drawbacks and suits own cases.
       </p>
 <div class="table">
 <a name="boost_pfr.tutorial.three_ways_of_getting_operators.flat_ops_comp"></a><p class="title"><b>Table 1.1. Different approaches for operators</b></p>
@@ -257,10 +257,10 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><a class="link" href="../BOOST_PF_idm45490961052832.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
+                  <code class="computeroutput"><a class="link" href="../BOOST_PF_idm46786936678256.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
                 </p>
                 <p>
-                  <code class="computeroutput"><a class="link" href="../BOOST_PF_idm45490961299744.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
+                  <code class="computeroutput"><a class="link" href="../BOOST_PF_idm46786936925360.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
                 </p>
               </td>
 <td>
@@ -310,7 +310,7 @@
               </td>
 <td>
                 <p>
-                  yes
+                  no
                 </p>
               </td>
 <td>
@@ -347,7 +347,7 @@
       </p>
 <p>
         This method is good if you're writing generic algorithms and need to use
-        operators from Boost.PFR only if there's no operators defined for the type:
+        operators from Boost.PFR only if there are no operators defined for the type:
       </p>
 <pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">pfr</span><span class="special">/</span><span class="identifier">precise</span><span class="special">/</span><span class="identifier">ops</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
 
@@ -380,8 +380,8 @@
 <span class="special">};</span>
 </pre>
 <p>
-        <span class="bold"><strong>2. <code class="computeroutput"><a class="link" href="../BOOST_PF_idm45490961052832.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
-        and <code class="computeroutput"><a class="link" href="../BOOST_PF_idm45490961299744.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
+        <span class="bold"><strong>2. <code class="computeroutput"><a class="link" href="../BOOST_PF_idm46786936678256.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
+        and <code class="computeroutput"><a class="link" href="../BOOST_PF_idm46786936925360.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
         approach</strong></span>
       </p>
 <p>
@@ -402,10 +402,10 @@
 <span class="identifier">assert</span><span class="special">(</span><span class="identifier">pair_like</span><span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">2</span><span class="special">}</span> <span class="special">&lt;</span> <span class="identifier">pair_like</span><span class="special">{</span><span class="number">1</span><span class="special">,</span> <span class="number">3</span><span class="special">});</span>
 </pre>
 <p>
-        Argument Dependant Lookup works well, <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">less</span></code>
+        Argument Dependant Lookup works well. <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">less</span></code>
         will find the operators for <code class="computeroutput"><span class="keyword">struct</span>
-        <span class="identifier">pair_like</span></code>. <code class="computeroutput"><a class="link" href="../BOOST_PF_idm45490961052832.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR(T)</a></code>
-        can not be used for local types, it must be called only once in namespace
+        <span class="identifier">pair_like</span></code>. <code class="computeroutput"><a class="link" href="../BOOST_PF_idm46786936678256.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR(T)</a></code>
+        can not be used for local types. It must be called only once in namespace
         of <code class="computeroutput"><span class="identifier">T</span></code>. It does not respect
         conversion operators of <code class="computeroutput"><span class="identifier">T</span></code>,
         so for example the following code will output different values:

@@ -35,7 +35,12 @@
           Static variables are ignored
         </li>
 <li class="listitem">
-          T must be aggregate initializable
+          T must be aggregate initializable without empty base classes
+        </li>
+<li class="listitem">
+          if T contains C arrays or it is inherited from non-empty type then the
+          result of reflection may differ depending on the C++ version and library
+          configuration
         </li>
 <li class="listitem">
           Additional C++14 <span class="bold"><strong>only</strong></span> limitations (switch
@@ -64,7 +69,7 @@
                       <span class="bold"><strong>Precise</strong></span>:
                       <div class="itemizedlist"><ul class="itemizedlist" type="disc">
 <li class="listitem">
-                            T must be constexpr aggregate initializable and all it's
+                            T must be constexpr aggregate initializable and all its
                             fields must be constexpr default constructible
                           </li>
 <li class="listitem">
