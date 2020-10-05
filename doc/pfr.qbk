@@ -273,6 +273,7 @@ Examples in the table use the following definition:
 [section Tutorial]
 
 [section Accessing structure member by index] [pfr_example_get] [endsect]
+[section Custom printing of aggregates] [pfr_sample_printing] [endsect]
 [section Flattening] [pfr_example_flattening] [pfr_example_flattening_2] [endsect]
 [/ [section Counting fields] [pfr_example_tuple_size] [endsect] ]
 

@@ -7,6 +7,52 @@
 #include <cassert>
 
 
+//[pfr_sample_printing
+/*`
+    The following example shows how to customize printing and write your own testing helper for structures:
+*/
+#include <boost/pfr/precise.hpp>
+#include <iostream>
+
+namespace my_testing {
+
+template <class T>
+void print_each(std::ostream& out, const T& v) { out << v; }
+void print_each(std::ostream& out, std::uint8_t v) { out << static_cast<unsigned>(v); }
+void print_each(std::ostream& out, std::int8_t v) { out << static_cast<int>(v); }
+
+template <class T>
+void print(const T& value) {
+    const char* sep = "";
+
+    boost::pfr::for_each_field(value, [&](const auto& v) {
+        std::cerr << std::exchange(sep, ", ");
+        print_each(std::cerr, v);
+    });
+}
+
+/// Usage:
+///     struct foo {std::uint8_t a, b;};
+///     foo get_foo();
+///     ...
+///     test_eq(foo{42, 22}, get_foo());
+///
+/// Output:
+///     42, 22 != 42, 24
+template <class T>
+void test_eq(const T& x, const T& y) {
+    using namespace boost::pfr::ops;
+    if (x == y) return;
+
+    print(x);
+    std::cerr << " != ";
+    print(y);
+}
+
+} // namespace my_testing
+//] [/pfr_sample_printing]
+
+
 //[pfr_intro
 #include <boost/pfr.hpp>
 
@@ -124,6 +170,14 @@ assert(r == 11);
 }
 
 
+struct foo_printing_test {std::uint8_t a, b;};
+foo_printing_test get_foo_printing_test() { return foo_printing_test{42, 24}; }
+
 int main() {
     example_get();
+
+    my_testing::test_eq(
+        foo_printing_test{42, 22},
+        get_foo_printing_test()
+    );
 }
