@@ -35,7 +35,8 @@
           Static variables are ignored
         </li>
 <li class="listitem">
-          T must be aggregate initializable without empty base classes
+          T must be <a href="https://en.cppreference.com/w/cpp/language/aggregate_initialization" target="_top">aggregate
+          initializable</a> without empty base classes
         </li>
 <li class="listitem">
           if T contains C arrays or it is inherited from non-empty type then the
@@ -51,8 +52,7 @@
                 one parameter.
               </li>
 <li class="listitem">
-                Additional limitations if the <span class="bold"><strong>Loophole</strong></span>
-                as also disabled:
+                Additional limitations if the <a class="link" href="configuration_macro.html" title="Configuration Macro"><span class="bold"><strong>Loophole</strong></span></a> is also disabled:
                 <div class="itemizedlist"><ul class="itemizedlist" type="square">
 <li class="listitem">
                       <span class="bold"><strong>Flat</strong></span>:

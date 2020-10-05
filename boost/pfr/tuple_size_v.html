@@ -33,8 +33,8 @@
 
 </span><span class="keyword">constexpr</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">size_t</span> tuple_size_v<span class="special">;</span></pre></div>
 <div class="refsect1">
-<a name="idm45744080258880"></a><h2>Description</h2>
-<p><code class="computeroutput">tuple_size_v</code> is a template variable that contains fields count in a T and works for any T that supports aggregate initialization even if T is not POD.  <a class="link" href="../../">Flattens</a> only multidimensional arrays.</p>
+<a name="idm45630905038992"></a><h2>Description</h2>
+<p><code class="computeroutput">tuple_size_v</code> is a template variable that contains fields count in a T and works for any T that supports aggregate initialization even if T is not POD.  <a class="link" href="../../boost_pfr/tutorial.html#boost_pfr.tutorial.flattening" title="Flattening">Flattens</a> only multidimensional arrays.</p>
 <p><span class="bold"><strong>Requires:</strong></span> C++14.</p>
 <p><span class="bold"><strong>Example:</strong></span> </p>
 <pre class="programlisting"><span class="identifier">std</span><span class="special">::</span><span class="identifier">array</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">,</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">tuple_size_v</span><span class="special">&lt;</span><span class="identifier">my_structure</span><span class="special">&gt;</span> <span class="special">&gt;</span> <span class="identifier">a</span><span class="special">;</span>
