@@ -10,33 +10,143 @@
     ]
 ]
 
-[section Motivation]
+[section Motivation and Intro]
 
-In C++ we have:
+Boost.Precise and Flat tuple Representation (Boost.PFR) is a library for very basic reflection that gives you access to structure elements by index and provides other `std::tuple` like methods for user defined types without any macro or boilerplate code.
 
-* tuples - types that provide access to members by index. Those are useful for generic programming.
-* structures - types with named fields that do not provide access to members by index. Those are just easy to use.
+[section Why tuples are bad and aggregates are more preferable?]
 
-This library provides tuple like methods for aggregate initializable structures, making them usable in contexts where only tuples were useful.
+`std::tuple` and `std::pair` are great for generic programming, however they have disadvantages. First of all, code that uses them becomes barely readable. Consider two definitions:
+
+```
+using auth_info_tuple = std::tuple<
+    std::int64_t,
+    std::int64_t,
+    std::int64_t,
+    std::time_t
+>;
+
+struct auth_info_aggreagte {
+    std::int64_t id;
+    std::int64_t session_id;
+    std::int64_t source_id;
+    std::time_t valid_till;
+};
+```
+
+Definition via structure is much more clear. Same story with usages: `return std::get<1>(value);` vs. `return value.session_id;`.
+
+Another advantage of aggregates is a more efficient copy, move construction and assignments.
+
+Because of the above issues many guidelines recommend to [*use aggregates instead of tuples]. However aggregates fail when it comes to the functional like programming.
+
+PFR library [*provides tuple like methods for aggregate initializable structures], making aggregates usable in contexts where only tuples were useful.
 
 [note All you have to do is to add `#include <boost/pfr.hpp>`.
 
 No macro or other type/member registrations required.]
 
+[endsect]
+
+
+[section Sample with DB]
+
+Imagine that you are writing the wrapper library for database. User of your library wish to implement `retrieve_friend` function:
+
+```
+#include <db/api.hpp> // your library
+
+// User code:
+
+struct user_info {
+    std::int64_t id;
+    std::string name;
+    std::int64_t github_stars;
+    std::string email;
+};
+
+// ...
+
+user_info retrieve_friend(std::string_view name);
+```
+
+Depending on the usage of PFR in your DB wrapper users code will look differently:
+
+[table:quick_examples
+[[ Without PFR ] [ With PFR ]]
+[[
+```
+user_info retrieve_friend(std::string_view name) {
+    auto tuple_info = db::one_row_as<std::int64_t, std::string, std::int64_t>(
+        "SELECT id, name, github_stars, email FROM user_infos WHERE name=$0",
+        name
+    );
+
+    auto friend_info = ask_user_for_friend(
+        user_info{
+            std::move(std::get<0>(tuple_info)),
+            std::move(std::get<1>(tuple_info)),
+            std::move(std::get<2>(tuple_info)),
+            std::move(std::get<3>(tuple_info)),
+        }
+    );
+
+    db::insert(
+        "INSERT INTO user_infos(id, name, github_stars, email) VALUES ($0, $1, $2, $3)",
+        std::move(std::get<0>(friend_info)),
+        std::move(std::get<1>(friend_info)),
+        std::move(std::get<2>(friend_info)).
+        std::move(std::get<3>(friend_info))
+    );
+
+    return friend_info;
+}
+
+```
+][
+```
+user_info retrieve_friend(std::string_view name) {
+    const auto info = db::one_row_as<user_info>(
+        "SELECT id, name, github_stars, email FROM user_infos WHERE name=$0",
+        name
+    );
+
+    auto friend_info = ask_user_for_friend(info);
+
+    db::insert(
+        "INSERT INTO user_infos(id, name, github_stars, email) VALUES ($0, $1, $2, $3)",
+        friend_info
+    );
+
+    return friend_info;
+}
+```
+]]
+]
+
+With PFR the code is shorter, more readable and more pleasant to write.
+
+[endsect]
+
+
+[section Representations]
 
 [import ../example/examples.cpp]
 
 The two different types of reflection are:
 
-* [*Precise] reflection, where each field type is represented as it actually exists, even if the type is itself a user-defined type.
-* [*Flat] reflection, where user-defined types are represented by their individual field types, and all other types are represented as they actually exists.
+* [*Precise] tuple representation, where each field type is represented as it actually exists, even if the type is itself a user-defined type.
+* [*Flat] tuple representation, where user-defined types are represented by their individual field types, and all other types are represented as they actually exists.
 
 As an example:
 
 [pfr_intro]
 
+[endsect]
 
-Boost.Precise and Flat Reflection (Boost.PFR) adds the following out-of-the-box functionality for aggregate initializable structures:
+[section Out of the box functionality ]
+
+Boost.Precise and Flat tuple Representation (Boost.PFR) adds the following out-of-the-box functionality for aggregate initializable structures:
 
 * comparison operators
 * heterogeneous comparators
@@ -49,11 +159,15 @@ Boost.Precise and Flat Reflection (Boost.PFR) adds the following out-of-the-box 
 
 PFR is a header only library that does not depend on Boost. You can just copy the content of the "include" folder [@https://github.com/apolukhin/magic_get from the github] into your project, and the library will work fine.
 
+[endsect]
+
 [warning This is not an official Boost library! It wasn't reviewed and can't be downloaded from www.boost.org. This library is available to the community to know real interest and get comments for refinement. The intention is to submit library to formal review, if community think that it is interesting!]
 
 [caution Recommended C++ Standards are C++17 and above]
 
 [caution Library requires at least C++14! Pre C++14 compilers (C++11, C++03...) are not supported]
+
+
 
 [endsect]
 
@@ -298,7 +412,7 @@ Argument Dependant Lookup works well, `std::less` will find the operators for `s
 
 [section Reflection of unions ]
 
-With [*precise] reflection you could do reflection if a type contains union. But be sure that operations for union are manually defined:
+You could use [*precise] representation if a type contains union. But be sure that operations for union are manually defined:
 
 ```
 #include <boost/pfr/precise/ops.hpp>
@@ -321,7 +435,7 @@ bool some_function(foo f1, foo f2) {
 ```
 
 [*Flat] reflection of types that contain unions is disabled.
-[*Flat] and [*precise] reflection of unions is disabled for safety reasons. There's a way to reflect the first member of a union and use it. Unfortunately there's no way to find out [*active] member of a union. Accessing an inactive union member is an Undefined Behavior. Using the first union member for reflection could lead to disaster if it is some character pointer. For example ostreaming `union {char* c; long long ll; } u; u.ll= 1;` will crash your program, as the active member is `ll` that holds `1` but we are trying to output a `char*`. This would cause an invalid pointer2 dereference.
+[*Flat] and [*precise] reflection of unions is disabled for safety reasons. There's a way to get the first member of a union and use it. Unfortunately there's no way to find out [*active] member of a union. Accessing an inactive union member is an Undefined Behavior. Using the first union member could lead to disaster if it is some character pointer. For example ostreaming `union {char* c; long long ll; } u; u.ll= 1;` will crash your program, as the active member is `ll` that holds `1` but we are trying to output a `char*`. This would cause an invalid pointer dereference.
 
 Any attempt to reflect unions leads to a compile time error. In many cases a static assert is triggered that outputs the following message:
 
@@ -388,7 +502,7 @@ Short description:
         * C++14:
             # Same approach as with [*flat] functions
         * C++14 with disabled [*Loophole]:
-            # at compile-time: use flat reflection if it could precisely reflect the type. Otherwise:
+            # at compile-time: use flat representation if it could precisely represent the type. Otherwise:
             # at compile-time: let `I` be is an index of current field, it equals 0
             # at run-time: `T` is constructed and field `I` is aggregate initialized using a separate instance of structure that is convertible to anything [note Additional care is taken to make sure that all the information about `T` is available to the compiler and that operations on `T` have no side effects, so the compiler can optimize away the unnecessary temporary objects.]
             # at compile-time: `I += 1`

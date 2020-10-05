@@ -1,6 +1,6 @@
-# Precise and Flat Reflection (ex Magic Get, ex PODs Flat Reflection)
+# Precise and Flat tuple Representation (ex Magic Get, ex PODs Flat Reflection)
 
-This C++14 library is meant for accessing structure elements by index and providing other std::tuple like methods for user defined types without any macro or boilerplate code.
+This C++14 is a library for very basic reflection that gives you access to structure elements by index and provides other `std::tuple` like methods for user defined types without any macro or boilerplate code.
 
 
 [Latest documentation](http://apolukhin.github.com/magic_get/index.html)
