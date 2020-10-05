@@ -459,7 +459,9 @@ By default Boost.PFR [*auto-detects your compiler abilities] and automatically d
     [[*BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE*] [Define to `0` if you are hit by the template instantiation depth issues with `std::make_integer_sequence` and wish to use PFR version of that metafunction. Define to `1` otherwize. ]]
 ]
 
-Note that disabling [*Loophole] in C++14 significantly limits the reflection abilities of the library. See next section for more info.
+Library prefers to use structured bindings for reflection if they are available, otherwise falls back to [*Loophole].
+
+Note that disabling [*Loophole] in C++14 significantly limits the reflection abilities of the library. See next section for more info on limitations.
 
 
 [endsect]
@@ -470,11 +472,11 @@ Note that disabling [*Loophole] in C++14 significantly limits the reflection abi
 The reflection has some limitations that depend on a C++ Standard and compiler capabilities:
 
 * Static variables are ignored
-* T must be aggregate initializable without empty base classes
+* T must be [@https://en.cppreference.com/w/cpp/language/aggregate_initialization aggregate initializable] without empty base classes
 * if T contains C arrays or it is inherited from non-empty type then the result of reflection may differ depending on the C++ version and library configuration
 * Additional C++14 [*only] limitations (switch to C++17 to remove all of those):
     * Non of the member fields should have a template constructor from one parameter.
-    * Additional limitations if the [*Loophole] as also disabled: 
+    * Additional limitations if the [link boost_pfr.configuration_macro [*Loophole]] is also disabled:
         * [*Flat]:
             * T must be POD and must not contain references nor bitfields
             * Enums will be returned as their underlying type
@@ -502,7 +504,7 @@ Short description:
             # at compile-time: structured bindings are used to decompose a type `T` to known amount of fields
         * C++14:
             # Same approach as with [*flat] functions
-        * C++14 with disabled [*Loophole]:
+        * C++14 with disabled [link boost_pfr.configuration_macro [*Loophole]]:
             # at compile-time: use flat representation if it could precisely represent the type. Otherwise:
             # at compile-time: let `I` be is an index of current field, it equals 0
             # at run-time: `T` is constructed and field `I` is aggregate initialized using a separate instance of structure that is convertible to anything [note Additional care is taken to make sure that all the information about `T` is available to the compiler and that operations on `T` have no side effects, so the compiler can optimize away the unnecessary temporary objects.]
@@ -514,7 +516,7 @@ Short description:
     # at run-time: a tuple of references to fields is returned => all the tuple methods are available for the structure
 
 Long description of some basics: [@https://youtu.be/UlNUNxLtBI0 Antony Polukhin: Better C++14 reflections].
-Long description of some basics of C++14 with disabled [*Loophole]: [@https://youtu.be/abdeAew3gmQ Antony Polukhin: C++14 Reflections Without Macros, Markup nor External Tooling].
+Long description of some basics of C++14 with disabled [link boost_pfr.configuration_macro [*Loophole]]: [@https://youtu.be/abdeAew3gmQ Antony Polukhin: C++14 Reflections Without Macros, Markup nor External Tooling].
 
 [endsect]
 
@@ -522,7 +524,7 @@ Long description of some basics of C++14 with disabled [*Loophole]: [@https://yo
 
 Great thanks to Bruno Dutra for showing the technique to precisely reflect aggregate initializable type in C++14 [@https://github.com/apolukhin/magic_get/issues/5 Manual type registering/structured bindings might be unnecessary].
 
-Great thanks to Alexandr Poltavsky for initial implementation the [*Loophole] technique and for describing it [@http://alexpolt.github.io/type-loophole.html in his blog].
+Great thanks to Alexandr Poltavsky for initial implementation the [link boost_pfr.configuration_macro [*Loophole]] technique and for describing it [@http://alexpolt.github.io/type-loophole.html in his blog].
 
 Great thanks to Chris Beck for implementing the detect-offsets-and-get-field-address functionality that avoids Undefined Behavior of reinterpret_casting layout compatible structures.
 
