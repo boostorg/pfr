@@ -29,6 +29,8 @@
 <div class="toc"><dl>
 <dt><span class="section"><a href="tutorial.html#boost_pfr.tutorial.accessing_structure_member_by_in">Accessing
       structure member by index</a></span></dt>
+<dt><span class="section"><a href="tutorial.html#boost_pfr.tutorial.custom_printing_of_aggregates">Custom
+      printing of aggregates</a></span></dt>
 <dt><span class="section"><a href="tutorial.html#boost_pfr.tutorial.flattening">Flattening</a></span></dt>
 <dt><span class="section"><a href="tutorial.html#boost_pfr.tutorial.should_i_use_flat_or_precise_fun">Should
       I use Flat or Precise functions?</a></span></dt>
@@ -62,6 +64,56 @@
 <pre class="programlisting"><span class="identifier">foo</span> <span class="identifier">f</span> <span class="special">{</span><span class="number">777</span><span class="special">,</span> <span class="char">'!'</span><span class="special">};</span>
 <span class="keyword">auto</span><span class="special">&amp;</span> <span class="identifier">r1</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">0</span><span class="special">&gt;(</span><span class="identifier">f</span><span class="special">);</span> <span class="comment">// accessing field with index 0, returns reference to `foo::some_integer`</span>
 <span class="keyword">auto</span><span class="special">&amp;</span> <span class="identifier">r2</span> <span class="special">=</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">get</span><span class="special">&lt;</span><span class="number">1</span><span class="special">&gt;(</span><span class="identifier">f</span><span class="special">);</span> <span class="comment">// accessing field with index 1, returns reference to `foo::c`</span>
+</pre>
+</div>
+<div class="section">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="boost_pfr.tutorial.custom_printing_of_aggregates"></a><a class="link" href="tutorial.html#boost_pfr.tutorial.custom_printing_of_aggregates" title="Custom printing of aggregates">Custom
+      printing of aggregates</a>
+</h3></div></div></div>
+<p>
+        The following example shows how to customize printing and write your own
+        testing helper for structures:
+      </p>
+<pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">pfr</span><span class="special">/</span><span class="identifier">precise</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
+<span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">iostream</span><span class="special">&gt;</span>
+
+<span class="keyword">namespace</span> <span class="identifier">my_testing</span> <span class="special">{</span>
+
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="keyword">void</span> <span class="identifier">print_each</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="identifier">out</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;</span> <span class="identifier">v</span><span class="special">)</span> <span class="special">{</span> <span class="identifier">out</span> <span class="special">&lt;&lt;</span> <span class="identifier">v</span><span class="special">;</span> <span class="special">}</span>
+<span class="keyword">void</span> <span class="identifier">print_each</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="identifier">out</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">uint8_t</span> <span class="identifier">v</span><span class="special">)</span> <span class="special">{</span> <span class="identifier">out</span> <span class="special">&lt;&lt;</span> <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="keyword">unsigned</span><span class="special">&gt;(</span><span class="identifier">v</span><span class="special">);</span> <span class="special">}</span>
+<span class="keyword">void</span> <span class="identifier">print_each</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">ostream</span><span class="special">&amp;</span> <span class="identifier">out</span><span class="special">,</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">int8_t</span> <span class="identifier">v</span><span class="special">)</span> <span class="special">{</span> <span class="identifier">out</span> <span class="special">&lt;&lt;</span> <span class="keyword">static_cast</span><span class="special">&lt;</span><span class="keyword">int</span><span class="special">&gt;(</span><span class="identifier">v</span><span class="special">);</span> <span class="special">}</span>
+
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="keyword">void</span> <span class="identifier">print</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;</span> <span class="identifier">value</span><span class="special">)</span> <span class="special">{</span>
+    <span class="keyword">const</span> <span class="keyword">char</span><span class="special">*</span> <span class="identifier">sep</span> <span class="special">=</span> <span class="string">""</span><span class="special">;</span>
+
+    <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">for_each_field</span><span class="special">(</span><span class="identifier">value</span><span class="special">,</span> <span class="special">[&amp;](</span><span class="keyword">const</span> <span class="keyword">auto</span><span class="special">&amp;</span> <span class="identifier">v</span><span class="special">)</span> <span class="special">{</span>
+        <span class="identifier">std</span><span class="special">::</span><span class="identifier">cerr</span> <span class="special">&lt;&lt;</span> <span class="identifier">std</span><span class="special">::</span><span class="identifier">exchange</span><span class="special">(</span><span class="identifier">sep</span><span class="special">,</span> <span class="string">", "</span><span class="special">);</span>
+        <span class="identifier">print_each</span><span class="special">(</span><span class="identifier">std</span><span class="special">::</span><span class="identifier">cerr</span><span class="special">,</span> <span class="identifier">v</span><span class="special">);</span>
+    <span class="special">});</span>
+<span class="special">}</span>
+
+<span class="comment">/// Usage:</span>
+<span class="comment">///     struct foo {std::uint8_t a, b;};</span>
+<span class="comment">///     foo get_foo();</span>
+<span class="comment">///     ...</span>
+<span class="comment">///     test_eq(foo{42, 22}, get_foo());</span>
+<span class="comment">///</span>
+<span class="comment">/// Output:</span>
+<span class="comment">///     42, 22 != 42, 24</span>
+<span class="keyword">template</span> <span class="special">&lt;</span><span class="keyword">class</span> <span class="identifier">T</span><span class="special">&gt;</span>
+<span class="keyword">void</span> <span class="identifier">test_eq</span><span class="special">(</span><span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;</span> <span class="identifier">x</span><span class="special">,</span> <span class="keyword">const</span> <span class="identifier">T</span><span class="special">&amp;</span> <span class="identifier">y</span><span class="special">)</span> <span class="special">{</span>
+    <span class="keyword">using</span> <span class="keyword">namespace</span> <span class="identifier">boost</span><span class="special">::</span><span class="identifier">pfr</span><span class="special">::</span><span class="identifier">ops</span><span class="special">;</span>
+    <span class="keyword">if</span> <span class="special">(</span><span class="identifier">x</span> <span class="special">==</span> <span class="identifier">y</span><span class="special">)</span> <span class="keyword">return</span><span class="special">;</span>
+
+    <span class="identifier">print</span><span class="special">(</span><span class="identifier">x</span><span class="special">);</span>
+    <span class="identifier">std</span><span class="special">::</span><span class="identifier">cerr</span> <span class="special">&lt;&lt;</span> <span class="string">" != "</span><span class="special">;</span>
+    <span class="identifier">print</span><span class="special">(</span><span class="identifier">y</span><span class="special">);</span>
+<span class="special">}</span>
+
+<span class="special">}</span> <span class="comment">// namespace my_testing</span>
 </pre>
 </div>
 <div class="section">
@@ -257,10 +309,10 @@
 <tr>
 <td>
                 <p>
-                  <code class="computeroutput"><a class="link" href="../BOOST_PF_idm46786936678256.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
+                  <code class="computeroutput"><a class="link" href="../BOOST_PF_idm46585559329264.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
                 </p>
                 <p>
-                  <code class="computeroutput"><a class="link" href="../BOOST_PF_idm46786936925360.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
+                  <code class="computeroutput"><a class="link" href="../BOOST_PF_idm46585559577168.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
                 </p>
               </td>
 <td>
@@ -380,8 +432,8 @@
 <span class="special">};</span>
 </pre>
 <p>
-        <span class="bold"><strong>2. <code class="computeroutput"><a class="link" href="../BOOST_PF_idm46786936678256.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
-        and <code class="computeroutput"><a class="link" href="../BOOST_PF_idm46786936925360.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
+        <span class="bold"><strong>2. <code class="computeroutput"><a class="link" href="../BOOST_PF_idm46585559329264.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR</a></code>
+        and <code class="computeroutput"><a class="link" href="../BOOST_PF_idm46585559577168.html" title="Macro BOOST_PFR_PRECISE_FUNCTIONS_FOR">BOOST_PFR_PRECISE_FUNCTIONS_FOR</a></code>
         approach</strong></span>
       </p>
 <p>
@@ -404,7 +456,7 @@
 <p>
         Argument Dependant Lookup works well. <code class="computeroutput"><span class="identifier">std</span><span class="special">::</span><span class="identifier">less</span></code>
         will find the operators for <code class="computeroutput"><span class="keyword">struct</span>
-        <span class="identifier">pair_like</span></code>. <code class="computeroutput"><a class="link" href="../BOOST_PF_idm46786936678256.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR(T)</a></code>
+        <span class="identifier">pair_like</span></code>. <code class="computeroutput"><a class="link" href="../BOOST_PF_idm46585559329264.html" title="Macro BOOST_PFR_FLAT_FUNCTIONS_FOR">BOOST_PFR_FLAT_FUNCTIONS_FOR(T)</a></code>
         can not be used for local types. It must be called only once in namespace
         of <code class="computeroutput"><span class="identifier">T</span></code>. It does not respect
         conversion operators of <code class="computeroutput"><span class="identifier">T</span></code>,
@@ -455,8 +507,8 @@
       unions </a>
 </h3></div></div></div>
 <p>
-        With <span class="bold"><strong>precise</strong></span> reflection you could do reflection
-        if a type contains union. But be sure that operations for union are manually
+        You could use <span class="bold"><strong>precise</strong></span> representation if
+        a type contains union. But be sure that operations for union are manually
         defined:
       </p>
 <pre class="programlisting"><span class="preprocessor">#include</span> <span class="special">&lt;</span><span class="identifier">boost</span><span class="special">/</span><span class="identifier">pfr</span><span class="special">/</span><span class="identifier">precise</span><span class="special">/</span><span class="identifier">ops</span><span class="special">.</span><span class="identifier">hpp</span><span class="special">&gt;</span>
@@ -479,18 +531,16 @@
 <p>
         <span class="bold"><strong>Flat</strong></span> reflection of types that contain unions
         is disabled. <span class="bold"><strong>Flat</strong></span> and <span class="bold"><strong>precise</strong></span>
-        reflection of unions is disabled for safety reasons. There's a way to reflect
+        reflection of unions is disabled for safety reasons. There's a way to get
         the first member of a union and use it. Unfortunately there's no way to find
         out <span class="bold"><strong>active</strong></span> member of a union. Accessing
         an inactive union member is an Undefined Behavior. Using the first union
-        member for reflection could lead to disaster if it is some character pointer.
-        For example ostreaming <code class="computeroutput"><span class="keyword">union</span> <span class="special">{</span><span class="keyword">char</span><span class="special">*</span>
-        <span class="identifier">c</span><span class="special">;</span> <span class="keyword">long</span> <span class="keyword">long</span> <span class="identifier">ll</span><span class="special">;</span> <span class="special">}</span>
-        <span class="identifier">u</span><span class="special">;</span> <span class="identifier">u</span><span class="special">.</span><span class="identifier">ll</span><span class="special">=</span> <span class="number">1</span><span class="special">;</span></code>
-        will crash your program, as the active member is <code class="computeroutput"><span class="identifier">ll</span></code>
-        that holds <code class="computeroutput"><span class="number">1</span></code> but we are trying
-        to output a <code class="computeroutput"><span class="keyword">char</span><span class="special">*</span></code>.
-        This would cause an invalid pointer2 dereference.
+        member could lead to disaster if it is some character pointer. For example
+        ostreaming <code class="computeroutput"><span class="keyword">union</span> <span class="special">{</span><span class="keyword">char</span><span class="special">*</span> <span class="identifier">c</span><span class="special">;</span> <span class="keyword">long</span> <span class="keyword">long</span>
+        <span class="identifier">ll</span><span class="special">;</span> <span class="special">}</span> <span class="identifier">u</span><span class="special">;</span>
+        <span class="identifier">u</span><span class="special">.</span><span class="identifier">ll</span><span class="special">=</span> <span class="number">1</span><span class="special">;</span></code> will crash your program, as the active member
+        is <code class="computeroutput"><span class="identifier">ll</span></code> that holds <code class="computeroutput"><span class="number">1</span></code> but we are trying to output a <code class="computeroutput"><span class="keyword">char</span><span class="special">*</span></code>. This
+        would cause an invalid pointer dereference.
       </p>
 <p>
         Any attempt to reflect unions leads to a compile time error. In many cases
