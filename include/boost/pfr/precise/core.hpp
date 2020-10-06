@@ -104,9 +104,13 @@ constexpr auto structure_to_tuple(const T& val) noexcept {
 /// \code
 ///     void foo(const int&, const short&);
 ///     struct my_struct { int i, short s; };
-///     const my_struct s{1, 2};
 ///
-///     std::apply(foo, structure_tie(s));
+///     const my_struct const_s{1, 2};
+///     std::apply(foo, structure_tie(const_s));
+///
+///     my_struct s;
+///     structure_tie(s) = std::tuple<int, short>{10, 11};
+///     assert(s.s == 11);
 /// \endcode
 template <class T>
 constexpr auto structure_tie(const T& val) noexcept {
@@ -117,17 +121,7 @@ constexpr auto structure_tie(const T& val) noexcept {
 }
 
 
-/// \brief Creates an `std::tuple` with lvalue references to fields of an aggregate T.
-///
-/// \b Requires: C++17 or \flatpod{C++14 flat POD or C++14 with not disabled Loophole}.
-///
-/// \b Example:
-/// \code
-///     struct my_struct { int i, short s; };
-///     my_struct s;
-///     structure_tie(s) = std::tuple<int, short>{10, 11};
-///     assert(s.s == 11);
-/// \endcode
+/// \overload structure_tie
 template <class T>
 constexpr auto structure_tie(T& val) noexcept {
     return detail::make_stdtiedtuple_from_tietuple(
@@ -136,6 +130,8 @@ constexpr auto structure_tie(T& val) noexcept {
     );
 }
 
+
+/// \overload structure_tie
 template <class T>
 constexpr auto structure_tie(T&&, std::enable_if_t< std::is_rvalue_reference<T&&>::value>* = 0) noexcept {
     static_assert(sizeof(T) && false, "====================> Boost.PFR: Calling boost::pfr::structure_tie on rvalue references is forbidden");
