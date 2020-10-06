@@ -89,6 +89,11 @@ test-suite pfr
     [ compile-fail common/ops_unrestricted_unions.cpp : $(CLASSIC_PREC_DEF)     : precise_unrestricted_unions ]
     [ compile-fail common/ops_unrestricted_unions.cpp : $(LOOPHOLE_PREC_DEF)    : precise_lh_unrestricted_unions ]
 
+    [ compile-fail common/rvalue_tie.cpp : $(CLASSIC_FLAT_DEF)                  : flat_rvalue_tie ]
+    [ compile-fail common/rvalue_tie.cpp : $(LOOPHOLE_FLAT_DEF)                 : flat_lh_rvalue_tie ]
+    [ compile-fail common/rvalue_tie.cpp : $(CLASSIC_PREC_DEF)                  : precise_rvalue_tie ]
+    [ compile-fail common/rvalue_tie.cpp : $(LOOPHOLE_PREC_DEF)                 : precise_lh_rvalue_tie ]
+
     [ compile-fail common/non_std_layout.cpp : $(CLASSIC_FLAT_DEF)              : flat_non_standard_layout ]
     [ compile-fail common/non_std_layout.cpp : $(LOOPHOLE_FLAT_DEF)             : flat_lh_non_standard_layout ]
     [ run common/non_std_layout.cpp     : : : $(CLASSIC_PREC_DEF)               : precise_non_standard_layout ]

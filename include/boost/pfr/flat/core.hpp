@@ -27,6 +27,8 @@ namespace boost { namespace pfr {
 ///
 /// \rcast
 ///
+/// \b Requires: `T` must not have const fields for non-const overload.
+///
 /// \b Example:
 /// \code
 ///     struct my_struct { int i, short s; };
@@ -88,6 +90,26 @@ auto flat_structure_to_tuple(const T& val) noexcept {
     );
 }
 
+/// \brief Creates an `std::tuple` with const lvalue references to fields of a \flattening{flattened} T.
+///
+/// \rcast
+///
+/// \b Example:
+/// \code
+///     void foo(const int&, const short&);
+///     struct my_struct { int i, short s; };
+///     const my_struct s{1, 2};
+///
+///     std::apply(foo, flat_structure_tie(s));
+/// \endcode
+template <class T>
+auto flat_structure_tie(const T& val) noexcept {
+    return detail::make_conststdtiedtuple_from_tietuple(
+        detail::tie_as_flat_tuple(const_cast<T&>(val)),
+        detail::make_index_sequence< flat_tuple_size_v<T> >()
+    );
+}
+
 
 /// \brief Creates an `std::tuple` with lvalue references to fields of a \flattening{flattened} T.
 ///
@@ -103,11 +125,17 @@ auto flat_structure_to_tuple(const T& val) noexcept {
 ///     assert(s.s == 11);
 /// \endcode
 template <class T>
-auto flat_structure_tie(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable<T, T>::value>* = 0 /* @endcond */) noexcept {
+auto flat_structure_tie(T& val /* @cond */, std::enable_if_t< std::is_trivially_assignable<T, T>::value>* = 0/* @endcond */ ) noexcept {
     return detail::make_stdtiedtuple_from_tietuple(
         detail::tie_as_flat_tuple(val),
         detail::make_index_sequence< flat_tuple_size_v<T> >()
     );
+}
+
+template <class T>
+auto flat_structure_tie(T&&, std::enable_if_t< std::is_rvalue_reference<T&&>::value>* = 0) noexcept {
+    static_assert(sizeof(T) && false, "====================> Boost.PFR: Calling boost::pfr::flat_structure_tie on rvalue references is forbidden");
+    return 0;
 }
 
 /// Calls `func` for each field of a \flattening{flattened} POD `value`.

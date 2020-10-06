@@ -153,8 +153,12 @@ void test_with_enums() {
     flat_get<2>(s) = 111;
     BOOST_TEST_EQ(flat_get<2>(s), 111);
 
+
+    const my_struct const_s{s};
     BOOST_TEST(flat_structure_tie(s) == flat_structure_tie(s));
+    BOOST_TEST(flat_structure_tie(s) == flat_structure_tie(const_s));
     BOOST_TEST(flat_structure_tie(s) == flat_structure_to_tuple(s));
+    BOOST_TEST(flat_structure_tie(s) == flat_structure_to_tuple(const_s));
     BOOST_TEST(flat_structure_tie(s) != t);
     flat_structure_tie(s) = t;
     BOOST_TEST_EQ(flat_get<0>(s), 17u);
@@ -186,6 +190,17 @@ void test_with_enums() {
         3 == flat_tuple_size_v<const volatile my_struct>,
         ""
     );
+
+    static_assert(std::is_same<
+        std::tuple<const unsigned&, const int&, const short&>, decltype(flat_structure_tie(const_s))
+    >::value, "");
+
+
+    struct my_const_struct { const my_enum e; const int i; short s; };
+    const my_const_struct const_cs{my_enum::VALUE1, 100, 110};
+    static_assert(std::is_same<
+        std::tuple<const unsigned&, const int&, const short&>, decltype(flat_structure_tie(const_cs))
+    >::value, "");
 }
 
 void test_comparable_struct() {

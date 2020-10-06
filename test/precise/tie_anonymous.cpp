@@ -47,16 +47,26 @@ struct other_anon {
 
 struct anon {
     other_anon a;
-    other_anon b;
+    const other_anon b;
 };
 
 void test_in_anon_ns() {
     anon x{{1}, {2}};
-    
+    const anon const_x{{10}, {20}};
+
     auto v = boost::pfr::structure_tie(x);
-    
     BOOST_TEST_EQ(std::get<0>(v).data, 1);
     BOOST_TEST_EQ(std::get<1>(v).data, 2);
+    static_assert(std::is_same<
+        std::tuple<other_anon&, const other_anon&>, decltype(v)
+    >::value, "");
+
+    auto const_v = boost::pfr::structure_tie(const_x);
+    BOOST_TEST_EQ(std::get<0>(const_v).data, 10);
+    BOOST_TEST_EQ(std::get<1>(const_v).data, 20);
+    static_assert(std::is_same<
+        std::tuple<const other_anon&, const other_anon&>, decltype(const_v)
+    >::value, "");
 
 #ifdef __cpp_lib_optional
     other_anon_with_optional opt{"test", {}, {}, {}};
@@ -69,11 +79,21 @@ void test_in_anon_ns() {
 
 void test_in_non_non_ns() {
     anon x{{1}, {2}};
-    
+    const anon const_x{{10}, {20}};
+
     auto v = boost::pfr::structure_tie(x);
-    
     BOOST_TEST_EQ(std::get<0>(v).data, 1);
     BOOST_TEST_EQ(std::get<1>(v).data, 2);
+    static_assert(std::is_same<
+        std::tuple<other_anon&, const other_anon&>, decltype(v)
+    >::value, "");
+
+    auto const_v = boost::pfr::structure_tie(const_x);
+    BOOST_TEST_EQ(std::get<0>(const_v).data, 10);
+    BOOST_TEST_EQ(std::get<1>(const_v).data, 20);
+    static_assert(std::is_same<
+        std::tuple<const other_anon&, const other_anon&>, decltype(const_v)
+    >::value, "");
 
 #ifdef __cpp_lib_optional
     other_anon_with_optional opt{"test again", {}, {}, {}};

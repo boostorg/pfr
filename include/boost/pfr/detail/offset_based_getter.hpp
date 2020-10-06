@@ -14,12 +14,10 @@
 #include <utility>
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/rvalue_t.hpp>
+#include <boost/pfr/detail/size_t_.hpp>
 
 
 namespace boost { namespace pfr { namespace detail {
-
-template <std::size_t Index>
-using size_t_ = std::integral_constant<std::size_t, Index >;
 
 // Our own implementation of std::aligned_storage. On godbolt with MSVC, I have compilation errors
 // using the standard version, it seems the compiler cannot generate default ctor.
