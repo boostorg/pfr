@@ -121,12 +121,24 @@ namespace boost { namespace pfr { namespace detail {
         seed ^= value + 0x9e3779b9 + (seed<<6) + (seed>>2);
     }
 
+    template <typename T>
+    auto compute_hash(const T& value, long /*priority*/)
+        -> decltype(std::hash<T>()(value))
+    {
+        return std::hash<T>()(value);
+    }
+
+    template <typename T>
+    std::size_t compute_hash(const T& value, int /*priority*/) {
+        static_assert(sizeof(T) && false, "====================> Boost.PFR: std::hash not specialized for type T");
+        return 0;
+    }
+
     template <std::size_t I, std::size_t N>
     struct hash_impl {
         template <class T>
         constexpr static std::size_t compute(const T& val) noexcept {
-            typedef std::decay_t<typename detail::sequence_tuple::tuple_element<I, T>::type> elem_t;
-            std::size_t h = std::hash<elem_t>()( ::boost::pfr::detail::sequence_tuple::get<I>(val) );
+            std::size_t h = detail::compute_hash( ::boost::pfr::detail::sequence_tuple::get<I>(val), 1L );
             detail::hash_combine(h, hash_impl<I + 1, N>::compute(val) );
             return h;
         }

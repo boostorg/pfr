@@ -54,6 +54,11 @@ test-suite pfr
     [ run common/std_interactions.cpp   : : : $(CLASSIC_PREC_DEF)               : precise_std_interactions ]
     [ run common/std_interactions.cpp   : : : $(LOOPHOLE_PREC_DEF)              : precise_lh_std_interactions ]
 
+    [ compile-fail common/pfr_review_test2.cpp   : $(CLASSIC_FLAT_DEF)          : flat_pfr_review_test2 ]
+    [ compile-fail common/pfr_review_test2.cpp   : $(LOOPHOLE_FLAT_DEF)         : flat_lh_pfr_review_test2 ]
+    [ compile-fail common/pfr_review_test2.cpp   : $(CLASSIC_PREC_DEF)          : precise_pfr_review_test2 ]
+    [ compile-fail common/pfr_review_test2.cpp   : $(LOOPHOLE_PREC_DEF)         : precise_lh_pfr_review_test2 ]
+
     [ compile-fail common/movable_and_lvalue_references.cpp : $(CLASSIC_FLAT_DEF)   : flat_movable_and_lvalue_references ]
     [ compile-fail common/movable_and_lvalue_references.cpp : $(LOOPHOLE_FLAT_DEF)  : flat_lh_movable_and_lvalue_references ]
     [ compile-fail common/movable_and_lvalue_references.cpp : $(CLASSIC_PREC_DEF)   : precise_movable_and_lvalue_references ]
