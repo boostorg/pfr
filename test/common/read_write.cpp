@@ -3,37 +3,17 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/core/lightweight_test.hpp>
+#include <boost/pfr/io.hpp>
+
 #include <sstream>
 #include <string>
 
+#include <boost/core/lightweight_test.hpp>
 
-#ifdef BOOST_PFR_TEST_FLAT
-#include <boost/pfr/flat/io.hpp>
-
-namespace boost { namespace test {
-    template <class Char, class Traits, class T>
-    void read(std::basic_istream<Char, Traits>& in, T& value) {
-        ::boost::pfr::flat_read(in, value);
-    }
-
-    template <class Char, class Traits, class T>
-    void write(std::basic_ostream<Char, Traits>& out, const T& value) {
-        ::boost::pfr::flat_write(out, value);
-    }
-}}
-
-#endif
-
-#ifdef BOOST_PFR_TEST_PRECISE
-#include <boost/pfr/precise/io.hpp>
 namespace boost { namespace test {
     using boost::pfr::read;
     using boost::pfr::write;
 }}
-#endif
-
-
 
 
 template <class T>
@@ -88,7 +68,6 @@ int main() {
     test_type(test1{1, 2, '3', 4, 5}, "{1, 2, 3, 4, 5}");
     test_type(test1{199, 299, '9', 499, 599}, "{199, 299, 9, 499, 599}");
 
-#ifdef BOOST_PFR_TEST_PRECISE
     struct test2 {
         with_operator f0;
         with_operator f1;
@@ -142,7 +121,6 @@ int main() {
     );
     #endif
 #endif
-#endif // BOOST_PFR_TEST_PRECISE
 
     return boost::report_errors();
 }

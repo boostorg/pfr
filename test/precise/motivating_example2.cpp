@@ -4,7 +4,7 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <iostream>
-#include "boost/pfr/precise.hpp"
+#include "boost/pfr.hpp"
 
 struct my_struct { // no ostream operator defined!
     std::string s;

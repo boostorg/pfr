@@ -3,7 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/core/lightweight_test.hpp>
+#include <boost/pfr/ops.hpp>
 
 #include <iostream>
 #include <typeinfo>
@@ -12,16 +12,7 @@
 #include <set>
 #include <string>
 
-
-#ifdef BOOST_PFR_TEST_FLAT
-#include <boost/pfr/flat/ops.hpp>
-#define BOOST_PFR_TEST_NAMESPECE boost::pfr::flat_ops
-#endif
-
-#ifdef BOOST_PFR_TEST_PRECISE
-#include <boost/pfr/precise/ops.hpp>
-#define BOOST_PFR_TEST_NAMESPECE boost::pfr::ops
-#endif
+#include <boost/core/lightweight_test.hpp>
 
 unsigned test_union_counter = 0;
 
@@ -42,7 +33,7 @@ inline std::istream& operator>>(std::istream& is, test_union& src) { ++test_unio
 
 template <class T>
 void test_comparable_struct() {
-    using namespace BOOST_PFR_TEST_NAMESPECE;
+    using namespace boost::pfr::ops;
     T s1 {0, 1, false, 6,7,8,9,10,11};
     T s2 = s1;
     T s3 {0, 1, false, 6,7,8,9,10,11111};
@@ -72,13 +63,13 @@ void test_comparable_struct() {
 
 void test_empty_struct() {
     struct empty {};
-    using namespace BOOST_PFR_TEST_NAMESPECE;
+    using namespace boost::pfr::ops;
     std::cout << empty{};
     BOOST_TEST(empty{} == empty{});
 }
 
 void test_implicit_conversions() {
-    using namespace BOOST_PFR_TEST_NAMESPECE;
+    using namespace boost::pfr::ops;
     std::stringstream ss;
     ss << std::true_type{};
     BOOST_TEST_EQ(ss.str(), "1"); // Does not break implicit conversion
@@ -99,7 +90,6 @@ int main() {
     };
     test_comparable_struct<local_comparable_struct>();
 
-#if defined(BOOST_PFR_TEST_PRECISE)
     struct local_comparable_struct_with_union {
         int i; short s; bool bl; int a,b,c,d,e; test_union u;
     };
@@ -107,7 +97,6 @@ int main() {
     
     // Making sure that test_union overloaded operations were called.
     BOOST_TEST_EQ(test_union_counter, 17);
-#endif
 
     test_empty_struct();
     test_implicit_conversions();

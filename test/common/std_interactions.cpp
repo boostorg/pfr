@@ -3,23 +3,14 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-
-#ifdef BOOST_PFR_TEST_PRECISE
-#   include <boost/pfr/precise/core.hpp>
-#   define BOOST_PFR_TEST_FUNCTION(x) boost::pfr::get<I>(x)
-#elif defined(BOOST_PFR_TEST_FLAT)
-#   include <boost/pfr/flat/core.hpp>
-#   define BOOST_PFR_TEST_FUNCTION(x) boost::pfr::flat_get<I>(x)
-#else
-#   error Misused test
-#endif
+#include <boost/pfr/core.hpp>
 
 #include <boost/core/lightweight_test.hpp>
 
 namespace helper {
     template <std::size_t I, class T>
     decltype(auto) get(T&& v) {
-        return BOOST_PFR_TEST_FUNCTION(std::forward<T>(v));
+        return boost::pfr::get<I>(std::forward<T>(v));
     }
 }
 

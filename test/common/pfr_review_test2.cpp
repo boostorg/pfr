@@ -6,8 +6,7 @@
 
 // Test case from https://github.com/madmongo1/pfr_review/blob/master/pre-cxx20/test-2.cpp
 
-#include <boost/pfr/flat/functions_for.hpp>
-#include <boost/pfr/precise/functions_for.hpp>
+#include <boost/pfr/functions_for.hpp>
 
 #include <boost/utility/string_view.hpp>
 
@@ -21,16 +20,11 @@ namespace the_wild {
         std::string        name;
         boost::string_view temperament;
     };
-#ifdef BOOST_PFR_TEST_FLAT
-    // Error: animal is not constexpr initializable
-    BOOST_PFR_FLAT_FUNCTIONS_FOR(animal)
-#endif
-#ifdef BOOST_PFR_TEST_PRECISE
+    
     // Error: std::hash not specialized for type
     // OR in C++14:
     // Error: animal is not constexpr initializable
     BOOST_PFR_PRECISE_FUNCTIONS_FOR(animal)
-#endif
 } // namespace the_wild
 
 const auto fido = the_wild::animal { "fido", "aloof" };

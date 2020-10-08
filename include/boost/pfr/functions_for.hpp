@@ -9,8 +9,8 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-#include <boost/pfr/precise/functors.hpp>
-#include <boost/pfr/precise/io.hpp>
+#include <boost/pfr/functors.hpp>
+#include <boost/pfr/io.hpp>
 
 /// \def BOOST_PFR_PRECISE_FUNCTIONS_FOR(T)
 /// Defines comparison operators and stream operators for T.
@@ -18,7 +18,7 @@
 ///
 /// \b Example:
 /// \code
-///     #include <boost/pfr/precise/functions_for.hpp>
+///     #include <boost/pfr/functions_for.hpp>
 ///     struct comparable_struct {      // No operators defined for that structure
 ///         int i; short s; char data[7]; bool bl; int a,b,c,d,e,f;
 ///     };

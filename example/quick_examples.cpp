@@ -37,35 +37,6 @@ inline std::ostream& operator<<(std::ostream& os, const bar& b) {
 }
 
 void test_examples() {
-  {
-    bar var{'A', {777, 3.141593}};
-    
-//[pfr_quick_examples_flat_functors_uset
-    // no `std::hash<bar>` or `bar::operator==(const bar&)` defined
-    std::unordered_set<
-        bar, boost::pfr::flat_hash<bar>,
-        boost::pfr::flat_equal_to<>> my_uset;
-    my_uset.insert(var);
-//]
-  }
-
-  {
-    bar var{'A', {777, 3.141593}};
-    
-//[pfr_quick_examples_flat_functors_set
-    // no `bar::operator<(const bar&)` defined
-    std::set<bar, boost::pfr::flat_less<>> my_set;
-    my_set.insert(var);
-//]
-  }
-
-  {
-//[pfr_quick_examples_flat_ops
-    using namespace boost::pfr::flat_ops; // Defines comparisons
-    assert((var < bar{'Z', {}} && var.f == foo{777, 3.141593}));
-//]
-    std::cout << "boost::pfr::flat_structure_tie(var) :\n" << var << '\n';
-  }
 
 #if BOOST_PFR_USE_CPP17
   {
@@ -76,19 +47,6 @@ void test_examples() {
 //]
   }
 #endif
-
-  {
-    bar var{'A', {777, 3.141593}};
-    
-//[pfr_quick_examples_flat_for_each
-    // incrementing each field on 1:
-    boost::pfr::flat_for_each_field(var, [](auto& field) {
-        field += 1;
-    });
-//]
-    
-    std::cout << "flat_for_each_field outputs:\n" << var << '\n';
-  }
     
   {  
     bar var{'A', {777, 3.141593}};
@@ -101,20 +59,6 @@ void test_examples() {
 //]
     
     std::cout << "flat_for_each_field outputs:\n" << var << '\n';
-  }
-
-
-
-  
-  {
-    bar var{'A', {777, 3.141593}};
-    
-//[pfr_quick_examples_flat_for_each_idx  
-    boost::pfr::flat_for_each_field(var, [](auto& field, std::size_t idx) {
-        std::cout << idx << ": "
-            << boost::typeindex::type_id_runtime(field) << '\n';
-    });
-//]
   }
     
   {
@@ -135,13 +79,6 @@ void test_examples() {
         << boost::pfr::tuple_size<bar>::value << '\n';
 //]
   }
-    
-  {    
-//[pfr_quick_examples_flat_tuple_size
-    std::cout << "flat_tuple_size: "
-        << boost::pfr::flat_tuple_size<bar>::value << '\n';
-//]
-  }
 
 #if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
   {
@@ -152,15 +89,6 @@ void test_examples() {
     std::cout << "boost::pfr::get<1>(var) outputs:\n" << var << '\n';
   }
 #endif
-
-  {
-    bar var{'A', {777, 3.141593}};
-//[pfr_quick_examples_flat_get_1
-    boost::pfr::flat_get<1>(var) = 1;
-//]
-    std::cout << "boost::pfr::flat_get<1>(var) outputs:\n" << var << '\n';
-  }
-  
   
   {
     bar var{'A', {777, 3.141593}};
@@ -168,14 +96,6 @@ void test_examples() {
     boost::pfr::get<1>(var.f) = 42.01;
 //]
     std::cout << "boost::pfr::get<1>(var.f) outputs:\n" << var << '\n';
-  }
-
-  {
-    bar var{'A', {777, 3.141593}};
-//[pfr_quick_examples_flat_get_2
-    boost::pfr::flat_get<1>(var.f) = 42.01;
-//]
-    std::cout << "boost::pfr::flat_get<1>(var.f) outputs:\n" << var << '\n';
   }
 
 #if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
@@ -190,15 +110,6 @@ void test_examples() {
   }
 #endif
 
-  {
-    bar var{'A', {777, 3.141593}};
-//[pfr_quick_examples_flat_structure_to_tuple
-    std::tuple<char, int, double> t = boost::pfr::flat_structure_to_tuple(var);
-    std::get<0>(t) = 'C';
-//]
-    std::cout << "boost::pfr::flat_structure_to_tuple(var) :\n" << var << '\n';
-  }
-
 #if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
   {
     bar var{'A', {777, 3.141593}};
@@ -211,14 +122,6 @@ void test_examples() {
   }
 #endif
 
-  {
-    bar var{'A', {777, 3.141593}};
-//[pfr_quick_examples_flat_structure_tie
-    std::tuple<char&, int&, double&> t = boost::pfr::flat_structure_tie(var);
-    std::get<0>(t) = 'C';
-//]
-    std::cout << "boost::pfr::flat_structure_tie(var) :\n" << var << '\n';
-  }
 } // void test_examples() {
 
 

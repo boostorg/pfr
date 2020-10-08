@@ -5,7 +5,7 @@
 
 #include <type_traits>
 
-#include <boost/pfr/precise/core.hpp>
+#include <boost/pfr/core.hpp>
 
 template <class T>
 struct constrained_template {

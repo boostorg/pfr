@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Antony Polukhin
+// Copyright (c) 2018-2020 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,7 +8,7 @@
 
 // boost::pfr::for_each_field crashes when sizeof(MyConfig) > 248 (probably >= 256)
 
-#include <boost/pfr/precise.hpp>
+#include <boost/pfr.hpp>
 
 #include <iostream>
 #include <type_traits>

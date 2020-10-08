@@ -16,7 +16,7 @@
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/io.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
-#include <boost/pfr/precise/tuple_size.hpp>
+#include <boost/pfr/tuple_size.hpp>
 
 #if BOOST_PFR_USE_CPP17
 #   include <boost/pfr/detail/core17.hpp>

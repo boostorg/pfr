@@ -5,7 +5,7 @@
 
 #include <iostream>
 #include <string>
-#include "boost/pfr/precise.hpp"
+#include "boost/pfr.hpp"
 
 struct some_person {
     std::string name;

@@ -19,103 +19,62 @@ project
 
 local DISABLE_ON_MSVC = <toolset>msvc:<build>no ;
 local DISABLE_ON_CLANG8_PLUS = <toolset>clang-8:<build>no <toolset>clang-9:<build>no <toolset>clang-10:<build>no ;
-local LOOPHOLE_FLAT_DEF = <define>BOOST_PFR_TEST_FLAT <define>BOOST_PFR_USE_LOOPHOLE=1 $(DISABLE_ON_MSVC) $(DISABLE_ON_CLANG8_PLUS) ;
-local CLASSIC_FLAT_DEF = <define>BOOST_PFR_TEST_FLAT <define>BOOST_PFR_USE_LOOPHOLE=0 $(DISABLE_ON_MSVC) ;
-local LOOPHOLE_PREC_DEF = <define>BOOST_PFR_TEST_PRECISE <define>BOOST_PFR_USE_LOOPHOLE=1 $(DISABLE_ON_MSVC) $(DISABLE_ON_CLANG8_PLUS) ;
-local CLASSIC_PREC_DEF = <define>BOOST_PFR_TEST_PRECISE <define>BOOST_PFR_USE_LOOPHOLE=0 ;
+local LOOPHOLE_PREC_DEF = <define>BOOST_PFR_USE_LOOPHOLE=1 $(DISABLE_ON_MSVC) $(DISABLE_ON_CLANG8_PLUS) ;
+local CLASSIC_PREC_DEF = <define>BOOST_PFR_USE_LOOPHOLE=0 ;
 
 test-suite pfr
   :
     ##### Common tests
     [ run common/offset_based_getter.cpp ]
 
-    [ run common/ops.cpp                : : : $(CLASSIC_FLAT_DEF)               : flat_ops ]
-    [ run common/ops.cpp                : : : $(LOOPHOLE_FLAT_DEF)              : flat_lh_ops ]
     [ run common/ops.cpp                : : : $(CLASSIC_PREC_DEF)               : precise_ops ]
     [ run common/ops.cpp                : : : $(LOOPHOLE_PREC_DEF)              : precise_lh_ops ]
 
-    [ run common/global_ops.cpp         : : : $(CLASSIC_FLAT_DEF)               : flat_global_ops ]
-    [ run common/global_ops.cpp         : : : $(LOOPHOLE_FLAT_DEF)              : flat_lh_global_ops ]
-    [ run common/global_ops.cpp         : : : $(CLASSIC_PREC_DEF)               : precise_global_ops ]
-    [ run common/global_ops.cpp         : : : $(LOOPHOLE_PREC_DEF)              : precise_lh_global_ops ]
-
-    [ run common/functions_for.cpp      : : : $(CLASSIC_FLAT_DEF)               : flat_function_for ]
-    [ run common/functions_for.cpp      : : : $(LOOPHOLE_FLAT_DEF)              : flat_lh_function_for ]
     [ run common/functions_for.cpp      : : : $(CLASSIC_PREC_DEF)               : precise_function_for ]
     [ run common/functions_for.cpp      : : : $(LOOPHOLE_PREC_DEF)              : precise_lh_function_for ]
 
-    [ run common/read_write.cpp         : : : $(CLASSIC_FLAT_DEF)               : flat_read_write ]
-    [ run common/read_write.cpp         : : : $(LOOPHOLE_FLAT_DEF)              : flat_lh_read_write ]
     [ run common/read_write.cpp         : : : $(CLASSIC_PREC_DEF)               : precise_read_write ]
     [ run common/read_write.cpp         : : : $(LOOPHOLE_PREC_DEF)              : precise_lh_read_write ]
 
-    [ run common/std_interactions.cpp   : : : $(CLASSIC_FLAT_DEF)               : flat_std_interactions ]
-    [ run common/std_interactions.cpp   : : : $(LOOPHOLE_FLAT_DEF)              : flat_lh_std_interactions ]
     [ run common/std_interactions.cpp   : : : $(CLASSIC_PREC_DEF)               : precise_std_interactions ]
     [ run common/std_interactions.cpp   : : : $(LOOPHOLE_PREC_DEF)              : precise_lh_std_interactions ]
 
-    [ compile-fail common/pfr_review_test2.cpp   : $(CLASSIC_FLAT_DEF)          : flat_pfr_review_test2 ]
-    [ compile-fail common/pfr_review_test2.cpp   : $(LOOPHOLE_FLAT_DEF)         : flat_lh_pfr_review_test2 ]
     [ compile-fail common/pfr_review_test2.cpp   : $(CLASSIC_PREC_DEF)          : precise_pfr_review_test2 ]
     [ compile-fail common/pfr_review_test2.cpp   : $(LOOPHOLE_PREC_DEF)         : precise_lh_pfr_review_test2 ]
 
-    [ compile-fail common/movable_and_lvalue_references.cpp : $(CLASSIC_FLAT_DEF)   : flat_movable_and_lvalue_references ]
-    [ compile-fail common/movable_and_lvalue_references.cpp : $(LOOPHOLE_FLAT_DEF)  : flat_lh_movable_and_lvalue_references ]
     [ compile-fail common/movable_and_lvalue_references.cpp : $(CLASSIC_PREC_DEF)   : precise_movable_and_lvalue_references ]
     [ compile-fail common/movable_and_lvalue_references.cpp : $(LOOPHOLE_PREC_DEF)  : precise_lh_movable_and_lvalue_references ]
 
-    [ compile-fail common/private_fields.cpp : $(CLASSIC_FLAT_DEF)              : flat_private_fields ]
-    [ compile-fail common/private_fields.cpp : $(LOOPHOLE_FLAT_DEF)             : flat_lh_private_fields ]
     [ compile-fail common/private_fields.cpp : $(CLASSIC_PREC_DEF)              : precise_private_fields ]
     [ compile-fail common/private_fields.cpp : $(LOOPHOLE_PREC_DEF)             : precise_lh_private_fields ]
 
-    [ compile-fail common/protected_fields.cpp : $(CLASSIC_FLAT_DEF)            : flat_protected_fields ]
-    [ compile-fail common/protected_fields.cpp : $(LOOPHOLE_FLAT_DEF)           : flat_lh_protected_fields ]
     [ compile-fail common/protected_fields.cpp : $(CLASSIC_PREC_DEF)            : precise_protected_fields ]
     [ compile-fail common/protected_fields.cpp : $(LOOPHOLE_PREC_DEF)           : precise_lh_protected_fields ]
 
-    [ compile-fail common/virtual_functions.cpp : $(CLASSIC_FLAT_DEF)           : flat_virtual_functions ]
-    [ compile-fail common/virtual_functions.cpp : $(LOOPHOLE_FLAT_DEF)          : flat_lh_virtual_functions ]
     [ compile-fail common/virtual_functions.cpp : $(CLASSIC_PREC_DEF)           : precise_virtual_functions ]
     [ compile-fail common/virtual_functions.cpp : $(LOOPHOLE_PREC_DEF)          : precise_lh_virtual_functions ]
 
-    [ compile-fail common/ops_on_union.cpp : $(CLASSIC_FLAT_DEF)                : flat_on_union ]
-    [ compile-fail common/ops_on_union.cpp : $(LOOPHOLE_FLAT_DEF)               : flat_lh_on_union ]
     [ compile-fail common/ops_on_union.cpp : $(CLASSIC_PREC_DEF)                : precise_on_union ]
     [ compile-fail common/ops_on_union.cpp : $(LOOPHOLE_PREC_DEF)               : precise_lh_on_union ]
 
-    [ compile-fail common/ops_unions.cpp : $(CLASSIC_FLAT_DEF)                  : flat_unions ]
-    [ compile-fail common/ops_unions.cpp : $(LOOPHOLE_FLAT_DEF)                 : flat_lh_unions ]
     [ compile-fail common/ops_unions.cpp : $(CLASSIC_PREC_DEF)                  : precise_unions ]
     [ compile-fail common/ops_unions.cpp : $(LOOPHOLE_PREC_DEF)                 : precise_lh_unions ]
 
-    [ compile-fail common/ops_unrestricted_unions.cpp : $(CLASSIC_FLAT_DEF)     : flat_unrestricted_unions ]
-    [ compile-fail common/ops_unrestricted_unions.cpp : $(LOOPHOLE_FLAT_DEF)    : flat_lh_unrestricted_unions ]
     [ compile-fail common/ops_unrestricted_unions.cpp : $(CLASSIC_PREC_DEF)     : precise_unrestricted_unions ]
     [ compile-fail common/ops_unrestricted_unions.cpp : $(LOOPHOLE_PREC_DEF)    : precise_lh_unrestricted_unions ]
 
-    [ compile-fail common/rvalue_tie.cpp : $(CLASSIC_FLAT_DEF)                  : flat_rvalue_tie ]
-    [ compile-fail common/rvalue_tie.cpp : $(LOOPHOLE_FLAT_DEF)                 : flat_lh_rvalue_tie ]
     [ compile-fail common/rvalue_tie.cpp : $(CLASSIC_PREC_DEF)                  : precise_rvalue_tie ]
     [ compile-fail common/rvalue_tie.cpp : $(LOOPHOLE_PREC_DEF)                 : precise_lh_rvalue_tie ]
 
-    [ compile-fail common/non_std_layout.cpp : $(CLASSIC_FLAT_DEF)              : flat_non_standard_layout ]
-    [ compile-fail common/non_std_layout.cpp : $(LOOPHOLE_FLAT_DEF)             : flat_lh_non_standard_layout ]
     [ run common/non_std_layout.cpp     : : : $(CLASSIC_PREC_DEF)               : precise_non_standard_layout ]
     [ run common/non_std_layout.cpp     : : : $(LOOPHOLE_PREC_DEF)              : precise_lh_non_standard_layout ]
 
-    [ compile-fail common/non_default_constructible.cpp : $(CLASSIC_FLAT_DEF)   : flat_non_default_constructible ]
-    [ compile-fail common/non_default_constructible.cpp : $(LOOPHOLE_FLAT_DEF)  : flat_lh_non_sdefault_constructible ]
     [ run common/non_default_constructible.cpp : : : $(CLASSIC_PREC_DEF)        : precise_non_default_constructible ]
     [ run common/non_default_constructible.cpp : : : $(LOOPHOLE_PREC_DEF)       : precise_lh_non_default_constructible ]
 
-    #[ compile-fail common/non_copyable_but_movable.cpp : $(CLASSIC_FLAT_DEF)    : flat_non_copyable_but_movable ]
-    #[ run common/non_copyable_but_movable.cpp : : : $(LOOPHOLE_FLAT_DEF)        : flat_lh_non_copyable_but_movable ]
     [ run common/non_copyable_but_movable.cpp : : : $(CLASSIC_PREC_DEF)         : precise_non_copyable_but_movable ]
     [ run common/non_copyable_but_movable.cpp : : : $(LOOPHOLE_PREC_DEF)        : precise_lh_non_copyable_but_movable ]
 
-    #[ compile-fail common/non_default_constructible_non_copyable_but_movable.cpp : $(CLASSIC_FLAT_DEF) : flat_non_dc_non_cop_but_mov ]
-    #[ run common/non_default_constructible_non_copyable_but_movable.cpp : : : $(LOOPHOLE_FLAT_DEF)     : flat_lh_non_dc_non_cop_but_mov ]
     [ run common/non_default_constructible_non_copyable_but_movable.cpp : : : $(CLASSIC_PREC_DEF)      : precise_non_dc_non_cop_but_mov ]
     [ run common/non_default_constructible_non_copyable_but_movable.cpp : : : $(LOOPHOLE_PREC_DEF)     : precise_lh_non_dc_non_cop_but_mov ]
 
@@ -129,17 +88,6 @@ test-suite pfr
     [ run common/test_tuple_sizes_on.cpp : : : $(DISABLE_ON_MSVC) <define>BOOST_PFR_RUN_TEST_ON=void* : test_tuple_sizes_on_voidptrs ]
     [ run common/test_tuple_sizes_on.cpp : : : $(DISABLE_ON_MSVC) <define>BOOST_PFR_RUN_TEST_ON="std::size_t" : test_tuple_sizes_on_size_ts ]
     #[ run common/test_tuple_sizes_on.cpp $(DISABLE_ON_MSVC)<define>BOOST_PFR_RUN_TEST_ON=char <define>BOOST_PFR_RUN_HUGE_TESTS : test_tuple_sizes_on_chars_huge ]
-
-
-    ##### Flat specific tests
-    [ run flat/core.cpp                     : : : $(CLASSIC_FLAT_DEF) ]
-    [ run flat/flat_tuple_size.cpp          : : : $(CLASSIC_FLAT_DEF) ]
-    [ run flat/flat_motivating_example.cpp  : : : $(CLASSIC_FLAT_DEF) ]
-    [ run flat/flat_for_each_field.cpp      : : : $(CLASSIC_FLAT_DEF) ]
-    [ run flat/destructuring_tie.cpp        : : : $(CLASSIC_FLAT_DEF) ]
-    [ compile-fail flat/flat_tuple_size_on_non_aggregate.cpp    : $(CLASSIC_FLAT_DEF) ]
-    [ compile-fail flat/flat_tuple_size_on_bitfields.cpp        : $(CLASSIC_FLAT_DEF) ]
-
 
     ##### Precise specific tests
     [ run precise/tuple_size.cpp                    : : : $(CLASSIC_PREC_DEF) : precise_tuple_size ]
@@ -166,15 +114,6 @@ test-suite pfr
     #[ compile-fail precise/issue30.cpp              : $(CLASSIC_PREC_DEF) : precise_issue30 ]
     #[ compile-fail precise/issue33.cpp              : $(CLASSIC_PREC_DEF) : precise_issue33 ]
 
-
-    ##### Loophole tests running precise and flat specific tests
-    [ run flat/core.cpp                             : : : $(LOOPHOLE_FLAT_DEF) : flat_lh_core ]
-    [ run flat/flat_tuple_size.cpp                  : : : $(LOOPHOLE_FLAT_DEF) : flat_lh_tuple_size ]
-    [ run flat/flat_motivating_example.cpp          : : : $(LOOPHOLE_FLAT_DEF) : flat_lh_motivating_example ]
-    [ run flat/flat_for_each_field.cpp              : : : $(LOOPHOLE_FLAT_DEF) : flat_lh_for_each_field ]
-    [ compile-fail flat/flat_tuple_size_on_non_aggregate.cpp    : $(LOOPHOLE_FLAT_DEF) : flat_lh_tuple_size_on_non_aggregate ]
-    [ compile-fail flat/flat_tuple_size_on_bitfields.cpp        : $(LOOPHOLE_FLAT_DEF) : flat_lh_tuple_size_on_bitfields ]
-
     [ run precise/tuple_size.cpp                    : : : $(LOOPHOLE_PREC_DEF) : precise_lh_tuple_size ]
     [ run precise/bitfields.cpp                     : : : $(LOOPHOLE_PREC_DEF) : precise_lh_tuple_size_on_bitfields ]
     [ run precise/for_each_field.cpp                : : : $(LOOPHOLE_PREC_DEF) : precise_lh_for_each_field ]
@@ -198,7 +137,6 @@ test-suite pfr
 
 
     # Examples from docs
-    [ run ../example/examples.cpp : : : $(DISABLE_ON_MSVC) ]
     [ run ../example/quick_examples.cpp : : : $(DISABLE_ON_MSVC) ]
   ;
 
