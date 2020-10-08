@@ -9,22 +9,18 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-#include <type_traits>
-#include <utility>      // metaprogramming stuff
+#include <boost/pfr/detail/core.hpp>
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/stdtuple.hpp>
 #include <boost/pfr/detail/for_each_field_impl.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
+#include <boost/pfr/detail/tie_from_structure_tuple.hpp>
+
+#include <type_traits>
+#include <utility>      // metaprogramming stuff
 
 #include <boost/pfr/tuple_size.hpp>
-#if BOOST_PFR_USE_CPP17
-#   include <boost/pfr/detail/core17.hpp>
-#else
-#   include <boost/pfr/detail/core14.hpp>
-#endif
-
-#include <boost/pfr/detail/tie_from_structure_tuple.hpp>
 
 namespace boost { namespace pfr {
 

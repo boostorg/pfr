@@ -10,6 +10,8 @@
 
 #include <boost/pfr/detail/config.hpp>
 
+#include <boost/pfr/detail/core.hpp>
+
 #include <type_traits>
 #include <utility>      // metaprogramming stuff
 
@@ -17,12 +19,6 @@
 #include <boost/pfr/detail/io.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 #include <boost/pfr/tuple_size.hpp>
-
-#if BOOST_PFR_USE_CPP17
-#   include <boost/pfr/detail/core17.hpp>
-#else
-#   include <boost/pfr/detail/core14.hpp>
-#endif
 
 namespace boost { namespace pfr {
 
