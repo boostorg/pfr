@@ -423,5 +423,5 @@ Great thanks to Chris Beck for implementing the detect-offsets-and-get-field-add
 
 [endsect]
 
-[xinclude autodoc_all.xml]
+[xinclude autodoc_pfr.xml]
 

@@ -37,7 +37,7 @@ local doxygen_params =
         "
     ;
 
-doxygen autodoc_all
+doxygen autodoc_pfr
     :
         [ glob ../../../boost/pfr.hpp ]
         [ glob ../../../boost/pfr/*.hpp ]
@@ -50,7 +50,7 @@ boostbook pfr-doc
     :
         pfr.qbk
     :
-        <dependency>autodoc_all
+        <dependency>autodoc_pfr
         <xsl:param>boost.root=http://www.boost.org/doc/libs/1_72_0
         #<xsl:param>boost.root=../../../.
         <xml:param>html.stylesheet=../../../../doc/src/boostbook.css
