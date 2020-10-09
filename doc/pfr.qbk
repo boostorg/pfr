@@ -217,11 +217,11 @@ Examples in the table use the following definition:
 
 [section Tutorial]
 
-[import ../example/examples.cpp]
+[import ../example/sample_printing.cpp]
+[import ../example/get.cpp]
 
 [section Accessing structure member by index] [pfr_example_get] [endsect]
 [section Custom printing of aggregates] [pfr_sample_printing] [endsect]
-[/ [section Counting fields] [pfr_example_tuple_size] [endsect] ]
 
 
 [section three ways of getting operators ]

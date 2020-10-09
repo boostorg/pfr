@@ -34,7 +34,10 @@ test-suite pfr_tests
     [ run test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=void* : test_tuple_sizes_on_voidptrs ]
     [ run test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON="std::size_t" : test_tuple_sizes_on_size_ts ]
 
-    [ run run/motivating_example.cpp : : : : auto_engine_detection ]
+    [ run ../example/motivating_example.cpp  : : : : auto_engine_motivating ]
+    [ run ../example/sample_printing.cpp     : : : : auto_engine_sample_printing ]
+    [ run ../example/get.cpp                 : : : : auto_engine_get ]
+    [ run ../example/quick_examples.cpp      : : : : auto_engine_quick ]
     
     # TODO: template_unconstrained.cpp does not work at all
     #[ run template_unconstrained.cpp : : : $(STRUCTURED_BINDING_ENGINE) : template_unconstrained_sb ]
