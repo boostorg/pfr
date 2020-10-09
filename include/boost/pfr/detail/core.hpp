@@ -9,6 +9,10 @@
 
 #include <boost/pfr/detail/config.hpp>
 
+// Each core provides `boost::pfr::detail::tie_as_tuple` and
+// `boost::pfr::detail::for_each_field_dispatcher` functions.
+//
+// The whole PFR library is build on top of those two functions.
 #if BOOST_PFR_USE_CPP17
 #   include <boost/pfr/detail/core17.hpp>
 #elif BOOST_PFR_USE_LOOPHOLE

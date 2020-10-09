@@ -196,7 +196,7 @@ constexpr std::size_t detect_fields_count_dispatch(size_t_<N>, int, int) noexcep
     return detail::detect_fields_count_greedy<T, 0, N>(detail::multi_element_range{});
 }
 
-///////////////////// Returns non-flattened fields count
+///////////////////// Returns fields count
 template <class T>
 constexpr std::size_t fields_count() noexcept {
     using type = std::remove_cv_t<T>;

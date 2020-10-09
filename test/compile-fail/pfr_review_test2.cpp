@@ -24,7 +24,7 @@ namespace the_wild {
     // Error: std::hash not specialized for type
     // OR in C++14:
     // Error: animal is not constexpr initializable
-    BOOST_PFR_PRECISE_FUNCTIONS_FOR(animal)
+    BOOST_PFR_FUNCTIONS_FOR(animal)
 } // namespace the_wild
 
 const auto fido = the_wild::animal { "fido", "aloof" };

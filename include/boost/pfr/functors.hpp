@@ -3,8 +3,8 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_PFR_PRECISE_FUNCTORS_HPP
-#define BOOST_PFR_PRECISE_FUNCTORS_HPP
+#ifndef BOOST_PFR_FUNCTORS_HPP
+#define BOOST_PFR_FUNCTORS_HPP
 #pragma once
 
 #include <boost/pfr/detail/config.hpp>
@@ -253,4 +253,4 @@ template <class T> struct hash {
 
 }} // namespace boost::pfr
 
-#endif // BOOST_PFR_PRECISE_FUNCTORS_HPP
+#endif // BOOST_PFR_FUNCTORS_HPP

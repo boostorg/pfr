@@ -10,10 +10,10 @@
 /// Includes all the Boost.PFR headers
 
 #include <boost/pfr/core.hpp>
-#include <boost/pfr/functors.hpp>
-#include <boost/pfr/ops.hpp>
-#include <boost/pfr/io.hpp>
-#include <boost/pfr/tuple_size.hpp>
 #include <boost/pfr/functions_for.hpp>
+#include <boost/pfr/functors.hpp>
+#include <boost/pfr/io.hpp>
+#include <boost/pfr/ops.hpp>
+#include <boost/pfr/tuple_size.hpp>
 
 #endif // BOOST_PFR_HPP

@@ -3,8 +3,8 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_PFR_PRECISE_CORE_HPP
-#define BOOST_PFR_PRECISE_CORE_HPP
+#ifndef BOOST_PFR_CORE_HPP
+#define BOOST_PFR_CORE_HPP
 #pragma once
 
 #include <boost/pfr/detail/config.hpp>
@@ -193,4 +193,4 @@ constexpr detail::tie_from_structure_tuple<Elements...> tie_from_structure(Eleme
 
 }} // namespace boost::pfr
 
-#endif // BOOST_PFR_PRECISE_CORE_HPP
+#endif // BOOST_PFR_CORE_HPP

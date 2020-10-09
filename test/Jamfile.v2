@@ -22,7 +22,7 @@ local DISABLE_ON_CLANG8_PLUS = <toolset>clang-8:<build>no <toolset>clang-9:<buil
 
 local STRUCTURED_BINDING_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=1 [ requires cxx17_structured_bindings ] ;
 local LOOPHOLE_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=1 <define>BOOST_PFR_USE_CPP17=0 $(DISABLE_ON_MSVC) $(DISABLE_ON_CLANG8_PLUS) ;
-local CLASSIC_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=0 ;
+local CLASSIC_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=0 $(DISABLE_ON_MSVC) ;
 
 test-suite pfr_tests
   :

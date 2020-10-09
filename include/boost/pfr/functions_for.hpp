@@ -3,8 +3,8 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_PFR_PRECISE_FUNCTIONS_FOR_HPP
-#define BOOST_PFR_PRECISE_FUNCTIONS_FOR_HPP
+#ifndef BOOST_PFR_FUNCTIONS_FOR_HPP
+#define BOOST_PFR_FUNCTIONS_FOR_HPP
 #pragma once
 
 #include <boost/pfr/detail/config.hpp>
@@ -12,7 +12,7 @@
 #include <boost/pfr/functors.hpp>
 #include <boost/pfr/io.hpp>
 
-/// \def BOOST_PFR_PRECISE_FUNCTIONS_FOR(T)
+/// \def BOOST_PFR_FUNCTIONS_FOR(T)
 /// Defines comparison operators and stream operators for T.
 /// If type T is comparable or streamable using it's own operator (but not it's conversion operator), then the original operator is used.
 ///
@@ -22,7 +22,7 @@
 ///     struct comparable_struct {      // No operators defined for that structure
 ///         int i; short s; char data[7]; bool bl; int a,b,c,d,e,f;
 ///     };
-///     BOOST_PFR_PRECISE_FUNCTIONS_FOR(comparable_struct)
+///     BOOST_PFR_FUNCTIONS_FOR(comparable_struct)
 ///     // ...
 ///
 ///     comparable_struct s1 {0, 1, "Hello", false, 6,7,8,9,10,11};
@@ -52,7 +52,7 @@
 /// std::size_t hash_value(const T& value);
 /// \endcode
 
-#define BOOST_PFR_PRECISE_FUNCTIONS_FOR(T)                                                                                                     \
+#define BOOST_PFR_FUNCTIONS_FOR(T)                                                                                                     \
     BOOST_PFR_MAYBE_UNUSED static inline bool operator==(const T& lhs, const T& rhs) { return ::boost::pfr::equal_to<T>{}(lhs, rhs);      }    \
     BOOST_PFR_MAYBE_UNUSED static inline bool operator!=(const T& lhs, const T& rhs) { return ::boost::pfr::not_equal<T>{}(lhs, rhs);     }    \
     BOOST_PFR_MAYBE_UNUSED static inline bool operator< (const T& lhs, const T& rhs) { return ::boost::pfr::less<T>{}(lhs, rhs);          }    \
@@ -74,6 +74,6 @@
     }                                                                                                                                          \
 /**/
 
-#endif // BOOST_PFR_PRECISE_FUNCTIONS_FOR_HPP
+#endif // BOOST_PFR_FUNCTIONS_FOR_HPP
 
 

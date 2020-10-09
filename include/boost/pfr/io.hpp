@@ -4,8 +4,8 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 
-#ifndef BOOST_PFR_PRECISE_IO_HPP
-#define BOOST_PFR_PRECISE_IO_HPP
+#ifndef BOOST_PFR_IO_HPP
+#define BOOST_PFR_IO_HPP
 #pragma once
 
 #include <boost/pfr/detail/config.hpp>
@@ -103,4 +103,4 @@ void read(std::basic_istream<Char, Traits>& in, T& value) {
 
 }} // namespace boost::pfr
 
-#endif // BOOST_PFR_PRECISE_IO_HPP
+#endif // BOOST_PFR_IO_HPP

@@ -1,6 +1,6 @@
 [library Boost.PFR
     [quickbook 1.6]
-    [version 1.0]
+    [version 2.0]
     [copyright 2016-2020 Antony Polukhin]
     [category Language Features Emulation]
     [license
@@ -12,7 +12,7 @@
 
 [section Motivation and Intro]
 
-Boost.Precise and Flat tuple Representation (Boost.PFR) is a library for very basic reflection that gives you access to structure elements by index and provides other `std::tuple` like methods for user defined types without any macro or boilerplate code.
+Boost.PFR is a library for very basic reflection that gives you access to structure elements by index and provides other `std::tuple` like methods for user defined types without any macro or boilerplate code.
 
 [section Why tuples are bad and aggregates are more preferable?]
 
@@ -130,24 +130,9 @@ With PFR the code is shorter, more readable and more pleasant to write.
 [endsect]
 
 
-[section Representations]
-
-[import ../example/examples.cpp]
-
-The two different types of reflection are:
-
-* [*Precise] tuple representation, where each field type is represented as it actually exists, even if the type is itself a user-defined type.
-* [*Flat] tuple representation, where user-defined types are represented by their individual field types, and all other types are represented as they actually exists.
-
-As an example:
-
-[pfr_intro]
-
-[endsect]
-
 [section Out of the box functionality ]
 
-Boost.Precise and Flat tuple Representation (Boost.PFR) adds the following out-of-the-box functionality for aggregate initializable structures:
+Boost.PFR adds the following out-of-the-box functionality for aggregate initializable structures:
 
 * comparison operators
 * heterogeneous comparators
@@ -189,52 +174,17 @@ Examples in the table use the following definition:
     [ `var == {A {1, 2.0}}` ]
     [ [funcref boost::pfr::get get] ]
 ][
-    [ [pfr_quick_examples_flat_get_1] ]
-    [ `var == {A, {1, 3.14159}}` ]
-    [ [funcref boost::pfr::flat_get flat_get] ]
-][
     [ [pfr_quick_examples_get_2] ]
     [ `var == {A, {777, 42.01}}` ]
     [ [funcref boost::pfr::get get] ]
 ][
-    [ [pfr_quick_examples_flat_get_2] ]
-    [ `var == {A, {777, 42.01}}` ]
-    [ [funcref boost::pfr::flat_get flat_get] ]
-][
-    [ [pfr_quick_examples_flat_functors_uset] ]
-    [ `my_uset` contains `var` ]
-    [
-        [classref boost::pfr::flat_hash flat_hash]
-
-        [classref boost::pfr::flat_equal_to flat_equal_to]
-    ]
-][
-    [ [pfr_quick_examples_flat_functors_set] ]
-    [ `my_set` contains `var` ]
-    [ [classref boost::pfr::flat_less flat_less] ]
-][
-    [ [pfr_quick_examples_flat_ops] ]
-    [ assert succeeds ]
-    [ [headerref boost/pfr/flat/ops.hpp using\u00A0namespace\u00A0flat_ops;] ]
-][
     [ [pfr_quick_examples_ops] ]
     [ assert succeeds ]
-    [ [headerref boost/pfr/precise/ops.hpp using\u00A0namespace\u00A0ops;] ]
-][
-    [ [pfr_quick_examples_flat_for_each] ]
-    [ `var == {B, {778, 4.14159}}` ]
-    [ [funcref boost::pfr::flat_for_each_field flat_for_each_field] ]
+    [ [headerref boost/pfr/ops.hpp using\u00A0namespace\u00A0ops;] ]
 ][
     [ [pfr_quick_examples_for_each] ]
     [ `var == {B, {787, 103.142}}` ]
     [ [funcref boost::pfr::for_each_field for_each_field] ]
-][
-    [ [pfr_quick_examples_flat_for_each_idx] ]
-    [ ```0: char
-1: int
-2: double
-``` ]
-    [ [funcref boost::pfr::flat_for_each_field flat_for_each_field] ]
 ][
     [ [pfr_quick_examples_for_each_idx] ]
     [ ```0: char
@@ -246,25 +196,13 @@ Examples in the table use the following definition:
     [ `tuple_size: 2` ]
     [ [classref boost::pfr::tuple_size tuple_size] ]
 ][
-    [ [pfr_quick_examples_flat_tuple_size] ]
-    [ `flat_tuple_size: 3` ]
-    [ [classref boost::pfr::flat_tuple_size flat_tuple_size] ]
-][
     [ [pfr_quick_examples_structure_to_tuple] ]
     [ `var == {A, {777, 3.14159}}` ]
     [ [funcref boost::pfr::structure_to_tuple structure_to_tuple] ]
 ][
-    [ [pfr_quick_examples_flat_structure_to_tuple] ]
-    [ `var == {A, {777, 3.14159}}` ]
-    [ [funcref boost::pfr::flat_structure_to_tuple flat_structure_to_tuple] ]
-][
     [ [pfr_quick_examples_structure_tie] ]
     [ `var == {A, {1, 2.0}}` ]
     [ [funcref boost::pfr::structure_tie structure_tie] ]
-][
-    [ [pfr_quick_examples_flat_structure_tie] ]
-    [ `var == {C, {777, 3.14159}}` ]
-    [ [funcref boost::pfr::flat_structure_tie flat_structure_tie] ]
 ]]
 
 
@@ -275,67 +213,41 @@ Examples in the table use the following definition:
 
 [section Accessing structure member by index] [pfr_example_get] [endsect]
 [section Custom printing of aggregates] [pfr_sample_printing] [endsect]
-[section Flattening] [pfr_example_flattening] [pfr_example_flattening_2] [endsect]
 [/ [section Counting fields] [pfr_example_tuple_size] [endsect] ]
 
-[section Should I use Flat or Precise functions?]
-All the functions that have `flat_` prefix and are declared in `boost/pfr/flat/*` headers are the [*flat] functions, other function are [*precise] and are declared in `boost/pfr/precise/*`. In previous example you've seen how the the flattening works.
 
-Use [*flat] functions if you:
-
-* wish types flattened
-* or you reflect types with C arrays
-
-For all the other cases prefer [*precise] functions.
-
-[warning MSVC currently supports only [*precise] functions and only in /std:c++latest or /std:c++17 modes.]
-
-[endsect]
-
-
-[section Three ways of getting operators ]
+[section three ways of getting operators ]
 
 There are three ways to start using Boost.PFR hashing, comparison and streaming for type `T` in your code. Each method has its own drawbacks and suits own cases.
 
-[table:flat_ops_comp Different approaches for operators
+[table:ops_comp Different approaches for operators
     [[ Approach
     ][ Defines operators in global namespace ][ Defined operators could be found by ADL ][ Works for local types ][ Usable locally, without affecting code from other scopes ][ Ignores implicit conversion operators ][ Respects user defined operators ]]
 
     [[
-        [headerref boost/pfr/precise/ops.hpp using\u00A0namespace\u00A0boost::pfr::ops;]
-
-        [headerref boost/pfr/flat/ops.hpp using\u00A0namespace\u00A0boost::pfr::flat_ops;]
+        [headerref boost/pfr/ops.hpp using\u00A0namespace\u00A0boost::pfr::ops;]
     ][ no ][ no ][ yes ][ yes ][ no ][ yes ]]
 
     [[
-        [macroref BOOST_PFR_FLAT_FUNCTIONS_FOR]
-        
-        [macroref BOOST_PFR_PRECISE_FUNCTIONS_FOR]  
+        [macroref BOOST_PFR_FUNCTIONS_FOR]  
     ][ yes if T is in it ][ yes ][ no ][ no, but could be limited to translation unit ][ yes for T ] [ no (compile time error) ]]
-
-    [[
-        [headerref boost/pfr/flat/global_ops.hpp]
-
-        [headerref boost/pfr/precise/global_ops.hpp]
-    ][ yes ][ no ][ yes ][ no, but could be limited to translation unit ][ yes all ][ yes ]]
 ]
 
 More detailed description follows:
 
-[*1. [headerref boost/pfr/precise/ops.hpp `using namespace boost::pfr::ops;`] and [headerref boost/pfr/flat/ops.hpp `using namespace boost::pfr::flat_ops;`] approach]
+[*1. [headerref boost/pfr/ops.hpp `using namespace boost::pfr::ops;`] approach]
 
 This method is good if you're writing generic algorithms and need to use operators from Boost.PFR only if there are no operators defined for the type:
 
 ```
-#include <boost/pfr/precise/ops.hpp>
+#include <boost/pfr/ops.hpp>
 
 template <class T>
 struct uniform_comparator_less {
     bool operator()(const T& lhs, const T& rhs) const noexcept {
         using namespace boost::pfr::ops;    // Enables Boost.PFR operators usage in this scope.
 
-        // If T has operator< or conversion operator then will use it.
-        // Otherwise will use boost::pfr::flat_less<T>.
+        // If T has operator< or conversion operator then it is used.
         return lhs < rhs;
     }
 };
@@ -344,11 +256,11 @@ This method's effects are local to the function. It works even for local types, 
 However *Argument Dependant Lookup* does not work with it:
 
 ```
-#include <boost/pfr/flat/ops.hpp>
+#include <boost/pfr/ops.hpp>
 template <class T>
 struct uniform_comparator_less {
     bool operator()(const T& lhs, const T& rhs) const noexcept {
-        using namespace flat_ops;
+        using namespace ops;
 
         // Compile time error if T has neither operator< nor
         // conversion operator to comparable type.
@@ -357,67 +269,48 @@ struct uniform_comparator_less {
 };
 ```
 
-[*2. [macroref BOOST_PFR_FLAT_FUNCTIONS_FOR] and [macroref BOOST_PFR_PRECISE_FUNCTIONS_FOR] approach]
+[*2. [macroref BOOST_PFR_FUNCTIONS_FOR] approach]
 
 This method is good if you're writing a structure and wish to define operators for that structure.
 ```
-#include <boost/pfr/flat/functions_for.hpp>
+#include <boost/pfr/functions_for.hpp>
 
 struct pair_like {
     int first;
     short second;
 };
 
-BOOST_PFR_FLAT_FUNCTIONS_FOR(pair_like)   // Defines operators
+BOOST_PFR_FUNCTIONS_FOR(pair_like)   // Defines operators
 
 // ...
 
 assert(pair_like{1, 2} < pair_like{1, 3});
 ```
-Argument Dependant Lookup works well. `std::less` will find the operators for `struct pair_like`. [macroref BOOST_PFR_FLAT_FUNCTIONS_FOR BOOST_PFR_FLAT_FUNCTIONS_FOR(T)]
+Argument Dependant Lookup works well. `std::less` will find the operators for `struct pair_like`. [macroref BOOST_PFR_FUNCTIONS_FOR BOOST_PFR_FUNCTIONS_FOR(T)]
 can not be used for local types. It must be called only once in namespace of `T`. It does not respect conversion operators of `T`, so for example the following code
 will output different values:
 ```
-#include <boost/pfr/flat/functions_for.hpp>
+#include <boost/pfr/functions_for.hpp>
 
 struct empty {
     operator std::string() { return "empty{}"; }
 };
 // Uncomment to get different output:
-// BOOST_PFR_FLAT_FUNCTIONS_FOR(empty)
+// BOOST_PFR_FUNCTIONS_FOR(empty)
 
 // ...
-std::cout << empty{}; // Outputs `empty{}` if BOOST_PFR_FLAT_FUNCTIONS_FOR(empty) is commented out, '{}' otherwise.
+std::cout << empty{}; // Outputs `empty{}` if BOOST_PFR_FUNCTIONS_FOR(empty) is commented out, '{}' otherwise.
 ```
-
-[*3. [headerref boost/pfr/flat/global_ops.hpp] and [headerref boost/pfr/precise/global_ops.hpp] approach]
-
-This approach is for those, who wish to have comparisons/streaming/hashing for all their types.
-
-```
-#include <boost/pfr/flat/global_ops.hpp>
-
-struct pair_like {
-    int first;
-    short second;
-};
-
-// ...
-
-assert(pair_like{1, 2} < pair_like{1, 3});
-```
-Argument Dependant Lookup works well, `std::less` will find the operators for `struct pair_like`. Operators for local types will be also defined.
-*All conversion operators of types are not used during comparisons/streaming/hashing.*
 
 [endsect]
 
 
 [section Reflection of unions ]
 
-You could use [*precise] representation if a type contains union. But be sure that operations for union are manually defined:
+You could use tuple-like representation if a type contains union. But be sure that operations for union are manually defined:
 
 ```
-#include <boost/pfr/precise/ops.hpp>
+#include <boost/pfr/ops.hpp>
 
 union test_union {
     int i;
@@ -436,8 +329,7 @@ bool some_function(foo f1, foo f2) {
 
 ```
 
-[*Flat] reflection of types that contain unions is disabled.
-[*Flat] and [*precise] reflection of unions is disabled for safety reasons. There's a way to get the first member of a union and use it. Unfortunately there's no way to find out [*active] member of a union. Accessing an inactive union member is an Undefined Behavior. Using the first union member could lead to disaster if it is some character pointer. For example ostreaming `union {char* c; long long ll; } u; u.ll= 1;` will crash your program, as the active member is `ll` that holds `1` but we are trying to output a `char*`. This would cause an invalid pointer dereference.
+Reflection of unions is disabled for safety reasons. There's a way to get the first member of a union and use it. Unfortunately there's no way to find out [*active] member of a union. Accessing an inactive union member is an Undefined Behavior. Using the first union member could lead to disaster if it is some character pointer. For example ostreaming `union {char* c; long long ll; } u; u.ll= 1;` will crash your program, as the active member is `ll` that holds `1` but we are trying to output a `char*`. This would cause an invalid pointer dereference.
 
 Any attempt to reflect unions leads to a compile time error. In many cases a static assert is triggered that outputs the following message:
 
@@ -478,12 +370,8 @@ The reflection has some limitations that depend on a C++ Standard and compiler c
 * Additional C++14 [*only] limitations (switch to C++17 to remove all of those):
     * Non of the member fields should have a template constructor from one parameter.
     * Additional limitations if the [link boost_pfr.configuration_macro [*Loophole]] is also disabled:
-        * [*Flat]:
-            * T must be POD and must not contain references nor bitfields
-            * Enums will be returned as their underlying type
-        * [*Precise]:
-            * T must be constexpr aggregate initializable and all its fields must be constexpr default constructible
-            * [funcref boost::pfr::get], [funcref boost::pfr::structure_to_tuple], [funcref boost::pfr::structure_tie], [headerref boost/pfr/precise/core.hpp boost::pfr::tuple_element] require T to be a flat POD type
+        * T must be constexpr aggregate initializable and all its fields must be constexpr default constructible
+        * [funcref boost::pfr::get], [funcref boost::pfr::structure_to_tuple], [funcref boost::pfr::structure_tie], [headerref boost/pfr/core.hpp boost::pfr::tuple_element] require T to be a flat POD type
 
 [endsect]
 
@@ -491,30 +379,25 @@ The reflection has some limitations that depend on a C++ Standard and compiler c
 
 Short description:
 
-* Flat functions:
-    # at compile-time: use aggregate initialization to detect fields count in user-provided structure
-    # at compile-time: make a structure that is convertible to anything and remember types it has been converted to during aggregate initialization of user-provided structure
-    # at compile-time: using knowledge from previous steps create a tuple with exactly the same layout as in user-provided structure
-    # at compile-time: find offsets for each field in user-provided structure using the tuple from previous step
-    # at run-time: get pointer to each field, knowing the structure address and each field offset
-    # at run-time: a tuple of references to fields is returned => all the tuple methods are available for the structure
-
-* Precise functions:
-    # at compile-time: use aggregate initialization to detect fields count in user-provided structure
-        * C++17:
-            # at compile-time: structured bindings are used to decompose a type `T` to known amount of fields
-        * C++14:
-            # Same approach as with [*flat] functions
-        * C++14 with disabled [link boost_pfr.configuration_macro [*Loophole]]:
-            # at compile-time: use flat representation if it could precisely represent the type. Otherwise:
-            # at compile-time: let `I` be is an index of current field, it equals 0
-            # at run-time: `T` is constructed and field `I` is aggregate initialized using a separate instance of structure that is convertible to anything [note Additional care is taken to make sure that all the information about `T` is available to the compiler and that operations on `T` have no side effects, so the compiler can optimize away the unnecessary temporary objects.]
-            # at compile-time: `I += 1`
-            # at compile-time: if `I` does not equal fields count goto step [~c.] from inside of the conversion operator of the structure that is convertible to anything
-            # at compile-time: using knowledge from previous steps create a tuple with exactly the same layout as in user-provided structure
-            # at compile-time: find offsets for each field in user-provided structure using the tuple from previous step
-            # at run-time: get pointer to each field, knowing the structure address and each field offset
-    # at run-time: a tuple of references to fields is returned => all the tuple methods are available for the structure
+# at compile-time: use aggregate initialization to detect fields count in user-provided structure
+    * C++17:
+        # at compile-time: structured bindings are used to decompose a type `T` to known amount of fields
+    * C++14:
+        # at compile-time: use aggregate initialization to detect fields count in user-provided structure
+        # at compile-time: make a structure that is convertible to anything and remember types it has been converted to during aggregate initialization of user-provided structure
+        # at compile-time: using knowledge from previous steps create a tuple with exactly the same layout as in user-provided structure
+        # at compile-time: find offsets for each field in user-provided structure using the tuple from previous step
+        # at run-time: get pointer to each field, knowing the structure address and each field offset
+        # at run-time: a tuple of references to fields is returned => all the tuple methods are available for the structure
+    * C++14 with disabled [link boost_pfr.configuration_macro [*Loophole]]:
+        # at compile-time: let `I` be is an index of current field, it equals 0
+        # at run-time: `T` is constructed and field `I` is aggregate initialized using a separate instance of structure that is convertible to anything [note Additional care is taken to make sure that all the information about `T` is available to the compiler and that operations on `T` have no side effects, so the compiler can optimize away the unnecessary temporary objects.]
+        # at compile-time: `I += 1`
+        # at compile-time: if `I` does not equal fields count goto step [~c.] from inside of the conversion operator of the structure that is convertible to anything
+        # at compile-time: using knowledge from previous steps create a tuple with exactly the same layout as in user-provided structure
+        # at compile-time: find offsets for each field in user-provided structure using the tuple from previous step
+        # at run-time: get pointer to each field, knowing the structure address and each field offset
+# at run-time: a tuple of references to fields is returned => all the tuple methods are available for the structure
 
 Long description of some basics: [@https://youtu.be/UlNUNxLtBI0 Antony Polukhin: Better C++14 reflections].
 Long description of some basics of C++14 with disabled [link boost_pfr.configuration_macro [*Loophole]]: [@https://youtu.be/abdeAew3gmQ Antony Polukhin: C++14 Reflections Without Macros, Markup nor External Tooling].
@@ -532,7 +415,5 @@ Great thanks to Chris Beck for implementing the detect-offsets-and-get-field-add
 [endsect]
 
 [section Reference]
-[xinclude autodoc_precise.xml]
-[xinclude autodoc_flat.xml]
 [xinclude autodoc_all.xml]
 [endsect]

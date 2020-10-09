@@ -29,7 +29,7 @@ struct comparable_struct {
     int i; short s; bool bl; int a,b,c,d,e,f;
 };
 
-BOOST_PFR_PRECISE_FUNCTIONS_FOR(comparable_struct)
+BOOST_PFR_FUNCTIONS_FOR(comparable_struct)
 
 template <typename Struct>
 void test_some_comparable_struct() {
@@ -65,7 +65,7 @@ void test_comparable_struct() {
 }
 
 struct empty { operator std::string() { return "empty{}"; } };
-BOOST_PFR_PRECISE_FUNCTIONS_FOR(empty)
+BOOST_PFR_FUNCTIONS_FOR(empty)
 
 void test_empty_struct() {
     BOOST_TEST_EQ(empty{}, empty{});
@@ -73,7 +73,7 @@ void test_empty_struct() {
 
 namespace foo {
     struct testing { bool b1, b2; int i; };
-    BOOST_PFR_PRECISE_FUNCTIONS_FOR(testing);
+    BOOST_PFR_FUNCTIONS_FOR(testing);
 }
 
 template <class Comparator>
@@ -99,7 +99,7 @@ void test_implicit_conversions() {
 
     ss.str("");
     ss << empty{};
-    BOOST_TEST_EQ(ss.str(), "{}"); // Breaks implicit conversion for types marked with BOOST_PFR_PRECISE_FUNCTIONS_FOR
+    BOOST_TEST_EQ(ss.str(), "{}"); // Breaks implicit conversion for types marked with BOOST_PFR_FUNCTIONS_FOR
 }
 
 namespace {
@@ -108,14 +108,14 @@ struct anonymous_comparable_struct {
     int i; short s; bool bl; int a,b,c,d,e,f;
 };
 
-BOOST_PFR_PRECISE_FUNCTIONS_FOR(anonymous_comparable_struct)
+BOOST_PFR_FUNCTIONS_FOR(anonymous_comparable_struct)
 
 
 struct other_anonymous_struct {
     anonymous_comparable_struct a,b;
 };
 
-BOOST_PFR_PRECISE_FUNCTIONS_FOR(other_anonymous_struct)
+BOOST_PFR_FUNCTIONS_FOR(other_anonymous_struct)
 
 }
 

@@ -30,7 +30,6 @@ local doxygen_params =
         <doxygen:param>INLINE_SIMPLE_STRUCTS=YES
         <doxygen:param>SORT_MEMBER_DOCS=NO
         <doxygen:param>"ALIASES= \\
-            \"flattening{1}=\\xmlonly<link linkend='boost_pfr.tutorial.flattening'>\\1</link>\\endxmlonly\" \\
             \"podops=\\b See \\b Also: \\xmlonly<link linkend='boost_pfr.tutorial.three_ways_of_getting_operators'>Three ways of getting operators</link>\\endxmlonly\" \\
             \"constexprinit{1}=\\xmlonly<link linkend='boost_pfr.limitations'>\\1</link>\\endxmlonly\" \\
             \"rcast=\\b Note: If reflecting structures with enums may `reinterpret_cast` enum to a reference to underlying type.\" \\
@@ -41,29 +40,10 @@ local doxygen_params =
 doxygen autodoc_all
     :
         [ glob ../../../boost/pfr.hpp ]
+        [ glob ../../../boost/pfr/*.hpp ]
     :
         $(doxygen_params)
         <xsl:param>"boost.doxygen.reftitle=Include all"
-    ;
-
-
-doxygen autodoc_flat
-    :
-        [ glob ../../../boost/pfr/flat.hpp ]
-        [ glob ../../../boost/pfr/flat/*.hpp ]
-    :
-        $(doxygen_params)
-        <xsl:param>"boost.doxygen.reftitle=Flat Reflection"
-    ;
-
-
-doxygen autodoc_precise
-    :
-        [ glob ../../../boost/pfr/precise.hpp ]
-        [ glob ../../../boost/pfr/precise/*.hpp ]
-    :
-        $(doxygen_params)
-        <xsl:param>"boost.doxygen.reftitle=Precise Reflection"
     ;
 
 boostbook pfr-doc
@@ -71,8 +51,6 @@ boostbook pfr-doc
         pfr.qbk
     :
         <dependency>autodoc_all
-        <dependency>autodoc_precise
-        <dependency>autodoc_flat
         <xsl:param>boost.root=http://www.boost.org/doc/libs/1_63_0
         #<xsl:param>boost.root=../../../.
         <xml:param>html.stylesheet=../../../../doc/src/boostbook.css

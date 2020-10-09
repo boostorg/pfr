@@ -4,8 +4,8 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 
-#ifndef BOOST_PFR_PRECISE_TUPLE_SIZE_HPP
-#define BOOST_PFR_PRECISE_TUPLE_SIZE_HPP
+#ifndef BOOST_PFR_TUPLE_SIZE_HPP
+#define BOOST_PFR_TUPLE_SIZE_HPP
 #pragma once
 
 #include <boost/pfr/detail/config.hpp>
@@ -19,8 +19,7 @@
 namespace boost { namespace pfr {
 
 /// Has a static const member variable `value` that contains fields count in a T.
-/// Works for any T that supports aggregate initialization even if T is not POD.
-/// \flattening{Flattens} only multidimensional arrays.
+/// Works for any T that supports aggregate initialization.
 ///
 /// \b Requires: C++14.
 ///
@@ -33,8 +32,7 @@ using tuple_size = detail::size_t_< boost::pfr::detail::fields_count<T>() >;
 
 
 /// `tuple_size_v` is a template variable that contains fields count in a T and
-/// works for any T that supports aggregate initialization even if T is not POD.
-/// \flattening{Flattens} only multidimensional arrays.
+/// works for any T that supports aggregate initialization.
 ///
 /// \b Requires: C++14.
 ///
@@ -47,4 +45,4 @@ constexpr std::size_t tuple_size_v = tuple_size<T>::value;
 
 }} // namespace boost::pfr
 
-#endif // BOOST_PFR_PRECISE_TUPLE_SIZE_HPP
+#endif // BOOST_PFR_TUPLE_SIZE_HPP
