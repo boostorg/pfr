@@ -19,11 +19,9 @@ struct Foo {
 };
 
 int main() {
-#if BOOST_PFR_USE_LOOPHOLE || BOOST_PFR_USE_CPP17
     Foo f{0};
     f.a.val_ = 5;
 
     BOOST_TEST_EQ(boost::pfr::get<0>(f).val_, 5);
     return boost::report_errors();
-#endif
 }

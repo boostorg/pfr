@@ -19,121 +19,73 @@ project
 
 local DISABLE_ON_MSVC = <toolset>msvc:<build>no ;
 local DISABLE_ON_CLANG8_PLUS = <toolset>clang-8:<build>no <toolset>clang-9:<build>no <toolset>clang-10:<build>no ;
-local LOOPHOLE_PREC_DEF = <define>BOOST_PFR_USE_LOOPHOLE=1 $(DISABLE_ON_MSVC) $(DISABLE_ON_CLANG8_PLUS) ;
-local CLASSIC_PREC_DEF = <define>BOOST_PFR_USE_LOOPHOLE=0 ;
 
-test-suite pfr
+local STRUCTURED_BINDING_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=1 [ requires cxx17_structured_bindings ] ;
+local LOOPHOLE_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=1 <define>BOOST_PFR_USE_CPP17=0 $(DISABLE_ON_MSVC) $(DISABLE_ON_CLANG8_PLUS) ;
+local CLASSIC_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=0 ;
+
+test-suite pfr_tests
   :
     [ run offset_based_getter.cpp ]
 
-    [ run ops.cpp                : : : $(CLASSIC_PREC_DEF)               : ops ]
-    [ run ops.cpp                : : : $(LOOPHOLE_PREC_DEF)              : lh_ops ]
+    [ run test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=char : test_tuple_sizes_on_chars ]
+    [ run test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=int : test_tuple_sizes_on_ints ]
+    [ run test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=short : test_tuple_sizes_on_shorts ]
+    [ run test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=void* : test_tuple_sizes_on_voidptrs ]
+    [ run test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON="std::size_t" : test_tuple_sizes_on_size_ts ]
 
-    [ run functions_for.cpp      : : : $(CLASSIC_PREC_DEF)               : function_for ]
-    [ run functions_for.cpp      : : : $(LOOPHOLE_PREC_DEF)              : lh_function_for ]
-
-    [ run read_write.cpp         : : : $(CLASSIC_PREC_DEF)               : read_write ]
-    [ run read_write.cpp         : : : $(LOOPHOLE_PREC_DEF)              : lh_read_write ]
-
-    [ run std_interactions.cpp   : : : $(CLASSIC_PREC_DEF)               : std_interactions ]
-    [ run std_interactions.cpp   : : : $(LOOPHOLE_PREC_DEF)              : lh_std_interactions ]
-
-    [ compile-fail pfr_review_test2.cpp   : $(CLASSIC_PREC_DEF)          : pfr_review_test2 ]
-    [ compile-fail pfr_review_test2.cpp   : $(LOOPHOLE_PREC_DEF)         : lh_pfr_review_test2 ]
-
-    [ compile-fail movable_and_lvalue_references.cpp : $(CLASSIC_PREC_DEF)   : movable_and_lvalue_references ]
-    [ compile-fail movable_and_lvalue_references.cpp : $(LOOPHOLE_PREC_DEF)  : lh_movable_and_lvalue_references ]
-
-    [ compile-fail private_fields.cpp : $(CLASSIC_PREC_DEF)              : private_fields ]
-    [ compile-fail private_fields.cpp : $(LOOPHOLE_PREC_DEF)             : lh_private_fields ]
-
-    [ compile-fail protected_fields.cpp : $(CLASSIC_PREC_DEF)            : protected_fields ]
-    [ compile-fail protected_fields.cpp : $(LOOPHOLE_PREC_DEF)           : lh_protected_fields ]
-
-    [ compile-fail virtual_functions.cpp : $(CLASSIC_PREC_DEF)           : virtual_functions ]
-    [ compile-fail virtual_functions.cpp : $(LOOPHOLE_PREC_DEF)          : lh_virtual_functions ]
-
-    [ compile-fail ops_on_union.cpp : $(CLASSIC_PREC_DEF)                : on_union ]
-    [ compile-fail ops_on_union.cpp : $(LOOPHOLE_PREC_DEF)               : lh_on_union ]
-
-    [ compile-fail ops_unions.cpp : $(CLASSIC_PREC_DEF)                  : unions ]
-    [ compile-fail ops_unions.cpp : $(LOOPHOLE_PREC_DEF)                 : lh_unions ]
-
-    [ compile-fail ops_unrestricted_unions.cpp : $(CLASSIC_PREC_DEF)     : unrestricted_unions ]
-    [ compile-fail ops_unrestricted_unions.cpp : $(LOOPHOLE_PREC_DEF)    : lh_unrestricted_unions ]
-
-    [ compile-fail rvalue_tie.cpp : $(CLASSIC_PREC_DEF)                  : rvalue_tie ]
-    [ compile-fail rvalue_tie.cpp : $(LOOPHOLE_PREC_DEF)                 : lh_rvalue_tie ]
-
-    [ run non_std_layout.cpp     : : : $(CLASSIC_PREC_DEF)               : non_standard_layout ]
-    [ run non_std_layout.cpp     : : : $(LOOPHOLE_PREC_DEF)              : lh_non_standard_layout ]
-
-    [ run non_default_constructible.cpp : : : $(CLASSIC_PREC_DEF)        : non_default_constructible ]
-    [ run non_default_constructible.cpp : : : $(LOOPHOLE_PREC_DEF)       : lh_non_default_constructible ]
-
-    [ run non_copyable_but_movable.cpp : : : $(CLASSIC_PREC_DEF)         : non_copyable_but_movable ]
-    [ run non_copyable_but_movable.cpp : : : $(LOOPHOLE_PREC_DEF)        : lh_non_copyable_but_movable ]
-
-    [ run non_default_constructible_non_copyable_but_movable.cpp : : : $(CLASSIC_PREC_DEF)      : non_dc_non_cop_but_mov ]
-    [ run non_default_constructible_non_copyable_but_movable.cpp : : : $(LOOPHOLE_PREC_DEF)     : lh_non_dc_non_cop_but_mov ]
-
-    [ compile-fail fields_count_on_reference.cpp ]
-    [ run fields_count_on_const.cpp ]
-
-    [ run test_tuple_sizes_on.cpp : : : $(DISABLE_ON_MSVC) <define>BOOST_PFR_RUN_TEST_ON=char : test_tuple_sizes_on_chars ]
-    [ run test_tuple_sizes_on.cpp : : : $(DISABLE_ON_MSVC) <define>BOOST_PFR_RUN_TEST_ON=int : test_tuple_sizes_on_ints ]
-    [ run test_tuple_sizes_on.cpp : : : $(DISABLE_ON_MSVC) <define>BOOST_PFR_RUN_TEST_ON=short : test_tuple_sizes_on_shorts ]
-    [ run test_tuple_sizes_on.cpp : : : $(DISABLE_ON_MSVC) <define>BOOST_PFR_RUN_TEST_ON=void* : test_tuple_sizes_on_voidptrs ]
-    [ run test_tuple_sizes_on.cpp : : : $(DISABLE_ON_MSVC) <define>BOOST_PFR_RUN_TEST_ON="std::size_t" : test_tuple_sizes_on_size_ts ]
-
-    [ run tuple_size.cpp                    : : : $(CLASSIC_PREC_DEF) : tuple_size ]
-    [ run bitfields.cpp                     : : : $(CLASSIC_PREC_DEF) : tuple_size_on_bitfields ]
-    [ run for_each_field.cpp                : : : $(CLASSIC_PREC_DEF) : for_each_field ]
-    [ run motivating_example0.cpp           : : : $(CLASSIC_PREC_DEF) : motivating_example0 ]
-    [ run motivating_example.cpp            : : : $(CLASSIC_PREC_DEF) : motivating_example ]
-    [ run motivating_example2.cpp           : : : $(CLASSIC_PREC_DEF) : motivating_example2 ]
-    [ run optional_like.cpp                 : : : $(CLASSIC_PREC_DEF) : optional_like ]
-    [ run get_non_default_constructible.cpp : : : $(CLASSIC_PREC_DEF) : get_non_default_constructible ]
-    [ run destructuring_tie.cpp             : : : $(CLASSIC_PREC_DEF) : destructuring_tie ]
-    [ run error_pfr_c1202.cpp               : : : $(CLASSIC_PREC_DEF) : c1202_issue21 ]
-    [ compile-fail non_aggregate.cpp        : $(CLASSIC_PREC_DEF)     : non_aggregate ]
-    [ run tie_anonymous.cpp                 : : : $(CLASSIC_PREC_DEF) [ requires cxx17_structured_bindings ] : tie_anonymous ]
-
-    # See "Requirements and Limitations" section of the docs for info on following tests:
-    #[ compile-fail template_constructor.cpp   : $(CLASSIC_PREC_DEF) [ requires !cxx17_structured_bindings ] : template_constructor14 ]
-    #[ compile-fail template_unconstrained.cpp : $(CLASSIC_PREC_DEF) [ requires !cxx17_structured_bindings ] : template_unconstrained14 ]
-    [ run template_constructor.cpp          : : : $(CLASSIC_PREC_DEF) [ requires cxx17_structured_bindings ] : template_constructor ]
-    # TODO:
-    #[ run template_unconstrained.cpp        : : : $(CLASSIC_PREC_DEF) [ requires cxx17_structured_bindings ] : template_unconstrained ]
-
-    # The following tests may compile of fail depending on C++ Standard version.
-    #[ compile-fail issue30.cpp              : $(CLASSIC_PREC_DEF) : issue30 ]
-    #[ compile-fail issue33.cpp              : $(CLASSIC_PREC_DEF) : issue33 ]
-
-    [ run tuple_size.cpp                    : : : $(LOOPHOLE_PREC_DEF) : lh_tuple_size ]
-    [ run bitfields.cpp                     : : : $(LOOPHOLE_PREC_DEF) : lh_tuple_size_on_bitfields ]
-    [ run for_each_field.cpp                : : : $(LOOPHOLE_PREC_DEF) : lh_for_each_field ]
-    [ run motivating_example0.cpp           : : : $(LOOPHOLE_PREC_DEF) : lh_motivating_example0 ]
-    [ run motivating_example.cpp            : : : $(LOOPHOLE_PREC_DEF) : lh_motivating_example ]
-    [ run motivating_example2.cpp           : : : $(LOOPHOLE_PREC_DEF) : lh_motivating_example2 ]
-    [ run optional_like.cpp                 : : : $(LOOPHOLE_PREC_DEF) : lh_optional_like ]
-    [ run get_non_default_constructible.cpp : : : $(LOOPHOLE_PREC_DEF) : lh_get_non_default_constructible ]
-    [ run error_pfr_c1202.cpp               : : : $(LOOPHOLE_PREC_DEF) : lh_c1202_issue21 ]
-    [ run issue30.cpp                       : : : $(LOOPHOLE_PREC_DEF) : lh_issue30 ]
-    [ run issue33.cpp                       : : : $(LOOPHOLE_PREC_DEF) : lh_issue33 ]
-    [ compile-fail non_aggregate.cpp        : $(LOOPHOLE_PREC_DEF) : lh_non_aggregate ]
-    [ run tie_anonymous.cpp                 : : : $(LOOPHOLE_PREC_DEF) [ requires cxx17_structured_bindings ] : lh_tie_anonymous ]
-
-    # See "Requirements and Limitations" section of the docs for info on following tests:
-    #[ compile-fail template_constructor.cpp   : $(LOOPHOLE_PREC_DEF) [ requires !cxx17_structured_bindings ] : lh_template_constructor14 ]
-    #[ compile-fail template_unconstrained.cpp : $(LOOPHOLE_PREC_DEF) [ requires !cxx17_structured_bindings ] : lh_template_unconstrained14 ]
-    [ run template_constructor.cpp   : : : $(LOOPHOLE_PREC_DEF) [ requires cxx17_structured_bindings ] : lh_template_constructor ]
-    # TODO:
-    #[ run template_unconstrained.cpp : : : $(LOOPHOLE_PREC_DEF) [ requires cxx17_structured_bindings ] : lh_template_unconstrained ]
-
-
-    # Examples from docs
-    [ run ../example/quick_examples.cpp : : : $(DISABLE_ON_MSVC) ]
+    [ run run/motivating_example.cpp : : : : auto_engine_detection ]
+    
+    # TODO: template_unconstrained.cpp does not work at all
+    #[ run template_unconstrained.cpp : : : $(STRUCTURED_BINDING_ENGINE) : template_unconstrained_sb ]
+    #[ run template_unconstrained.cpp : : : $(LOOPHOLE_ENGINE) : template_unconstrained_lh ]
+    #[ compile-fail template_unconstrained.cpp : $(CLASSIC_ENGINE) : template_unconstrained_classic ]
   ;
 
+local BLACKLIST_TESTS_FOR_LOOPHOLE =
+    template_constructor    # Template constructor in one of the fields of the aggregate
+    tie_anonymous           # TODO: const is dropped, fix
+  ;
 
+# Those tests are either 
+# * reflecting a non literal type
+# * or calling boost::pfr::get and the result is a user defined structure
+local BLACKLIST_TESTS_FOR_CLASSIC =
+    get_non_default_constructible
+    issue30
+    issue33
+    motivating_example0
+    motivating_example2
+    optional_like
+    read_write_non_literal
+    template_constructor
+    tie_anonymous
+  ;
+
+for local source_file in [ glob ./run/*.cpp ] ../example/quick_examples.cpp
+{
+    local target_name = $(source_file[1]:B) ;
+    pfr_tests += [ run $(source_file) : : : $(STRUCTURED_BINDING_ENGINE) : $(target_name)_sb ] ;
+    
+    if ! $(target_name) in $(BLACKLIST_TESTS_FOR_LOOPHOLE)
+    {
+        pfr_tests += [ run $(source_file) : : : $(LOOPHOLE_ENGINE) : $(target_name)_lh ] ;
+    }
+
+    if ! $(target_name) in $(BLACKLIST_TESTS_FOR_CLASSIC)
+    {
+        pfr_tests += [ run $(source_file) : : : $(CLASSIC_ENGINE) : $(target_name)_classic ] ;
+    }
+    else
+    {
+        pfr_tests += [ compile-fail $(source_file) : $(CLASSIC_ENGINE) : $(target_name)_classic ] ;
+    }
+}
+
+for local source_file in [ glob ./compile-fail/*.cpp ]
+{
+    local target_name = $(source_file[1]:B) ;
+    pfr_tests += [ compile-fail $(source_file) : $(STRUCTURED_BINDING_ENGINE) : $(target_name)_sb ] ;
+    pfr_tests += [ compile-fail $(source_file) : $(LOOPHOLE_ENGINE) : $(target_name)_lh ] ;
+    pfr_tests += [ compile-fail $(source_file) : $(CLASSIC_ENGINE) : $(target_name)_classic ] ;
+}

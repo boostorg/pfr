@@ -8,6 +8,7 @@
 #include <boost/pfr/ops.hpp>
 
 #include <string>
+#include <type_traits>
 
 #if defined(__has_include)
 #   if __has_include(<optional>)
@@ -57,8 +58,9 @@ void test_in_anon_ns() {
     auto v = boost::pfr::structure_tie(x);
     BOOST_TEST_EQ(std::get<0>(v).data, 1);
     BOOST_TEST_EQ(std::get<1>(v).data, 2);
+    using v_type = decltype(v);
     static_assert(std::is_same<
-        std::tuple<other_anon&, const other_anon&>, decltype(v)
+        std::tuple<other_anon&, const other_anon&>, v_type
     >::value, "");
 
     auto const_v = boost::pfr::structure_tie(const_x);
@@ -84,8 +86,9 @@ void test_in_non_non_ns() {
     auto v = boost::pfr::structure_tie(x);
     BOOST_TEST_EQ(std::get<0>(v).data, 1);
     BOOST_TEST_EQ(std::get<1>(v).data, 2);
+    using v_type = decltype(v);
     static_assert(std::is_same<
-        std::tuple<other_anon&, const other_anon&>, decltype(v)
+        std::tuple<other_anon&, const other_anon&>, v_type
     >::value, "");
 
     auto const_v = boost::pfr::structure_tie(const_x);

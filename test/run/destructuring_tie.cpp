@@ -7,8 +7,6 @@
 #include <boost/pfr/core.hpp>
 #include <boost/core/lightweight_test.hpp>
 
-#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
-
 auto parseHex(char const* p, size_t limit = ~0u) {
     struct { size_t val; char const* rest; } res = { 0, p };
     while (limit) {
@@ -60,12 +58,3 @@ int main() {
     return boost::report_errors();
 }
 
-#else // C++14 without loophole
-
-#include <iostream>
-
-int main(int, char** argv) {
-   std::cerr << argv[0] << ": Not supported in C++14 without reflection loophole.\n";
-}
-
-#endif

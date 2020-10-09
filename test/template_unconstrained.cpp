@@ -30,6 +30,7 @@ struct int_element {
     int value_;
 };
 
+
 struct aggregate_unconstrained {
     unconstrained_template<int> a;
     unconstrained_template<int_element> b;
