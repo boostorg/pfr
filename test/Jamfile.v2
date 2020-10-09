@@ -62,7 +62,7 @@ local BLACKLIST_TESTS_FOR_CLASSIC =
     tie_anonymous
   ;
 
-for local source_file in [ glob ./run/*.cpp ] ../example/quick_examples.cpp
+for local source_file in [ glob ./run/*.cpp ] [ glob ../example/*.cpp ]
 {
     local target_name = $(source_file[1]:B) ;
     pfr_tests += [ run $(source_file) : : : $(STRUCTURED_BINDING_ENGINE) : $(target_name)_sb ] ;

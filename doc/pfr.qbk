@@ -18,6 +18,9 @@ Boost.PFR is a library for very basic reflection that gives you access to struct
 
 `std::tuple` and `std::pair` are great for generic programming, however they have disadvantages. First of all, code that uses them becomes barely readable. Consider two definitions:
 
+[table:tuples_vs_aggregates
+[[ Tuple ] [ Aggregate ]]
+[[
 ```
 using auth_info_tuple = std::tuple<
     std::int64_t,
@@ -25,14 +28,17 @@ using auth_info_tuple = std::tuple<
     std::int64_t,
     std::time_t
 >;
-
+```
+][
+```
 struct auth_info_aggregate {
     std::int64_t id;
     std::int64_t session_id;
     std::int64_t source_id;
-    std::time_t valid_till;
+    std::time_t  valid_till;
 };
 ```
+]]
 
 Definition via [@https://en.cppreference.com/w/cpp/language/aggregate_initialization aggregate initializable] structure is much more clear. Same story with usages: `return std::get<1>(value);` vs. `return value.session_id;`.
 
@@ -210,6 +216,8 @@ Examples in the table use the following definition:
 
 
 [section Tutorial]
+
+[import ../example/examples.cpp]
 
 [section Accessing structure member by index] [pfr_example_get] [endsect]
 [section Custom printing of aggregates] [pfr_sample_printing] [endsect]
