@@ -39,6 +39,7 @@ struct auth_info_aggregate {
 };
 ```
 ]]
+]
 
 Definition via [@https://en.cppreference.com/w/cpp/language/aggregate_initialization aggregate initializable] structure is much more clear. Same story with usages: `return std::get<1>(value);` vs. `return value.session_id;`.
 
@@ -422,6 +423,5 @@ Great thanks to Chris Beck for implementing the detect-offsets-and-get-field-add
 
 [endsect]
 
-[section Reference]
 [xinclude autodoc_all.xml]
-[endsect]
+

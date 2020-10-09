@@ -43,7 +43,7 @@ doxygen autodoc_all
         [ glob ../../../boost/pfr/*.hpp ]
     :
         $(doxygen_params)
-        <xsl:param>"boost.doxygen.reftitle=Include all"
+        <xsl:param>"boost.doxygen.reftitle=Reference Section"
     ;
 
 boostbook pfr-doc
@@ -51,7 +51,7 @@ boostbook pfr-doc
         pfr.qbk
     :
         <dependency>autodoc_all
-        <xsl:param>boost.root=http://www.boost.org/doc/libs/1_63_0
+        <xsl:param>boost.root=http://www.boost.org/doc/libs/1_72_0
         #<xsl:param>boost.root=../../../.
         <xml:param>html.stylesheet=../../../../doc/src/boostbook.css
     ;
