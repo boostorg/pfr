@@ -570,7 +570,7 @@ auto tie_as_tuple(T& val) noexcept {
     );
     static_assert(
         boost::pfr::detail::is_flat_refelectable<T>( detail::make_index_sequence<boost::pfr::detail::fields_count<T>()>{} ),
-        "====================> Boost.PFR: Not possible in C++14 to represent that type without loosing information. Use boost::pfr::flat_ version, or change type definition, or enable C++17"
+        "====================> Boost.PFR: Not possible in C++14 to represent that type without loosing information. Change type definition or enable C++17"
     );
     return boost::pfr::detail::tie_as_flat_tuple(val);
 }

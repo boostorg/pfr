@@ -46,15 +46,18 @@ test-suite pfr_tests
   ;
 
 local BLACKLIST_TESTS_FOR_LOOPHOLE =
-    template_constructor    # Template constructor in one of the fields of the aggregate
-    tie_anonymous           # TODO: const is dropped, fix
+    get_const_field                     # boost::pfr::get gives compile time error on const fields
+    template_constructor                # Template constructor in one of the fields of the aggregate
+    tie_anonymous_const_field           # boost::pfr::structure_tie gives compile time error on const fields
   ;
 
 # Those tests are either 
 # * reflecting a non literal type
 # * or calling boost::pfr::get and the result is a user defined structure
 local BLACKLIST_TESTS_FOR_CLASSIC =
+    get_const_field
     get_non_default_constructible
+    get_rvalue
     issue30
     issue33
     motivating_example0
@@ -63,6 +66,7 @@ local BLACKLIST_TESTS_FOR_CLASSIC =
     read_write_non_literal
     template_constructor
     tie_anonymous
+    tie_anonymous_const_field
   ;
 
 for local source_file in [ glob ./run/*.cpp ] [ glob ../example/*.cpp ]
@@ -73,6 +77,10 @@ for local source_file in [ glob ./run/*.cpp ] [ glob ../example/*.cpp ]
     if ! $(target_name) in $(BLACKLIST_TESTS_FOR_LOOPHOLE)
     {
         pfr_tests += [ run $(source_file) : : : $(LOOPHOLE_ENGINE) : $(target_name)_lh ] ;
+    }
+    else
+    {
+        pfr_tests += [ compile-fail $(source_file) : $(LOOPHOLE_ENGINE) : $(target_name)_lh ] ;
     }
 
     if ! $(target_name) in $(BLACKLIST_TESTS_FOR_CLASSIC)

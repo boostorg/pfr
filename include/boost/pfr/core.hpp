@@ -43,8 +43,28 @@ constexpr decltype(auto) get(const T& val) noexcept {
 
 /// \overload get
 template <std::size_t I, class T>
-constexpr decltype(auto) get(T& val) noexcept {
+constexpr decltype(auto) get(T& val
+#if !BOOST_PFR_USE_CPP17
+    , std::enable_if_t<std::is_assignable<T, T>::value>* = nullptr
+#endif
+) noexcept {
     return detail::sequence_tuple::get<I>( detail::tie_as_tuple(val) );
+}
+
+#if !BOOST_PFR_USE_CPP17
+/// \overload get
+template <std::size_t I, class T>
+constexpr auto get(T&, std::enable_if_t<!std::is_assignable<T, T>::value>* = nullptr) noexcept {
+    static_assert(sizeof(T) && false, "====================> Boost.PFR: Calling boost::pfr::get on non const non assignable type is allowed only in C++17");
+    return 0;
+}
+#endif
+
+
+/// \overload get
+template <std::size_t I, class T>
+constexpr auto get(T&& val, std::enable_if_t< std::is_rvalue_reference<T&&>::value>* = 0) noexcept {
+    return std::move(detail::sequence_tuple::get<I>( detail::tie_as_tuple(val) ));
 }
 
 
@@ -119,12 +139,25 @@ constexpr auto structure_tie(const T& val) noexcept {
 
 /// \overload structure_tie
 template <class T>
-constexpr auto structure_tie(T& val) noexcept {
+constexpr auto structure_tie(T& val
+#if !BOOST_PFR_USE_CPP17
+    , std::enable_if_t<std::is_assignable<T, T>::value>* = nullptr
+#endif
+) noexcept {
     return detail::make_stdtiedtuple_from_tietuple(
         detail::tie_as_tuple(val),
         detail::make_index_sequence< tuple_size_v<T> >()
     );
 }
+
+#if !BOOST_PFR_USE_CPP17
+/// \overload structure_tie
+template <class T>
+constexpr auto structure_tie(T&, std::enable_if_t<!std::is_assignable<T, T>::value>* = nullptr) noexcept {
+    static_assert(sizeof(T) && false, "====================> Boost.PFR: Calling boost::pfr::structure_tie on non const non assignable type is allowed only in C++17");
+    return 0;
+}
+#endif
 
 
 /// \overload structure_tie
