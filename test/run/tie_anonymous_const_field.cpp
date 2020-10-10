@@ -11,11 +11,6 @@
 #include <typeindex>
 #include <type_traits>
 
-namespace some {
-    struct struct1{ int i; };
-    struct struct2{ int i; };
-}
-
 namespace testing {
 
 namespace {

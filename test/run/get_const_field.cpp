@@ -10,11 +10,6 @@
 
 #include <boost/core/lightweight_test.hpp>
 
-namespace some {
-    struct struct1{ int i; };
-    struct struct2{ int i; };
-}
-
 namespace testing {
 
 namespace {

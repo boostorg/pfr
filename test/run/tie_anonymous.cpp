@@ -5,13 +5,13 @@
 
 #include <boost/core/lightweight_test.hpp>
 
-#include <boost/pfr/ops.hpp>
+#include <boost/pfr/core.hpp>
 
 #include <string>
 #include <type_traits>
 
 #if defined(__has_include)
-#   if __has_include(<optional>)
+#   if __has_include(<optional>) && (__cplusplus >= 201703L)
 #       include <optional>
 #   endif
 #endif

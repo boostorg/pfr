@@ -14,116 +14,92 @@
 
 Boost.PFR is a library for very basic reflection that gives you access to structure elements by index and provides other `std::tuple` like methods for user defined types without any macro or boilerplate code.
 
-[section Why tuples are bad and aggregates are more preferable?]
+[import ../example/motivating_example0.cpp]
+[pfr_motivating_example]
 
-`std::tuple` and `std::pair` are great for generic programming, however they have disadvantages. First of all, code that uses them becomes barely readable. Consider two definitions:
-
-[table:tuples_vs_aggregates
-[[ Tuple ] [ Aggregate ]]
-[[
-```
-using auth_info_tuple = std::tuple<
-    std::int64_t,
-    std::int64_t,
-    std::int64_t,
-    std::time_t
->;
-```
-][
-```
-struct auth_info_aggregate {
-    std::int64_t id;
-    std::int64_t session_id;
-    std::int64_t source_id;
-    std::time_t  valid_till;
-};
-```
-]]
-]
-
-Definition via [@https://en.cppreference.com/w/cpp/language/aggregate_initialization aggregate initializable] structure is much more clear. Same story with usages: `return std::get<1>(value);` vs. `return value.session_id;`.
-
-Another advantage of aggregates is a more efficient copy, move construction and assignments.
-
-Because of the above issues many guidelines recommend to [*use aggregates instead of tuples]. However aggregates fail when it comes to the functional like programming.
-
-PFR library [*provides tuple like methods for aggregate initializable structures], making aggregates usable in contexts where only tuples were useful.
 
 [note All you have to do is to add `#include <boost/pfr.hpp>`.
 
 No macro or other type/member registrations required.]
 
-[endsect]
 
+[h2 Usecase example]
 
-[section Sample with DB]
-
-Imagine that you are writing the wrapper library for database. User of your library wish to implement `retrieve_friend` function:
-
-```
-#include <db/api.hpp> // your library
-
-// User code:
-
-struct user_info {
-    std::int64_t id;
-    std::string name;
-    std::int64_t github_stars;
-    std::string email;
-};
-
-// ...
-
-user_info retrieve_friend(std::string_view name);
-```
-
-Depending on the usage of PFR in your DB wrapper users code will look differently:
+Imagine that you are writing the wrapper library for a database. Depending on the usage of PFR users code will look differently:
 
 [table:quick_examples
 [[ Without PFR ] [ With PFR ]]
 [[
 ```
+#include <db/api.hpp>
+
+struct user_info {
+    std::int64_t id;
+    std::string name, email, login;
+};
+
 user_info retrieve_friend(std::string_view name) {
-    std::tuple<<std::int64_t, std::string, std::int64_t>> info
-      = db::one_row_as<std::int64_t, std::string, std::int64_t>(
-        "SELECT id, name, github_stars, email FROM user_infos WHERE name=$0",
+    std::tuple info_tuple
+      = db::one_row_as<std::int64_t, std::string, std::string, std::string>(
+        "SELECT id, name, email, login FROM user_infos WHERE name=$0",
         name
     );
 
-    auto friend_info = ask_user_for_friend(
-        user_info{
-            std::move(std::get<0>(info)),
-            std::move(std::get<1>(info)),
-            std::move(std::get<2>(info)),
-            std::move(std::get<3>(info)),
-        }
-    );
-
-    db::insert(
-        "INSERT INTO user_infos(id, name, github_stars, email) VALUES ($0, $1, $2, $3)",
-        std::move(std::get<0>(friend_info)),
-        std::move(std::get<1>(friend_info)),
-        std::move(std::get<2>(friend_info)).
-        std::move(std::get<3>(friend_info))
-    );
-
-    return friend_info;
-}
-
-```
-][
-```
-user_info retrieve_friend(std::string_view name) {
-    user_info info = db::one_row_as<user_info>(
-        "SELECT id, name, github_stars, email FROM user_infos WHERE name=$0",
-        name
-    );
+    ////// Library users would usually move data from tuple to helper structures //////
+    user_info info {
+        std::move(std::get<0>(info_tuple)),
+        std::move(std::get<1>(info_tuple)),
+        std::move(std::get<2>(info_tuple)),
+        std::move(std::get<3>(info_tuple)),
+    }
+    //////////////////////////////////////////////////////////////////////////////////
 
     auto friend_info = ask_user_for_friend(std::move(info));
 
     db::insert(
         "INSERT INTO user_infos(id, name, github_stars, email) VALUES ($0, $1, $2, $3)",
-        friend_info
+        std::move(friend_info.id),    ////////////////////////////////////////////////
+        std::move(friend_info.name),  // Users are forced to move individual fields
+        std::move(friend_info.email), // because your library can not iterate over
+        std::move(friend_info.login), // the fields of a user provided structure
+    );
+
+    return friend_info;
+}
+```
+][
+```
+#include <db/api.hpp>
+
+struct user_info {
+    std::int64_t id;
+    std::string name, email, login;
+};
+
+user_info retrieve_friend(std::string_view name) {
+    // With PFR you can put data directly into user provided structures
+    user_info info = db::one_row_as<user_info>(
+        "SELECT id, name, email, login FROM user_infos WHERE name=$0",
+        name
+    );
+
+    ///////////////// No boiler plate code to move data around ///////////////////////    
+
+
+
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////
+
+    auto friend_info = ask_user_for_friend(std::move(info));
+
+    db::insert(
+        "INSERT INTO user_infos(id, name, github_stars, email) VALUES ($0, $1, $2, $3)",
+        friend_info     //////////////////////////////////////////////////////////////
+                        // PFR allows you to iterate over all the fields of a user
+                        // provided structure
+                        //
     );
 
     return friend_info;
@@ -134,10 +110,9 @@ user_info retrieve_friend(std::string_view name) {
 
 With PFR the code is shorter, more readable and more pleasant to write.
 
-[endsect]
 
 
-[section Out of the box functionality ]
+[h2 Out of the box functionality ]
 
 Boost.PFR adds the following out-of-the-box functionality for aggregate initializable structures:
 
@@ -152,15 +127,9 @@ Boost.PFR adds the following out-of-the-box functionality for aggregate initiali
 
 PFR is a header only library that does not depend on Boost. You can just copy the content of the "include" folder [@https://github.com/apolukhin/magic_get from the github] into your project, and the library will work fine.
 
-[endsect]
-
-[warning This is not an official Boost library! It wasn't reviewed and can't be downloaded from www.boost.org. This library is available to the community to know real interest and get comments for refinement. The intention is to submit library to formal review, if community think that it is interesting!]
-
 [caution Recommended C++ Standards are C++17 and above]
 
 [caution Library requires at least C++14! Pre C++14 compilers (C++11, C++03...) are not supported]
-
-
 
 [endsect]
 
@@ -221,11 +190,47 @@ Examples in the table use the following definition:
 [import ../example/sample_printing.cpp]
 [import ../example/get.cpp]
 
+
+[section Why tuples are bad and aggregates are more preferable?]
+
+`std::tuple` and `std::pair` are good for generic programming, however they have disadvantages. First of all, code that uses them becomes barely readable. Consider two definitions:
+
+[table:tuples_vs_aggregates
+[[ Tuple ] [ Aggregate ]]
+[[
+```
+using auth_info_tuple = std::tuple<
+    std::int64_t, // What does this integer represents?
+    std::int64_t,
+    std::time_t
+>;
+```
+][
+```
+struct auth_info_aggregate {
+    std::int64_t user_id;    // Oh, now I see!
+    std::int64_t session_id;
+    std::time_t  valid_till;
+};
+```
+]]
+]
+
+Definition via [@https://en.cppreference.com/w/cpp/language/aggregate_initialization aggregate initializable] structure is much more clear. Same story with usages: `return std::get<1>(value);` vs. `return value.session_id;`.
+
+Another advantage of aggregates is a more efficient copy, move construction and assignments.
+
+Because of the above issues many guidelines recommend to [*use aggregates instead of tuples]. However aggregates fail when it comes to the functional like programming.
+
+PFR library [*provides tuple like methods for aggregate initializable structures], making aggregates usable in contexts where only tuples were useful.
+
+[endsect]
+
 [section Accessing structure member by index] [pfr_example_get] [endsect]
 [section Custom printing of aggregates] [pfr_sample_printing] [endsect]
 
 
-[section three ways of getting operators ]
+[section Three ways of getting operators ]
 
 There are three ways to start using Boost.PFR hashing, comparison and streaming for type `T` in your code. Each method has its own drawbacks and suits own cases.
 
