@@ -12,7 +12,6 @@
 #include <boost/pfr/ops.hpp>
 
 #include <boost/pfr/detail/functional.hpp>
-#include <boost/pfr/detail/make_integer_sequence.hpp>
 
 /// \file boost/pfr/functors.hpp
 /// Contains functors that are close to the Standard Library ones.
@@ -27,7 +26,7 @@ namespace boost { namespace pfr {
 template <class T = void> struct equal_to {
     /// \return \b true if each field of \b x equals the field with same index of \b y.
     bool operator()(const T& x, const T& y) const {
-        return detail::binary_visit<detail::equal_impl>(x, y);
+        return boost::pfr::eq(x, y);
     }
 
 #ifdef BOOST_PFR_DOXYGEN_INVOKED
@@ -44,7 +43,7 @@ template <class T = void> struct equal_to {
 template <> struct equal_to<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const {
-        return detail::binary_visit<detail::equal_impl>(x, y);
+        return boost::pfr::eq(x, y);
     }
 
     typedef std::true_type is_transparent;
@@ -55,7 +54,7 @@ template <> struct equal_to<void> {
 template <class T = void> struct not_equal {
     /// \return \b true if at least one field \b x not equals the field with same index of \b y.
     bool operator()(const T& x, const T& y) const {
-        return detail::binary_visit<detail::not_equal_impl>(x, y);
+        return boost::pfr::ne(x, y);
     }
 
 #ifdef BOOST_PFR_DOXYGEN_INVOKED
@@ -72,7 +71,7 @@ template <class T = void> struct not_equal {
 template <> struct not_equal<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const {
-        return detail::binary_visit<detail::not_equal_impl>(x, y);
+        return boost::pfr::ne(x, y);
     }
 
     typedef std::true_type is_transparent;
@@ -83,7 +82,7 @@ template <> struct not_equal<void> {
 template <class T = void> struct greater {
     /// \return \b true if field of \b x greater than the field with same index of \b y and all previous fields of \b x equal to the same fields of \b y.
     bool operator()(const T& x, const T& y) const {
-        return detail::binary_visit<detail::greater_impl>(x, y);
+        return boost::pfr::gt(x, y);
     }
 
 #ifdef BOOST_PFR_DOXYGEN_INVOKED
@@ -100,7 +99,7 @@ template <class T = void> struct greater {
 template <> struct greater<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const {
-        return detail::binary_visit<detail::greater_impl>(x, y);
+        return boost::pfr::gt(x, y);
     }
 
     typedef std::true_type is_transparent;
@@ -111,7 +110,7 @@ template <> struct greater<void> {
 template <class T = void> struct less {
     /// \return \b true if field of \b x less than the field with same index of \b y and all previous fields of \b x equal to the same fields of \b y.
     bool operator()(const T& x, const T& y) const {
-        return detail::binary_visit<detail::less_impl>(x, y);
+        return boost::pfr::lt(x, y);
     }
 
 #ifdef BOOST_PFR_DOXYGEN_INVOKED
@@ -128,7 +127,7 @@ template <class T = void> struct less {
 template <> struct less<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const {
-        return detail::binary_visit<detail::less_impl>(x, y);
+        return boost::pfr::lt(x, y);
     }
 
     typedef std::true_type is_transparent;
@@ -140,7 +139,7 @@ template <class T = void> struct greater_equal {
     /// \return \b true if field of \b x greater than the field with same index of \b y and all previous fields of \b x equal to the same fields of \b y;
     /// or if each field of \b x equals the field with same index of \b y.
     bool operator()(const T& x, const T& y) const {
-        return detail::binary_visit<detail::greater_equal_impl>(x, y);
+        return boost::pfr::ge(x, y);
     }
 
 #ifdef BOOST_PFR_DOXYGEN_INVOKED
@@ -157,7 +156,7 @@ template <class T = void> struct greater_equal {
 template <> struct greater_equal<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const {
-        return detail::binary_visit<detail::greater_equal_impl>(x, y);
+        return boost::pfr::ge(x, y);
     }
 
     typedef std::true_type is_transparent;
@@ -169,7 +168,7 @@ template <class T = void> struct less_equal {
     /// \return \b true if field of \b x less than the field with same index of \b y and all previous fields of \b x equal to the same fields of \b y;
     /// or if each field of \b x equals the field with same index of \b y.
     bool operator()(const T& x, const T& y) const {
-        return detail::binary_visit<detail::less_equal_impl>(x, y);
+        return boost::pfr::le(x, y);
     }
 
 #ifdef BOOST_PFR_DOXYGEN_INVOKED
@@ -186,7 +185,7 @@ template <class T = void> struct less_equal {
 template <> struct less_equal<void> {
     template <class T, class U>
     bool operator()(const T& x, const U& y) const {
-        return detail::binary_visit<detail::less_equal_impl>(x, y);
+        return boost::pfr::le(x, y);
     }
 
     typedef std::true_type is_transparent;

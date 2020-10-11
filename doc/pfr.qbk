@@ -136,50 +136,46 @@ PFR is a header only library that does not depend on Boost. You can just copy th
 
 [section Short Examples for the Impatient]
 
-Examples in the table use the following definition:
-
 [import ../example/quick_examples.cpp]
-
-[pfr_quick_examples_structures]
 
 
 [table:quick_examples
-[[ Code snippet ] [ `var` content or output ] [ Function description: ]]
+[[ Code snippet ] [ Functions reference: ]]
 [
-    [ [pfr_quick_examples_get_1] ]
-    [ `var == {A {1, 2.0}}` ]
-    [ [funcref boost::pfr::get get] ]
-][
-    [ [pfr_quick_examples_get_2] ]
-    [ `var == {A, {777, 42.01}}` ]
-    [ [funcref boost::pfr::get get] ]
+    [ [pfr_quick_examples_get] ]
+    [ [funcref boost::pfr::get] ]
 ][
     [ [pfr_quick_examples_ops] ]
-    [ assert succeeds ]
-    [ [headerref boost/pfr/ops.hpp using\u00A0namespace\u00A0ops;] ]
+    [
+        [headerref boost/pfr/ops.hpp Header boost/pfr/ops.hpp]
+    ]
 ][
     [ [pfr_quick_examples_for_each] ]
-    [ `var == {B, {787, 103.142}}` ]
-    [ [funcref boost::pfr::for_each_field for_each_field] ]
+    [
+        [funcref boost::pfr::for_each_field]
+
+        [funcref boost::pfr::io]
+    ]
+][
+    [ [pfr_quick_examples_functions_for] ]
+    [ [macroref BOOST_PFR_FUNCTIONS_FOR] ]
+][
+    [ [pfr_quick_examples_eq_fields] ]
+    [ [headerref boost/pfr/ops.hpp Header boost/pfr/ops_fields.hpp ]
 ][
     [ [pfr_quick_examples_for_each_idx] ]
-    [ ```0: char
-1: quick_examples_ns::foo
-``` ]
-    [ [funcref boost::pfr::for_each_field for_each_field] ]
+    [ [funcref boost::pfr::for_each_field] ]
 ][
     [ [pfr_quick_examples_tuple_size] ]
-    [ `tuple_size: 2` ]
-    [ [classref boost::pfr::tuple_size tuple_size] ]
+    [ [classref boost::pfr::tuple_size] ]
 ][
     [ [pfr_quick_examples_structure_to_tuple] ]
-    [ `var == {A, {777, 3.14159}}` ]
-    [ [funcref boost::pfr::structure_to_tuple structure_to_tuple] ]
+    [ [funcref boost::pfr::structure_to_tuple] ]
 ][
     [ [pfr_quick_examples_structure_tie] ]
-    [ `var == {A, {1, 2.0}}` ]
-    [ [funcref boost::pfr::structure_tie structure_tie] ]
+    [ [funcref boost::pfr::structure_tie] ]
 ]]
+]
 
 
 [endsect]

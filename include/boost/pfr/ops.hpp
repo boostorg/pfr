@@ -42,100 +42,113 @@ namespace boost { namespace pfr {
 namespace detail {
 
 ///////////////////// Helper typedefs that are used by all the ops
-    template <template <class, class> class Detector, class T>
-    using enable_not_comp_base_t = typename std::enable_if<
-        not_appliable<Detector, T const&, T const&>::value,
+    template <template <class, class> class Detector, class T, class U>
+    using enable_not_comp_base_t = std::enable_if_t<
+        not_appliable<Detector, T const&, U const&>::value,
         bool
-    >::type;
+    >;
 
-    template <template <class, class> class Detector, class T>
-    using enable_comp_base_t = typename std::enable_if<
-        !not_appliable<Detector, T const&, T const&>::value,
+    template <template <class, class> class Detector, class T, class U>
+    using enable_comp_base_t = std::enable_if_t<
+        !not_appliable<Detector, T const&, U const&>::value,
         bool
-    >::type;
+    >;
 ///////////////////// std::enable_if_t like functions that enable only if types do not support operation
 
-    template <class T> using enable_not_eq_comp_t = enable_not_comp_base_t<comp_eq_detector, T>;
-    template <class T> using enable_not_ne_comp_t = enable_not_comp_base_t<comp_ne_detector, T>;
-    template <class T> using enable_not_lt_comp_t = enable_not_comp_base_t<comp_lt_detector, T>;
-    template <class T> using enable_not_le_comp_t = enable_not_comp_base_t<comp_le_detector, T>;
-    template <class T> using enable_not_gt_comp_t = enable_not_comp_base_t<comp_gt_detector, T>;
-    template <class T> using enable_not_ge_comp_t = enable_not_comp_base_t<comp_ge_detector, T>;
+    template <class T, class U> using enable_not_eq_comp_t = enable_not_comp_base_t<comp_eq_detector, T, U>;
+    template <class T, class U> using enable_not_ne_comp_t = enable_not_comp_base_t<comp_ne_detector, T, U>;
+    template <class T, class U> using enable_not_lt_comp_t = enable_not_comp_base_t<comp_lt_detector, T, U>;
+    template <class T, class U> using enable_not_le_comp_t = enable_not_comp_base_t<comp_le_detector, T, U>;
+    template <class T, class U> using enable_not_gt_comp_t = enable_not_comp_base_t<comp_gt_detector, T, U>;
+    template <class T, class U> using enable_not_ge_comp_t = enable_not_comp_base_t<comp_ge_detector, T, U>;
 
+    template <class T> using enable_not_hashable_t = std::enable_if_t<
+        not_appliable<hash_detector, const T&, const T&>::value,
+        std::size_t
+    >;
 ///////////////////// std::enable_if_t like functions that enable only if types do support operation
 
-    template <class T> using enable_eq_comp_t = enable_comp_base_t<comp_eq_detector, T>;
-    template <class T> using enable_ne_comp_t = enable_comp_base_t<comp_ne_detector, T>;
-    template <class T> using enable_lt_comp_t = enable_comp_base_t<comp_lt_detector, T>;
-    template <class T> using enable_le_comp_t = enable_comp_base_t<comp_le_detector, T>;
-    template <class T> using enable_gt_comp_t = enable_comp_base_t<comp_gt_detector, T>;
-    template <class T> using enable_ge_comp_t = enable_comp_base_t<comp_ge_detector, T>;
+    template <class T, class U> using enable_eq_comp_t = enable_comp_base_t<comp_eq_detector, T, U>;
+    template <class T, class U> using enable_ne_comp_t = enable_comp_base_t<comp_ne_detector, T, U>;
+    template <class T, class U> using enable_lt_comp_t = enable_comp_base_t<comp_lt_detector, T, U>;
+    template <class T, class U> using enable_le_comp_t = enable_comp_base_t<comp_le_detector, T, U>;
+    template <class T, class U> using enable_gt_comp_t = enable_comp_base_t<comp_gt_detector, T, U>;
+    template <class T, class U> using enable_ge_comp_t = enable_comp_base_t<comp_ge_detector, T, U>;
+
+    template <class T> using enable_hashable_t = std::enable_if_t<
+        !not_appliable<hash_detector, const T&, const T&>::value,
+        std::size_t
+    >;
 } // namespace detail
 
-template <class T>
-detail::enable_not_eq_comp_t<T> eq(const T& lhs, const T& rhs) noexcept {
+template <class T, class U>
+detail::enable_not_eq_comp_t<T, U> eq(const T& lhs, const U& rhs) noexcept {
     return boost::pfr::eq_fields(lhs, rhs);
 }
 
-template <class T>
-detail::enable_eq_comp_t<T> eq(const T& lhs, const T& rhs) noexcept {
+template <class T, class U>
+detail::enable_eq_comp_t<T, U> eq(const T& lhs, const U& rhs) {
     return lhs == rhs;
 }
 
-template <class T>
-detail::enable_not_ne_comp_t<T> ne(const T& lhs, const T& rhs) noexcept {
+template <class T, class U>
+detail::enable_not_ne_comp_t<T, U> ne(const T& lhs, const U& rhs) noexcept {
     return boost::pfr::ne_fields(lhs, rhs);
 }
 
-template <class T>
-detail::enable_ne_comp_t<T> ne(const T& lhs, const T& rhs) noexcept {
+template <class T, class U>
+detail::enable_ne_comp_t<T, U> ne(const T& lhs, const U& rhs) {
     return lhs != rhs;
 }
 
-template <class T>
-detail::enable_not_lt_comp_t<T> lt(const T& lhs, const T& rhs) noexcept {
+template <class T, class U>
+detail::enable_not_lt_comp_t<T, U> lt(const T& lhs, const U& rhs) noexcept {
     return boost::pfr::lt_fields(lhs, rhs);
 }
 
-template <class T>
-detail::enable_lt_comp_t<T> lt(const T& lhs, const T& rhs) noexcept {
+template <class T, class U>
+detail::enable_lt_comp_t<T, U> lt(const T& lhs, const U& rhs) {
     return lhs < rhs;
 }
 
-template <class T>
-detail::enable_not_gt_comp_t<T> gt(const T& lhs, const T& rhs) noexcept {
+template <class T, class U>
+detail::enable_not_gt_comp_t<T, U> gt(const T& lhs, const U& rhs) noexcept {
     return boost::pfr::gt_fields(lhs, rhs);
 }
 
-template <class T>
-detail::enable_gt_comp_t<T> gt(const T& lhs, const T& rhs) noexcept {
+template <class T, class U>
+detail::enable_gt_comp_t<T, U> gt(const T& lhs, const U& rhs) {
     return lhs > rhs;
 }
 
-template <class T>
-detail::enable_not_le_comp_t<T> le(const T& lhs, const T& rhs) noexcept {
+template <class T, class U>
+detail::enable_not_le_comp_t<T, U> le(const T& lhs, const U& rhs) noexcept {
     return boost::pfr::le_fields(lhs, rhs);
 }
 
-template <class T>
-detail::enable_le_comp_t<T> le(const T& lhs, const T& rhs) noexcept {
+template <class T, class U>
+detail::enable_le_comp_t<T, U> le(const T& lhs, const U& rhs) {
     return lhs <= rhs;
 }
 
-template <class T>
-detail::enable_not_ge_comp_t<T> ge(const T& lhs, const T& rhs) noexcept {
+template <class T, class U>
+detail::enable_not_ge_comp_t<T, U> ge(const T& lhs, const U& rhs) noexcept {
     return boost::pfr::ge_fields(lhs, rhs);
 }
 
-template <class T>
-detail::enable_ge_comp_t<T> ge(const T& lhs, const T& rhs) noexcept {
+template <class T, class U>
+detail::enable_ge_comp_t<T, U> ge(const T& lhs, const U& rhs) {
     return lhs >= rhs;
 }
 
-/// \brief helper function for Boost
 template <class T>
-static std::enable_if_t<std::is_trivial<T>::value, std::size_t> hash_value(const T& value) noexcept {
+detail::enable_not_hashable_t<T> hash_value(const T& value) noexcept {
     return boost::pfr::hash_fields(value);
+}
+
+template <class T>
+detail::enable_hashable_t<T> hash_value(const T& value) {
+    return std::hash<T>{}(value);
 }
 
 }} // namespace boost::pfr
