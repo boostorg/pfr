@@ -24,7 +24,7 @@
 
 namespace boost { namespace pfr {
 
-/// \brief Returns reference or const reference to a field with index `I` in aggregate T.
+/// \brief Returns reference or const reference to a field with index `I` in \aggregate T.
 ///
 /// \b Requires: C++17 or \flatpod{C++14 flat POD or C++14 with not disabled Loophole}.
 ///
@@ -68,31 +68,31 @@ constexpr auto get(T&& val, std::enable_if_t< std::is_rvalue_reference<T&&>::val
 }
 
 
-/// \brief `tuple_element` has a `typedef type-of-a-field-with-index-I-in-aggregate-T type;`
+/// \brief `tuple_element` has a `using type = type-of-a-field-with-index-I-in-T;`
 ///
 /// \b Requires: C++17 or \flatpod{C++14 flat POD or C++14 with not disabled Loophole}.
 ///
 /// \b Example:
 /// \code
-///     std::vector<  boost::pfr::tuple_element<0, my_structure>::type  > v;
+///     std::vector< boost::pfr::tuple_element<0, my_structure>::type > v;
 /// \endcode
 template <std::size_t I, class T>
 using tuple_element = detail::sequence_tuple::tuple_element<I, decltype( ::boost::pfr::detail::tie_as_tuple(std::declval<T&>()) ) >;
 
 
-/// \brief Type of a field with index `I` in aggregate `T`.
+/// \brief Type of a field with index `I` in \aggregate `T`.
 ///
 /// \b Requires: C++17 or \flatpod{C++14 flat POD or C++14 with not disabled Loophole}.
 ///
 /// \b Example:
 /// \code
-///     std::vector<  boost::pfr::tuple_element_t<0, my_structure>  > v;
+///     std::vector< boost::pfr::tuple_element_t<0, my_structure> > v;
 /// \endcode
 template <std::size_t I, class T>
 using tuple_element_t = typename tuple_element<I, T>::type;
 
 
-/// \brief Creates an `std::tuple` from an aggregate T.
+/// \brief Creates a `std::tuple` from an \aggregate T.
 ///
 /// \b Requires: C++17 or \flatpod{C++14 flat POD or C++14 with not disabled Loophole}.
 ///
@@ -112,7 +112,7 @@ constexpr auto structure_to_tuple(const T& val) noexcept {
 }
 
 
-/// \brief Creates an `std::tuple` with const lvalue references to fields of an aggregate T.
+/// \brief Creates a `std::tuple` with const lvalue references to fields of an \aggregate T.
 ///
 /// \b Requires: C++17 or \flatpod{C++14 flat POD or C++14 with not disabled Loophole}.
 ///
@@ -174,7 +174,7 @@ constexpr auto structure_tie(T&&, std::enable_if_t< std::is_rvalue_reference<T&&
 /// \param func must have one of the following signatures:
 ///     * any_return_type func(U&& field)                // field of value is perfect forwarded to function
 ///     * any_return_type func(U&& field, std::size_t i)
-///     * any_return_type func(U&& value, I i)  // Here I is an `std::integral_constant<size_t, field_index>`
+///     * any_return_type func(U&& value, I i)           // Here I is an `std::integral_constant<size_t, field_index>`
 ///
 /// \param value To each field of this variable will be the `func` applied.
 ///
@@ -208,7 +208,7 @@ void for_each_field(T&& value, F&& func) {
 }
 
 /// \brief Create a tuple of lvalue references capable of de-structuring
-/// assignment from fields of an aggregate T.
+/// assignment from fields of an \aggregate T.
 ///
 /// \b Example:
 /// \code

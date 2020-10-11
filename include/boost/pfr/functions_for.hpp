@@ -13,8 +13,7 @@
 #include <boost/pfr/io_fields.hpp>
 
 /// \def BOOST_PFR_FUNCTIONS_FOR(T)
-/// Defines comparison operators and stream operators for T.
-/// If type T is comparable or streamable using it's own operator (but not it's conversion operator), then the original operator is used.
+/// Defines comparison and stream operators for T along with hash_value function.
 ///
 /// \b Example:
 /// \code
@@ -73,5 +72,4 @@
 /**/
 
 #endif // BOOST_PFR_FUNCTIONS_FOR_HPP
-
 
