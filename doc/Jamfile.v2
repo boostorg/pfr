@@ -30,6 +30,7 @@ local doxygen_params =
         <doxygen:param>INLINE_SIMPLE_STRUCTS=YES
         <doxygen:param>SORT_MEMBER_DOCS=NO
         <doxygen:param>"ALIASES= \\
+            \"forcedlink{1}=\\xmlonly<link linkend='boost.pfr.\\1'>\\endxmlonly boost::pfr::\\1\\xmlonly</link>\\endxmlonly\" \\
             \"podops=\\b See \\b Also : \\xmlonly<link linkend='boost_pfr.tutorial.three_ways_of_getting_operators'>\\endxmlonly Three ways of getting operators \\xmlonly</link>\\endxmlonly\" \\
             \"constexprinit{1}=\\xmlonly<link linkend='boost_pfr.limitations'>\\endxmlonly \\1 \\xmlonly</link>\\endxmlonly\" \\
             \"rcast=\\b Note: If reflecting structures with enums may `reinterpret_cast` enum to a reference to underlying type.\" \\

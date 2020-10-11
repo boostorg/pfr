@@ -81,11 +81,15 @@ namespace detail {
     >;
 } // namespace detail
 
+/// \brief Compares lhs and rhs for equality using their own conversion operators
+///
+/// \returns: true of false
 template <class T, class U>
 detail::enable_not_eq_comp_t<T, U> eq(const T& lhs, const U& rhs) noexcept {
     return boost::pfr::eq_fields(lhs, rhs);
 }
 
+/// \overload eq
 template <class T, class U>
 detail::enable_eq_comp_t<T, U> eq(const T& lhs, const U& rhs) {
     return lhs == rhs;

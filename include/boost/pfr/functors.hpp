@@ -22,7 +22,7 @@ namespace boost { namespace pfr {
 
 ///////////////////// Comparisons
 
-/// \brief std::equal_to like comparator that returns boost::pfr::eq(x, y)
+/// \brief std::equal_to like comparator that returns \forcedlink{eq}(x, y)
 template <class T = void> struct equal_to {
     /// \return \b true if each field of \b x equals the field with same index of \b y.
     bool operator()(const T& x, const T& y) const {
@@ -50,7 +50,7 @@ template <> struct equal_to<void> {
 };
 /// @endcond
 
-/// \brief std::not_equal like comparator that returns boost::pfr::ne(x, y)
+/// \brief std::not_equal like comparator that returns \forcedlink{ne}(x, y)
 template <class T = void> struct not_equal {
     /// \return \b true if at least one field \b x not equals the field with same index of \b y.
     bool operator()(const T& x, const T& y) const {
@@ -78,7 +78,7 @@ template <> struct not_equal<void> {
 };
 /// @endcond
 
-/// \brief std::greater like comparator that returns boost::pfr::gt(x, y)
+/// \brief std::greater like comparator that returns \forcedlink{gt}(x, y)
 template <class T = void> struct greater {
     /// \return \b true if field of \b x greater than the field with same index of \b y and all previous fields of \b x equal to the same fields of \b y.
     bool operator()(const T& x, const T& y) const {
@@ -106,7 +106,7 @@ template <> struct greater<void> {
 };
 /// @endcond
 
-/// \brief std::less like comparator that returns boost::pfr::lt(x, y)
+/// \brief std::less like comparator that returns \forcedlink{lt}(x, y)
 template <class T = void> struct less {
     /// \return \b true if field of \b x less than the field with same index of \b y and all previous fields of \b x equal to the same fields of \b y.
     bool operator()(const T& x, const T& y) const {
@@ -134,7 +134,7 @@ template <> struct less<void> {
 };
 /// @endcond
 
-/// \brief std::greater_equal like comparator that returns boost::pfr::ge(x, y)
+/// \brief std::greater_equal like comparator that returns \forcedlink{ge}(x, y)
 template <class T = void> struct greater_equal {
     /// \return \b true if field of \b x greater than the field with same index of \b y and all previous fields of \b x equal to the same fields of \b y;
     /// or if each field of \b x equals the field with same index of \b y.
@@ -163,7 +163,7 @@ template <> struct greater_equal<void> {
 };
 /// @endcond
 
-/// \brief std::less_equal like comparator that returns boost::pfr::le(x, y)
+/// \brief std::less_equal like comparator that returns \forcedlink{le}(x, y)
 template <class T = void> struct less_equal {
     /// \return \b true if field of \b x less than the field with same index of \b y and all previous fields of \b x equal to the same fields of \b y;
     /// or if each field of \b x equals the field with same index of \b y.
@@ -193,7 +193,7 @@ template <> struct less_equal<void> {
 /// @endcond
 
 
-/// \brief std::hash like functor that returns boost::pfr::hash_value(x)
+/// \brief std::hash like functor that returns \forcedlink{hash_value}(x)
 template <class T> struct hash {
     /// \return hash value of \b x.
     std::size_t operator()(const T& x) const {
