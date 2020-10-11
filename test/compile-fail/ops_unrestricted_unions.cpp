@@ -4,7 +4,6 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/pfr/ops.hpp>
-using namespace boost::pfr::ops;
 
 #include <string>
 
@@ -21,5 +20,5 @@ int main() {
     // Not calling the destructor intentionally!
     auto v = new two_unions{{1}, {1}};
 
-    return *v == *v;
+    return boost::pfr::eq(*v, *v);
 }

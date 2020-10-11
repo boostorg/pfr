@@ -42,8 +42,7 @@ void test_examples() {
   {
 //[pfr_quick_examples_ops
     struct test { std::string f1; std::string_view f2; };
-    using namespace boost::pfr::ops; // Defines comparisons
-    assert((test{"abc", ""} > test{"aaa", "zomg"}));
+    assert(boost::pfr::gt(test{"abc", ""}, test{"aaa", "zomg"}));
 //]
   }
 #endif

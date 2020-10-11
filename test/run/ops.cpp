@@ -4,6 +4,7 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <boost/pfr/ops.hpp>
+#include <boost/pfr/io.hpp>
 
 #include <iostream>
 #include <typeinfo>
@@ -33,45 +34,41 @@ inline std::istream& operator>>(std::istream& is, test_union& src) { ++test_unio
 
 template <class T>
 void test_comparable_struct() {
-    using namespace boost::pfr::ops;
+    using namespace boost::pfr;
     T s1 {0, 1, false, 6,7,8,9,10,11};
     T s2 = s1;
     T s3 {0, 1, false, 6,7,8,9,10,11111};
-    BOOST_TEST(s1 == s2);
-    BOOST_TEST(s1 <= s2);
-    BOOST_TEST(s1 >= s2);
-    BOOST_TEST(!(s1 != s2));
-    BOOST_TEST(!(s1 == s3));
-    BOOST_TEST(s1 != s3);
-    BOOST_TEST(s1 < s3);
-    BOOST_TEST(s3 > s2);
-    BOOST_TEST(s1 <= s3);
-    BOOST_TEST(s3 >= s2);
+    BOOST_TEST(eq(s1, s2));
+    BOOST_TEST(le(s1, s2));
+    BOOST_TEST(ge(s1, s2));
+    BOOST_TEST(!ne(s1, s2));
+    BOOST_TEST(!eq(s1, s3));
+    BOOST_TEST(ne(s1, s3));
+    BOOST_TEST(lt(s1, s3));
+    BOOST_TEST(gt(s3, s2));
+    BOOST_TEST(le(s1, s3));
+    BOOST_TEST(ge(s3, s2));
 
-    std::cout << s1 << std::endl;
+    write(std::cout, s1);
 
     T s4;
     std::stringstream ss;
     ss.exceptions ( std::ios::failbit);
-    ss << s1;
-    ss >> s4;
-    std::cout << s4 << std::endl;
-    BOOST_TEST(s1 == s4);
-    int i = 1, j = 2;
-    BOOST_TEST_NE(i, j);
+    write(ss, s1);
+    read(ss, s4);
+    write(std::cout, s4);
+    BOOST_TEST(eq(s1, s4));
 }
 
 void test_empty_struct() {
     struct empty {};
-    using namespace boost::pfr::ops;
-    std::cout << empty{};
-    BOOST_TEST(empty{} == empty{});
+    boost::pfr::write(std::cout, empty{});
+    BOOST_TEST(boost::pfr::eq(empty{}, empty{}));
 }
 
 void test_implicit_conversions() {
-    using namespace boost::pfr::ops;
     std::stringstream ss;
-    ss << std::true_type{};
+    boost::pfr::write(ss, std::true_type{});
     BOOST_TEST_EQ(ss.str(), "1"); // Does not break implicit conversion
 }
 

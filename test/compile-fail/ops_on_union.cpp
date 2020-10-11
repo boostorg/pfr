@@ -6,7 +6,6 @@
 #include <string>
 
 #include <boost/pfr/ops.hpp>
-using namespace boost::pfr::ops;
 
 union test_union {
     const char* c;
@@ -15,5 +14,5 @@ union test_union {
 
 int main() {
     test_union v{""};
-    return v == v;
+    return boost::pfr::eq(v, v);
 }

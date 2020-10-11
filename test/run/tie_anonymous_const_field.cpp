@@ -5,7 +5,7 @@
 
 #include <boost/core/lightweight_test.hpp>
 
-#include <boost/pfr/ops.hpp>
+#include <boost/pfr/core.hpp>
 
 #include <string>
 #include <typeindex>

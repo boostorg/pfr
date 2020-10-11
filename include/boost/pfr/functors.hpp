@@ -9,7 +9,7 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-#include <boost/pfr/detail/core.hpp>
+#include <boost/pfr/ops.hpp>
 
 #include <boost/pfr/detail/functional.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
@@ -20,39 +20,6 @@
 ///
 /// \b Requires: C++17 or \constexprinit{C++14 constexpr aggregate intializable type}.
 namespace boost { namespace pfr {
-
-namespace detail {
-
-    template <template <std::size_t, std::size_t> class Visitor, class T, class U>
-    bool binary_visit(const T& x, const U& y) {
-        constexpr std::size_t fields_count_lhs = detail::fields_count<std::remove_reference_t<T>>();
-        constexpr std::size_t fields_count_rhs = detail::fields_count<std::remove_reference_t<U>>();
-        constexpr std::size_t fields_count_min = detail::min_size(fields_count_lhs, fields_count_rhs);
-        typedef Visitor<0, fields_count_min> visitor_t;
-
-#if BOOST_PFR_USE_CPP17
-        return visitor_t::cmp(detail::tie_as_tuple(x), detail::tie_as_tuple(y));
-#else
-        bool result = true;
-        ::boost::pfr::detail::for_each_field_dispatcher(
-            x,
-            [&result, &y](const auto& lhs) {
-                ::boost::pfr::detail::for_each_field_dispatcher(
-                    y,
-                    [&result, &lhs](const auto& rhs) {
-                        result = visitor_t::cmp(lhs, rhs);
-                    },
-                    detail::make_index_sequence<fields_count_rhs>{}
-                );
-            },
-            detail::make_index_sequence<fields_count_lhs>{}
-        );
-
-        return result;
-#endif
-    }
-
-} // namespace detail
 
 ///////////////////// Comparisons
 
@@ -80,6 +47,7 @@ template <> struct equal_to<void> {
         return detail::binary_visit<detail::equal_impl>(x, y);
     }
 
+    typedef std::true_type is_transparent;
 };
 /// @endcond
 
@@ -230,24 +198,7 @@ template <> struct less_equal<void> {
 template <class T> struct hash {
     /// \return hash value of \b x.
     std::size_t operator()(const T& x) const {
-        constexpr std::size_t fields_count_val = boost::pfr::detail::fields_count<std::remove_reference_t<T>>();
-#if BOOST_PFR_USE_CPP17
-        return detail::hash_impl<0, fields_count_val>::compute(detail::tie_as_tuple(x));
-#else
-        std::size_t result = 0;
-        ::boost::pfr::detail::for_each_field_dispatcher(
-            x,
-            [&result](const auto& lhs) {
-                // We can not reuse `fields_count_val` in lambda because compilers had issues with
-                // passing constexpr variables into lambdas. Computing is again is the most portable solution.
-                constexpr std::size_t fields_count_val_lambda = boost::pfr::detail::fields_count<std::remove_reference_t<T>>();
-                result = detail::hash_impl<0, fields_count_val_lambda>::compute(lhs);
-            },
-            detail::make_index_sequence<fields_count_val>{}
-        );
-
-        return result;
-#endif
+        return boost::pfr::hash_value(x);
     }
 };
 

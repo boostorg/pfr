@@ -8,7 +8,7 @@
 /*`
     The following example shows how to customize printing and write your own testing helper for structures:
 */
-#include <boost/pfr.hpp>
+#include <boost/pfr/ops.hpp>
 #include <iostream>
 
 namespace my_testing {
@@ -38,8 +38,7 @@ void print(std::ostream& out, const T& value) {
 ///     42, 22 != 42, 24
 template <class T>
 void test_eq(const T& x, const T& y) {
-    using namespace boost::pfr::ops;
-    if (x == y) return;
+    if (boost::pfr::eq(x, y)) return;
 
     print(std::cerr, x);
     std::cerr << " != ";

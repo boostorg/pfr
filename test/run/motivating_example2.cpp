@@ -12,9 +12,10 @@ struct my_struct { // no ostream operator defined!
 };
 
 int main() {
-    using namespace boost::pfr::ops; // C++17 out-of-the-box ostream operators for aggregate initializables!
-
     my_struct s{{"Das ist fantastisch!"}, 100};
-    std::cout << "my_struct has " << boost::pfr::tuple_size<my_struct>::value
-        << " fields: " << s << "\n";
+
+    std::cout << "my_struct has "
+        << boost::pfr::tuple_size<my_struct>::value // Outputs: 2
+        << " fields: ";
+    boost::pfr::write(std::cout, s); // Outputs: {"Das ist fantastisch!", 100};
 }

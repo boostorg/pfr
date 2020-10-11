@@ -157,6 +157,35 @@ namespace boost { namespace pfr { namespace detail {
         return x < y ? x : y;
     }
 
+    template <template <std::size_t, std::size_t> class Visitor, class T, class U>
+    bool binary_visit(const T& x, const U& y) {
+        constexpr std::size_t fields_count_lhs = detail::fields_count<std::remove_reference_t<T>>();
+        constexpr std::size_t fields_count_rhs = detail::fields_count<std::remove_reference_t<U>>();
+        constexpr std::size_t fields_count_min = detail::min_size(fields_count_lhs, fields_count_rhs);
+        typedef Visitor<0, fields_count_min> visitor_t;
+
+#if BOOST_PFR_USE_CPP17
+        return visitor_t::cmp(detail::tie_as_tuple(x), detail::tie_as_tuple(y));
+#else
+        bool result = true;
+        ::boost::pfr::detail::for_each_field_dispatcher(
+            x,
+            [&result, &y](const auto& lhs) {
+                ::boost::pfr::detail::for_each_field_dispatcher(
+                    y,
+                    [&result, &lhs](const auto& rhs) {
+                        result = visitor_t::cmp(lhs, rhs);
+                    },
+                    detail::make_index_sequence<fields_count_rhs>{}
+                );
+            },
+            detail::make_index_sequence<fields_count_lhs>{}
+        );
+
+        return result;
+#endif
+    }
+
 }}} // namespace boost::pfr::detail
 
 #endif // BOOST_PFR_DETAIL_FUNCTIONAL_HPP

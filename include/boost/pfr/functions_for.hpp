@@ -9,8 +9,8 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-#include <boost/pfr/functors.hpp>
-#include <boost/pfr/io.hpp>
+#include <boost/pfr/ops_fields.hpp>
+#include <boost/pfr/io_fields.hpp>
 
 /// \def BOOST_PFR_FUNCTIONS_FOR(T)
 /// Defines comparison operators and stream operators for T.
@@ -53,24 +53,24 @@
 /// \endcode
 
 #define BOOST_PFR_FUNCTIONS_FOR(T)                                                                                                             \
-    BOOST_PFR_MAYBE_UNUSED inline bool operator==(const T& lhs, const T& rhs) { return ::boost::pfr::equal_to<T>{}(lhs, rhs);      }           \
-    BOOST_PFR_MAYBE_UNUSED inline bool operator!=(const T& lhs, const T& rhs) { return ::boost::pfr::not_equal<T>{}(lhs, rhs);     }           \
-    BOOST_PFR_MAYBE_UNUSED inline bool operator< (const T& lhs, const T& rhs) { return ::boost::pfr::less<T>{}(lhs, rhs);          }           \
-    BOOST_PFR_MAYBE_UNUSED inline bool operator> (const T& lhs, const T& rhs) { return ::boost::pfr::greater<T>{}(lhs, rhs);       }           \
-    BOOST_PFR_MAYBE_UNUSED inline bool operator<=(const T& lhs, const T& rhs) { return ::boost::pfr::less_equal<T>{}(lhs, rhs);    }           \
-    BOOST_PFR_MAYBE_UNUSED inline bool operator>=(const T& lhs, const T& rhs) { return ::boost::pfr::greater_equal<T>{}(lhs, rhs); }           \
+    BOOST_PFR_MAYBE_UNUSED inline bool operator==(const T& lhs, const T& rhs) { return ::boost::pfr::eq_fields(lhs, rhs); }           \
+    BOOST_PFR_MAYBE_UNUSED inline bool operator!=(const T& lhs, const T& rhs) { return ::boost::pfr::ne_fields(lhs, rhs); }           \
+    BOOST_PFR_MAYBE_UNUSED inline bool operator< (const T& lhs, const T& rhs) { return ::boost::pfr::lt_fields(lhs, rhs); }           \
+    BOOST_PFR_MAYBE_UNUSED inline bool operator> (const T& lhs, const T& rhs) { return ::boost::pfr::gt_fields(lhs, rhs); }           \
+    BOOST_PFR_MAYBE_UNUSED inline bool operator<=(const T& lhs, const T& rhs) { return ::boost::pfr::le_fields(lhs, rhs); }           \
+    BOOST_PFR_MAYBE_UNUSED inline bool operator>=(const T& lhs, const T& rhs) { return ::boost::pfr::ge_fields(lhs, rhs); }           \
     template <class Char, class Traits>                                                                                                        \
     BOOST_PFR_MAYBE_UNUSED inline ::std::basic_ostream<Char, Traits>& operator<<(::std::basic_ostream<Char, Traits>& out, const T& value) {    \
-        ::boost::pfr::write(out, value);                                                                                                       \
+        ::boost::pfr::write_fields(out, value);                                                                                                       \
         return out;                                                                                                                            \
     }                                                                                                                                          \
     template <class Char, class Traits>                                                                                                        \
     BOOST_PFR_MAYBE_UNUSED inline ::std::basic_istream<Char, Traits>& operator>>(::std::basic_istream<Char, Traits>& in, T& value) {           \
-        ::boost::pfr::read(in, value);                                                                                                         \
+        ::boost::pfr::read_fields(in, value);                                                                                                         \
         return in;                                                                                                                             \
     }                                                                                                                                          \
     BOOST_PFR_MAYBE_UNUSED inline std::size_t hash_value(const T& v) {                                                                         \
-        return ::boost::pfr::hash<T>{}(v);                                                                                                     \
+        return ::boost::pfr::hash_fields(v);                                                                                                     \
     }                                                                                                                                          \
 /**/
 
