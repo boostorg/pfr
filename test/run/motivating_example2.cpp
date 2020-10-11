@@ -16,6 +16,6 @@ int main() {
 
     std::cout << "my_struct has "
         << boost::pfr::tuple_size<my_struct>::value // Outputs: 2
-        << " fields: ";
-    boost::pfr::write(std::cout, s); // Outputs: {"Das ist fantastisch!", 100};
+        << " fields: "
+        << boost::pfr::io(s); // Outputs: {"Das ist fantastisch!", 100};
 }

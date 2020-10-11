@@ -49,26 +49,26 @@ void test_comparable_struct() {
     BOOST_TEST(le(s1, s3));
     BOOST_TEST(ge(s3, s2));
 
-    write(std::cout, s1);
+    std::cout << boost::pfr::io(s1);
 
     T s4;
     std::stringstream ss;
     ss.exceptions ( std::ios::failbit);
-    write(ss, s1);
-    read(ss, s4);
-    write(std::cout, s4);
+    ss << boost::pfr::io(s1);
+    ss >> boost::pfr::io(s4);
+    std::cout << boost::pfr::io(s4);
     BOOST_TEST(eq(s1, s4));
 }
 
 void test_empty_struct() {
     struct empty {};
-    boost::pfr::write(std::cout, empty{});
+    std::cout << boost::pfr::io(empty{});
     BOOST_TEST(boost::pfr::eq(empty{}, empty{}));
 }
 
 void test_implicit_conversions() {
     std::stringstream ss;
-    boost::pfr::write(ss, std::true_type{});
+    ss << boost::pfr::io(std::true_type{});
     BOOST_TEST_EQ(ss.str(), "1"); // Does not break implicit conversion
 }
 

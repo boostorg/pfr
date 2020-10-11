@@ -10,18 +10,12 @@
 
 #include <boost/core/lightweight_test.hpp>
 
-namespace boost { namespace test {
-    using boost::pfr::read;
-    using boost::pfr::write;
-}}
-
-
 template <class T>
 void test_write_read(const T& value) {
     T result;
     std::stringstream ss;
-    boost::test::write(ss, value);
-    boost::test::read(ss, result);
+    ss << boost::pfr::io(value);
+    ss >> boost::pfr::io(result);
     BOOST_TEST_EQ(value.f0, result.f0);
     BOOST_TEST_EQ(value.f1, result.f1);
     BOOST_TEST_EQ(value.f2, result.f2);
@@ -32,7 +26,7 @@ void test_write_read(const T& value) {
 template <class T>
 void to_string_test(const T& value, const char* ethalon) {
     std::stringstream ss;
-    boost::test::write(ss, value);
+    ss << boost::pfr::io(value);
     BOOST_TEST_EQ(ss.str(), ethalon);
 }
 

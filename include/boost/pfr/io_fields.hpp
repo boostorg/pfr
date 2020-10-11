@@ -22,18 +22,17 @@
 
 namespace boost { namespace pfr {
 
-/// \brief Writes aggregate `value` to `out`
-///
-/// \b Requires: C++17 or \constexprinit{C++14 constexpr aggregate intializable type}.
-///
-/// \b Example:
-/// \code
-///     struct my_struct { int i, short s; };
-///     my_struct s{12, 13};
-///     write(std::cout, s); // outputs '{12, 13}'
-/// \endcode
+namespace detail {
+
+template <class T>
+struct io_fields_impl {
+    T value;
+};
+
+
 template <class Char, class Traits, class T>
-void write_fields(std::basic_ostream<Char, Traits>& out, const T& value) {
+std::basic_ostream<Char, Traits>& operator<<(std::basic_ostream<Char, Traits>& out, io_fields_impl<const T&>&& x) {
+    const T& value = x.value;
     constexpr std::size_t fields_count_val = boost::pfr::detail::fields_count<T>();
     out << '{';
 #if BOOST_PFR_USE_CPP17
@@ -50,25 +49,18 @@ void write_fields(std::basic_ostream<Char, Traits>& out, const T& value) {
         detail::make_index_sequence<fields_count_val>{}
     );
 #endif
-    out << '}';
+    return out << '}';
 }
 
-/// Reads aggregate `value` from stream `in`
-///
-/// \b Requires: C++17 or \constexprinit{C++14 constexpr aggregate intializable type}.
-///
-/// \b Example:
-/// \code
-///     struct my_struct { int i, short s; };
-///     my_struct s;
-///     std::stringstream ss;
-///     ss << "{ 12, 13 }";
-///     ss >> s;
-///     assert(s.i == 12);
-///     assert(s.i == 13);
-/// \endcode
+
 template <class Char, class Traits, class T>
-void read_fields(std::basic_istream<Char, Traits>& in, T& value) {
+std::basic_ostream<Char, Traits>& operator<<(std::basic_ostream<Char, Traits>& out, io_fields_impl<T>&& x) {
+    return out << io_fields_impl<const std::remove_reference_t<T>&>{x.value};
+}
+
+template <class Char, class Traits, class T>
+std::basic_istream<Char, Traits>& operator>>(std::basic_istream<Char, Traits>& in, io_fields_impl<T&>&& x) {
+    T& value = x.value;
     constexpr std::size_t fields_count_val = boost::pfr::detail::fields_count<T>();
 
     const auto prev_exceptions = in.exceptions();
@@ -99,6 +91,39 @@ void read_fields(std::basic_istream<Char, Traits>& in, T& value) {
 
     in.flags(prev_flags);
     in.exceptions(prev_exceptions);
+
+    return in;
+}
+
+template <class Char, class Traits, class T>
+std::basic_istream<Char, Traits>& operator>>(std::basic_istream<Char, Traits>& in, io_fields_impl<const T&>&& x) {
+    static_assert(sizeof(T) && false, "====================> Boost.PFR: Atetmpt to use istream operator on a boost::pfr::io_fields wrapped type T with const qualifier.");
+}
+
+template <class Char, class Traits, class T>
+std::basic_istream<Char, Traits>& operator>>(std::basic_istream<Char, Traits>& in, io_fields_impl<T>&& x) {
+    static_assert(sizeof(T) && false, "====================> Boost.PFR: Atetmpt to use istream operator on a boost::pfr::io_fields wrapped temporary of type T.");
+}
+
+} // namespace detail
+
+/// IO manupulator to read/write aggregate `value` field by field.
+///
+/// \b Requires: C++17 or \constexprinit{C++14 constexpr aggregate intializable type}.
+///
+/// \b Example:
+/// \code
+///     struct my_struct { int i, short s; };
+///     my_struct s;
+///     std::stringstream ss;
+///     ss << "{ 12, 13 }";
+///     ss >> boost::pfr::io_fields(s);
+///     assert(s.i == 12);
+///     assert(s.i == 13);
+/// \endcode
+template <class T>
+auto io_fields(T&& value) noexcept {
+    return detail::io_fields_impl<T>{std::forward<T>(value)};
 }
 
 }} // namespace boost::pfr

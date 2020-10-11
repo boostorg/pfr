@@ -16,8 +16,6 @@
 /// Contains comparison operators and stream operators for types that do not have their own operators.
 /// If type is comparable or streamable using it's own operator or it's conversion operator, then the original operator is used.
 ///
-/// Just write \b using \b namespace \b ops; and operators will be available in scope.
-///
 /// \b Requires: C++17 or \constexprinit{C++14 constexpr aggregate intializable type}.
 ///
 /// \b Example:

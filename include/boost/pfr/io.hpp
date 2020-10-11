@@ -13,23 +13,21 @@
 #include <boost/pfr/io_fields.hpp>
 
 /// \file boost/pfr/io.hpp
-/// Contains stream operators for types.
+/// Contains IO stream manipulator for types.
 /// If type is streamable using its own operator or its conversion operator, then the original operator is used.
-///
-/// Just write \b using \b namespace \b ops; and operators will be available in scope.
 ///
 /// \b Requires: C++17 or \constexprinit{C++14 constexpr aggregate intializable type}.
 ///
 /// \b Example:
 /// \code
-///     #include <boost/pfr/ops.hpp>
+///     #include <boost/pfr/io.hpp>
 ///     struct comparable_struct {      // No operators defined for that structure
 ///         int i; short s; char data[7]; bool bl; int a,b,c,d,e,f;
 ///     };
 ///     // ...
 ///
 ///     comparable_struct s1 {0, 1, "Hello", false, 6,7,8,9,10,11};
-///     boost::pfr::write(std::cout, s1);  // Outputs: {0, 1, H, e, l, l, o, , , 0, 6, 7, 8, 9, 10, 11}
+///     std::cout << boost::pfr::io(s1);  // Outputs: {0, 1, H, e, l, l, o, , , 0, 6, 7, 8, 9, 10, 11}
 /// \endcode
 ///
 /// \podops for other ways to define operators and more details.
@@ -39,7 +37,7 @@ namespace boost { namespace pfr {
 
 namespace detail {
 
-///////////////////// Helper typedefs that are used by all the ops
+///////////////////// Helper typedefs
     template <class Stream, class Type>
     using enable_not_ostreamable_t = typename std::enable_if<
         not_appliable<ostreamable_detector, Stream&, Type const&>::value,
@@ -64,28 +62,53 @@ namespace detail {
         Stream&
     >::type;
 
+
+///////////////////// IO impl
+
+template <class T>
+struct io_impl {
+    T value;
+};
+
+template <class Char, class Traits, class T>
+enable_not_ostreamable_t<std::basic_ostream<Char, Traits>, T> operator<<(std::basic_ostream<Char, Traits>& out, io_impl<T>&& x) {
+    return out << boost::pfr::io_fields(std::forward<T>(x.value));
+}
+
+template <class Char, class Traits, class T>
+enable_ostreamable_t<std::basic_ostream<Char, Traits>, T> operator<<(std::basic_ostream<Char, Traits>& out, io_impl<T>&& x) {
+    return out << x.value;
+}
+
+template <class Char, class Traits, class T>
+enable_not_istreamable_t<std::basic_istream<Char, Traits>, T> operator>>(std::basic_istream<Char, Traits>& in, io_impl<T>&& x) {
+    return in >> boost::pfr::io_fields(std::forward<T>(x.value));
+}
+
+template <class Char, class Traits, class T>
+enable_istreamable_t<std::basic_istream<Char, Traits>, T> operator>>(std::basic_istream<Char, Traits>& in, io_impl<T>&& x) {
+    return in >> x.value;
+}
+
 } // namespace detail
 
-template <class Char, class Traits, class T>
-detail::enable_not_ostreamable_t<std::basic_ostream<Char, Traits>, T> write(std::basic_ostream<Char, Traits>& out, const T& value) {
-    boost::pfr::write_fields(out, value);
-    return out;
-}
-
-template <class Char, class Traits, class T>
-detail::enable_ostreamable_t<std::basic_ostream<Char, Traits>, T> write(std::basic_ostream<Char, Traits>& out, const T& value) {
-    return out << value;
-}
-
-template <class Char, class Traits, class T>
-detail::enable_not_istreamable_t<std::basic_istream<Char, Traits>, T> read(std::basic_istream<Char, Traits>& in, T& value) {
-    boost::pfr::read_fields(in, value);
-    return in;
-}
-
-template <class Char, class Traits, class T>
-detail::enable_istreamable_t<std::basic_istream<Char, Traits>, T> read(std::basic_istream<Char, Traits>& in, T& value) {
-    return in >> value;
+/// IO manupulator to read/write aggregate `value` using its IO stream operators or using boost::pfr::io_fields if operators are not awailable.
+///
+/// \b Requires: C++17 or \constexprinit{C++14 constexpr aggregate intializable type}.
+///
+/// \b Example:
+/// \code
+///     struct my_struct { int i, short s; };
+///     my_struct s;
+///     std::stringstream ss;
+///     ss << "{ 12, 13 }";
+///     ss >> boost::pfr::io(s);
+///     assert(s.i == 12);
+///     assert(s.i == 13);
+/// \endcode
+template <class T>
+auto io(T&& value) noexcept {
+    return detail::io_impl<T>{std::forward<T>(value)};
 }
 
 }} // namespace boost::pfr
