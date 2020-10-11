@@ -161,7 +161,7 @@ PFR is a header only library that does not depend on Boost. You can just copy th
     [ [macroref BOOST_PFR_FUNCTIONS_FOR] ]
 ][
     [ [pfr_quick_examples_eq_fields] ]
-    [ [headerref boost/pfr/ops.hpp Header boost/pfr/ops_fields.hpp ]
+    [ [headerref boost/pfr/ops.hpp Header boost/pfr/ops_fields.hpp ] ]
 ][
     [ [pfr_quick_examples_for_each_idx] ]
     [ [funcref boost::pfr::for_each_field] ]
@@ -175,7 +175,7 @@ PFR is a header only library that does not depend on Boost. You can just copy th
     [ [pfr_quick_examples_structure_tie] ]
     [ [funcref boost::pfr::structure_tie] ]
 ]]
-]
+
 
 
 [endsect]
@@ -232,20 +232,35 @@ There are three ways to start using Boost.PFR hashing, comparison and streaming 
 
 [table:ops_comp Different approaches for operators
     [[ Approach
-    ][ Defines operators in global namespace ][ Defined operators could be found by ADL ][ Works for local types ][ Usable locally, without affecting code from other scopes ][ Ignores implicit conversion operators ][ Respects user defined operators ]]
+    ][ When to use
+    ][ Operators could be found by ADL ][ Works for local types ][ Usable locally, without affecting code from other scopes ][ Ignores implicit conversion operators ][ Respects user defined operators ]]
 
     [[
-        [headerref boost/pfr/ops.hpp using\u00A0namespace\u00A0boost::pfr::ops;]
-    ][ no ][ no ][ yes ][ yes ][ no ][ yes ]]
+        [headerref boost/pfr/ops.hpp boost/pfr/ops.hpp: eq, ne, gt, lt, le, ge]
+
+        [headerref boost/pfr/io.hpp boost/pfr/io.hpp: io]
+    ][
+        Use when you need to compare values by provided for them operators or via field-by-field comparison.
+    ][ no ][ yes ][ yes ][ no ][ yes ]]
 
     [[
-        [macroref BOOST_PFR_FUNCTIONS_FOR]  
-    ][ yes if T is in it ][ yes ][ no ][ no, but could be limited to translation unit ][ yes for T ] [ no (compile time error) ]]
+        [macroref BOOST_PFR_FUNCTIONS_FOR BOOST_PFR_FUNCTIONS_FOR(T)]
+    ][
+        Use near the type definition to define the whole set of operators for your type.
+    ][ yes ][ no ][ no ][ yes for T ] [ no (compile time error) ]]
+
+    [[
+        [headerref boost/pfr/ops_fields.hpp boost/pfr/ops_fields.hpp: eq_fields, ne_fields, gt_fields, lt_fields, le_fields, ge_fields]
+
+        [headerref boost/pfr/io.hpp boost/pfr/io_fields.hpp: io_fields]
+    ][
+        Use to implement the required set of operators for your type.
+    ][ no ][ yes ][ yes ][ yes ][ yes ]]
 ]
 
 More detailed description follows:
 
-[*1. [headerref boost/pfr/ops.hpp `using namespace boost::pfr::ops;`] approach]
+[*1. `eq, ne, gt, lt, le, ge, io` approach]
 
 This method is good if you're writing generic algorithms and need to use operators from Boost.PFR only if there are no operators defined for the type:
 
@@ -255,31 +270,15 @@ This method is good if you're writing generic algorithms and need to use operato
 template <class T>
 struct uniform_comparator_less {
     bool operator()(const T& lhs, const T& rhs) const noexcept {
-        using namespace boost::pfr::ops;    // Enables Boost.PFR operators usage in this scope.
-
         // If T has operator< or conversion operator then it is used.
-        return lhs < rhs;
+        return boost::pfr::lt(lhs, rhs);
     }
 };
 ```
-This method's effects are local to the function. It works even for local types, like structures defined in functions.
-However *Argument Dependant Lookup* does not work with it:
+This methods effects are local to the function. It works even for local types, like structures defined in functions.
 
-```
-#include <boost/pfr/ops.hpp>
-template <class T>
-struct uniform_comparator_less {
-    bool operator()(const T& lhs, const T& rhs) const noexcept {
-        using namespace ops;
 
-        // Compile time error if T has neither operator< nor
-        // conversion operator to comparable type.
-        return std::less{}(lhs, rhs);
-    }
-};
-```
-
-[*2. [macroref BOOST_PFR_FUNCTIONS_FOR] approach]
+[*2. BOOST_PFR_FUNCTIONS_FOR(T) approach]
 
 This method is good if you're writing a structure and wish to define operators for that structure.
 ```
@@ -297,7 +296,7 @@ BOOST_PFR_FUNCTIONS_FOR(pair_like)   // Defines operators
 assert(pair_like{1, 2} < pair_like{1, 3});
 ```
 Argument Dependant Lookup works well. `std::less` will find the operators for `struct pair_like`. [macroref BOOST_PFR_FUNCTIONS_FOR BOOST_PFR_FUNCTIONS_FOR(T)]
-can not be used for local types. It must be called only once in namespace of `T`. It does not respect conversion operators of `T`, so for example the following code
+can not be used for local types. It does not respect conversion operators of `T`, so for example the following code
 will output different values:
 ```
 #include <boost/pfr/functions_for.hpp>
@@ -311,6 +310,25 @@ struct empty {
 // ...
 std::cout << empty{}; // Outputs `empty{}` if BOOST_PFR_FUNCTIONS_FOR(empty) is commented out, '{}' otherwise.
 ```
+
+[*3. `eq_fields, ne_fields, gt_fields, lt_fields, le_fields, ge_fields, io_fields` approach]
+
+This method is good if you're willing to provide only some operators for your type:
+
+```
+#include <boost/pfr/io_fields.hpp>
+
+struct pair_like {
+    int first;
+    std::string second;
+};
+
+inline std::ostream& operator<<(std::ostream& os, const pair_like& x) {
+    return os <<  bost::pfr::io_fields(x);
+}
+```
+
+All the `*_fields` functions do ignore user defined operators and work only with fields of a type. This makes them perfect for defining you own operators.
 
 [endsect]
 
@@ -329,12 +347,8 @@ union test_union {
 
 inline bool operator==(test_union l, test_union r) noexcept; // Compile time error without this operator
 
-
-struct foo { int i; test_union u; };
-
-bool some_function(foo f1, foo f2) {
-    using namespace boost::pfr::ops;
-    return f1 == f2; // OK
+bool some_function(test_union f1, test_union f2) {
+    return boost::pfr::eq(f1, f2); // OK
 }
 
 ```
