@@ -12,6 +12,24 @@
 #include <boost/pfr/ops_fields.hpp>
 #include <boost/pfr/io_fields.hpp>
 
+/// \file boost/pfr/functions_for.hpp
+/// Contains BOOST_PFR_FUNCTIONS_FOR macro that defined comparison and stream operators for T along with hash_value function.
+/// \b Example:
+/// \code
+///     #include <boost/pfr/functions_for.hpp>
+///
+///     namespace my_namespace {
+///         struct my_struct {      // No operators defined for that structure
+///             int i; short s; char data[7]; bool bl; int a,b,c,d,e,f;
+///         };
+///         BOOST_PFR_FUNCTIONS_FOR(my_struct)
+///     }
+/// \endcode
+///
+/// \podops for other ways to define operators and more details.
+///
+/// \b Synopsis:
+
 /// \def BOOST_PFR_FUNCTIONS_FOR(T)
 /// Defines comparison and stream operators for T along with hash_value function.
 ///

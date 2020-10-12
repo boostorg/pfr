@@ -20,6 +20,29 @@
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 #include <boost/pfr/tuple_size.hpp>
 
+/// \file boost/pfr/io_fields.hpp
+/// Contains IO manupulator \forcedlink{io_fields} to read/write \aggregate `value` field-by-field.
+///
+/// \b Example:
+/// \code
+///     struct my_struct {
+///         int i;
+///         short s;
+///     };
+///
+///     std::ostream& operator<<(std::ostream& os, const my_struct& x) {
+///         return os << boost::pfr::io_fields(x);  // Equivalent to: os << "{ " << x.i << " ," <<  x.s << " }"
+///     }
+///
+///     std::istream& operator>>(std::istream& is, my_struct& x) {
+///         return is >> boost::pfr::io_fields(x);  // Equivalent to: is >> "{ " >> x.i >> " ," >>  x.s >> " }"
+///     }
+/// \endcode
+///
+/// \podops for other ways to define operators and more details.
+///
+/// \b Synopsis:
+
 namespace boost { namespace pfr {
 
 namespace detail {
@@ -107,19 +130,22 @@ std::basic_istream<Char, Traits>& operator>>(std::basic_istream<Char, Traits>& i
 
 } // namespace detail
 
-/// IO manupulator to read/write aggregate `value` field by field.
-///
-/// \b Requires: C++17 or \constexprinit{C++14 constexpr aggregate intializable type}.
+/// IO manupulator to read/write \aggregate `value` field-by-field.
 ///
 /// \b Example:
 /// \code
-///     struct my_struct { int i, short s; };
-///     my_struct s;
-///     std::stringstream ss;
-///     ss << "{ 12, 13 }";
-///     ss >> boost::pfr::io_fields(s);
-///     assert(s.i == 12);
-///     assert(s.i == 13);
+///     struct my_struct {
+///         int i;
+///         short s;
+///     };
+///
+///     std::ostream& operator<<(std::ostream& os, const my_struct& x) {
+///         return os << boost::pfr::io_fields(x);  // Equivalent to: os << "{ " << x.i << " ," <<  x.s << " }"
+///     }
+///
+///     std::istream& operator>>(std::istream& is, my_struct& x) {
+///         return is >> boost::pfr::io_fields(x);  // Equivalent to: is >> "{ " >> x.i >> " ," >>  x.s >> " }"
+///     }
 /// \endcode
 template <class T>
 auto io_fields(T&& value) noexcept {

@@ -10,25 +10,22 @@
     ]
 ]
 
-[section Motivation and Intro]
+[section Intro]
 
-Boost.PFR is a library for very basic reflection that gives you access to structure elements by index and provides other `std::tuple` like methods for user defined types without any macro or boilerplate code.
+Boost.PFR is a library for very basic reflection that gives you access to structure elements by index and provides other `std::tuple` like methods for user defined types without any macro or boilerplate code:
 
 [import ../example/motivating_example0.cpp]
 [pfr_motivating_example]
 
-
-[note All you have to do is to add `#include <boost/pfr.hpp>`.
-
-No macro or other type/member registrations required.]
+See [link boost_pfr.limitations_and_configuration limitations].
 
 
 [h2 Usecase example]
 
-Imagine that you are writing the wrapper library for a database. Depending on the usage of PFR users code will look differently:
+Imagine that you are writing the wrapper library for a database. Depending on the usage of Boost.PFR users code will look differently:
 
 [table:quick_examples
-[[ Without PFR ] [ With PFR ]]
+[[ Without Boost.PFR ] [ With Boost.PFR ]]
 [[
 ```
 #include <db/api.hpp>
@@ -77,13 +74,13 @@ struct user_info {
 };
 
 user_info retrieve_friend(std::string_view name) {
-    // With PFR you can put data directly into user provided structures
+    // With Boost.PFR you can put data directly into user provided structures
     user_info info = db::one_row_as<user_info>(
         "SELECT id, name, email, login FROM user_infos WHERE name=$0",
         name
     );
 
-    ///////////////// No boiler plate code to move data around ///////////////////////    
+    ////////////////// No boilerplate code to move data around ///////////////////////    
 
 
 
@@ -97,8 +94,8 @@ user_info retrieve_friend(std::string_view name) {
     db::insert(
         "INSERT INTO user_infos(id, name, github_stars, email) VALUES ($0, $1, $2, $3)",
         friend_info     //////////////////////////////////////////////////////////////
-                        // PFR allows you to iterate over all the fields of a user
-                        // provided structure
+                        // Boost.PFR allows you to iterate over all the fields of a
+                        // user provided structure
                         //
     );
 
@@ -108,7 +105,7 @@ user_info retrieve_friend(std::string_view name) {
 ]]
 ]
 
-With PFR the code is shorter, more readable and more pleasant to write.
+With Boost.PFR the code is shorter, more readable and more pleasant to write.
 
 
 
@@ -116,20 +113,18 @@ With PFR the code is shorter, more readable and more pleasant to write.
 
 Boost.PFR adds the following out-of-the-box functionality for aggregate initializable structures:
 
-* comparison operators
+* comparison functions
 * heterogeneous comparators
 * hash
-* stream operators
+* IO streaming
 * access to members by index
 * member type retrieval
 * methods for cooperation with `std::tuple`
 * methods to visit each field of the structure
 
-PFR is a header only library that does not depend on Boost. You can just copy the content of the "include" folder [@https://github.com/apolukhin/magic_get from the github] into your project, and the library will work fine.
+Boost.PFR is a header only library that does not depend on Boost. You can just copy the content of the "include" folder [@https://github.com/apolukhin/magic_get from the github] into your project, and the library will work fine.
 
-[caution Recommended C++ Standards are C++17 and above]
-
-[caution Library requires at least C++14! Pre C++14 compilers (C++11, C++03...) are not supported]
+[caution Recommended C++ Standards are C++17 and above. Library requires at least C++14! Pre C++14 compilers (C++11, C++03...) are not supported]
 
 [endsect]
 
@@ -212,7 +207,7 @@ struct auth_info_aggregate {
 ]]
 ]
 
-Definition via [@https://en.cppreference.com/w/cpp/language/aggregate_initialization aggregate initializable] structure is much more clear. Same story with usages: `return std::get<1>(value);` vs. `return value.session_id;`.
+Definition via aggregate initializable structure is much more clear. Same story with usages: `return std::get<1>(value);` vs. `return value.session_id;`.
 
 Another advantage of aggregates is a more efficient copy, move construction and assignments.
 
@@ -366,36 +361,46 @@ error: static_assert failed "====================> Boost.PFR: For safety reasons
 
 [endsect]
 
-[section Configuration Macro]
+
+[section Limitations and Configuration]
+
+[caution Recommended C++ Standards are C++17 and above. Library requires at least C++14! Pre C++14 compilers (C++11, C++03...) are not supported. ]
+
+Boost.PFR library works best with [*simple aggregates] - non-inherited aggregate initializable structures without const fields, C arrays and static variables:
+
+```
+struct simple_aggregate {
+    std::string name;
+    int age;
+    boost::uuids::uuid uuid; 
+};
+```
+The library may work with aggregates other that simple ones, but the behavior tends to be unportable. 
+
+[h2 Configuration Macro]
 
 By default Boost.PFR [*auto-detects your compiler abilities] and automatically defines the configuration macro into appropriate values. If you wish to override that behavior, just define:
 [table:linkmacro Macros
     [[Macro name] [Effect]]
-    [[*BOOST_PFR_USE_CPP17*] [Define to `1` if you wish to use structured bindings and other C++17 features for reflection. Define to `0` otherwise.]]
-    [[*BOOST_PFR_USE_LOOPHOLE*] [Define to `1` if you wish to exploit [@http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#2118 CWG 2118] for reflection. Define to `0` otherwise.]]
-    [[*BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE*] [Define to `0` if you are hit by the template instantiation depth issues with `std::make_integer_sequence` and wish to use PFR version of that metafunction. Define to `1` otherwize. ]]
+    [[*BOOST_PFR_USE_CPP17*] [Define to `1` if you wish to override Boost.FRR choice and use C++17 structured bindings for reflection. Define to `0` to override Boost.FRR choice and disable C++17 structured bindings usage.]]
+    [[*BOOST_PFR_USE_LOOPHOLE*] [Define to `1` if you wish to override Boost.FRR choice and exploit [@http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#2118 CWG 2118] for reflection. Define to `0` to override Boost.FRR choice and disable CWG 2118 usage.]]
+    [[*BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE*] [Define to `0` if you are hit by the template instantiation depth issues with `std::make_integer_sequence` and wish to use Boost.PFR version of that metafunction. Define to `1` to override Boost.FRR detection logic. ]]
 ]
 
-Library prefers to use structured bindings for reflection if they are available, otherwise falls back to [*Loophole].
 
-Note that disabling [*Loophole] in C++14 significantly limits the reflection abilities of the library. See next section for more info on limitations.
+[h2 Details on Limitations]
 
-
-[endsect]
-
-
-[section Limitations]
-
-The reflection has some limitations that depend on a C++ Standard and compiler capabilities:
+The Boost.PFRs reflection has some limitations that depend on a C++ Standard and compiler capabilities:
 
 * Static variables are ignored
-* T must be [@https://en.cppreference.com/w/cpp/language/aggregate_initialization aggregate initializable] without empty base classes
+* T must be aggregate initializable without empty base classes
 * if T contains C arrays or it is inherited from non-empty type then the result of reflection may differ depending on the C++ version and library configuration
-* Additional C++14 [*only] limitations (switch to C++17 to remove all of those):
+* Additional limitations if [*BOOST_PFR_USE_CPP17 == 0]:
     * Non of the member fields should have a template constructor from one parameter.
-    * Additional limitations if the [link boost_pfr.configuration_macro [*Loophole]] is also disabled:
+    * Additional limitations if [*BOOST_PFR_USE_LOOPHOLE == 0]:
         * T must be constexpr aggregate initializable and all its fields must be constexpr default constructible
         * [funcref boost::pfr::get], [funcref boost::pfr::structure_to_tuple], [funcref boost::pfr::structure_tie], [headerref boost/pfr/core.hpp boost::pfr::tuple_element] require T to be a flat POD type
+
 
 [endsect]
 
@@ -413,7 +418,7 @@ Short description:
         # at compile-time: find offsets for each field in user-provided structure using the tuple from previous step
         # at run-time: get pointer to each field, knowing the structure address and each field offset
         # at run-time: a tuple of references to fields is returned => all the tuple methods are available for the structure
-    * C++14 with disabled [link boost_pfr.configuration_macro [*Loophole]]:
+    * C++14 with disabled [link boost_pfr.limitations_and_configuration [*BOOST_PFR_USE_LOOPHOLE]]:
         # at compile-time: let `I` be is an index of current field, it equals 0
         # at run-time: `T` is constructed and field `I` is aggregate initialized using a separate instance of structure that is convertible to anything [note Additional care is taken to make sure that all the information about `T` is available to the compiler and that operations on `T` have no side effects, so the compiler can optimize away the unnecessary temporary objects.]
         # at compile-time: `I += 1`
@@ -424,7 +429,8 @@ Short description:
 # at run-time: a tuple of references to fields is returned => all the tuple methods are available for the structure
 
 Long description of some basics: [@https://youtu.be/UlNUNxLtBI0 Antony Polukhin: Better C++14 reflections].
-Long description of some basics of C++14 with disabled [link boost_pfr.configuration_macro [*Loophole]]: [@https://youtu.be/abdeAew3gmQ Antony Polukhin: C++14 Reflections Without Macros, Markup nor External Tooling].
+Long description of some basics of C++14 with disabled [link boost_pfr.limitations_and_configuration [*BOOST_PFR_USE_LOOPHOLE]]: [@https://youtu.be/abdeAew3gmQ Antony Polukhin: C++14 Reflections Without Macros, Markup nor External Tooling].
+Description of the [*BOOST_PFR_USE_LOOPHOLE] technique by its inventor Alexandr Poltavsky [@http://alexpolt.github.io/type-loophole.html in his blog].
 
 [endsect]
 
@@ -432,7 +438,7 @@ Long description of some basics of C++14 with disabled [link boost_pfr.configura
 
 Great thanks to Bruno Dutra for showing the technique to precisely reflect aggregate initializable type in C++14 [@https://github.com/apolukhin/magic_get/issues/5 Manual type registering/structured bindings might be unnecessary].
 
-Great thanks to Alexandr Poltavsky for initial implementation the [link boost_pfr.configuration_macro [*Loophole]] technique and for describing it [@http://alexpolt.github.io/type-loophole.html in his blog].
+Great thanks to Alexandr Poltavsky for initial implementation the [link boost_pfr.limitations_and_configuration [*BOOST_PFR_USE_LOOPHOLE]] technique and for describing it [@http://alexpolt.github.io/type-loophole.html in his blog].
 
 Great thanks to Chris Beck for implementing the detect-offsets-and-get-field-address functionality that avoids Undefined Behavior of reinterpret_casting layout compatible structures.
 

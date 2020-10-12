@@ -22,11 +22,14 @@
 
 #include <boost/pfr/tuple_size.hpp>
 
+/// \file boost/pfr/core.hpp
+/// Contains all the basic tuple-like interfaces \forcedlink{get}, \forcedlink{tuple_size}, \forcedlink{tuple_element_t}, and others.
+///
+/// \b Synopsis:
+
 namespace boost { namespace pfr {
 
 /// \brief Returns reference or const reference to a field with index `I` in \aggregate T.
-///
-/// \b Requires: C++17 or \flatpod{C++14 flat POD or C++14 with not disabled Loophole}.
 ///
 /// \b Example:
 /// \code
@@ -70,8 +73,6 @@ constexpr auto get(T&& val, std::enable_if_t< std::is_rvalue_reference<T&&>::val
 
 /// \brief `tuple_element` has a `using type = type-of-a-field-with-index-I-in-T;`
 ///
-/// \b Requires: C++17 or \flatpod{C++14 flat POD or C++14 with not disabled Loophole}.
-///
 /// \b Example:
 /// \code
 ///     std::vector< boost::pfr::tuple_element<0, my_structure>::type > v;
@@ -82,8 +83,6 @@ using tuple_element = detail::sequence_tuple::tuple_element<I, decltype( ::boost
 
 /// \brief Type of a field with index `I` in \aggregate `T`.
 ///
-/// \b Requires: C++17 or \flatpod{C++14 flat POD or C++14 with not disabled Loophole}.
-///
 /// \b Example:
 /// \code
 ///     std::vector< boost::pfr::tuple_element_t<0, my_structure> > v;
@@ -93,8 +92,6 @@ using tuple_element_t = typename tuple_element<I, T>::type;
 
 
 /// \brief Creates a `std::tuple` from an \aggregate T.
-///
-/// \b Requires: C++17 or \flatpod{C++14 flat POD or C++14 with not disabled Loophole}.
 ///
 /// \b Example:
 /// \code
@@ -113,8 +110,6 @@ constexpr auto structure_to_tuple(const T& val) noexcept {
 
 
 /// \brief Creates a `std::tuple` with const lvalue references to fields of an \aggregate T.
-///
-/// \b Requires: C++17 or \flatpod{C++14 flat POD or C++14 with not disabled Loophole}.
 ///
 /// \b Example:
 /// \code
@@ -169,8 +164,6 @@ constexpr auto structure_tie(T&&, std::enable_if_t< std::is_rvalue_reference<T&&
 
 /// Calls `func` for each field of a `value`.
 ///
-/// \b Requires: C++17 or \constexprinit{C++14 constexpr aggregate intializable type}.
-///
 /// \param func must have one of the following signatures:
 ///     * any_return_type func(U&& field)                // field of value is perfect forwarded to function
 ///     * any_return_type func(U&& field, std::size_t i)
@@ -192,7 +185,7 @@ void for_each_field(T&& value, F&& func) {
     ::boost::pfr::detail::for_each_field_dispatcher(
         value,
         [f = std::forward<F>(func)](auto&& t) mutable {
-            // MSVC related workaround. It's lambdas do not capture constexprs.
+            // MSVC related workaround. Its lambdas do not capture constexprs.
             constexpr std::size_t fields_count_val_in_lambda
                 = boost::pfr::detail::fields_count<std::remove_reference_t<T>>();
 

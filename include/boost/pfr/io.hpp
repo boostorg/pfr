@@ -13,10 +13,8 @@
 #include <boost/pfr/io_fields.hpp>
 
 /// \file boost/pfr/io.hpp
-/// Contains IO stream manipulator for types.
-/// If type is streamable using its own operator or its conversion operator, then the original operator is used.
-///
-/// \b Requires: C++17 or \constexprinit{C++14 constexpr aggregate intializable type}.
+/// Contains IO stream manipulator \forcedlink{io} for types.
+/// If type is streamable using its own operator or its conversion operator, then the types operator is used.
 ///
 /// \b Example:
 /// \code
@@ -32,35 +30,35 @@
 ///
 /// \podops for other ways to define operators and more details.
 ///
-/// \b This \b header \b contains:
+/// \b Synopsis:
 namespace boost { namespace pfr {
 
 namespace detail {
 
 ///////////////////// Helper typedefs
     template <class Stream, class Type>
-    using enable_not_ostreamable_t = typename std::enable_if<
-        not_appliable<ostreamable_detector, Stream&, Type const&>::value,
+    using enable_not_ostreamable_t = std::enable_if_t<
+        not_appliable<ostreamable_detector, Stream&, Type>::value,
         Stream&
-    >::type;
+    >;
 
     template <class Stream, class Type>
-    using enable_not_istreamable_t = typename std::enable_if<
-        not_appliable<istreamable_detector, Stream&, Type&>::value,
+    using enable_not_istreamable_t = std::enable_if_t<
+        not_appliable<istreamable_detector, Stream&, Type>::value,
         Stream&
-    >::type;
+    >;
 
     template <class Stream, class Type>
-    using enable_ostreamable_t = typename std::enable_if<
-        !not_appliable<ostreamable_detector, Stream&, Type const&>::value,
+    using enable_ostreamable_t = std::enable_if_t<
+        !not_appliable<ostreamable_detector, Stream&, Type>::value,
         Stream&
-    >::type;
+    >;
 
     template <class Stream, class Type>
-    using enable_istreamable_t = typename std::enable_if<
-        !not_appliable<istreamable_detector, Stream&, Type&>::value,
+    using enable_istreamable_t = std::enable_if_t<
+        !not_appliable<istreamable_detector, Stream&, Type>::value,
         Stream&
-    >::type;
+    >;
 
 
 ///////////////////// IO impl
@@ -69,6 +67,16 @@ template <class T>
 struct io_impl {
     T value;
 };
+
+template <class Char, class Traits, class T>
+enable_not_ostreamable_t<std::basic_ostream<Char, Traits>, T> operator<<(std::basic_ostream<Char, Traits>&& out, io_impl<T>&& x) {
+    return out << boost::pfr::io_fields(std::forward<T>(x.value));
+}
+
+template <class Char, class Traits, class T>
+enable_ostreamable_t<std::basic_ostream<Char, Traits>, T> operator<<(std::basic_ostream<Char, Traits>&& out, io_impl<T>&& x) {
+    return out << x.value;
+}
 
 template <class Char, class Traits, class T>
 enable_not_ostreamable_t<std::basic_ostream<Char, Traits>, T> operator<<(std::basic_ostream<Char, Traits>& out, io_impl<T>&& x) {
@@ -92,13 +100,11 @@ enable_istreamable_t<std::basic_istream<Char, Traits>, T> operator>>(std::basic_
 
 } // namespace detail
 
-/// IO manupulator to read/write aggregate `value` using its IO stream operators or using boost::pfr::io_fields if operators are not awailable.
-///
-/// \b Requires: C++17 or \constexprinit{C++14 constexpr aggregate intializable type}.
+/// IO manupulator to read/write \aggregate `value` using its IO stream operators or using boost::pfr::io_fields if operators are not awailable.
 ///
 /// \b Example:
 /// \code
-///     struct my_struct { int i, short s; };
+///     struct my_struct { int i; short s; };
 ///     my_struct s;
 ///     std::stringstream ss;
 ///     ss << "{ 12, 13 }";

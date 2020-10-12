@@ -15,8 +15,6 @@
 /// \file boost/pfr/ops_fields.hpp
 /// Contains field-by-fields comparison and hash functions.
 ///
-/// \b Requires: C++17 or \constexprinit{C++14 constexpr aggregate intializable type}.
-///
 /// \b Example:
 /// \code
 ///     #include <boost/pfr/ops_fields.hpp>
@@ -32,38 +30,65 @@
 ///
 /// \podops for other ways to define operators and more details.
 ///
-/// \b This \b header \b contains:
+/// \b Synopsis:
 namespace boost { namespace pfr {
-    template <class T>
-    bool eq_fields(const T& lhs, const T& rhs) noexcept {
+
+    /// Does a field-by-field comparison.
+    ///
+    /// \returns `std::tie( _lhs-fields_ ) == std::tie( _rhs-fields_ )`
+    template <class T, class U>
+    bool eq_fields(const T& lhs, const U& rhs) noexcept {
         return detail::binary_visit<detail::equal_impl>(lhs, rhs);
     }
 
-    template <class T>
-    bool ne_fields(const T& lhs, const T& rhs) noexcept {
+
+    /// Does a field-by-field comparison.
+    ///
+    /// \returns `std::tie( _lhs-fields_ ) != std::tie( _rhs-fields_ )`
+    template <class T, class U>
+    bool ne_fields(const T& lhs, const U& rhs) noexcept {
         return detail::binary_visit<detail::not_equal_impl>(lhs, rhs);
     }
 
-    template <class T>
-    bool gt_fields(const T& lhs, const T& rhs) noexcept {
+    /// Does a field-by-field comparison.
+    ///
+    /// \returns `std::tie( _lhs-fields_ ) > std::tie( _rhs-fields_ )`
+    template <class T, class U>
+    bool gt_fields(const T& lhs, const U& rhs) noexcept {
         return detail::binary_visit<detail::greater_impl>(lhs, rhs);
     }
 
-    template <class T>
-    bool lt_fields(const T& lhs, const T& rhs) noexcept {
+
+    /// Does a field-by-field comparison.
+    ///
+    /// \returns `std::tie( _lhs-fields_ ) < std::tie( _rhs-fields_ )`
+    template <class T, class U>
+    bool lt_fields(const T& lhs, const U& rhs) noexcept {
         return detail::binary_visit<detail::less_impl>(lhs, rhs);
     }
 
-    template <class T>
-    bool ge_fields(const T& lhs, const T& rhs) noexcept {
+
+    /// Does a field-by-field comparison.
+    ///
+    /// \returns `std::tie( _lhs-fields_ ) >= std::tie( _rhs-fields_ )`
+    template <class T, class U>
+    bool ge_fields(const T& lhs, const U& rhs) noexcept {
         return detail::binary_visit<detail::greater_equal_impl>(lhs, rhs);
     }
 
-    template <class T>
-    bool le_fields(const T& lhs, const T& rhs) noexcept {
+
+    /// Does a field-by-field comparison.
+    ///
+    /// \returns `std::tie( _lhs-fields_ ) <= std::tie( _rhs-fields_ )`
+    template <class T, class U>
+    bool le_fields(const T& lhs, const U& rhs) noexcept {
         return detail::binary_visit<detail::less_equal_impl>(lhs, rhs);
     }
 
+
+    /// Does a field-by-field hashing.
+    ///
+    /// \returns combined hash of all the fields
     template <class T>
     std::size_t hash_fields(const T& x) {
         constexpr std::size_t fields_count_val = boost::pfr::detail::fields_count<std::remove_reference_t<T>>();

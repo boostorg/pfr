@@ -17,7 +17,22 @@
 /// Contains functors that are close to the Standard Library ones.
 /// Each functor calls corresponding Boost.PFR function from boost/pfr/ops.hpp
 ///
-/// \b Requires: C++17 or \constexprinit{C++14 constexpr aggregate intializable type}.
+/// \b Example:
+/// \code
+///     #include <boost/pfr/functors.hpp>
+///     struct my_struct {      // No operators defined for that structure
+///         int i; short s; char data[7]; bool bl; int a,b,c,d,e,f;
+///     };
+///     // ...
+///
+///     std::unordered_set<
+///         my_struct,
+///         boost::pfr::hash<>,
+///         boost::pfr::equal_to<>
+///     > my_set;
+/// \endcode
+///
+/// \b Synopsis:
 namespace boost { namespace pfr {
 
 ///////////////////// Comparisons
