@@ -13,7 +13,14 @@
 #if defined(__has_include)
 #   if __has_include(<optional>) && (__cplusplus >= 201703L)
 #       include <optional>
+#       ifdef __cpp_lib_optional
+#           define BOOST_PFR_TEST_HAS_OPTIONAL 1
+#       endif
 #   endif
+#endif
+
+#ifndef BOOST_PFR_TEST_HAS_OPTIONAL
+#define BOOST_PFR_TEST_HAS_OPTIONAL 0
 #endif
 
 namespace some {
@@ -25,7 +32,7 @@ namespace testing {
 
 namespace {
 
-#ifdef __cpp_lib_optional
+#if BOOST_PFR_TEST_HAS_OPTIONAL
 struct anon_with_optional {
     std::string a;
     std::optional<some::struct1> b;
@@ -62,7 +69,7 @@ void test_in_anon_ns() {
     >::value, "");
 
     // TODO: something is wrong with loophole and optional
-#if defined(__cpp_lib_optional) && !BOOST_PFR_USE_LOOPHOLE
+#if BOOST_PFR_TEST_HAS_OPTIONAL && !BOOST_PFR_USE_LOOPHOLE
     other_anon_with_optional opt{"test", {}, {}, {}};
     auto opt_val = boost::pfr::structure_tie(opt);
     BOOST_TEST_EQ(std::get<0>(opt_val), "test");
@@ -82,7 +89,7 @@ void test_in_non_non_ns() {
     >::value, "");
 
     // TODO: something is wrong with loophole and optional
-#if defined(__cpp_lib_optional) && !BOOST_PFR_USE_LOOPHOLE
+#if BOOST_PFR_TEST_HAS_OPTIONAL && !BOOST_PFR_USE_LOOPHOLE
     other_anon_with_optional opt{"test again", {}, {}, {}};
     auto opt_val = boost::pfr::structure_tie(opt);
     BOOST_TEST_EQ(std::get<0>(opt_val), "test again");

@@ -38,28 +38,27 @@ namespace detail {
 ///////////////////// Helper typedefs
     template <class Stream, class Type>
     using enable_not_ostreamable_t = std::enable_if_t<
-        not_appliable<ostreamable_detector, Stream&, Type>::value,
+        not_appliable<ostreamable_detector, Stream&, const std::remove_reference_t<Type>&>::value,
         Stream&
     >;
 
     template <class Stream, class Type>
     using enable_not_istreamable_t = std::enable_if_t<
-        not_appliable<istreamable_detector, Stream&, Type>::value,
+        not_appliable<istreamable_detector, Stream&, Type&>::value,
         Stream&
     >;
 
     template <class Stream, class Type>
     using enable_ostreamable_t = std::enable_if_t<
-        !not_appliable<ostreamable_detector, Stream&, Type>::value,
+        !not_appliable<ostreamable_detector, Stream&, const std::remove_reference_t<Type>&>::value,
         Stream&
     >;
 
     template <class Stream, class Type>
     using enable_istreamable_t = std::enable_if_t<
-        !not_appliable<istreamable_detector, Stream&, Type>::value,
+        !not_appliable<istreamable_detector, Stream&, Type&>::value,
         Stream&
     >;
-
 
 ///////////////////// IO impl
 
@@ -67,16 +66,6 @@ template <class T>
 struct io_impl {
     T value;
 };
-
-template <class Char, class Traits, class T>
-enable_not_ostreamable_t<std::basic_ostream<Char, Traits>, T> operator<<(std::basic_ostream<Char, Traits>&& out, io_impl<T>&& x) {
-    return out << boost::pfr::io_fields(std::forward<T>(x.value));
-}
-
-template <class Char, class Traits, class T>
-enable_ostreamable_t<std::basic_ostream<Char, Traits>, T> operator<<(std::basic_ostream<Char, Traits>&& out, io_impl<T>&& x) {
-    return out << x.value;
-}
 
 template <class Char, class Traits, class T>
 enable_not_ostreamable_t<std::basic_ostream<Char, Traits>, T> operator<<(std::basic_ostream<Char, Traits>& out, io_impl<T>&& x) {

@@ -23,7 +23,8 @@ int main(int argc, const char* argv[]) {
         << " was born in " << boost::pfr::get<1>(val);  // Works with any aggregate initializables!
 
     if (argc > 1) {
-        std::ofstream(argv[1]) << boost::pfr::io(val);  // File now contains: {"Edgar Allan Poe", 1809}
+        std::ofstream ofs(argv[1]);
+        ofs << boost::pfr::io(val);                     // File now contains: {"Edgar Allan Poe", 1809}
     }
 }
 //]
