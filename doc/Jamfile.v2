@@ -51,7 +51,7 @@ boostbook pfr-doc
         pfr.qbk
     :
         <dependency>autodoc_pfr
-        <xsl:param>boost.root=http://www.boost.org/doc/libs/1_72_0
+        <xsl:param>boost.root=https://www.boost.org/doc/libs/1_72_0
         #<xsl:param>boost.root=../../../.
         <xml:param>html.stylesheet=../../../../doc/src/boostbook.css
     ;
