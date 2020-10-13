@@ -78,6 +78,8 @@ void test_examples() {
 
   {
 //[pfr_quick_examples_tuple_size
+    // Getting fields count of some structure
+
     struct some { int a,b,c,d,e; };
 
     std::cout << "Fields count in structure: "
@@ -124,6 +126,8 @@ void test_examples() {
 #if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
   {
 //[pfr_quick_examples_structure_tie
+    // Getting a tuple of references to structure fields
+
     struct foo { int a, b; };
     struct other {
         char c;
