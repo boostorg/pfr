@@ -32,7 +32,7 @@ local doxygen_params =
         <doxygen:param>"ALIASES= \\
             \"forcedlink{1}=\\xmlonly<link linkend='boost.pfr.\\1'>\\endxmlonly boost::pfr::\\1\\xmlonly</link>\\endxmlonly\" \\
             \"podops=\\b See \\b Also : \\xmlonly<link linkend='boost_pfr.tutorial.three_ways_of_getting_operators'>\\endxmlonly Three ways of getting operators \\xmlonly</link>\\endxmlonly\" \\
-            \"aggregate=\\xmlonly<link linkend='boost_pfr.limitations_and_configuration'>\\endxmlonly aggregate \\xmlonly</link>\\endxmlonly\" \\
+            \"aggregate=\\xmlonly<link linkend='boost_pfr.limitations_and_configuration'>\\endxmlonly simple aggregate \\xmlonly</link>\\endxmlonly\" \\
             \"BOOST_PFR_DOXYGEN_INVOKED\" \\
         "
     ;

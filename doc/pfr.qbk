@@ -400,7 +400,7 @@ struct simple_aggregate {
     boost::uuids::uuid uuid; 
 };
 ```
-The library may work with aggregates other that simple ones, but the behavior tends to be unportable. 
+The library may work with aggregates other than simple ones, but the behavior tends to be unportable.
 
 [h2 Configuration Macro]
 

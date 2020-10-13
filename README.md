@@ -1,6 +1,6 @@
 # Boost.PFR
 
-This C++14 is a library for very basic reflection that gives you access to structure elements by index and provides other `std::tuple` like methods for user defined types without any macro or boilerplate code.
+This is a C++14 library for very basic reflection that gives you access to structure elements by index and provides other `std::tuple` like methods for user defined types without any macro or boilerplate code.
 
 
 [Latest documentation](http://apolukhin.github.com/magic_get/index.html)
@@ -21,20 +21,20 @@ Master:         | [![Build Status](https://travis-ci.org/apolukhin/magic_get.svg
 #include "boost/pfr.hpp"
 
 struct some_person {
-    std::string name;
-    unsigned birth_year;
+  std::string name;
+  unsigned birth_year;
 };
 
 int main(int argc, const char* argv[]) {
-    some_person val{"Edgar Allan Poe", 1809};
+  some_person val{"Edgar Allan Poe", 1809};
 
-    std::cout << boost::pfr::get<0>(val)                // No macro!
-        << " was born in " << boost::pfr::get<1>(val);  // Works with any aggregate initializables!
+  std::cout << boost::pfr::get<0>(val)                // No macro!
+      << " was born in " << boost::pfr::get<1>(val);  // Works with any aggregate initializables!
 
-    if (argc > 1) {
-        std::ofstream ofs(argv[1]);
-        ofs << boost::pfr::io(val);                     // File now contains: {"Edgar Allan Poe", 1809}
-    }
+  if (argc > 1) {
+    std::ofstream ofs(argv[1]);
+    ofs << boost::pfr::io(val);                       // File now contains: {"Edgar Allan Poe", 1809}
+  }
 }
 ```
 Outputs:
