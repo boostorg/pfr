@@ -13,6 +13,15 @@
 
 namespace my_ns {
 
+/// Usage:
+///     struct foo {std::uint8_t a, b;};
+///     ...
+///     std::cout << my_ns::my_io(foo{42, 22});
+///
+/// Output: 42, 22
+template <class T>
+auto my_io(const T& value);
+
 namespace detail {
     // Helpers to print individual values
     template <class T>
@@ -39,12 +48,7 @@ namespace detail {
     }
 }
 
-/// Usage:
-///     struct foo {std::uint8_t a, b;};
-///     ...
-///     std::cout << my_ns::my_io(foo{42, 22});
-///
-/// Output: 42, 22
+// Definition:
 template <class T>
 auto my_io(const T& value) {
     return detail::io_reference<T>{value};

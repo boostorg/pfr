@@ -107,6 +107,8 @@ void test_examples() {
 #if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
   {
 //[pfr_quick_examples_structure_to_tuple
+    // Getting a std::tuple of values from structures fields
+
     struct foo { int a, b; };
     struct other {
         char c;
@@ -126,7 +128,7 @@ void test_examples() {
 #if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
   {
 //[pfr_quick_examples_structure_tie
-    // Getting a tuple of references to structure fields
+    // Getting a std::tuple of references to structure fields
 
     struct foo { int a, b; };
     struct other {

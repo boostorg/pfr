@@ -12,12 +12,12 @@
 
 [section Intro]
 
-Boost.PFR is a library for very basic reflection that gives you access to structure elements by index and provides other `std::tuple` like methods for user defined types without any macro or boilerplate code:
+Boost.PFR is a C++14 library for a very basic reflection. It gives you access to structure elements by index and provides other `std::tuple` like methods for user defined types without any macro or boilerplate code:
 
 [import ../example/motivating_example0.cpp]
 [pfr_motivating_example]
 
-See [link boost_pfr.limitations_and_configuration limitations].
+See [link boost_pfr.limitations_and_configuration [*limitations]].
 
 
 [h2 Usecase example]
@@ -42,20 +42,20 @@ user_info retrieve_friend(std::string_view name) {
         name
     );
 
-    ////// Library users would usually move data from tuple to helper structures //////
+    ////////////////////////////////////////////////////////////////////////////////
     user_info info {
         std::move(std::get<0>(info_tuple)),
         std::move(std::get<1>(info_tuple)),
         std::move(std::get<2>(info_tuple)),
         std::move(std::get<3>(info_tuple)),
     }
-    //////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
 
     auto friend_info = ask_user_for_friend(std::move(info));
 
     db::insert(
         "INSERT INTO user_infos(id, name, email, login) VALUES ($0, $1, $2, $3)",
-        std::move(friend_info.id),    ////////////////////////////////////////////////
+        std::move(friend_info.id),    //////////////////////////////////////////////
         std::move(friend_info.name),  // Users are forced to move individual fields
         std::move(friend_info.email), // because your library can not iterate over
         std::move(friend_info.login), // the fields of a user provided structure
@@ -80,20 +80,20 @@ user_info retrieve_friend(std::string_view name) {
         name
     );
 
-    ////////////////// No boilerplate code to move data around ///////////////////////    
+    ////////////////// No boilerplate code to move data around /////////////////////
 
 
 
 
 
 
-    //////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
 
     auto friend_info = ask_user_for_friend(std::move(info));
 
     db::insert(
         "INSERT INTO user_infos(id, name, email, login) VALUES ($0, $1, $2, $3)",
-        friend_info     //////////////////////////////////////////////////////////////
+        friend_info     ////////////////////////////////////////////////////////////
                         // Boost.PFR allows you to iterate over all the fields of a
                         // user provided structure
                         //
@@ -122,7 +122,7 @@ Boost.PFR adds the following out-of-the-box functionality for aggregate initiali
 * methods for cooperation with `std::tuple`
 * methods to visit each field of the structure
 
-Boost.PFR is a header only library that does not depend on Boost. You can just copy the content of the "include" folder [@https://github.com/apolukhin/magic_get from the github] into your project, and the library will work fine.
+Boost.PFR is a header only library that does not depend on Boost. You can just copy the content of the "include" folder [@https://github.com/boostorg/pfr from the github] into your project, and the library will work fine.
 
 [caution Recommended C++ Standards are C++17 and above. Library requires at least C++14! Pre C++14 compilers (C++11, C++03...) are not supported]
 
@@ -236,9 +236,9 @@ Definition via aggregate initializable structure is much more clear. Same story 
 
 Another advantage of aggregates is a more efficient copy, move construction and assignments.
 
-Because of the above issues many guidelines recommend to [*use aggregates instead of tuples]. However aggregates fail when it comes to the functional like programming.
+Because of the above issues some guidelines recommend to [*use aggregates instead of tuples]. However aggregates fail when it comes to the functional like programming.
 
-PFR library [*provides tuple like methods for aggregate initializable structures], making aggregates usable in contexts where only tuples were useful.
+Boost.PFR library [*provides tuple like methods for aggregate initializable structures], making aggregates usable in contexts where only tuples were useful.
 
 [endsect]
 
@@ -373,7 +373,7 @@ bool some_function(test_union f1, test_union f2) {
 
 ```
 
-Reflection of unions is disabled for safety reasons. There's a way to get the first member of a union and use it. Unfortunately there's no way to find out [*active] member of a union. Accessing an inactive union member is an Undefined Behavior. Using the first union member could lead to disaster if it is some character pointer. For example ostreaming `union {char* c; long long ll; } u; u.ll= 1;` will crash your program, as the active member is `ll` that holds `1` but we are trying to output a `char*`. This would cause an invalid pointer dereference.
+Reflection of unions is disabled in the Boost.PFR library for safety reasons. Alas, there's no way to find out [*active] member of a union and accessing an inactive member is an Undefined Behavior. For example, library could always return the first member, but ostreaming `u` in `union {char* c; long long ll; } u; u.ll= 1;` will crash your program with an invalid pointer dereference.
 
 Any attempt to reflect unions leads to a compile time error. In many cases a static assert is triggered that outputs the following message:
 
@@ -391,13 +391,13 @@ error: static_assert failed "====================> Boost.PFR: For safety reasons
 
 [caution Recommended C++ Standards are C++17 and above. Library requires at least C++14! Pre C++14 compilers (C++11, C++03...) are not supported. ]
 
-Boost.PFR library works best with [*simple aggregates] - non-inherited aggregate initializable structures without const fields, C arrays and static variables:
+Boost.PFR library works best with [*simple aggregates] - non-inherited aggregate initializable structures without const fields, C arrays nor static variables:
 
 ```
 struct simple_aggregate {
     std::string name;
     int age;
-    boost::uuids::uuid uuid; 
+    boost::uuids::uuid uuid;
 };
 ```
 The library may work with aggregates other than simple ones, but the behavior tends to be unportable.
@@ -434,16 +434,16 @@ The Boost.PFRs reflection has some limitations that depend on a C++ Standard and
 Short description:
 
 # at compile-time: use aggregate initialization to detect fields count in user-provided structure
-    * C++17:
+    * [*BOOST_PFR_USE_CPP17 == 1]:
         # at compile-time: structured bindings are used to decompose a type `T` to known amount of fields
-    * C++14:
+    * [*BOOST_PFR_USE_CPP17 == 0 && BOOST_PFR_USE_LOOPHOLE == 1]:
         # at compile-time: use aggregate initialization to detect fields count in user-provided structure
         # at compile-time: make a structure that is convertible to anything and remember types it has been converted to during aggregate initialization of user-provided structure
         # at compile-time: using knowledge from previous steps create a tuple with exactly the same layout as in user-provided structure
         # at compile-time: find offsets for each field in user-provided structure using the tuple from previous step
         # at run-time: get pointer to each field, knowing the structure address and each field offset
         # at run-time: a tuple of references to fields is returned => all the tuple methods are available for the structure
-    * C++14 with disabled [link boost_pfr.limitations_and_configuration [*BOOST_PFR_USE_LOOPHOLE]]:
+    * [*BOOST_PFR_USE_CPP17 == 0 && BOOST_PFR_USE_LOOPHOLE == 0]:
         # at compile-time: let `I` be is an index of current field, it equals 0
         # at run-time: `T` is constructed and field `I` is aggregate initialized using a separate instance of structure that is convertible to anything [note Additional care is taken to make sure that all the information about `T` is available to the compiler and that operations on `T` have no side effects, so the compiler can optimize away the unnecessary temporary objects.]
         # at compile-time: `I += 1`
@@ -454,8 +454,8 @@ Short description:
 # at run-time: a tuple of references to fields is returned => all the tuple methods are available for the structure
 
 Long description of some basics: [@https://youtu.be/UlNUNxLtBI0 Antony Polukhin: Better C++14 reflections].
-Long description of some basics of C++14 with disabled [link boost_pfr.limitations_and_configuration [*BOOST_PFR_USE_LOOPHOLE]]: [@https://youtu.be/abdeAew3gmQ Antony Polukhin: C++14 Reflections Without Macros, Markup nor External Tooling].
-Description of the [*BOOST_PFR_USE_LOOPHOLE] technique by its inventor Alexandr Poltavsky [@http://alexpolt.github.io/type-loophole.html in his blog].
+Long description of some basics of C++14 with [link boost_pfr.limitations_and_configuration [*BOOST_PFR_USE_LOOPHOLE == 0]]: [@https://youtu.be/abdeAew3gmQ Antony Polukhin: C++14 Reflections Without Macros, Markup nor External Tooling].
+Description of the [*BOOST_PFR_USE_LOOPHOLE == 1] technique by its inventor Alexandr Poltavsky [@http://alexpolt.github.io/type-loophole.html in his blog].
 
 [endsect]
 
@@ -463,7 +463,7 @@ Description of the [*BOOST_PFR_USE_LOOPHOLE] technique by its inventor Alexandr 
 
 Great thanks to Bruno Dutra for showing the technique to precisely reflect aggregate initializable type in C++14 [@https://github.com/apolukhin/magic_get/issues/5 Manual type registering/structured bindings might be unnecessary].
 
-Great thanks to Alexandr Poltavsky for initial implementation the [link boost_pfr.limitations_and_configuration [*BOOST_PFR_USE_LOOPHOLE]] technique and for describing it [@http://alexpolt.github.io/type-loophole.html in his blog].
+Great thanks to Alexandr Poltavsky for initial implementation the [*BOOST_PFR_USE_LOOPHOLE == 1] technique and for describing it [@http://alexpolt.github.io/type-loophole.html in his blog].
 
 Great thanks to Chris Beck for implementing the detect-offsets-and-get-field-address functionality that avoids Undefined Behavior of reinterpret_casting layout compatible structures.
 
