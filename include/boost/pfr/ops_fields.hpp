@@ -33,53 +33,65 @@
 /// \b Synopsis:
 namespace boost { namespace pfr {
 
-    /// Does a field-by-field comparison.
+    /// Does a field-by-field equality comparison.
     ///
-    /// \returns `std::tie( _lhs-fields_ ) == std::tie( _rhs-fields_ )`
+    /// Let MIN be std::min(tuple_size_v<T>, tuple_size_v<U>). Let _lhs-fields_ and _rhs-fields_ be the tuples of MIN fields of lhs and rhs correspondingly.
+    ///
+    /// \returns `std::tie( _lhs-fields_ ) == std::tie( _rhs-fields_ ) && tuple_size_v<T> == tuple_size_v<U>`
     template <class T, class U>
     bool eq_fields(const T& lhs, const U& rhs) noexcept {
         return detail::binary_visit<detail::equal_impl>(lhs, rhs);
     }
 
 
-    /// Does a field-by-field comparison.
+    /// Does a field-by-field inequality comparison.
     ///
-    /// \returns `std::tie( _lhs-fields_ ) != std::tie( _rhs-fields_ )`
+    /// Let MIN be std::min(tuple_size_v<T>, tuple_size_v<U>). Let _lhs-fields_ and _rhs-fields_ be the tuples of MIN fields of lhs and rhs correspondingly.
+    ///
+    /// \returns `std::tie( _lhs-fields_ ) != std::tie( _rhs-fields_ ) || tuple_size_v<T> != tuple_size_v<U>`
     template <class T, class U>
     bool ne_fields(const T& lhs, const U& rhs) noexcept {
         return detail::binary_visit<detail::not_equal_impl>(lhs, rhs);
     }
 
-    /// Does a field-by-field comparison.
+    /// Does a field-by-field greter comparison.
     ///
-    /// \returns `std::tie( _lhs-fields_ ) > std::tie( _rhs-fields_ )`
+    /// Let MIN be std::min(tuple_size_v<T>, tuple_size_v<U>). Let _lhs-fields_ and _rhs-fields_ be the tuples of MIN fields of lhs and rhs correspondingly.
+    ///
+    /// \returns `std::tie( _lhs-fields_ ) > std::tie( _rhs-fields_ ) || (std::tie( _lhs-fields_ ) == std::tie( _rhs-fields_ ) && tuple_size_v<T> > tuple_size_v<U>)`
     template <class T, class U>
     bool gt_fields(const T& lhs, const U& rhs) noexcept {
         return detail::binary_visit<detail::greater_impl>(lhs, rhs);
     }
 
 
-    /// Does a field-by-field comparison.
+    /// Does a field-by-field less comparison.
     ///
-    /// \returns `std::tie( _lhs-fields_ ) < std::tie( _rhs-fields_ )`
+    /// Let MIN be std::min(tuple_size_v<T>, tuple_size_v<U>). Let _lhs-fields_ and _rhs-fields_ be the tuples of MIN fields of lhs and rhs correspondingly.
+    ///
+    /// \returns `std::tie( _lhs-fields_ ) < std::tie( _rhs-fields_ ) || (std::tie( _lhs-fields_ ) == std::tie( _rhs-fields_ ) && tuple_size_v<T> < tuple_size_v<U>)`
     template <class T, class U>
     bool lt_fields(const T& lhs, const U& rhs) noexcept {
         return detail::binary_visit<detail::less_impl>(lhs, rhs);
     }
 
 
-    /// Does a field-by-field comparison.
+    /// Does a field-by-field greater equal comparison.
     ///
-    /// \returns `std::tie( _lhs-fields_ ) >= std::tie( _rhs-fields_ )`
+    /// Let MIN be std::min(tuple_size_v<T>, tuple_size_v<U>). Let _lhs-fields_ and _rhs-fields_ be the tuples of MIN fields of lhs and rhs correspondingly.
+    ///
+    /// \returns `std::tie( _lhs-fields_ ) > std::tie( _rhs-fields_ ) || (std::tie( _lhs-fields_ ) == std::tie( _rhs-fields_ ) && tuple_size_v<T> >= tuple_size_v<U>)`
     template <class T, class U>
     bool ge_fields(const T& lhs, const U& rhs) noexcept {
         return detail::binary_visit<detail::greater_equal_impl>(lhs, rhs);
     }
 
 
-    /// Does a field-by-field comparison.
+    /// Does a field-by-field less equal comparison.
     ///
-    /// \returns `std::tie( _lhs-fields_ ) <= std::tie( _rhs-fields_ )`
+    /// Let MIN be std::min(tuple_size_v<T>, tuple_size_v<U>). Let _lhs-fields_ and _rhs-fields_ be the tuples of MIN fields of lhs and rhs correspondingly.
+    ///
+    /// \returns `std::tie( _lhs-fields_ ) < std::tie( _rhs-fields_ ) || (std::tie( _lhs-fields_ ) == std::tie( _rhs-fields_ ) && tuple_size_v<T> <= tuple_size_v<U>)`
     template <class T, class U>
     bool le_fields(const T& lhs, const U& rhs) noexcept {
         return detail::binary_visit<detail::less_equal_impl>(lhs, rhs);
