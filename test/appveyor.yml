@@ -68,7 +68,7 @@ environment:
 before_build:
     - set BOOST_BRANCH=develop
     - if "%APPVEYOR_REPO_BRANCH%" == "master" set BOOST_BRANCH=master
-    - echo "Testing %APPVEYOR_PROJECT_NAME%"
+    - echo "Testing %BOOST_LIBS_FOLDER%"
     # Cloning Boost libraries (fast nondeep cloning)
     - set BOOST=C:/boost-local
     - git clone -b %BOOST_BRANCH% --depth 10 https://github.com/boostorg/boost.git %BOOST%
@@ -84,7 +84,7 @@ before_build:
 build_script:
     - cmd /c bootstrap
     - b2.exe headers
-    - cd %BOOST%/libs/%APPVEYOR_PROJECT_NAME%/test
+    - cd %BOOST%/libs/%BOOST_LIBS_FOLDER%/test
 
 after_build:
 before_test:

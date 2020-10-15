@@ -16,11 +16,34 @@ project
         [ requires cxx14_constexpr ]
     ;
 
+
+########## BEGIN of helpers to detect Loophole trick support
+
+actions mp_simple_run_action
+{
+      $(>) > $(<)
+}
+
+rule mp-run-simple ( sources + : args * : input-files * : requirements * : target-name )
+{
+   exe $(target-name)_exe : $(sources) : $(requirements) ;
+   explicit $(target-name)_exe ;
+   make $(target-name).output : $(target-name)_exe : @mp_simple_run_action ;
+   explicit $(target-name).output ;
+   alias $(target-name) : $(target-name).output ;
+}
+
+mp-run-simple loophole_detection.cpp : : : : compiler_supports_loophole ;
+explicit compiler_supports_loophole ;
+
+########## END of helpers to detect Loophole trick support
+
+
 local DISABLE_ON_MSVC = <toolset>msvc:<build>no ;
-local DISABLE_ON_CLANG8_PLUS = <toolset>clang-8:<build>no <toolset>clang-9:<build>no <toolset>clang-10:<build>no ;
+local REQUIRE_LOOPHOLE = [ check-target-builds ../test//compiler_supports_loophole : : <build>no ] ;
 
 local STRUCTURED_BINDING_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=1 [ requires cxx17_structured_bindings ] ;
-local LOOPHOLE_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=1 <define>BOOST_PFR_USE_CPP17=0 $(DISABLE_ON_MSVC) $(DISABLE_ON_CLANG8_PLUS) ;
+local LOOPHOLE_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=1 <define>BOOST_PFR_USE_CPP17=0 $(REQUIRE_LOOPHOLE) ;
 local CLASSIC_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=0 $(DISABLE_ON_MSVC) ;
 
 test-suite pfr_tests
