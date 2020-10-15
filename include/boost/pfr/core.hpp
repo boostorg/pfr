@@ -29,7 +29,7 @@
 
 namespace boost { namespace pfr {
 
-/// \brief Returns reference or const reference to a field with index `I` in \aggregate T.
+/// \brief Returns reference or const reference to a field with index `I` in \aggregate `val`.
 ///
 /// \b Example:
 /// \code
@@ -71,7 +71,7 @@ constexpr auto get(T&& val, std::enable_if_t< std::is_rvalue_reference<T&&>::val
 }
 
 
-/// \brief `tuple_element` has a `using type = type-of-a-field-with-index-I-in-T;`
+/// \brief `tuple_element` has a member typedef `type` that returns the type of a field with index I in \aggregate T.
 ///
 /// \b Example:
 /// \code
@@ -91,7 +91,7 @@ template <std::size_t I, class T>
 using tuple_element_t = typename tuple_element<I, T>::type;
 
 
-/// \brief Creates a `std::tuple` from an \aggregate T.
+/// \brief Creates a `std::tuple` from fields of an \aggregate `val`.
 ///
 /// \b Example:
 /// \code
@@ -109,7 +109,9 @@ constexpr auto structure_to_tuple(const T& val) noexcept {
 }
 
 
-/// \brief Creates a `std::tuple` with const lvalue references to fields of an \aggregate T.
+/// \brief std::tie` like function that ties fields of a structure.
+///
+/// \returns a `std::tuple` with lvalue and const lvalue references to fields of an \aggregate `val`.
 ///
 /// \b Example:
 /// \code
@@ -200,8 +202,10 @@ void for_each_field(T&& value, F&& func) {
     );
 }
 
-/// \brief Create a tuple of lvalue references capable of de-structuring
-/// assignment from fields of an \aggregate T.
+/// \brief std::tie-like function that allows assigning to tied values from aggregates.
+///
+/// \returns an object with lvalue references to `args...`; on assignment of an \aggregate value to that
+/// object each field of an aggregate is assigned to the corresponding `args...` reference.
 ///
 /// \b Example:
 /// \code

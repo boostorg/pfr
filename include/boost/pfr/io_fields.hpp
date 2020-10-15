@@ -147,6 +147,11 @@ std::basic_istream<Char, Traits>& operator>>(std::basic_istream<Char, Traits>& i
 ///         return is >> boost::pfr::io_fields(x);  // Equivalent to: is >> "{ " >> x.i >> " ," >>  x.s >> " }"
 ///     }
 /// \endcode
+///
+/// Input and output streaming operators for `boost::pfr::io_fields` are symmetric, meaning that you get the original value by streaming it and
+/// reading back if each fields streaming operator is symmetric.
+///
+/// \customio
 template <class T>
 auto io_fields(T&& value) noexcept {
     return detail::io_fields_impl<T>{std::forward<T>(value)};

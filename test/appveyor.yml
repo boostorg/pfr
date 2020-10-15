@@ -11,7 +11,7 @@
 # File revision #6 (with DIFF)
 
 init:
-    - set BOOST_REMOVE=%APPVEYOR_PROJECT_NAME%         # Remove this folder from lib from full clone of Boost.
+    - set BOOST_REMOVE=pfr  #%APPVEYOR_PROJECT_NAME%         # Remove this folder from lib from full clone of Boost.
 
 ###############################################################################################################
 # From this point and below code is same for all the Boost libs

@@ -12,7 +12,7 @@
 
 [section Intro]
 
-Boost.PFR is a C++14 library for a very basic reflection. It gives you access to structure elements by index and provides other `std::tuple` like methods for user defined types without any macro or boilerplate code:
+Boost.PFR is a C++14 library for a very basic reflection. It gives you access to structure elements by index and provides other `std::tuple` like methods for user defined types without macro or boilerplate code:
 
 [import ../example/motivating_example0.cpp]
 [pfr_motivating_example]

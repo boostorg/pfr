@@ -89,7 +89,7 @@ enable_istreamable_t<std::basic_istream<Char, Traits>, T> operator>>(std::basic_
 
 } // namespace detail
 
-/// IO manupulator to read/write \aggregate `value` using its IO stream operators or using boost::pfr::io_fields if operators are not awailable.
+/// IO manupulator to read/write \aggregate `value` using its IO stream operators or using \forcedlink{io_fields} if operators are not awailable.
 ///
 /// \b Example:
 /// \code
@@ -101,6 +101,8 @@ enable_istreamable_t<std::basic_istream<Char, Traits>, T> operator>>(std::basic_
 ///     assert(s.i == 12);
 ///     assert(s.i == 13);
 /// \endcode
+///
+/// \customio
 template <class T>
 auto io(T&& value) noexcept {
     return detail::io_impl<T>{std::forward<T>(value)};
