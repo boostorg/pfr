@@ -1,0 +1,15 @@
+{
+    "key": "pfr",
+    "name": "PFR",
+    "authors": [
+        "Antony Polukhin"
+    ],
+    "maintainers": [
+        "Antony Polukhin <antoshkka -at- gmail.com>"
+    ],
+    "description": "Basic reflection  for user defined types.",
+    "category": [
+        "Data",
+        "Metaprogramming"
+    ]
+}
