@@ -11,7 +11,11 @@
 # File revision #6 (with DIFF)
 
 init:
-    - set BOOST_REMOVE=pfr  #%APPVEYOR_PROJECT_NAME%         # Remove this folder from lib from full clone of Boost.
+    # boost-local/libs/ folder to put this library into. This may be useful, if you're for example running Travis
+    # from `Boost.DLL` repo while Boost already has `dll` and with to replace `dll` with content of`Boost.DLL`.
+    #
+    # Otherwise just leave the default value - set BOOST_LIBS_FOLDER=%APPVEYOR_PROJECT_NAME%
+    - set BOOST_LIBS_FOLDER=pfr # DIFF
 
 ###############################################################################################################
 # From this point and below code is same for all the Boost libs
@@ -71,9 +75,10 @@ before_build:
     - cd %BOOST%
     - git submodule update --init --depth 10 tools/build tools/boostdep libs/type_index # DIFF: Added libs/type_index
 
-    - rm -rf %BOOST%/libs/%BOOST_REMOVE%
-    - mv %APPVEYOR_BUILD_FOLDER% %BOOST%/libs/%APPVEYOR_PROJECT_NAME%
-    - python tools/boostdep/depinst/depinst.py --git_args "--depth 10 --jobs 2" %APPVEYOR_PROJECT_NAME%
+    - echo "rm -rf %BOOST%/libs/%BOOST_LIBS_FOLDER%"
+    - rm -rf %BOOST%/libs/%BOOST_LIBS_FOLDER%
+    - mv %APPVEYOR_BUILD_FOLDER% %BOOST%/libs/%BOOST_LIBS_FOLDER%
+    - python tools/boostdep/depinst/depinst.py --git_args "--depth 10 --jobs 2" %BOOST_LIBS_FOLDER%
     - python tools/boostdep/depinst/depinst.py --git_args "--depth 10 --jobs 2" type_index # DIFF: Added
 
 build_script:
