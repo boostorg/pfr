@@ -113,8 +113,6 @@ before_install:
   # Global options for sanitizers
   - UBSAN_OPTIONS=print_stacktrace=1
   - LSAN_OPTIONS=verbosity=1:log_threads=1
-  # Set this to the name of the library
-  - BOOST_LIBS_FOLDER=`basename $TRAVIS_BUILD_DIR`
 
   # Cloning minimal set of Boost libraries
   - BOOST=$HOME/boost-local
