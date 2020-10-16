@@ -157,7 +157,7 @@ after_success:
   - find ../../../bin.v2/ -name "*.no" -exec cp "{}" $TRAVIS_BUILD_DIR/coverals/ \;
   - wget https://github.com/linux-test-project/lcov/archive/v1.12.zip
   - unzip v1.12.zip
-  - LCOV="`pwd`/lcov-1.12/bin/lcov --gcov-tool gcov-6"
+  - LCOV="`pwd`/lcov-1.12/bin/lcov"
 
   # Preparing Coveralls data by changind data format to a readable one
   - echo "$LCOV --directory $TRAVIS_BUILD_DIR/coverals --base-directory `pwd` --capture --output-file $TRAVIS_BUILD_DIR/coverals/coverage.info"
