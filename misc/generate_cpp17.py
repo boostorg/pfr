@@ -65,7 +65,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<!std::is_class<
 ############################################################################################################################
 EPILOGUE = """
 template <class T, std::size_t I>
-constexpr void tie_as_tuple(T& val, size_t_<I>) noexcept {
+constexpr void tie_as_tuple(T& /*val*/, size_t_<I>) noexcept {
   static_assert(sizeof(T) && false,
                 "====================> Boost.PFR: Too many fields in a structure T. Regenerate include/boost/pfr/detail/core17_generated.hpp file for appropriate count of fields. For example: `python ./misc/generate_cpp17.py 300 > include/boost/pfr/detail/core17_generated.hpp`");
 }

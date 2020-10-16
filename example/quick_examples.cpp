@@ -98,7 +98,7 @@ void test_examples() {
     };
 
     sample var{};
-    boost::pfr::get<1>(var) = 42.01;
+    boost::pfr::get<1>(var) = 42.01f;
 
     std::cout << var.f; // Outputs: 42.01
 //]

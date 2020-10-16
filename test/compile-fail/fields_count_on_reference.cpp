@@ -11,5 +11,5 @@ struct some_struct {
 };
 
 int main() {
-    return boost::pfr::detail::fields_count<some_struct&>();
+    return static_cast<int>(boost::pfr::detail::fields_count<some_struct&>());
 }

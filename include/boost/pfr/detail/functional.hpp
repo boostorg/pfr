@@ -129,7 +129,7 @@ namespace boost { namespace pfr { namespace detail {
     }
 
     template <typename T>
-    std::size_t compute_hash(const T& value, int /*priority*/) {
+    std::size_t compute_hash(const T& /*value*/, int /*priority*/) {
         static_assert(sizeof(T) && false, "====================> Boost.PFR: std::hash not specialized for type T");
         return 0;
     }
