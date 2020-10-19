@@ -391,16 +391,25 @@ error: static_assert failed "====================> Boost.PFR: For safety reasons
 
 [caution Recommended C++ Standards are C++17 and above. Library requires at least C++14! Pre C++14 compilers (C++11, C++03...) are not supported. ]
 
-Boost.PFR library works best with [*simple aggregates] - non-inherited aggregate initializable structures without const fields, C arrays nor static variables:
+Boost.PFR library works with types that satisfy the requirements of `SimpleAggregare`: aggregate types without base classes, `const` fields, references, or C arrays:
 
 ```
-struct simple_aggregate {
+struct simple_aggregate {  // SimpleAggregare
+    std::string name;
+    int age;
+    boost::uuids::uuid uuid;
+};
+
+struct empty {             // SimpleAggregare
+};
+
+struct aggregate : empty { // not a SimpleAggregare
     std::string name;
     int age;
     boost::uuids::uuid uuid;
 };
 ```
-The library may work with aggregates other than simple ones, but the behavior tends to be unportable.
+The library may work with aggregates that don't satisfy the requirements of `SimpleAggregare`, but the behavior tends to be non-portable.
 
 [h2 Configuration Macro]
 
@@ -470,4 +479,3 @@ Great thanks to Chris Beck for implementing the detect-offsets-and-get-field-add
 [endsect]
 
 [xinclude autodoc_pfr.xml]
-

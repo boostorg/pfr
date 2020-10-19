@@ -50,7 +50,7 @@ constexpr auto tie_as_tuple(T& /*val*/, size_t_<0>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<std::is_class< std::remove_cv_t<T> >::value>* = 0) noexcept {
-  auto& [a] = val;
+  auto& [a] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a);
 }
 
@@ -89,18 +89,18 @@ for i in xrange(1, funcs_count):
         indexes += ","
 
     if i >= max_args_on_a_line:
-        indexes += ascii_letters[i / max_args_on_a_line - 1] 
+        indexes += ascii_letters[i / max_args_on_a_line - 1]
     indexes += ascii_letters[i % max_args_on_a_line]
 
     print "template <class T>"
     print "constexpr auto tie_as_tuple(T& val, size_t_<" + str(i + 1) + ">) noexcept {"
     if i < max_args_on_a_line:
-        print "  auto& [" + indexes.strip() + "] = val;"
+        print "  auto& [" + indexes.strip() + "] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate."
         print "  return ::boost::pfr::detail::make_tuple_of_references(" + indexes.strip() + ");"
     else:
         print "  auto& ["
         print indexes
-        print "  ] = val;"
+        print "  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate."
         print ""
         print "  return ::boost::pfr::detail::make_tuple_of_references("
         print indexes
