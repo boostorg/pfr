@@ -5,6 +5,11 @@
 
 #include <boost/pfr/tuple_size.hpp>
 
+#ifdef __clang__
+#   pragma clang diagnostic ignored "-Wunused-private-field"
+#endif
+
+
 class test_with_private {
 private:
     int i;

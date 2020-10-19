@@ -7,6 +7,10 @@
 
 #include <string>
 
+#if defined(_MSC_VER)
+# pragma warning( disable: 4624 ) // destructor was implicitly defined as deleted
+#endif
+
 union test_unrestricted_union {
     int i;
     std::string s;

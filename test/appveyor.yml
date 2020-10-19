@@ -73,13 +73,12 @@ before_build:
     - set BOOST=C:/boost-local
     - git clone -b %BOOST_BRANCH% --depth 10 https://github.com/boostorg/boost.git %BOOST%
     - cd %BOOST%
-    - git submodule update --init --depth 10 tools/build tools/boostdep libs/type_index # DIFF: Added libs/type_index
+    - git submodule update --init --depth 10 tools/build tools/boostdep
 
     - echo "rm -rf %BOOST%/libs/%BOOST_LIBS_FOLDER%"
     - rm -rf %BOOST%/libs/%BOOST_LIBS_FOLDER%
     - mv %APPVEYOR_BUILD_FOLDER% %BOOST%/libs/%BOOST_LIBS_FOLDER%
-    - python tools/boostdep/depinst/depinst.py --git_args "--depth 10 --jobs 2" %BOOST_LIBS_FOLDER%
-    - python tools/boostdep/depinst/depinst.py --git_args "--depth 10 --jobs 2" type_index # DIFF: Added
+    - python tools/boostdep/depinst/depinst.py --git_args "--depth 10 --jobs 2" -I example -I examples %BOOST_LIBS_FOLDER%
 
 build_script:
     - cmd /c bootstrap

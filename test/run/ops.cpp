@@ -15,6 +15,10 @@
 
 #include <boost/core/lightweight_test.hpp>
 
+#ifdef __clang__
+#   pragma clang diagnostic ignored "-Wmissing-braces"
+#endif
+
 unsigned test_union_counter = 0;
 
 union test_union {
