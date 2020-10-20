@@ -6,7 +6,6 @@
 
 //[pfr_motivating_example
 #include <iostream>
-#include <fstream>
 #include <string>
 
 #include "boost/pfr.hpp"
@@ -16,15 +15,12 @@ struct some_person {
     unsigned birth_year;
 };
 
-int main(int argc, const char* argv[]) {
+int main() {
     some_person val{"Edgar Allan Poe", 1809};
 
     std::cout << boost::pfr::get<0>(val)                // No macro!
         << " was born in " << boost::pfr::get<1>(val);  // Works with any aggregate initializables!
 
-    if (argc > 1) {
-        std::ofstream ofs(argv[1]);
-        ofs << boost::pfr::io(val);                     // File now contains: {"Edgar Allan Poe", 1809}
-    }
+    std::cout << boost::pfr::io(val);                   // Outputs: {"Edgar Allan Poe", 1809}
 }
 //]

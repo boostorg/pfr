@@ -24,7 +24,7 @@ See [link boost_pfr.limitations_and_configuration [*limitations]].
 
 Imagine that you are writing the wrapper library for a database. Depending on the usage of Boost.PFR users code will look differently:
 
-[table:quick_examples
+[table:hand_made_vs_pfr_1
 [[ Without Boost.PFR ] [ With Boost.PFR ]]
 [[
 ```
@@ -58,7 +58,7 @@ user_info retrieve_friend(std::string_view name) {
         std::move(friend_info.id),    //////////////////////////////////////////////
         std::move(friend_info.name),  // Users are forced to move individual fields
         std::move(friend_info.email), // because your library can not iterate over
-        std::move(friend_info.login), // the fields of a user provided structure
+        std::move(friend_info.login)  // the fields of a user provided structure
     );
 
     return friend_info;
@@ -104,6 +104,53 @@ user_info retrieve_friend(std::string_view name) {
 ```
 ]]
 ]
+
+Otherwise your library could require a customization point for a user type:
+
+
+[table:hand_made_vs_pfr_2
+[[ Without Boost.PFR ] [ With Boost.PFR ]]
+[[
+```
+#include <db/api.hpp>
+
+struct user_info {
+    std::int64_t id;
+    std::string name, email, login;
+};
+
+/// Customizations via hand-written code or macro like BOOST_FUSION_ADAPT_STRUCT ///
+auto db_api_tie(user_info& ui) noexcept {
+    return std::tie(ui.id, ui.name, ui.email, ui.login);
+}
+
+auto db_api_tie(const user_info& ui) noexcept {
+    return std::tie(ui.id, ui.name, ui.email, ui.login);
+}
+////////////////////////////////////////////////////////////////////////////////////
+```
+][
+```
+#include <db/api.hpp>
+
+struct user_info {
+    std::int64_t id;
+    std::string name, email, login;
+};
+
+//////// With Boost.PFR there's no need in hand written customizations /////////////
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////
+```
+]]
+]
+
 
 With Boost.PFR the code is shorter, more readable and more pleasant to write.
 
