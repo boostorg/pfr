@@ -85,6 +85,7 @@ local BLACKLIST_TESTS_FOR_CLASSIC =
     optional_like
     read_write_non_literal
     template_constructor
+    template_forwarding_ref
     template_unconstrained
     tie_anonymous
     tie_anonymous_const_field
