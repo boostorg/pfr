@@ -79,33 +79,33 @@ constexpr void tie_as_tuple(T& /*val*/, size_t_<I>) noexcept {
 
 
 indexes = "    a"
-print PROLOGUE
+print(PROLOGUE)
 funcs_count = 100 if len(sys.argv) == 1 else int(sys.argv[1])
 max_args_on_a_line = len(ascii_letters)
-for i in xrange(1, funcs_count):
+for i in range(1, funcs_count):
     if i % max_args_on_a_line == 0:
         indexes += ",\n    "
     else:
         indexes += ","
 
     if i >= max_args_on_a_line:
-        indexes += ascii_letters[i / max_args_on_a_line - 1]
+        indexes += ascii_letters[i // max_args_on_a_line - 1]
     indexes += ascii_letters[i % max_args_on_a_line]
 
-    print "template <class T>"
-    print "constexpr auto tie_as_tuple(T& val, size_t_<" + str(i + 1) + ">) noexcept {"
+    print("template <class T>")
+    print("constexpr auto tie_as_tuple(T& val, size_t_<" + str(i + 1) + ">) noexcept {")
     if i < max_args_on_a_line:
-        print "  auto& [" + indexes.strip() + "] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate."
-        print "  return ::boost::pfr::detail::make_tuple_of_references(" + indexes.strip() + ");"
+        print("  auto& [" + indexes.strip() + "] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.")
+        print("  return ::boost::pfr::detail::make_tuple_of_references(" + indexes.strip() + ");")
     else:
-        print "  auto& ["
-        print indexes
-        print "  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate."
-        print ""
-        print "  return ::boost::pfr::detail::make_tuple_of_references("
-        print indexes
-        print "  );"
+        print("  auto& [")
+        print(indexes)
+        print("  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.")
+        print("")
+        print("  return ::boost::pfr::detail::make_tuple_of_references(")
+        print(indexes)
+        print("  );")
 
-    print "}\n"
+    print("}\n")
 
-print EPILOGUE
+print(EPILOGUE)

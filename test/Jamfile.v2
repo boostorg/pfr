@@ -5,6 +5,7 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 #
 
+import python ;
 import testing ;
 import ../../config/checks/config : requires ;
 
@@ -15,7 +16,6 @@ project
         <define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1
         [ requires cxx14_constexpr ]
     ;
-
 
 ########## BEGIN of helpers to detect Loophole trick support
 
@@ -124,4 +124,9 @@ for local source_file in [ glob ./compile-fail/*.cpp ]
     pfr_tests += [ compile-fail $(source_file) : $(STRUCTURED_BINDING_ENGINE) : $(target_name)_sb ] ;
     pfr_tests += [ compile-fail $(source_file) : $(LOOPHOLE_ENGINE) : $(target_name)_lh ] ;
     pfr_tests += [ compile-fail $(source_file) : $(CLASSIC_ENGINE) : $(target_name)_classic ] ;
+}
+
+if [ python.configured ]
+{
+    testing.make-test run-pyd : ../misc/generate_cpp17.py ;
 }
