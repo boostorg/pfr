@@ -7,16 +7,13 @@
 
 #include <boost/pfr/core.hpp>
 
-//#include <boost/multiprecision/cpp_dec_float.hpp>
-
-//const int kPrecision = 18;
-//using Numeric = boost::multiprecision::number<boost::multiprecision::cpp_dec_float<kPrecision>>;
-
 template <class T>
 struct unconstrained_template {
     unconstrained_template() = default;
     unconstrained_template(const unconstrained_template&) = default;
     unconstrained_template(unconstrained_template&&) = default;
+    unconstrained_template& operator=(const unconstrained_template&) = default;
+    unconstrained_template& operator=(unconstrained_template&&) = default;
 
     template <class U>
     constexpr unconstrained_template(const U& val)
@@ -34,10 +31,8 @@ struct int_element {
 struct aggregate_unconstrained {
     unconstrained_template<int> a;
     unconstrained_template<int_element> b;
-//    Numeric c;
 };
 
-// TODO: WIP
 int main() {
     using sanity = decltype(aggregate_unconstrained{
       boost::pfr::detail::ubiq_lref_constructor{0},
@@ -51,6 +46,7 @@ int main() {
     );
 
     boost::pfr::detail::enable_if_constructible_helper_t<aggregate_unconstrained, 2> foo;
+    (void)foo;
 
     static_assert(
         std::is_same<
@@ -67,16 +63,6 @@ int main() {
         >::value,
         "Precise reflection with template constructors fails to work"
     );
-
-    /*
-    static_assert(
-        std::is_same<
-            boost::pfr::tuple_element_t<2, aggregate_unconstrained>,
-            Numeric
-        >::value,
-        "Precise reflection with template constructors fails to work"
-    );
-    */
 
     aggregate_unconstrained aggr{3, 4};
     return boost::pfr::get<1>(aggr).value_.value_ - 4;

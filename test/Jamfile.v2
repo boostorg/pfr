@@ -60,14 +60,9 @@ test-suite pfr_tests
     [ run test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON="std::size_t" : test_tuple_sizes_on_size_ts ]
 
     [ run run/motivating_example.cpp      : : : : auto_engine_motivating ]
-    [ run ../example/sample_printing.cpp     : : : : auto_engine_sample_printing ]
-    [ run ../example/get.cpp                 : : : : auto_engine_get ]
-    [ run ../example/quick_examples.cpp      : : : : auto_engine_quick ]
-    
-    # TODO: template_unconstrained.cpp does not work at all
-    #[ run template_unconstrained.cpp : : : $(STRUCTURED_BINDING_ENGINE) : template_unconstrained_sb ]
-    #[ run template_unconstrained.cpp : : : $(LOOPHOLE_ENGINE) : template_unconstrained_lh ]
-    #[ compile-fail template_unconstrained.cpp : $(CLASSIC_ENGINE) : template_unconstrained_classic ]
+    [ run ../example/sample_printing.cpp  : : : : auto_engine_sample_printing ]
+    [ run ../example/get.cpp              : : : : auto_engine_get ]
+    [ run ../example/quick_examples.cpp   : : : : auto_engine_quick ]
   ;
 
 local BLACKLIST_TESTS_FOR_LOOPHOLE =
@@ -90,6 +85,7 @@ local BLACKLIST_TESTS_FOR_CLASSIC =
     optional_like
     read_write_non_literal
     template_constructor
+    template_unconstrained
     tie_anonymous
     tie_anonymous_const_field
   ;
