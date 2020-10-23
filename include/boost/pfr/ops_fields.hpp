@@ -104,7 +104,7 @@ namespace boost { namespace pfr {
     template <class T>
     std::size_t hash_fields(const T& x) {
         constexpr std::size_t fields_count_val = boost::pfr::detail::fields_count<std::remove_reference_t<T>>();
-#if BOOST_PFR_USE_CPP17
+#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
         return detail::hash_impl<0, fields_count_val>::compute(detail::tie_as_tuple(x));
 #else
         std::size_t result = 0;

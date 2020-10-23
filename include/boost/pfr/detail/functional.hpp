@@ -164,7 +164,7 @@ namespace boost { namespace pfr { namespace detail {
         constexpr std::size_t fields_count_min = detail::min_size(fields_count_lhs, fields_count_rhs);
         typedef Visitor<0, fields_count_min> visitor_t;
 
-#if BOOST_PFR_USE_CPP17
+#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
         return visitor_t::cmp(detail::tie_as_tuple(x), detail::tie_as_tuple(y));
 #else
         bool result = true;

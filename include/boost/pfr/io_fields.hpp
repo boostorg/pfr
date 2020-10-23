@@ -58,7 +58,7 @@ std::basic_ostream<Char, Traits>& operator<<(std::basic_ostream<Char, Traits>& o
     const T& value = x.value;
     constexpr std::size_t fields_count_val = boost::pfr::detail::fields_count<T>();
     out << '{';
-#if BOOST_PFR_USE_CPP17
+#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
     detail::print_impl<0, fields_count_val>::print(out, detail::tie_as_tuple(value));
 #else
     ::boost::pfr::detail::for_each_field_dispatcher(
@@ -94,7 +94,7 @@ std::basic_istream<Char, Traits>& operator>>(std::basic_istream<Char, Traits>& i
     in >> parenthis;
     if (parenthis != '{') in.setstate(std::basic_istream<Char, Traits>::failbit);
 
-#if BOOST_PFR_USE_CPP17
+#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
     detail::read_impl<0, fields_count_val>::read(in, detail::tie_as_tuple(value));
 #else
     ::boost::pfr::detail::for_each_field_dispatcher(
