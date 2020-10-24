@@ -8,6 +8,12 @@
 
 #include <type_traits>
 
+#if defined(_MSC_VER) && _MSC_VER <= 1916
+#   error Compiler fails to do compile time computations for LoopHole. Fixed in later versions of the compiler
+// Error: boost/pfr/detail/core14_loophole.hpp(98): error C3779: 'boost::pfr::detail::loophole': a function that returns 'auto' cannot be used before it is defined
+#endif
+
+
 template <unsigned> struct tag{};
 
 template <class T, unsigned N>
