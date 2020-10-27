@@ -7,6 +7,8 @@
 #define BOOST_PFR_DETAIL_CONFIG_HPP
 #pragma once
 
+#include <type_traits> // to get non standard platform macro definitions (__GLIBCXX__ for example)
+
 // Reminder:
 //  * MSVC++ 14.2 _MSC_VER == 1927 <- Loophole is known to work (Visual Studio ????)
 //  * MSVC++ 14.1 _MSC_VER == 1916 <- Loophole is known to NOT work (Visual Studio 2017)

@@ -50,6 +50,8 @@ local CLASSIC_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CP
 
 test-suite pfr_tests
   :
+    [ run print_config.cpp : : : <test-info>always_show_run_output : auto_engine_config ]
+
     [ run offset_based_getter.cpp ]
 
     [ run test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=char : test_tuple_sizes_on_chars ]
