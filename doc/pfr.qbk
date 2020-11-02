@@ -517,11 +517,13 @@ Description of the [*BOOST_PFR_USE_LOOPHOLE == 1] technique by its inventor Alex
 
 [section Acknowledgements]
 
-Great thanks to Bruno Dutra for showing the technique to precisely reflect aggregate initializable type in C++14 [@https://github.com/apolukhin/magic_get/issues/5 Manual type registering/structured bindings might be unnecessary].
+Many thanks to Bruno Dutra for showing the technique to precisely reflect aggregate initializable type in C++14 [@https://github.com/apolukhin/magic_get/issues/5 Manual type registering/structured bindings might be unnecessary].
 
-Great thanks to Alexandr Poltavsky for initial implementation the [*BOOST_PFR_USE_LOOPHOLE == 1] technique and for describing it [@http://alexpolt.github.io/type-loophole.html in his blog].
+Many thanks to Alexandr Poltavsky for initial implementation the [*BOOST_PFR_USE_LOOPHOLE == 1] technique and for describing it [@http://alexpolt.github.io/type-loophole.html in his blog].
 
-Great thanks to Chris Beck for implementing the detect-offsets-and-get-field-address functionality that avoids Undefined Behavior of reinterpret_casting layout compatible structures.
+Many thanks to Chris Beck for implementing the detect-offsets-and-get-field-address functionality that avoids Undefined Behavior of reinterpret_casting layout compatible structures.
+
+Many thanks to the Boost people who participated in the formal review, especially to Benedek Thaler, Steven Watanabe and Andrzej Krzemienski.
 
 [endsect]
 
