@@ -70,6 +70,7 @@ local BLACKLIST_TESTS_FOR_LOOPHOLE =
     get_const_field                     # boost::pfr::get gives compile time error on const fields
     template_constructor                # Template constructor in one of the fields of the aggregate
     tie_anonymous_const_field           # boost::pfr::structure_tie gives compile time error on const fields
+    optional_chrono                     # boost::pfr::* has problems with std::optional, produces compile time error
   ;
 
 # Those tests are either 
