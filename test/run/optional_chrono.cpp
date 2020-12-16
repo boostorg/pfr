@@ -9,20 +9,8 @@
 
 #include <chrono>
 
-#if defined(__has_include)
-#   if __has_include(<optional>) && (__cplusplus >= 201703L)
-#       include <optional>
-#       ifdef __cpp_lib_optional
-#           define BOOST_PFR_TEST_HAS_OPTIONAL 1
-#       endif
-#   endif
-#endif
+#include <optional>
 
-#ifndef BOOST_PFR_TEST_HAS_OPTIONAL
-#define BOOST_PFR_TEST_HAS_OPTIONAL 0
-#endif
-
-#if BOOST_PFR_TEST_HAS_OPTIONAL
 struct struct_with_optional {
     std::optional<std::chrono::seconds> a;
     std::optional<std::chrono::milliseconds> b;
@@ -52,9 +40,4 @@ int main() {
 
     return boost::report_errors();
 }
-#else // #if BOOST_PFR_TEST_HAS_OPTIONAL
-int main() {
-    return boost::report_errors();
-}
-#endif // #if BOOST_PFR_TEST_HAS_OPTIONAL
 
