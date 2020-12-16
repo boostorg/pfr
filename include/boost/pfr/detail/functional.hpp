@@ -158,7 +158,7 @@ namespace boost { namespace pfr { namespace detail {
     }
 
     template <template <std::size_t, std::size_t> class Visitor, class T, class U>
-    bool binary_visit(const T& x, const U& y) {
+    constexpr bool binary_visit(const T& x, const U& y) {
         constexpr std::size_t fields_count_lhs = detail::fields_count<std::remove_reference_t<T>>();
         constexpr std::size_t fields_count_rhs = detail::fields_count<std::remove_reference_t<U>>();
         constexpr std::size_t fields_count_min = detail::min_size(fields_count_lhs, fields_count_rhs);

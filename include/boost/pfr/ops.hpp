@@ -82,13 +82,13 @@ namespace detail {
 ///
 /// \returns true if lhs is equal to rhs; false otherwise
 template <class T, class U>
-detail::enable_not_eq_comp_t<T, U> eq(const T& lhs, const U& rhs) noexcept {
+constexpr detail::enable_not_eq_comp_t<T, U> eq(const T& lhs, const U& rhs) noexcept {
     return boost::pfr::eq_fields(lhs, rhs);
 }
 
 /// \overload eq
 template <class T, class U>
-detail::enable_eq_comp_t<T, U> eq(const T& lhs, const U& rhs) {
+constexpr detail::enable_eq_comp_t<T, U> eq(const T& lhs, const U& rhs) {
     return lhs == rhs;
 }
 
@@ -97,13 +97,13 @@ detail::enable_eq_comp_t<T, U> eq(const T& lhs, const U& rhs) {
 ///
 /// \returns true if lhs is not equal to rhs; false otherwise
 template <class T, class U>
-detail::enable_not_ne_comp_t<T, U> ne(const T& lhs, const U& rhs) noexcept {
+constexpr detail::enable_not_ne_comp_t<T, U> ne(const T& lhs, const U& rhs) noexcept {
     return boost::pfr::ne_fields(lhs, rhs);
 }
 
 /// \overload ne
 template <class T, class U>
-detail::enable_ne_comp_t<T, U> ne(const T& lhs, const U& rhs) {
+constexpr detail::enable_ne_comp_t<T, U> ne(const T& lhs, const U& rhs) {
     return lhs != rhs;
 }
 
@@ -112,13 +112,13 @@ detail::enable_ne_comp_t<T, U> ne(const T& lhs, const U& rhs) {
 ///
 /// \returns true if lhs is less than rhs; false otherwise
 template <class T, class U>
-detail::enable_not_lt_comp_t<T, U> lt(const T& lhs, const U& rhs) noexcept {
+constexpr detail::enable_not_lt_comp_t<T, U> lt(const T& lhs, const U& rhs) noexcept {
     return boost::pfr::lt_fields(lhs, rhs);
 }
 
 /// \overload lt
 template <class T, class U>
-detail::enable_lt_comp_t<T, U> lt(const T& lhs, const U& rhs) {
+constexpr detail::enable_lt_comp_t<T, U> lt(const T& lhs, const U& rhs) {
     return lhs < rhs;
 }
 
@@ -127,13 +127,13 @@ detail::enable_lt_comp_t<T, U> lt(const T& lhs, const U& rhs) {
 ///
 /// \returns true if lhs is greater than rhs; false otherwise
 template <class T, class U>
-detail::enable_not_gt_comp_t<T, U> gt(const T& lhs, const U& rhs) noexcept {
+constexpr detail::enable_not_gt_comp_t<T, U> gt(const T& lhs, const U& rhs) noexcept {
     return boost::pfr::gt_fields(lhs, rhs);
 }
 
 /// \overload gt
 template <class T, class U>
-detail::enable_gt_comp_t<T, U> gt(const T& lhs, const U& rhs) {
+constexpr detail::enable_gt_comp_t<T, U> gt(const T& lhs, const U& rhs) {
     return lhs > rhs;
 }
 
@@ -142,13 +142,13 @@ detail::enable_gt_comp_t<T, U> gt(const T& lhs, const U& rhs) {
 ///
 /// \returns true if lhs is less or equal to rhs; false otherwise
 template <class T, class U>
-detail::enable_not_le_comp_t<T, U> le(const T& lhs, const U& rhs) noexcept {
+constexpr detail::enable_not_le_comp_t<T, U> le(const T& lhs, const U& rhs) noexcept {
     return boost::pfr::le_fields(lhs, rhs);
 }
 
 /// \overload le
 template <class T, class U>
-detail::enable_le_comp_t<T, U> le(const T& lhs, const U& rhs) {
+constexpr detail::enable_le_comp_t<T, U> le(const T& lhs, const U& rhs) {
     return lhs <= rhs;
 }
 
@@ -157,13 +157,13 @@ detail::enable_le_comp_t<T, U> le(const T& lhs, const U& rhs) {
 ///
 /// \returns true if lhs is greater or equal to rhs; false otherwise
 template <class T, class U>
-detail::enable_not_ge_comp_t<T, U> ge(const T& lhs, const U& rhs) noexcept {
+constexpr detail::enable_not_ge_comp_t<T, U> ge(const T& lhs, const U& rhs) noexcept {
     return boost::pfr::ge_fields(lhs, rhs);
 }
 
 /// \overload ge
 template <class T, class U>
-detail::enable_ge_comp_t<T, U> ge(const T& lhs, const U& rhs) {
+constexpr detail::enable_ge_comp_t<T, U> ge(const T& lhs, const U& rhs) {
     return lhs >= rhs;
 }
 
@@ -172,13 +172,13 @@ detail::enable_ge_comp_t<T, U> ge(const T& lhs, const U& rhs) {
 ///
 /// \returns std::size_t with hash of the value
 template <class T>
-detail::enable_not_hashable_t<T> hash_value(const T& value) noexcept {
+constexpr detail::enable_not_hashable_t<T> hash_value(const T& value) noexcept {
     return boost::pfr::hash_fields(value);
 }
 
 /// \overload hash_value
 template <class T>
-detail::enable_hashable_t<T> hash_value(const T& value) {
+constexpr detail::enable_hashable_t<T> hash_value(const T& value) {
     return std::hash<T>{}(value);
 }
 

@@ -39,7 +39,7 @@ namespace boost { namespace pfr {
     /// `R` are the results of calling `std::tie` on first `N` fields of `lhs` and
     // `rhs` respectively; `N` is `std::min(tuple_size_v<T>, tuple_size_v<U>)`.
     template <class T, class U>
-    bool eq_fields(const T& lhs, const U& rhs) noexcept {
+    constexpr bool eq_fields(const T& lhs, const U& rhs) noexcept {
         return detail::binary_visit<detail::equal_impl>(lhs, rhs);
     }
 
@@ -50,7 +50,7 @@ namespace boost { namespace pfr {
     /// `R` are the results of calling `std::tie` on first `N` fields of `lhs` and
     // `rhs` respectively; `N` is `std::min(tuple_size_v<T>, tuple_size_v<U>)`.
     template <class T, class U>
-    bool ne_fields(const T& lhs, const U& rhs) noexcept {
+    constexpr bool ne_fields(const T& lhs, const U& rhs) noexcept {
         return detail::binary_visit<detail::not_equal_impl>(lhs, rhs);
     }
 
@@ -60,7 +60,7 @@ namespace boost { namespace pfr {
     /// `R` are the results of calling `std::tie` on first `N` fields of `lhs` and
     // `rhs` respectively; `N` is `std::min(tuple_size_v<T>, tuple_size_v<U>)`.
     template <class T, class U>
-    bool gt_fields(const T& lhs, const U& rhs) noexcept {
+    constexpr bool gt_fields(const T& lhs, const U& rhs) noexcept {
         return detail::binary_visit<detail::greater_impl>(lhs, rhs);
     }
 
@@ -71,7 +71,7 @@ namespace boost { namespace pfr {
     /// `R` are the results of calling `std::tie` on first `N` fields of `lhs` and
     // `rhs` respectively; `N` is `std::min(tuple_size_v<T>, tuple_size_v<U>)`.
     template <class T, class U>
-    bool lt_fields(const T& lhs, const U& rhs) noexcept {
+    constexpr bool lt_fields(const T& lhs, const U& rhs) noexcept {
         return detail::binary_visit<detail::less_impl>(lhs, rhs);
     }
 
@@ -82,7 +82,7 @@ namespace boost { namespace pfr {
     /// `R` are the results of calling `std::tie` on first `N` fields of `lhs` and
     // `rhs` respectively; `N` is `std::min(tuple_size_v<T>, tuple_size_v<U>)`.
     template <class T, class U>
-    bool ge_fields(const T& lhs, const U& rhs) noexcept {
+    constexpr bool ge_fields(const T& lhs, const U& rhs) noexcept {
         return detail::binary_visit<detail::greater_equal_impl>(lhs, rhs);
     }
 
@@ -93,7 +93,7 @@ namespace boost { namespace pfr {
     /// `R` are the results of calling `std::tie` on first `N` fields of `lhs` and
     // `rhs` respectively; `N` is `std::min(tuple_size_v<T>, tuple_size_v<U>)`.
     template <class T, class U>
-    bool le_fields(const T& lhs, const U& rhs) noexcept {
+    constexpr bool le_fields(const T& lhs, const U& rhs) noexcept {
         return detail::binary_visit<detail::less_equal_impl>(lhs, rhs);
     }
 
