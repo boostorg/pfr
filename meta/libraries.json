@@ -11,5 +11,6 @@
     "category": [
         "Data",
         "Metaprogramming"
-    ]
+    ],
+    "cxxstd": "14"
 }
