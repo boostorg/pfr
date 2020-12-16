@@ -438,25 +438,25 @@ error: static_assert failed "====================> Boost.PFR: For safety reasons
 
 [caution Recommended C++ Standards are C++17 and above. Library requires at least C++14! Pre C++14 compilers (C++11, C++03...) are not supported. ]
 
-Boost.PFR library works with types that satisfy the requirements of `SimpleAggregare`: aggregate types without base classes, `const` fields, references, or C arrays:
+Boost.PFR library works with types that satisfy the requirements of `SimpleAggregate`: aggregate types without base classes, `const` fields, references, or C arrays:
 
 ```
-struct simple_aggregate {  // SimpleAggregare
+struct simple_aggregate {  // SimpleAggregate
     std::string name;
     int age;
     boost::uuids::uuid uuid;
 };
 
-struct empty {             // SimpleAggregare
+struct empty {             // SimpleAggregate
 };
 
-struct aggregate : empty { // not a SimpleAggregare
+struct aggregate : empty { // not a SimpleAggregate
     std::string name;
     int age;
     boost::uuids::uuid uuid;
 };
 ```
-The library may work with aggregates that don't satisfy the requirements of `SimpleAggregare`, but the behavior tends to be non-portable.
+The library may work with aggregates that don't satisfy the requirements of `SimpleAggregate`, but the behavior tends to be non-portable.
 
 [h2 Configuration Macro]
 
