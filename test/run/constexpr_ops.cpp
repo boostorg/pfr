@@ -13,6 +13,7 @@
 #include <set>
 #include <string>
 
+#include <boost/config.hpp>
 #include <boost/core/lightweight_test.hpp>
 
 #ifdef __clang__
@@ -57,6 +58,11 @@ struct comparable_struct {
 }
 
 int main() {
+    // MSVC fails to use strucutred bindings in constexpr:
+    //
+    // error C2131: expression did not evaluate to a constant
+    // pfr/detail/functional.hpp(21): note: failure was caused by a read of a variable outside its lifetime
+#if !defined(_MSC_VER) || (_MSC_VER >= 1927) || !BOOST_PFR_USE_CPP17
     test_constexpr_comparable<foo::comparable_struct>();
 
     struct local_comparable_struct {
@@ -68,7 +74,7 @@ int main() {
         int i; short s; bool bl; int a,b,c,d,e; test_union u;
     };
     test_constexpr_comparable<local_comparable_struct>();
-
+#endif
     return boost::report_errors();
 }
 
