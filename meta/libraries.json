@@ -12,5 +12,6 @@
         "Data",
         "Metaprogramming"
     ],
+    "std": [ "proposal" ],
     "cxxstd": "14"
 }
