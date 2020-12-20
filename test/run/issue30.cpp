@@ -18,6 +18,12 @@ struct Message2 {
   std::unique_ptr<int> data42 = std::make_unique<int>(42);
 };
 
+// Example from duplicate issue #45
+struct UniquePtr {
+    std::unique_ptr<int> a;
+};
+static_assert (boost::pfr::tuple_size_v<UniquePtr> == 1);
+
 int main() {
   Message message;
   auto& ptr = boost::pfr::get<0>(message);
