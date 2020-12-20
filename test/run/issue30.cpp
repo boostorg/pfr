@@ -22,7 +22,7 @@ struct Message2 {
 struct UniquePtr {
     std::unique_ptr<int> a;
 };
-static_assert (boost::pfr::tuple_size_v<UniquePtr> == 1);
+static_assert (boost::pfr::tuple_size_v<UniquePtr> == 1, "");
 
 int main() {
   Message message;
