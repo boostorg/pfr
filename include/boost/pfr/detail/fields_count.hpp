@@ -26,26 +26,41 @@
 
 namespace boost { namespace pfr { namespace detail {
 
+template <class T, class U>
+constexpr void static_assert_non_inherited() noexcept {
+    static_assert(
+            std::is_same<std::remove_cv_t<U>, std::remove_cv_t<T>>::value
+            || !std::is_base_of<U, T>::value,
+            "====================> Boost.PFR: Boost.PFR: Inherited types are not supported."
+    );
+}
+
 ///////////////////// Structure that can be converted to reference to anything
-struct ubiq_lref_constructor {
+template<class T=void>
+struct ubiq_lref_constructor_ {
     std::size_t ignore;
     template <class Type> constexpr operator Type&() const && noexcept {  // tweak for template_unconstrained.cpp like cases
+        static_assert_non_inherited<T, Type>();
         return detail::unsafe_declval<Type&>();
     };
 
     template <class Type> constexpr operator Type&() const & noexcept {  // tweak for optional_chrono.cpp like cases
+        static_assert_non_inherited<T, Type>();
         return detail::unsafe_declval<Type&>();
     };
 };
+using ubiq_lref_constructor = ubiq_lref_constructor_<>;
 
 ///////////////////// Structure that can be converted to rvalue reference to anything
-struct ubiq_rref_constructor {
+template<class T=void>
+struct ubiq_rref_constructor_ {
     std::size_t ignore;
     template <class Type> /*constexpr*/ operator Type&&() const && noexcept {  // Allows initialization of rvalue reference fields and move-only types
+        static_assert_non_inherited<T, Type>();
         return detail::unsafe_declval<Type&&>();
     };
 };
-
+using ubiq_rref_constructor = ubiq_rref_constructor_<>;
 
 #ifndef __cpp_lib_is_aggregate
 ///////////////////// Hand-made is_aggregate_initializable_n<T> trait
@@ -78,7 +93,7 @@ template <class T, std::size_t N>
 struct is_aggregate_initializable_n {
     template <std::size_t ...I>
     static constexpr bool is_not_constructible_n(std::index_sequence<I...>) noexcept {
-        return (!std::is_constructible<T, decltype(ubiq_lref_constructor{I})...>::value && !std::is_constructible<T, decltype(ubiq_rref_constructor{I})...>::value)
+        return (!std::is_constructible<T, decltype(ubiq_lref_constructor_<T>{I})...>::value && !std::is_constructible<T, decltype(ubiq_rref_constructor_<T>{I})...>::value)
             || is_single_field_and_aggregate_initializable<N, T>::value
         ;
     }
@@ -96,11 +111,11 @@ struct is_aggregate_initializable_n {
 ///////////////////// Helper for SFINAE on fields count
 template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<std::is_copy_constructible<T>::value>::type>
 constexpr auto enable_if_constructible_helper(std::index_sequence<I...>) noexcept
-    -> typename std::add_pointer<decltype(T{ ubiq_lref_constructor{I}... })>::type;
+    -> typename std::add_pointer<decltype(T{ ubiq_lref_constructor_<T>{I}... })>::type;
 
 template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<!std::is_copy_constructible<T>::value>::type>
 constexpr auto enable_if_constructible_helper(std::index_sequence<I...>) noexcept
-    -> typename std::add_pointer<decltype(T{ ubiq_rref_constructor{I}... })>::type;
+    -> typename std::add_pointer<decltype(T{ ubiq_rref_constructor_<T>{I}... })>::type;
 
 template <class T, std::size_t N, class /*Enable*/ = decltype( enable_if_constructible_helper<T>(detail::make_index_sequence<N>()) ) >
 using enable_if_constructible_helper_t = std::size_t;
