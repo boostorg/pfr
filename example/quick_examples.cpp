@@ -55,7 +55,7 @@ void test_examples() {
 
   {
 //[pfr_quick_examples_for_each_idx
-    // Iterate over fields of a varible and output index and
+    // Iterate over fields of a variable and output index and
     // type of a variable.
 
     struct tag0{};
