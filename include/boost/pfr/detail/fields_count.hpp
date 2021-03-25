@@ -55,9 +55,9 @@ using ubiq_lref_constructor = ubiq_lref_constructor_<>;
 template<class T=void>
 struct ubiq_rref_constructor_ {
     std::size_t ignore;
-    template <class Type> /*constexpr*/ operator Type&&() const && noexcept {  // Allows initialization of rvalue reference fields and move-only types
+    template <class Type> /*constexpr*/ operator Type() const && noexcept {  // Allows initialization of rvalue reference fields and move-only types
         static_assert_non_inherited<T, Type>();
-        return detail::unsafe_declval<Type&&>();
+        return detail::unsafe_declval<Type>();
     };
 };
 using ubiq_rref_constructor = ubiq_rref_constructor_<>;
@@ -225,6 +225,7 @@ constexpr std::size_t fields_count() noexcept {
         "====================> Boost.PFR: Attempt to get fields count on a reference. This is not allowed because that could hide an issue and different library users expect different behavior in that case."
     );
 
+#ifndef __cpp_guaranteed_copy_elision
     static_assert(
         std::is_copy_constructible<std::remove_all_extents_t<type>>::value || (
             std::is_move_constructible<std::remove_all_extents_t<type>>::value
@@ -232,6 +233,7 @@ constexpr std::size_t fields_count() noexcept {
         ),
         "====================> Boost.PFR: Type and each field in the type must be copy constructible (or move constructible and move assignable)."
     );
+#endif  // #ifndef __cpp_guaranteed_copy_elision
 
     static_assert(
         !std::is_polymorphic<type>::value,
