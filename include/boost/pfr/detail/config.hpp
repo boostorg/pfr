@@ -66,6 +66,14 @@
 #   endif
 #endif
 
+#ifndef BOOST_PFR_HAS_GUARANTEED_COPY_ELISION
+#   if  defined(__cpp_guaranteed_copy_elision) && (!defined(_MSC_VER) || _MSC_VER > 1928)
+#       define BOOST_PFR_HAS_GUARANTEED_COPY_ELISION 1
+#   else
+#       define BOOST_PFR_HAS_GUARANTEED_COPY_ELISION 0
+#   endif
+#endif
+
 #if defined(__has_cpp_attribute)
 #   if __has_cpp_attribute(maybe_unused)
 #       define BOOST_PFR_MAYBE_UNUSED [[maybe_unused]]

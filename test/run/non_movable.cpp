@@ -18,7 +18,7 @@ struct X {
 struct S { X x0; X x1; int x2; X x3; };
 
 int main() {
-#ifdef __cpp_guaranteed_copy_elision
+#if BOOST_PFR_HAS_GUARANTEED_COPY_ELISION
     static_assert(boost::pfr::tuple_size_v<S> == 4, "");
 
     struct S5_0 { int x0; int x1; int x2; int x3; X x4; };
@@ -38,7 +38,7 @@ int main() {
 
     struct S6 { X x0; X x1; X x2; X x3; X x4;  X x5;};
     static_assert(boost::pfr::tuple_size_v<S6> == 6, "");
-#endif  // #ifdef __cpp_guaranteed_copy_elision
+#endif  // #if BOOST_PFR_HAS_GUARANTEED_COPY_ELISION
 
     return boost::report_errors();
 }

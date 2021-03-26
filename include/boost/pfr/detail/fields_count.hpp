@@ -210,7 +210,7 @@ constexpr std::size_t fields_count() noexcept {
         "====================> Boost.PFR: Attempt to get fields count on a reference. This is not allowed because that could hide an issue and different library users expect different behavior in that case."
     );
 
-#ifndef __cpp_guaranteed_copy_elision
+#if !BOOST_PFR_HAS_GUARANTEED_COPY_ELISION
     static_assert(
         std::is_copy_constructible<std::remove_all_extents_t<type>>::value || (
             std::is_move_constructible<std::remove_all_extents_t<type>>::value
@@ -218,7 +218,7 @@ constexpr std::size_t fields_count() noexcept {
         ),
         "====================> Boost.PFR: Type and each field in the type must be copy constructible (or move constructible and move assignable)."
     );
-#endif  // #ifndef __cpp_guaranteed_copy_elision
+#endif  // #if !BOOST_PFR_HAS_GUARANTEED_COPY_ELISION
 
     static_assert(
         !std::is_polymorphic<type>::value,
