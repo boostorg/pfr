@@ -1,4 +1,3 @@
-// Copyright (c) 2021 Denis Mikhailov
 // Copyright (c) 2021 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -6,11 +5,11 @@
 
 #include <boost/pfr/core.hpp>
 
-struct A
-{};
+struct A {
+    int zero;
+};
 
-struct B : A
-{
+struct B : public A {
     int one;
     int two;
 };

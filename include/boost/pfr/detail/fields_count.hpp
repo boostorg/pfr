@@ -26,41 +26,26 @@
 
 namespace boost { namespace pfr { namespace detail {
 
-template <class T, class U>
-constexpr void static_assert_non_inherited() noexcept {
-    static_assert(
-            std::is_same<std::remove_cv_t<U>, std::remove_cv_t<T>>::value
-            || !std::is_base_of<U, T>::value,
-            "====================> Boost.PFR: Boost.PFR: Inherited types are not supported."
-    );
-}
-
 ///////////////////// Structure that can be converted to reference to anything
-template<class T=void>
-struct ubiq_lref_constructor_ {
+struct ubiq_lref_constructor {
     std::size_t ignore;
     template <class Type> constexpr operator Type&() const && noexcept {  // tweak for template_unconstrained.cpp like cases
-        static_assert_non_inherited<T, Type>();
         return detail::unsafe_declval<Type&>();
     };
 
     template <class Type> constexpr operator Type&() const & noexcept {  // tweak for optional_chrono.cpp like cases
-        static_assert_non_inherited<T, Type>();
         return detail::unsafe_declval<Type&>();
     };
 };
-using ubiq_lref_constructor = ubiq_lref_constructor_<>;
 
 ///////////////////// Structure that can be converted to rvalue reference to anything
-template<class T=void>
-struct ubiq_rref_constructor_ {
+struct ubiq_rref_constructor {
     std::size_t ignore;
     template <class Type> /*constexpr*/ operator Type() const && noexcept {  // Allows initialization of rvalue reference fields and move-only types
-        static_assert_non_inherited<T, Type>();
         return detail::unsafe_declval<Type>();
     };
 };
-using ubiq_rref_constructor = ubiq_rref_constructor_<>;
+
 
 #ifndef __cpp_lib_is_aggregate
 ///////////////////// Hand-made is_aggregate_initializable_n<T> trait
@@ -93,7 +78,7 @@ template <class T, std::size_t N>
 struct is_aggregate_initializable_n {
     template <std::size_t ...I>
     static constexpr bool is_not_constructible_n(std::index_sequence<I...>) noexcept {
-        return (!std::is_constructible<T, decltype(ubiq_lref_constructor_<T>{I})...>::value && !std::is_constructible<T, decltype(ubiq_rref_constructor_<T>{I})...>::value)
+        return (!std::is_constructible<T, decltype(ubiq_lref_constructor{I})...>::value && !std::is_constructible<T, decltype(ubiq_rref_constructor{I})...>::value)
             || is_single_field_and_aggregate_initializable<N, T>::value
         ;
     }
@@ -108,14 +93,68 @@ struct is_aggregate_initializable_n {
 
 #endif // #ifndef __cpp_lib_is_aggregate
 
+///////////////////// Detect aggregates with inheritance
+template <class Derived, class U>
+constexpr bool static_assert_non_inherited() noexcept {
+    static_assert(
+            !std::is_base_of<U, Derived>::value,
+            "====================> Boost.PFR: Boost.PFR: Inherited types are not supported."
+    );
+    return true;
+}
+
+template <class Derived>
+struct ubiq_lref_base_asserting {
+    template <class Type> constexpr operator Type&() const &&  // tweak for template_unconstrained.cpp like cases
+        noexcept(detail::static_assert_non_inherited<Derived, Type>())  // force the computation of assert function
+    {
+        return detail::unsafe_declval<Type&>();
+    };
+
+    template <class Type> constexpr operator Type&() const &  // tweak for optional_chrono.cpp like cases
+        noexcept(detail::static_assert_non_inherited<Derived, Type>())  // force the computation of assert function
+    {
+        return detail::unsafe_declval<Type&>();
+    };
+};
+
+template <class Derived>
+struct ubiq_rref_base_asserting {
+    template <class Type> /*constexpr*/ operator Type() const &&  // Allows initialization of rvalue reference fields and move-only types
+        noexcept(detail::static_assert_non_inherited<Derived, Type>())  // force the computation of assert function
+    {
+        return detail::unsafe_declval<Type>();
+    };
+};
+
+template <class T, std::size_t I0, std::size_t... I, class /*Enable*/ = typename std::enable_if<std::is_copy_constructible<T>::value>::type>
+constexpr auto assert_first_not_base(std::index_sequence<I0, I...>) noexcept
+    -> typename std::add_pointer<decltype(T{ ubiq_lref_base_asserting<T>{}, ubiq_lref_constructor{I}... })>::type
+{
+    return nullptr;
+}
+
+template <class T, std::size_t I0, std::size_t... I, class /*Enable*/ = typename std::enable_if<!std::is_copy_constructible<T>::value>::type>
+constexpr auto assert_first_not_base(std::index_sequence<I0, I...>) noexcept
+    -> typename std::add_pointer<decltype(T{ ubiq_rref_base_asserting<T>{}, ubiq_rref_constructor{I}... })>::type
+{
+    return nullptr;
+}
+
+template <class T>
+constexpr void* assert_first_not_base(std::index_sequence<>) noexcept
+{
+    return nullptr;
+}
+
 ///////////////////// Helper for SFINAE on fields count
 template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<std::is_copy_constructible<T>::value>::type>
 constexpr auto enable_if_constructible_helper(std::index_sequence<I...>) noexcept
-    -> typename std::add_pointer<decltype(T{ ubiq_lref_constructor_<T>{I}... })>::type;
+    -> typename std::add_pointer<decltype(T{ ubiq_lref_constructor{I}... })>::type;
 
 template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<!std::is_copy_constructible<T>::value>::type>
 constexpr auto enable_if_constructible_helper(std::index_sequence<I...>) noexcept
-    -> typename std::add_pointer<decltype(T{ ubiq_rref_constructor_<T>{I}... })>::type;
+    -> typename std::add_pointer<decltype(T{ ubiq_rref_constructor{I}... })>::type;
 
 template <class T, std::size_t N, class /*Enable*/ = decltype( enable_if_constructible_helper<T>(detail::make_index_sequence<N>()) ) >
 using enable_if_constructible_helper_t = std::size_t;
@@ -258,6 +297,8 @@ constexpr std::size_t fields_count() noexcept {
 
     constexpr std::size_t max_fields_count = (sizeof(type) * CHAR_BIT); // We multiply by CHAR_BIT because the type may have bitfields in T
     constexpr std::size_t result = detail::detect_fields_count_dispatch<type>(size_t_<max_fields_count>{}, 1L, 1L);
+
+    detail::assert_first_not_base<type>(detail::make_index_sequence<result>{});
 
 #ifndef __cpp_lib_is_aggregate
     static_assert(
