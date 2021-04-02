@@ -40,6 +40,13 @@ matrix:
           sources: ubuntu-toolchain-r-test
           packages: g++-8
 
+    - env: B2_ARGS='cxxstd=14,17 toolset=gcc-7 cxxflags="--coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined -DBOOST_TRAVISCI_BUILD" linkflags="--coverage  -lasan -lubsan"'
+      name: "GCC-7"
+      addons:
+        apt:
+          sources: ubuntu-toolchain-r-test
+          packages: g++-7
+
     - env: B2_ARGS='cxxstd=1y toolset=gcc-5 cxxflags="--coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined -DBOOST_TRAVISCI_BUILD" linkflags="--coverage  -lasan -lubsan"'
       name: "GCC-5"
       addons:
