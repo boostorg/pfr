@@ -348,7 +348,7 @@ constexpr size_array<N> get_type_offsets() noexcept {
 
 ///////////////////// Returns array of typeids and zeros if construtor of a type accepts sizeof...(I) parameters
 template <class T, std::size_t N, std::size_t... I>
-constexpr void* flat_type_to_array_of_type_ids(std::size_t* types, std::index_sequence<I...>) noexcept
+constexpr void* flat_type_to_array_of_type_ids(std::size_t* types, detail::index_sequence<I...>) noexcept
 {
     static_assert(
         N <= sizeof(T),
@@ -392,16 +392,16 @@ constexpr auto flat_array_of_type_ids() noexcept {
 ///////////////////// Convert array of typeids into sequence_tuple::tuple
 
 template <class T, std::size_t First, std::size_t... I>
-constexpr auto as_flat_tuple_impl(std::index_sequence<First, I...>) noexcept;
+constexpr auto as_flat_tuple_impl(detail::index_sequence<First, I...>) noexcept;
 
 template <class T>
-constexpr sequence_tuple::tuple<> as_flat_tuple_impl(std::index_sequence<>) noexcept {
+constexpr sequence_tuple::tuple<> as_flat_tuple_impl(detail::index_sequence<>) noexcept {
     return sequence_tuple::tuple<>{};
 }
 
 template <std::size_t Increment, std::size_t... I>
-constexpr auto increment_index_sequence(std::index_sequence<I...>) noexcept {
-    return std::index_sequence<I + Increment...>{};
+constexpr auto increment_index_sequence(detail::index_sequence<I...>) noexcept {
+    return detail::index_sequence<I + Increment...>{};
 }
 
 template <class T, std::size_t V, std::size_t I, std::size_t SubtupleLength>
@@ -453,7 +453,7 @@ constexpr size_array<N> resize_dropping_zeros_and_decrementing(size_t_<N>, const
 }
 
 template <class T, std::size_t First, std::size_t... I, std::size_t... INew>
-constexpr auto as_flat_tuple_impl_drop_helpers(std::index_sequence<First, I...>, std::index_sequence<INew...>) noexcept {
+constexpr auto as_flat_tuple_impl_drop_helpers(detail::index_sequence<First, I...>, detail::index_sequence<INew...>) noexcept {
     constexpr auto a = detail::flat_array_of_type_ids<T>();
 
     constexpr size_array<sizeof...(I) + 1> subtuples_length {{
@@ -492,12 +492,12 @@ constexpr std::size_t count_skips_in_array(std::size_t begin_index, std::size_t 
 }
 
 template <class T, std::size_t First, std::size_t... I>
-constexpr auto as_flat_tuple_impl(std::index_sequence<First, I...>) noexcept {
+constexpr auto as_flat_tuple_impl(detail::index_sequence<First, I...>) noexcept {
     constexpr auto a = detail::flat_array_of_type_ids<T>();
     constexpr std::size_t count_of_I = sizeof...(I);
 
     return detail::as_flat_tuple_impl_drop_helpers<T>(
-        std::index_sequence<First, I...>{},
+        detail::index_sequence<First, I...>{},
         detail::make_index_sequence< 1 + count_of_I - count_skips_in_array(First, First + count_of_I, a) >{}
     );
 }
@@ -534,7 +534,7 @@ struct ubiq_is_flat_refelectable {
 };
 
 template <class T, std::size_t... I>
-constexpr bool is_flat_refelectable(std::index_sequence<I...>) noexcept {
+constexpr bool is_flat_refelectable(detail::index_sequence<I...>) noexcept {
     constexpr std::size_t fields = sizeof...(I);
     bool result[fields] = {static_cast<bool>(I)...};
     const T v{ ubiq_is_flat_refelectable{result[I]}... };
@@ -605,10 +605,10 @@ struct is_constexpr_aggregate_initializable { // TODO: try to fix it
 
 
 template <class T, class F, std::size_t I0, std::size_t... I, class... Fields>
-void for_each_field_in_depth(T& t, F&& f, std::index_sequence<I0, I...>, identity<Fields>...);
+void for_each_field_in_depth(T& t, F&& f, detail::index_sequence<I0, I...>, identity<Fields>...);
 
 template <class T, class F, class... Fields>
-void for_each_field_in_depth(T& t, F&& f, std::index_sequence<>, identity<Fields>...);
+void for_each_field_in_depth(T& t, F&& f, detail::index_sequence<>, identity<Fields>...);
 
 template <class T, class F, class IndexSeq, class... Fields>
 struct next_step {
@@ -630,16 +630,16 @@ struct next_step {
 };
 
 template <class T, class F, std::size_t I0, std::size_t... I, class... Fields>
-void for_each_field_in_depth(T& t, F&& f, std::index_sequence<I0, I...>, identity<Fields>...) {
+void for_each_field_in_depth(T& t, F&& f, detail::index_sequence<I0, I...>, identity<Fields>...) {
     (void)std::add_const_t<std::remove_reference_t<T>>{
         Fields{}...,
-        next_step<T, F, std::index_sequence<I...>, Fields...>{t, f},
+        next_step<T, F, detail::index_sequence<I...>, Fields...>{t, f},
         ubiq_constructor_constexpr_copy{I}...
     };
 }
 
 template <class T, class F, class... Fields>
-void for_each_field_in_depth(T& lvalue, F&& f, std::index_sequence<>, identity<Fields>...) {
+void for_each_field_in_depth(T& lvalue, F&& f, detail::index_sequence<>, identity<Fields>...) {
     using tuple_type = sequence_tuple::tuple<Fields...>;
 
     offset_based_getter<std::remove_cv_t<std::remove_reference_t<T>>, tuple_type> getter;
@@ -649,7 +649,7 @@ void for_each_field_in_depth(T& lvalue, F&& f, std::index_sequence<>, identity<F
 }
 
 template <class T, class F, std::size_t... I>
-void for_each_field_dispatcher_1(T& t, F&& f, std::index_sequence<I...>, std::true_type /*is_flat_refelectable*/) {
+void for_each_field_dispatcher_1(T& t, F&& f, detail::index_sequence<I...>, std::true_type /*is_flat_refelectable*/) {
     std::forward<F>(f)(
         boost::pfr::detail::tie_as_flat_tuple(t)
     );
@@ -657,16 +657,16 @@ void for_each_field_dispatcher_1(T& t, F&& f, std::index_sequence<I...>, std::tr
 
 
 template <class T, class F, std::size_t... I>
-void for_each_field_dispatcher_1(T& t, F&& f, std::index_sequence<I...>, std::false_type /*is_flat_refelectable*/) {
+void for_each_field_dispatcher_1(T& t, F&& f, detail::index_sequence<I...>, std::false_type /*is_flat_refelectable*/) {
     boost::pfr::detail::for_each_field_in_depth(
         t,
         std::forward<F>(f),
-        std::index_sequence<I...>{}
+        detail::index_sequence<I...>{}
     );
 }
 
 template <class T, class F, std::size_t... I>
-void for_each_field_dispatcher(T& t, F&& f, std::index_sequence<I...>) {
+void for_each_field_dispatcher(T& t, F&& f, detail::index_sequence<I...>) {
     static_assert(
         !std::is_union<T>::value,
         "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."
@@ -682,11 +682,11 @@ void for_each_field_dispatcher(T& t, F&& f, std::index_sequence<I...>) {
 
     //static_assert(is_constexpr_aggregate_initializable<T, I...>::value, "====================> Boost.PFR: T must be a constexpr initializable type");
 
-    constexpr bool is_flat_refelectable_val = detail::is_flat_refelectable<T>( std::index_sequence<I...>{} );
+    constexpr bool is_flat_refelectable_val = detail::is_flat_refelectable<T>( detail::index_sequence<I...>{} );
     detail::for_each_field_dispatcher_1(
         t,
         std::forward<F>(f),
-        std::index_sequence<I...>{},
+        detail::index_sequence<I...>{},
         std::integral_constant<bool, is_flat_refelectable_val>{}
     );
 }

@@ -17,21 +17,21 @@
 namespace boost { namespace pfr { namespace detail {
 
 template <class T, std::size_t... I>
-constexpr auto make_stdtuple_from_tietuple(const T& t, std::index_sequence<I...>) noexcept {
+constexpr auto make_stdtuple_from_tietuple(const T& t, detail::index_sequence<I...>) noexcept {
     return std::make_tuple(
         boost::pfr::detail::sequence_tuple::get<I>(t)...
     );
 }
 
 template <class T, std::size_t... I>
-constexpr auto make_stdtiedtuple_from_tietuple(const T& t, std::index_sequence<I...>) noexcept {
+constexpr auto make_stdtiedtuple_from_tietuple(const T& t, detail::index_sequence<I...>) noexcept {
     return std::tie(
         boost::pfr::detail::sequence_tuple::get<I>(t)...
     );
 }
 
 template <class T, std::size_t... I>
-constexpr auto make_conststdtiedtuple_from_tietuple(const T& t, std::index_sequence<I...>) noexcept {
+constexpr auto make_conststdtiedtuple_from_tietuple(const T& t, detail::index_sequence<I...>) noexcept {
     return std::tuple<
         std::add_lvalue_reference_t<std::add_const_t<
             std::remove_reference_t<decltype(boost::pfr::detail::sequence_tuple::get<I>(t))>

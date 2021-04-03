@@ -116,7 +116,7 @@ template <class T, class U>
 struct loophole_type_list_lref;
 
 template <typename T, std::size_t... I>
-struct loophole_type_list_lref< T, std::index_sequence<I...> >
+struct loophole_type_list_lref< T, detail::index_sequence<I...> >
      // Instantiating loopholes:
     : sequence_tuple::tuple< decltype(T{ loophole_ubiq_lref<T, I>{}... }, 0) >
 {
@@ -128,7 +128,7 @@ template <class T, class U>
 struct loophole_type_list_rref;
 
 template <typename T, std::size_t... I>
-struct loophole_type_list_rref< T, std::index_sequence<I...> >
+struct loophole_type_list_rref< T, detail::index_sequence<I...> >
      // Instantiating loopholes:
     : sequence_tuple::tuple< decltype(T{ loophole_ubiq_rref<T, I>{}... }, 0) >
 {
@@ -176,7 +176,7 @@ auto tie_as_tuple(T& val) noexcept {
 }
 
 template <class T, class F, std::size_t... I>
-void for_each_field_dispatcher(T& t, F&& f, std::index_sequence<I...>) {
+void for_each_field_dispatcher(T& t, F&& f, detail::index_sequence<I...>) {
     static_assert(
         !std::is_union<T>::value,
         "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."
