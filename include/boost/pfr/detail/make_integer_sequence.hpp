@@ -71,7 +71,7 @@ using make_integer_sequence = typename make_integer_sequence_impl<T, N>::type;
 #else // BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE == 1
 
 #if BOOST_PFR_USE_STD_INTEGRAL_SEQUENCE != 1
-#error Boost.PFR BOOST_PFR_USE_STD_INTEGRAL_SEQUENCE is required for BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE config.
+#error Boost.PFR You need to enable BOOST_PFR_USE_STD_INTEGRAL_SEQUENCE option, or you need to disable BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE
 #endif
 
 template <typename T, T N>

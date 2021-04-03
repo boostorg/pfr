@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2021 Antony Polukhin
+// Copyright (c) 2016-2020 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,10 +21,9 @@
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/size_t_.hpp>
 
-// TODO regenerate and error text
 #if !BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE
 #ifdef __cpp_lib_tuple_element_t
-//#   error TEST
+#   error Boost.PFR Including <utility> before including <boost/pfr.hpp> is not acceptable. Please include <utility> after <boost/pfr.hpp>
 #endif
 #endif
 
