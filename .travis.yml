@@ -178,7 +178,7 @@ matrix:
             - llvm-toolchain-xenial-7
 
     - os: osx
-      env: B2_ARGS='toolset=clang COMPILER=clang++ CXXSTD=14,1z'
+      env: B2_ARGS='toolset=clang cxxstd=14,1z'
       name: "clang osx"
 
 ###############################################################################################################
