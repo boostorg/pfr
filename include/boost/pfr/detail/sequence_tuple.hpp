@@ -47,31 +47,6 @@ struct tuple_base<detail::index_sequence<> > {
     static constexpr std::size_t size_v = 0;
 };
 
-template <std::size_t N, class T>
-constexpr T& get_impl(base_from_member<N, T>& t) noexcept {
-    return t.value;
-}
-
-template <std::size_t N, class T>
-constexpr const T& get_impl(const base_from_member<N, T>& t) noexcept {
-    return t.value;
-}
-
-template <std::size_t N, class T>
-constexpr volatile T& get_impl(volatile base_from_member<N, T>& t) noexcept {
-    return t.value;
-}
-
-template <std::size_t N, class T>
-constexpr const volatile T& get_impl(const volatile base_from_member<N, T>& t) noexcept {
-    return t.value;
-}
-
-template <std::size_t N, class T>
-constexpr T&& get_impl(base_from_member<N, T>&& t) noexcept {
-    return std::forward<T>(t.value);
-}
-
 
 template <class ...Values>
 struct tuple: tuple_base<

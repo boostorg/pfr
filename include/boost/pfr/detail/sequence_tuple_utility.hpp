@@ -12,6 +12,31 @@
 
 namespace boost { namespace pfr { namespace detail { namespace sequence_tuple {
 
+template <std::size_t N, class T>
+constexpr T& get_impl(base_from_member<N, T>& t) noexcept {
+    return t.value;
+}
+
+template <std::size_t N, class T>
+constexpr const T& get_impl(const base_from_member<N, T>& t) noexcept {
+    return t.value;
+}
+
+template <std::size_t N, class T>
+constexpr volatile T& get_impl(volatile base_from_member<N, T>& t) noexcept {
+    return t.value;
+}
+
+template <std::size_t N, class T>
+constexpr const volatile T& get_impl(const volatile base_from_member<N, T>& t) noexcept {
+    return t.value;
+}
+
+template <std::size_t N, class T>
+constexpr T&& get_impl(base_from_member<N, T>&& t) noexcept {
+    return std::forward<T>(t.value);
+}
+
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(tuple<T...>& t) noexcept {
     static_assert(N < tuple<T...>::size_v, "====================> Boost.PFR: Tuple index out of bounds");

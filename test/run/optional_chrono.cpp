@@ -9,7 +9,27 @@
 
 #include <chrono>
 
-#include <optional>
+#if defined(__has_include)
+#   if __has_include(<optional>) && (__cplusplus >= 201703L)
+#       include <optional>
+#       define BOOST_PFR_OPTIONAL_CHRONO_TEST_USE_OPTIONAL
+#   endif
+#endif
+
+#ifndef BOOST_PFR_OPTIONAL_CHRONO_TEST_USE_OPTIONAL
+#       include <experimental/optional>
+#       define BOOST_PFR_OPTIONAL_CHRONO_TEST_USE_EXPERIMENTAL_OPTIONAL
+#endif
+
+#ifdef BOOST_PFR_OPTIONAL_CHRONO_TEST_USE_OPTIONAL
+using std::optional;
+#undef BOOST_PFR_OPTIONAL_CHRONO_TEST_USE_OPTIONAL
+#endif
+
+#ifdef BOOST_PFR_OPTIONAL_CHRONO_TEST_USE_EXPERIMENTAL_OPTIONAL
+using std::experimental::optional;
+#undef BOOST_PFR_OPTIONAL_CHRONO_TEST_USE_EXPERIMENTAL_OPTIONAL
+#endif
 
 // This class mimics libc++ implementation of std::chrono::duration with unfxed LWG3050
 template <class Rep, class Period>
@@ -38,17 +58,17 @@ private:
 };
 
 struct struct_with_bogus_duration {
-    std::optional<bogus_duration<long, char>> d0;
-    std::optional<bogus_duration<long, char>> d1;
+    optional<bogus_duration<long, char>> d0;
+    optional<bogus_duration<long, char>> d1;
 };
 
 struct struct_with_optional {
-    std::optional<std::chrono::seconds> a;
-    std::optional<std::chrono::milliseconds> b;
-    std::optional<std::chrono::microseconds> c;
-    std::optional<std::chrono::nanoseconds> d;
-    std::optional<std::chrono::steady_clock::duration> e;
-    std::optional<std::chrono::system_clock::duration> f;
+    optional<std::chrono::seconds> a;
+    optional<std::chrono::milliseconds> b;
+    optional<std::chrono::microseconds> c;
+    optional<std::chrono::nanoseconds> d;
+    optional<std::chrono::steady_clock::duration> e;
+    optional<std::chrono::system_clock::duration> f;
 };
 
 int main() {
