@@ -36,6 +36,9 @@ rule mp-run-simple ( sources + : args * : input-files * : requirements * : targe
 mp-run-simple loophole_detection.cpp : : : : compiler_supports_loophole ;
 explicit compiler_supports_loophole ;
 
+mp-run-simple structured_bindings_detection.cpp : : : : compiler_supports_structured_bindings ;
+explicit compiler_supports_structured_bindings ;
+
 ########## END of helpers to detect Loophole trick support
 
 
@@ -43,8 +46,12 @@ local DISABLE_ON_MSVC = <toolset>msvc:<build>no ;
 local REQUIRE_LOOPHOLE =
     [ check-target-builds ../test//compiler_supports_loophole : : <build>no ]
   ;
+local REQUIRE_STRUCTURED_BINDING =
+    [ check-target-builds ../test//compiler_supports_structured_bindings : : <build>no ]
+    [ requires cxx17_structured_bindings ]
+  ;
 
-local STRUCTURED_BINDING_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=1 [ requires cxx17_structured_bindings ] ;
+local STRUCTURED_BINDING_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=1 $(REQUIRE_STRUCTURED_BINDING) ;
 local LOOPHOLE_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=1 <define>BOOST_PFR_USE_CPP17=0 $(REQUIRE_LOOPHOLE) ;
 local CLASSIC_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=0 $(DISABLE_ON_MSVC) ;
 

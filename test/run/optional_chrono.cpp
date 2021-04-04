@@ -9,8 +9,20 @@
 
 #include <chrono>
 
-#include <optional>
+#if defined(__has_include)
+#   if __has_include(<optional>) && (__cplusplus >= 201703L)
+#       include <optional>
+#       ifdef __cpp_lib_optional
+#           define BOOST_PFR_TEST_HAS_OPTIONAL 1
+#       endif
+#   endif
+#endif
 
+#ifndef BOOST_PFR_TEST_HAS_OPTIONAL
+#define BOOST_PFR_TEST_HAS_OPTIONAL 0
+#endif
+
+#if BOOST_PFR_TEST_HAS_OPTIONAL
 // This class mimics libc++ implementation of std::chrono::duration with unfxed LWG3050
 template <class Rep, class Period>
 class bogus_duration {
@@ -75,4 +87,8 @@ int main() {
 
     return boost::report_errors();
 }
-
+#else // #if BOOST_PFR_TEST_HAS_OPTIONAL
+int main() {
+    return boost::report_errors();
+}
+#endif // #if BOOST_PFR_TEST_HAS_OPTIONAL
