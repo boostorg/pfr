@@ -7,8 +7,6 @@
 #define BOOST_PFR_DETAIL_SIZE_T_HPP
 #pragma once
 
-#include <type_traits>
-
 namespace boost { namespace pfr { namespace detail {
 
 ///////////////////// General utility stuff

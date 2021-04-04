@@ -66,10 +66,6 @@
 #   endif
 #endif
 
-#ifndef BOOST_PFR_USE_STD_INTEGRAL_SEQUENCE
-#define BOOST_PFR_USE_STD_INTEGRAL_SEQUENCE BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE
-#endif
-
 #ifndef BOOST_PFR_HAS_GUARANTEED_COPY_ELISION
 #   if  defined(__cpp_guaranteed_copy_elision) && (!defined(_MSC_VER) || _MSC_VER > 1928)
 #       define BOOST_PFR_HAS_GUARANTEED_COPY_ELISION 1

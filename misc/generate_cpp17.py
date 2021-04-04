@@ -36,12 +36,6 @@ PROLOGUE = """// Copyright (c) 2016-2020 Antony Polukhin
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/size_t_.hpp>
 
-#if !BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE
-#ifdef __cpp_lib_tuple_element_t
-#   error Boost.PFR Including <utility> before including <boost/pfr.hpp> is not acceptable. Please include <utility> after <boost/pfr.hpp>
-#endif
-#endif
-
 namespace boost { namespace pfr { namespace detail {
 
 template <class... Args>

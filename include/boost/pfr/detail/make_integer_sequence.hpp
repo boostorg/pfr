@@ -9,9 +9,9 @@
 #pragma once
 
 #include <boost/pfr/detail/config.hpp>
-#include <boost/pfr/detail/integer_sequence.hpp>
 
 #include <type_traits>
+#include <utility>
 #include <cstddef>
 
 namespace boost { namespace pfr { namespace detail {
@@ -26,8 +26,11 @@ namespace boost { namespace pfr { namespace detail {
 
 #ifdef BOOST_PFR_USE_MAKE_INTEGER_SEQ_BUILTIN
 
+using std::integer_sequence;
+
+// Clang unable to use namespace qualified std::integer_sequence in __make_integer_seq.
 template <typename T, T N>
-using make_integer_sequence = __make_integer_seq<detail::integer_sequence, T, N>;
+using make_integer_sequence = __make_integer_seq<integer_sequence, T, N>;
 
 #undef BOOST_PFR_USE_MAKE_INTEGER_SEQ_BUILTIN
 
@@ -37,8 +40,8 @@ template <typename T, typename U>
 struct join_sequences;
 
 template <typename T, T... A, T... B>
-struct join_sequences<detail::integer_sequence<T, A...>, detail::integer_sequence<T, B...>> {
-    using type = detail::integer_sequence<T, A..., B...>;
+struct join_sequences<std::integer_sequence<T, A...>, std::integer_sequence<T, B...>> {
+    using type = std::integer_sequence<T, A..., B...>;
 };
 
 template <typename T, T Min, T Max>
@@ -53,7 +56,7 @@ struct build_sequence_impl {
 
 template <typename T, T V>
 struct build_sequence_impl<T, V, V> {
-    using type = detail::integer_sequence<T, V>;
+    using type = std::integer_sequence<T, V>;
 };
 
 template <typename T, std::size_t N>
@@ -61,7 +64,7 @@ struct make_integer_sequence_impl : build_sequence_impl<T, 0, N - 1> {};
 
 template <typename T>
 struct make_integer_sequence_impl<T, 0> {
-    using type = detail::integer_sequence<T>;
+    using type = std::integer_sequence<T>;
 };
 
 template <typename T, T N>
@@ -69,10 +72,6 @@ using make_integer_sequence = typename make_integer_sequence_impl<T, N>::type;
 
 #endif // !defined BOOST_PFR_USE_MAKE_INTEGER_SEQ_BUILTIN
 #else // BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE == 1
-
-#if BOOST_PFR_USE_STD_INTEGRAL_SEQUENCE != 1
-#error Boost.PFR You need to enable BOOST_PFR_USE_STD_INTEGRAL_SEQUENCE option, or you need to disable BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE
-#endif
 
 template <typename T, T N>
 using make_integer_sequence = std::make_integer_sequence<T, N>;
