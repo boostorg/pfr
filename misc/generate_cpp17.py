@@ -38,6 +38,12 @@ PROLOGUE = """// Copyright (c) 2016-2020 Antony Polukhin
 
 namespace boost { namespace pfr { namespace detail {
 
+struct GuaranteedSimpleAggregate
+{
+    int first;
+    int second;
+};
+
 template <class... Args>
 constexpr auto make_tuple_of_references(Args&&... args) noexcept {
   return sequence_tuple::tuple<Args&...>{ args... };
@@ -50,6 +56,10 @@ constexpr auto tie_as_tuple(T& /*val*/, size_t_<0>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<std::is_class< std::remove_cv_t<T> >::value>* = 0) noexcept {
+  GuaranteedSimpleAggregate guaranteedSimpleAggregate = {};
+  const auto& [dummy_first, dummy_second] = guaranteedSimpleAggregate; // ====================> Boost.PFR: Your compiler has some problem with structured binding, please dont't use structured binding engine in this compiler! You may disable structured binding engine by setting -DBOOST_PFR_USE_CPP17=0
+  (void)dummy_first; (void)dummy_second;
+  
   auto& [a] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a);
 }
@@ -94,6 +104,10 @@ for i in range(1, funcs_count):
 
     print("template <class T>")
     print("constexpr auto tie_as_tuple(T& val, size_t_<" + str(i + 1) + ">) noexcept {")
+    print("  GuaranteedSimpleAggregate guaranteedSimpleAggregate = {};")
+    print("  const auto& [dummy_first, dummy_second] = guaranteedSimpleAggregate; // ====================> Boost.PFR: Your compiler has some problem with structured binding, please dont't use structured binding engine in this compiler! You may disable structured binding engine by setting -DBOOST_PFR_USE_CPP17=0")
+    print("  (void)dummy_first; (void)dummy_second;")
+    print("")
     if i < max_args_on_a_line:
         print("  auto& [" + indexes.strip() + "] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.")
         print("  return ::boost::pfr::detail::make_tuple_of_references(" + indexes.strip() + ");")
