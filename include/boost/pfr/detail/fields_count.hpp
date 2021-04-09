@@ -31,11 +31,11 @@ struct ubiq_lref_constructor {
     std::size_t ignore;
     template <class Type> constexpr operator Type&() const && noexcept {  // tweak for template_unconstrained.cpp like cases
         return detail::unsafe_declval<Type&>();
-    };
+    }
 
     template <class Type> constexpr operator Type&() const & noexcept {  // tweak for optional_chrono.cpp like cases
         return detail::unsafe_declval<Type&>();
-    };
+    }
 };
 
 ///////////////////// Structure that can be converted to rvalue reference to anything
@@ -43,7 +43,7 @@ struct ubiq_rref_constructor {
     std::size_t ignore;
     template <class Type> /*constexpr*/ operator Type() const && noexcept {  // Allows initialization of rvalue reference fields and move-only types
         return detail::unsafe_declval<Type>();
-    };
+    }
 };
 
 
@@ -109,13 +109,13 @@ struct ubiq_lref_base_asserting {
         noexcept(detail::static_assert_non_inherited<Derived, Type>())  // force the computation of assert function
     {
         return detail::unsafe_declval<Type&>();
-    };
+    }
 
     template <class Type> constexpr operator Type&() const &  // tweak for optional_chrono.cpp like cases
         noexcept(detail::static_assert_non_inherited<Derived, Type>())  // force the computation of assert function
     {
         return detail::unsafe_declval<Type&>();
-    };
+    }
 };
 
 template <class Derived>
@@ -124,7 +124,7 @@ struct ubiq_rref_base_asserting {
         noexcept(detail::static_assert_non_inherited<Derived, Type>())  // force the computation of assert function
     {
         return detail::unsafe_declval<Type>();
-    };
+    }
 };
 
 template <class T, std::size_t I0, std::size_t... I, class /*Enable*/ = typename std::enable_if<std::is_copy_constructible<T>::value>::type>
