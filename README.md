@@ -3,7 +3,7 @@
 This is a C++14 library for very basic reflection that gives you access to structure elements by index and provides other `std::tuple` like methods for user defined types without any macro or boilerplate code.
 
 
-[Latest documentation](http://apolukhin.github.com/magic_get/index.html)
+[Latest documentation](https://www.boost.org/doc/libs/develop/doc/html/boost_pfr.html)
 
 ### Test results
 
@@ -94,7 +94,7 @@ my_struct has 2 fields: {"Das ist fantastisch!", 100}
 
 ### Requirements and Limitations
 
-[See docs](http://apolukhin.github.com/magic_get/index.html).
+[See docs](https://www.boost.org/doc/libs/develop/doc/html/boost_pfr.html).
 
 ### License
 
