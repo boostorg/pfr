@@ -48,10 +48,7 @@ constexpr std::size_t tie_as_offsets_tuple_impl_apply(I i, std::size_t& offset, 
 template<class T, std::size_t... I>
 constexpr auto tie_as_offsets_tuple_impl(std::index_sequence<I...>, std::size_t& offset, std::size_t& space) noexcept
 {
-    const std::size_t v[] = { (
-             tie_as_offsets_tuple_impl_apply<T>(size_t_<I>{}, offset, space)
-     )... };
-    return detail::make_sequence_tuple( v[I]... );
+    return detail::make_sequence_tuple( tie_as_offsets_tuple_impl_apply<T>(size_t_<I>{}, offset, space)... );
 }
 
 template<class T>
