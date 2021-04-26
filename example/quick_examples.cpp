@@ -12,6 +12,7 @@
 #include <boost/pfr.hpp>
 #include <boost/type_index.hpp>
 
+// boost-no-inspect
 void test_examples() {
 
 #if BOOST_PFR_USE_CPP17
