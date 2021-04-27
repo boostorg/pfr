@@ -8,20 +8,29 @@
 #pragma once
 
 #include <boost/pfr/detail/config.hpp>
+#include <cstdint>
+#include <limits>
 
 namespace boost { namespace pfr { namespace detail {
 
-    template<typename T>
-    /*constexpr*/ inline T memptr_cast(std::size_t offset) noexcept
+    constexpr std::uint8_t unsigned_by_size(size_t_<1>) noexcept { return 0; }
+    constexpr std::uint16_t unsigned_by_size(size_t_<2>) noexcept { return 0; }
+    constexpr std::uint32_t unsigned_by_size(size_t_<4>) noexcept { return 0; }
+    constexpr std::uint64_t unsigned_by_size(size_t_<8>) noexcept { return 0; }
+
+    template<typename T, std::size_t I>
+    inline T memptr_cast(size_t_<I> offset)
     {
-        // TODO: implement offset checking
-        // TODO: implement check that T is correct member pointer
-        static_assert(sizeof(T) == sizeof(std::size_t), "====================> Boost.PFR: Internal error while casting offset to member pointer");
+        using raw_type = decltype(unsigned_by_size(size_t_<sizeof(T)>{ }));
+
+        static_assert(sizeof(raw_type) <= sizeof(std::size_t), "====================> Boost.PFR: Internal error while casting offset to member pointer.");
+        static_assert(decltype(offset)::value <= (std::size_t)std::numeric_limits<raw_type>::max(), "====================> Boost.PFR: Internal error while casting offset to member pointer: overflow was detected");
+
         union {
             T memptr;
-            std::size_t offset_;
+            raw_type offset_;
         };
-        offset_ = offset;
+        offset_ = static_cast<raw_type>(offset);
         return memptr;
     }
 
