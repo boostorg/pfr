@@ -120,6 +120,7 @@ before_install:
   - git clone -b $BOOST_BRANCH --depth 10 https://github.com/boostorg/boost.git $BOOST
   - cd $BOOST
   - git submodule update --init --depth 10 tools/build tools/boostdep tools/inspect libs/filesystem
+  - python tools/boostdep/depinst/depinst.py --git_args "--depth 10 --jobs 2" $BOOST/libs/filesystem
 
   # Replacing Boost module with this project and installing Boost dependencies
   - rm -rf $BOOST/libs/$BOOST_LIBS_FOLDER
