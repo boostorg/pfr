@@ -119,7 +119,7 @@ before_install:
   - echo "Testing $BOOST_LIBS_FOLDER, to remove $BOOST/libs/$BOOST_LIBS_FOLDER, testing branch $BOOST_BRANCH"
   - git clone -b $BOOST_BRANCH --depth 10 https://github.com/boostorg/boost.git $BOOST
   - cd $BOOST
-  - git submodule update --init --depth 10 tools/build tools/boostdep
+  - git submodule update --init --depth 10 tools/build tools/boostdep tools/inspect libs/filesystem
 
   # Replacing Boost module with this project and installing Boost dependencies
   - rm -rf $BOOST/libs/$BOOST_LIBS_FOLDER
@@ -131,6 +131,7 @@ before_install:
   # Adding missing toolsets and preparing Boost headers
   - ./bootstrap.sh
   - ./b2 headers
+  - ./b2 -j4 variant=debug tools/inspect/build
   - |-
     echo "using gcc ;" >> ~/user-config.jam
     echo "using clang ;" >> ~/user-config.jam
