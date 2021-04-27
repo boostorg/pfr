@@ -13,7 +13,7 @@
 
 namespace boost { namespace pfr { namespace detail {
 
-    constexpr std::uint8_t unsigned_by_size(size_t_<1>) noexcept { return 0; }
+    constexpr std::uint8_t  unsigned_by_size(size_t_<1>) noexcept { return 0; }
     constexpr std::uint16_t unsigned_by_size(size_t_<2>) noexcept { return 0; }
     constexpr std::uint32_t unsigned_by_size(size_t_<4>) noexcept { return 0; }
     constexpr std::uint64_t unsigned_by_size(size_t_<8>) noexcept { return 0; }
@@ -23,8 +23,14 @@ namespace boost { namespace pfr { namespace detail {
     {
         using raw_type = decltype(unsigned_by_size(size_t_<sizeof(T)>{ }));
 
-        static_assert(sizeof(raw_type) <= sizeof(std::size_t), "====================> Boost.PFR: Internal error while casting offset to member pointer.");
-        static_assert(decltype(offset)::value <= (std::size_t)std::numeric_limits<raw_type>::max(), "====================> Boost.PFR: Internal error while casting offset to member pointer: overflow was detected");
+        static_assert(
+            sizeof(raw_type) <= sizeof(std::size_t), 
+            "====================> Boost.PFR: Internal error while casting offset to member pointer."
+        );
+        static_assert(
+            decltype(offset)::value <= (std::size_t)std::numeric_limits<raw_type>::max(), 
+            "====================> Boost.PFR: Internal error while casting offset to member pointer: overflow was detected"
+        );
 
         union {
             T memptr;
