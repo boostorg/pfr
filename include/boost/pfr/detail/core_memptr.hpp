@@ -33,6 +33,7 @@ using tuple_element_ = sequence_tuple::tuple_element<I, decltype( detail::tie_as
 template <std::size_t I, class T>
 using tuple_memptr_t = typename detail::tuple_element_<I, T>::type T::*;
 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<class T, class I>
