@@ -77,7 +77,7 @@ template<class T, std::size_t... I>
 inline auto tie_as_memptrs_tuple_impl(std::index_sequence<I...>) noexcept
 {
     constexpr auto offsets = tie_as_offsets_tuple<T>();
-    return detail::make_sequence_tuple( detail::memptr_cast<detail::tuple_memptr_t<I, T>>(sequence_tuple::get<I>(offsets))... );
+    return detail::make_sequence_tuple( detail::memptr_cast<detail::tuple_memptr_t<I, T>>(size_t_<sequence_tuple::get<I>(offsets))>{}... );
 }
 
 template <class T>
