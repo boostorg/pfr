@@ -158,7 +158,7 @@ jobs:
         shell: cmd
         run: |
           echo GITHUB_REPOSITORY: %GITHUB_REPOSITORY%
-          for /f %%i in ("%GITHUB_REPOSITORY%") do set LIBRARY=%%~nxi
+          set LIBRARY=pfr
           echo LIBRARY: %LIBRARY%
           echo LIBRARY=%LIBRARY%>>%GITHUB_ENV%
           echo GITHUB_BASE_REF: %GITHUB_BASE_REF%
