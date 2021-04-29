@@ -151,6 +151,8 @@ script:
   - ../../../dist/bin/inspect ..
 
 after_success:
+  - exit 0  # we run coverage reports from GithubActions
+
   # Copying Coveralls data to a separate folder
   - mkdir -p $TRAVIS_BUILD_DIR/coverals
   - wget https://github.com/linux-test-project/lcov/archive/v1.15.zip
