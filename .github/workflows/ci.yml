@@ -69,7 +69,7 @@ jobs:
       - name: Setup Boost
         run: |
           echo GITHUB_REPOSITORY: $GITHUB_REPOSITORY
-          LIBRARY=${GITHUB_REPOSITORY#*/}
+          LIBRARY=pfr  # Note: changed from ${GITHUB_REPOSITORY#*/}
           echo LIBRARY: $LIBRARY
           echo "LIBRARY=$LIBRARY" >> $GITHUB_ENV
           echo GITHUB_BASE_REF: $GITHUB_BASE_REF
@@ -84,8 +84,7 @@ jobs:
           cd boost-root
           git submodule update --init --depth 10 --jobs 2 tools/boostdep tools/inspect libs/filesystem
           python tools/boostdep/depinst/depinst.py --git_args "--depth 10 --jobs 3" filesystem
-          rm -rf libs/pfr/*
-          mkdir libs/$LIBRARY # Note: added this line and changed the previous to make the script work with apolukhin/magic_get repo
+          rm -rf libs/$LIBRARY/*
           cp -r $GITHUB_WORKSPACE/* libs/$LIBRARY
           python tools/boostdep/depinst/depinst.py --include benchmark --include example --include examples --include tools --git_args "--depth 10 --jobs 3" $LIBRARY
           ./bootstrap.sh
@@ -171,7 +170,6 @@ jobs:
           cd ..
           git clone -b %BOOST_BRANCH% --depth 1 https://github.com/boostorg/boost.git boost-root
           cd boost-root
-          rmdir /s libs\pfr
           xcopy /s /e /q %GITHUB_WORKSPACE% libs\%LIBRARY%\
           git submodule update --init tools/boostdep
           python tools/boostdep/depinst/depinst.py --include benchmark --include example --include examples --include tools --git_args "--jobs 3" %LIBRARY%
