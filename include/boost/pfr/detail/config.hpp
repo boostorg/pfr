@@ -53,7 +53,7 @@
 
 #if (BOOST_PFR_USE_CPP17==0 && !BOOST_PFR_USE_LOOPHOLE)
 #   if (defined(_MSC_VER) && _MSC_VER < 1916) ///< in Visual Studio 2017 v15.9 PFR library with classic engine normally works
-#	     error Boost.PFR requires /std:c++latest or /std:c++17 flags on your compiler.
+#      error Boost.PFR requires /std:c++latest or /std:c++17 flags on your compiler.
 #   endif
 #endif
 
