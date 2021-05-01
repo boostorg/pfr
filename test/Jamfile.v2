@@ -38,7 +38,7 @@ explicit compiler_supports_loophole ;
 ########## END of helpers to detect Loophole trick support
 
 
-local DISABLE_ON_MSVC = <toolset>msvc:<build>no ;
+local DISABLE_ON_MSVC = ; #<toolset>msvc:<build>no ;
 local REQUIRE_LOOPHOLE =
     [ check-target-builds ../test//compiler_supports_loophole : : <build>no ]
   ;
