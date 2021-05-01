@@ -135,10 +135,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - toolset: msvc-14.0
-            cxxstd: "14,latest"
-            addrmd: 32,64
-            os: windows-2016
           - toolset: msvc-14.1
             cxxstd: "14,17,latest"
             addrmd: 32,64
