@@ -171,12 +171,13 @@ namespace boost { namespace pfr { namespace detail {
         ::boost::pfr::detail::for_each_field_dispatcher(
             x,
             [&result, &y](const auto& lhs) {
+                constexpr std::size_t fields_count_rhs_ = detail::fields_count<std::remove_reference_t<U>>();
                 ::boost::pfr::detail::for_each_field_dispatcher(
                     y,
                     [&result, &lhs](const auto& rhs) {
                         result = visitor_t::cmp(lhs, rhs);
                     },
-                    detail::make_index_sequence<fields_count_rhs>{}
+                    detail::make_index_sequence<fields_count_rhs_>{}
                 );
             },
             detail::make_index_sequence<fields_count_lhs>{}
