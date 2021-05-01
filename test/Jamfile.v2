@@ -12,7 +12,6 @@ import ../../config/checks/config : requires ;
 project
     : source-location .
     : requirements
-        <toolset>msvc:<cxxflags>"/std:c++latest"
         <define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1
         [ requires cxx14_constexpr ]
     ;
