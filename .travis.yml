@@ -218,7 +218,8 @@ before_install:
   - echo "Testing $BOOST_LIBS_FOLDER, to remove $BOOST/libs/$BOOST_LIBS_FOLDER, testing branch $BOOST_BRANCH"
   - git clone -b $BOOST_BRANCH --depth 10 https://github.com/boostorg/boost.git $BOOST
   - cd $BOOST
-  - git submodule update --init --depth 10 tools/build tools/boostdep
+  - git submodule update --init --depth 10 tools/build tools/boostdep tools/inspect libs/filesystem
+  - python tools/boostdep/depinst/depinst.py --git_args "--depth 10 --jobs 2" $BOOST/libs/filesystem
 
   # Replacing Boost module with this project and installing Boost dependencies
   - rm -rf $BOOST/libs/$BOOST_LIBS_FOLDER
@@ -230,6 +231,7 @@ before_install:
   # Adding missing toolsets and preparing Boost headers
   - ./bootstrap.sh
   - ./b2 headers
+  - ./b2 -j4 variant=debug tools/inspect/build
   - |-
     echo "using gcc ;" >> ~/user-config.jam
     echo "using clang ;" >> ~/user-config.jam
@@ -245,21 +247,20 @@ before_install:
 
 script:
   - sh -c "../../../b2 -j2 $B2_ARGS"
+  - ../../../dist/bin/inspect ..
 
 after_success:
+  - exit 0  # we run coverage reports from GithubActions
+
   # Copying Coveralls data to a separate folder
   - mkdir -p $TRAVIS_BUILD_DIR/coverals
-  - find ../../../bin.v2/ -name "*.gcda" -exec cp "{}" $TRAVIS_BUILD_DIR/coverals/ \;
-  - find ../../../bin.v2/ -name "*.gcno" -exec cp "{}" $TRAVIS_BUILD_DIR/coverals/ \;
-  - find ../../../bin.v2/ -name "*.da" -exec cp "{}" $TRAVIS_BUILD_DIR/coverals/ \;
-  - find ../../../bin.v2/ -name "*.no" -exec cp "{}" $TRAVIS_BUILD_DIR/coverals/ \;
-  - wget https://github.com/linux-test-project/lcov/archive/v1.12.zip
-  - unzip v1.12.zip
-  - LCOV="`pwd`/lcov-1.12/bin/lcov"
+  - wget https://github.com/linux-test-project/lcov/archive/v1.15.zip
+  - unzip v1.15.zip
+  - LCOV="`pwd`/lcov-1.15/bin/lcov"
 
   # Preparing Coveralls data by changind data format to a readable one
-  - echo "$LCOV --directory $TRAVIS_BUILD_DIR/coverals --base-directory `pwd` --capture --output-file $TRAVIS_BUILD_DIR/coverals/coverage.info"
-  - $LCOV --directory $TRAVIS_BUILD_DIR/coverals --base-directory `pwd` --capture --output-file $TRAVIS_BUILD_DIR/coverals/coverage.info
+  - echo "$LCOV --directory $BOOST/bin.v2/libs/$BOOST_LIBS_FOLDER --base-directory `pwd` --capture --output-file $TRAVIS_BUILD_DIR/coverals/coverage.info"
+  - $LCOV --directory $BOOST/bin.v2/libs/$BOOST_LIBS_FOLDER --base-directory `pwd` --capture --output-file $TRAVIS_BUILD_DIR/coverals/coverage.info
 
   # ... erasing /test/ /example/ folder data
   - cd $BOOST

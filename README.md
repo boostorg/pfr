@@ -1,16 +1,17 @@
-# Boost.PFR
+# [Boost.PFR](https://boost.org/libs/pfr)
 
 This is a C++14 library for very basic reflection that gives you access to structure elements by index and provides other `std::tuple` like methods for user defined types without any macro or boilerplate code.
 
-
-[Latest documentation](http://apolukhin.github.com/magic_get/index.html)
+Boost.PFR is a part of the [Boost C++ Libraries](https://github.com/boostorg). However, Boost.PFR is a header only library that does not depend on Boost. You can just copy the content of the "include" folder from the github into your project, and the library will work fine.
 
 ### Test results
 
 Branches        | Build         | Tests coverage | More info
 ----------------|-------------- | -------------- |-----------
-Develop:        | [![Build Status](https://travis-ci.org/apolukhin/magic_get.svg?branch=develop)](https://travis-ci.org/apolukhin/magic_get) [![Build status](https://ci.appveyor.com/api/projects/status/3tled9gd24k9paia/branch/develop?svg=true)](https://ci.appveyor.com/project/apolukhin/magic-get/branch/develop) | [![Coverage Status](https://coveralls.io/repos/github/apolukhin/magic_get/badge.png?branch=develop)](https://coveralls.io/github/apolukhin/magic_get?branch=develop) | [details...](http://www.boost.org/development/tests/develop/developer/pfr.html)
-Master:         | [![Build Status](https://travis-ci.org/apolukhin/magic_get.svg?branch=master)](https://travis-ci.org/apolukhin/magic_get) [![Build status](https://ci.appveyor.com/api/projects/status/3tled9gd24k9paia/branch/master?svg=true)](https://ci.appveyor.com/project/apolukhin/magic-get/branch/master) | [![Coverage Status](https://coveralls.io/repos/github/apolukhin/magic_get/badge.png?branch=master)](https://coveralls.io/github/apolukhin/magic_get?branch=master) | [details...](http://www.boost.org/development/tests/master/developer/pfr.html)
+Develop:        | [![CI](https://github.com/boostorg/pfr/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/boostorg/pfr/actions/workflows/ci.yml) [![Build Status](https://travis-ci.org/apolukhin/magic_get.svg?branch=develop)](https://travis-ci.org/apolukhin/magic_get) [![Build status](https://ci.appveyor.com/api/projects/status/3tled9gd24k9paia/branch/develop?svg=true)](https://ci.appveyor.com/project/apolukhin/magic-get/branch/develop) | [![Coverage Status](https://coveralls.io/repos/github/apolukhin/magic_get/badge.png?branch=develop)](https://coveralls.io/github/apolukhin/magic_get?branch=develop) | [details...](https://www.boost.org/development/tests/develop/developer/pfr.html)
+Master:         | [![CI](https://github.com/boostorg/pfr/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/boostorg/pfr/actions/workflows/ci.yml) [![Build Status](https://travis-ci.org/apolukhin/magic_get.svg?branch=master)](https://travis-ci.org/apolukhin/magic_get) [![Build status](https://ci.appveyor.com/api/projects/status/3tled9gd24k9paia/branch/master?svg=true)](https://ci.appveyor.com/project/apolukhin/magic-get/branch/master) | [![Coverage Status](https://coveralls.io/repos/github/apolukhin/magic_get/badge.png?branch=master)](https://coveralls.io/github/apolukhin/magic_get?branch=master) | [details...](https://www.boost.org/development/tests/master/developer/pfr.html)
+
+[Latest developer documentation](https://www.boost.org/doc/libs/develop/doc/html/boost_pfr.html)
 
 ### Motivating Example #0
 ```c++
@@ -94,8 +95,8 @@ my_struct has 2 fields: {"Das ist fantastisch!", 100}
 
 ### Requirements and Limitations
 
-[See docs](http://apolukhin.github.com/magic_get/index.html).
+[See docs](https://www.boost.org/doc/libs/develop/doc/html/boost_pfr.html).
 
 ### License
 
-Distributed under the [Boost Software License, Version 1.0](http://boost.org/LICENSE_1_0.txt).
+Distributed under the [Boost Software License, Version 1.0](https://boost.org/LICENSE_1_0.txt).

@@ -73,7 +73,7 @@ void test_empty_struct() {
 
 namespace foo {
     struct testing { bool b1, b2; int i; };
-    BOOST_PFR_FUNCTIONS_FOR(testing);
+    BOOST_PFR_FUNCTIONS_FOR(testing)
 }
 
 template <class Comparator>
