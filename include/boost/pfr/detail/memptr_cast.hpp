@@ -28,7 +28,7 @@ namespace boost { namespace pfr { namespace detail {
             "====================> Boost.PFR: Internal error while casting offset to member pointer."
         );
         static_assert(
-            decltype(offset)::value <= (std::size_t)std::numeric_limits<raw_type>::max(), 
+            decltype(offset)::value <= (std::size_t)(std::numeric_limits<raw_type>::max)(), 
             "====================> Boost.PFR: Internal error while casting offset to member pointer: overflow was detected"
         );
 
