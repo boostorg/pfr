@@ -549,6 +549,11 @@ constexpr bool is_flat_refelectable(std::index_sequence<I...>) noexcept {
     return true;
 }
 
+template<class T>
+constexpr bool is_flat_refelectable(std::index_sequence<>) noexcept {
+    return true; ///< all empty structs always flat refelectable
+}
+
 template <class T>
 auto tie_as_flat_tuple(T& lvalue) noexcept {
     static_assert(
