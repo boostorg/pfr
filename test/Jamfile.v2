@@ -10,10 +10,16 @@ import python ;
 import testing ;
 import ../../config/checks/config : requires ;
 
+local USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS = <define>BOOST_PFR_USE_CPP17=0 ;
+
+if ! [ os.environ BOOST_PFR_TEST_WITH_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS ]
+{
+    USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS = ;
+}
 project
     : source-location .
     : requirements
-        <define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1
+        <define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1 $(USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS)
         [ requires cxx14_constexpr ]
     ;
 
