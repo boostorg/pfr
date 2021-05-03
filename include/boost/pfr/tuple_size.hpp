@@ -11,7 +11,7 @@
 #include <boost/pfr/detail/config.hpp>
 
 #include <type_traits>
-#include <boost/pfr/detail/utility.hpp>      // metaprogramming stuff
+#include <utility>      // metaprogramming stuff
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/fields_count.hpp>

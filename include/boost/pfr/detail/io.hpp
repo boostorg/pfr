@@ -40,7 +40,7 @@ inline auto quoted_helper(std::string& s) noexcept {
 
 template <class T>
 inline decltype(auto) quoted_helper(T&& v) noexcept {
-    return detail::forward<T>(v);
+    return std::forward<T>(v);
 }
 
 template <std::size_t I, std::size_t N>

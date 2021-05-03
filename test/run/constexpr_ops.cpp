@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <typeinfo>
+#include <tuple>
 #include <sstream>
 #include <set>
 #include <string>

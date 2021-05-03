@@ -18,7 +18,7 @@
 #include <boost/pfr/detail/tie_from_structure_tuple.hpp>
 
 #include <type_traits>
-#include <boost/pfr/detail/utility.hpp>      // metaprogramming stuff
+#include <utility>      // metaprogramming stuff
 
 #include <boost/pfr/tuple_size.hpp>
 
@@ -67,7 +67,7 @@ constexpr auto get(T&, std::enable_if_t<!std::is_assignable<T, T>::value>* = nul
 /// \overload get
 template <std::size_t I, class T>
 constexpr auto get(T&& val, std::enable_if_t< std::is_rvalue_reference<T&&>::value>* = 0) noexcept {
-    return detail::move(detail::sequence_tuple::get<I>( detail::tie_as_tuple(val) ));
+    return std::move(detail::sequence_tuple::get<I>( detail::tie_as_tuple(val) ));
 }
 
 
@@ -90,7 +90,7 @@ using tuple_element = detail::sequence_tuple::tuple_element<I, decltype( ::boost
 template <std::size_t I, class T>
 using tuple_element_t = typename tuple_element<I, T>::type;
 
-#if BOOST_PFR_USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS == 0
+
 /// \brief Creates a `std::tuple` from fields of an \aggregate `val`.
 ///
 /// \b Example:
@@ -164,48 +164,6 @@ constexpr auto structure_tie(T&&, std::enable_if_t< std::is_rvalue_reference<T&&
     return 0;
 }
 
-/// \brief std::tie-like function that allows assigning to tied values from aggregates.
-///
-/// \returns an object with lvalue references to `args...`; on assignment of an \aggregate value to that
-/// object each field of an aggregate is assigned to the corresponding `args...` reference.
-///
-/// \b Example:
-/// \code
-///     auto f() {
-///       struct { struct { int x, y } p; short s; } res { { 4, 5 }, 6 };
-///       return res;
-///     }
-///     auto [p, s] = f();
-///     tie_from_structure(p, s) = f();
-/// \endcode
-template <typename... Elements>
-constexpr detail::tie_from_structure_tuple<Elements...> tie_from_structure(Elements&... args) noexcept {
-return detail::tie_from_structure_tuple<Elements...>(args...);
-}
-
-#else // BOOST_PFR_USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS == 1
-/// \overload structure_to_tuple
-template <class T>
-constexpr auto structure_to_tuple(const T& val) noexcept {
-    static_assert(sizeof(T) && false, "====================> Boost.PFR: std::tuple is prohibited in broken structured bindings mode");
-    return 0;
-}
-
-/// \overload structure_tie
-template <class T>
-constexpr auto structure_tie(const T& val) noexcept {
-    static_assert(sizeof(T) && false, "====================> Boost.PFR: std::tuple is prohibited in broken structured bindings mode");
-    return 0;
-}
-
-/// \overload tie_from_structure
-template <typename... Elements>
-constexpr auto tie_from_structure(Elements&... args) noexcept {
-    static_assert(sizeof...(Elements) && false, "====================> Boost.PFR: std::tuple is prohibited in broken structured bindings mode");
-    return 0;
-}
-#endif
-
 /// Calls `func` for each field of a `value`.
 ///
 /// \param func must have one of the following signatures:
@@ -228,20 +186,39 @@ void for_each_field(T&& value, F&& func) {
 
     ::boost::pfr::detail::for_each_field_dispatcher(
         value,
-        [f = detail::forward<F>(func)](auto&& t) mutable {
+        [f = std::forward<F>(func)](auto&& t) mutable {
             // MSVC related workaround. Its lambdas do not capture constexprs.
             constexpr std::size_t fields_count_val_in_lambda
                 = boost::pfr::detail::fields_count<std::remove_reference_t<T>>();
 
             ::boost::pfr::detail::for_each_field_impl(
                 t,
-                detail::forward<F>(f),
+                std::forward<F>(f),
                 detail::make_index_sequence<fields_count_val_in_lambda>{},
                 std::is_rvalue_reference<T&&>{}
             );
         },
         detail::make_index_sequence<fields_count_val>{}
     );
+}
+
+/// \brief std::tie-like function that allows assigning to tied values from aggregates.
+///
+/// \returns an object with lvalue references to `args...`; on assignment of an \aggregate value to that
+/// object each field of an aggregate is assigned to the corresponding `args...` reference.
+///
+/// \b Example:
+/// \code
+///     auto f() {
+///       struct { struct { int x, y } p; short s; } res { { 4, 5 }, 6 };
+///       return res;
+///     }
+///     auto [p, s] = f();
+///     tie_from_structure(p, s) = f();
+/// \endcode
+template <typename... Elements>
+constexpr detail::tie_from_structure_tuple<Elements...> tie_from_structure(Elements&... args) noexcept {
+    return detail::tie_from_structure_tuple<Elements...>(args...);
 }
 
 }} // namespace boost::pfr

@@ -10,8 +10,6 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-#if BOOST_PFR_USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS == 0
-
 #include <boost/pfr/detail/core.hpp>
 
 #include <boost/pfr/detail/stdtuple.hpp>
@@ -42,7 +40,5 @@ struct tie_from_structure_tuple : std::tuple<Elements&...> {
 };
 
 }}} // boost::pfr::detail
-
-#endif // BOOST_PFR_USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS == 0
 
 #endif // BOOST_PFR_DETAIL_TIE_FROM_STRUCTURE_TUPLE_HPP

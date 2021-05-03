@@ -11,11 +11,11 @@
 #include <boost/pfr/detail/config.hpp>
 
 #include <type_traits>
-#include <boost/pfr/detail/utility.hpp>
+#include <utility>
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/rvalue_t.hpp>
 #include <boost/pfr/detail/size_t_.hpp>
-#include <memory> // for std::addressof
+
 
 namespace boost { namespace pfr { namespace detail {
 

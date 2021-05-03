@@ -10,7 +10,7 @@
 #include <boost/pfr/detail/config.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 
-#include <boost/pfr/detail/utility.hpp>      // metaprogramming stuff
+#include <utility>      // metaprogramming stuff
 #include <cstddef>      // std::size_t
 
 ///////////////////// Tuple that holds its values in the supplied order
@@ -27,7 +27,7 @@ struct tuple_base;
 
 
 template <std::size_t... I, class ...Tail>
-struct tuple_base< detail::index_sequence<I...>, Tail... >
+struct tuple_base< std::index_sequence<I...>, Tail... >
     : base_from_member<I , Tail>...
 {
     static constexpr std::size_t size_v = sizeof...(I);
@@ -44,7 +44,7 @@ struct tuple_base< detail::index_sequence<I...>, Tail... >
 };
 
 template <>
-struct tuple_base<detail::index_sequence<> > {
+struct tuple_base<std::index_sequence<> > {
     static constexpr std::size_t size_v = 0;
 };
 
@@ -70,7 +70,7 @@ constexpr const volatile T& get_impl(const volatile base_from_member<N, T>& t) n
 
 template <std::size_t N, class T>
 constexpr T&& get_impl(base_from_member<N, T>&& t) noexcept {
-    return detail::forward<T>(t.value);
+    return std::forward<T>(t.value);
 }
 
 
@@ -113,7 +113,7 @@ constexpr decltype(auto) get(volatile tuple<T...>& t) noexcept {
 template <std::size_t N, class ...T>
 constexpr decltype(auto) get(tuple<T...>&& t) noexcept {
     static_assert(N < tuple<T...>::size_v, "====================> Boost.PFR: Tuple index out of bounds");
-    return sequence_tuple::get_impl<N>(detail::move(t));
+    return sequence_tuple::get_impl<N>(std::move(t));
 }
 
 template <std::size_t I, class T>

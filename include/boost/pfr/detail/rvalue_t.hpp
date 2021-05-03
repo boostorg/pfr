@@ -8,7 +8,7 @@
 #pragma once
 
 #include <type_traits>
-#include <boost/pfr/detail/utility.hpp>      // std::enable_if_t
+#include <utility>      // std::enable_if_t
 
 // This header provides aliases rvalue_t and lvalue_t.
 //

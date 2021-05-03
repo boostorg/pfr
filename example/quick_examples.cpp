@@ -105,7 +105,7 @@ void test_examples() {
 //]
   }
 
-#if (BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE) && !BOOST_PFR_USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS
+#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
   {
 //[pfr_quick_examples_structure_to_tuple
     // Getting a std::tuple of values from structures fields
@@ -126,7 +126,7 @@ void test_examples() {
   }
 #endif
 
-#if (BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE) && !BOOST_PFR_USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS
+#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
   {
 //[pfr_quick_examples_structure_tie
     // Getting a std::tuple of references to structure fields

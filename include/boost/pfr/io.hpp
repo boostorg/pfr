@@ -69,7 +69,7 @@ struct io_impl {
 
 template <class Char, class Traits, class T>
 enable_not_ostreamable_t<std::basic_ostream<Char, Traits>, T> operator<<(std::basic_ostream<Char, Traits>& out, io_impl<T>&& x) {
-    return out << boost::pfr::io_fields(detail::forward<T>(x.value));
+    return out << boost::pfr::io_fields(std::forward<T>(x.value));
 }
 
 template <class Char, class Traits, class T>
@@ -79,7 +79,7 @@ enable_ostreamable_t<std::basic_ostream<Char, Traits>, T> operator<<(std::basic_
 
 template <class Char, class Traits, class T>
 enable_not_istreamable_t<std::basic_istream<Char, Traits>, T> operator>>(std::basic_istream<Char, Traits>& in, io_impl<T>&& x) {
-    return in >> boost::pfr::io_fields(detail::forward<T>(x.value));
+    return in >> boost::pfr::io_fields(std::forward<T>(x.value));
 }
 
 template <class Char, class Traits, class T>
@@ -105,7 +105,7 @@ enable_istreamable_t<std::basic_istream<Char, Traits>, T> operator>>(std::basic_
 /// \customio
 template <class T>
 auto io(T&& value) noexcept {
-    return detail::io_impl<T>{detail::forward<T>(value)};
+    return detail::io_impl<T>{std::forward<T>(value)};
 }
 
 }} // namespace boost::pfr

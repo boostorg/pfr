@@ -9,9 +9,7 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-#if BOOST_PFR_USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS == 0
-
-#include <boost/pfr/detail/utility.hpp>      // metaprogramming stuff
+#include <utility>      // metaprogramming stuff
 #include <tuple>
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
@@ -19,21 +17,21 @@
 namespace boost { namespace pfr { namespace detail {
 
 template <class T, std::size_t... I>
-constexpr auto make_stdtuple_from_tietuple(const T& t, detail::index_sequence<I...>) noexcept {
+constexpr auto make_stdtuple_from_tietuple(const T& t, std::index_sequence<I...>) noexcept {
     return std::make_tuple(
         boost::pfr::detail::sequence_tuple::get<I>(t)...
     );
 }
 
 template <class T, std::size_t... I>
-constexpr auto make_stdtiedtuple_from_tietuple(const T& t, detail::index_sequence<I...>) noexcept {
+constexpr auto make_stdtiedtuple_from_tietuple(const T& t, std::index_sequence<I...>) noexcept {
     return std::tie(
         boost::pfr::detail::sequence_tuple::get<I>(t)...
     );
 }
 
 template <class T, std::size_t... I>
-constexpr auto make_conststdtiedtuple_from_tietuple(const T& t, detail::index_sequence<I...>) noexcept {
+constexpr auto make_conststdtiedtuple_from_tietuple(const T& t, std::index_sequence<I...>) noexcept {
     return std::tuple<
         std::add_lvalue_reference_t<std::add_const_t<
             std::remove_reference_t<decltype(boost::pfr::detail::sequence_tuple::get<I>(t))>
@@ -44,7 +42,5 @@ constexpr auto make_conststdtiedtuple_from_tietuple(const T& t, detail::index_se
 }
 
 }}} // namespace boost::pfr::detail
-
-#endif // BOOST_PFR_USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS == 0
 
 #endif // BOOST_PFR_DETAIL_STDTUPLE_HPP
