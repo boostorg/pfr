@@ -92,7 +92,9 @@ matrix:
     # Required by boost fusion
     - os: linux
       dist: xenial
-      env: B2_ARGS='toolset=clang-3.5 cxxstd=14,1z'
+      env:
+        - B2_ARGS='toolset=clang-3.5 cxxstd=14,1z'
+        - BOOST_PFR_TEST_WITH_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS=1
       name: "clang-3.5"
       addons:
         apt:
@@ -101,7 +103,9 @@ matrix:
 
     - os: linux
       dist: xenial
-      env: B2_ARGS='toolset=clang-3.6 cxxstd=14,1z'
+      env:
+        - B2_ARGS='toolset=clang-3.6 cxxstd=14,1z'
+        - BOOST_PFR_TEST_WITH_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS=1
       name: "clang-3.6"
       addons:
         apt:
@@ -110,7 +114,9 @@ matrix:
 
     - os: linux
       dist: xenial
-      env: B2_ARGS='toolset=clang-3.7 cxxstd=14,1z'
+      env:
+        - B2_ARGS='toolset=clang-3.7 cxxstd=14,1z'
+        - BOOST_PFR_TEST_WITH_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS=1
       name: "clang-3.7"
       addons:
         apt:
@@ -119,7 +125,9 @@ matrix:
 
     - os: linux
       dist: xenial
-      env: B2_ARGS='toolset=clang-3.8 cxxstd=14,1z'
+      env:
+        - B2_ARGS='toolset=clang-3.8 cxxstd=14,1z'
+        - BOOST_PFR_TEST_WITH_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS=1
       name: "clang-3.8"
       addons:
         apt:
@@ -128,7 +136,9 @@ matrix:
 
     - os: linux
       dist: xenial
-      env: B2_ARGS='toolset=clang-3.9 cxxstd=14,1z'
+      env:
+        - B2_ARGS='toolset=clang-3.9 cxxstd=14,1z'
+        - BOOST_PFR_TEST_WITH_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS=1
       name: "clang-3.9"
       addons:
         apt:
@@ -137,7 +147,9 @@ matrix:
 
     - os: linux
       dist: xenial
-      env: B2_ARGS='toolset=clang-4.0 cxxstd=14,1z'
+      env:
+        - B2_ARGS='toolset=clang-4.0 cxxstd=14,1z'
+        - BOOST_PFR_TEST_WITH_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS=1
       name: "clang-4.0"
       addons:
         apt:
@@ -146,7 +158,9 @@ matrix:
 
     - os: linux
       dist: xenial
-      env: B2_ARGS='toolset=clang-5.0 cxxstd=14,17,2a'
+      env:
+         - B2_ARGS='toolset=clang-5.0 cxxstd=14,17,2a'
+         - BOOST_PFR_TEST_WITH_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS=1
       name: "clang-5.0"
       addons:
         apt:
@@ -157,7 +171,9 @@ matrix:
 
     - os: linux
       dist: xenial
-      env: B2_ARGS='toolset=clang-6.0 cxxstd=14,17,2a'
+      env:
+        - B2_ARGS='toolset=clang-6.0 cxxstd=14,17,2a'
+        - BOOST_PFR_TEST_WITH_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS=1
       name: "clang-6.0"
       addons:
         apt:
@@ -168,7 +184,9 @@ matrix:
 
     - os: linux
       dist: xenial
-      env: B2_ARGS='toolset=clang-7.0 cxxstd=14,17,2a'
+      env:
+        - B2_ARGS='toolset=clang-7.0 cxxstd=14,17,2a'
+        - BOOST_PFR_TEST_WITH_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS=1
       name: "clang-7.0"
       addons:
         apt:
@@ -178,7 +196,9 @@ matrix:
             - llvm-toolchain-xenial-7
 
     - os: osx
-      env: B2_ARGS='toolset=clang cxxstd=14,1z'
+      env:
+        - B2_ARGS='toolset=clang cxxstd=14,1z'
+        - BOOST_PFR_TEST_WITH_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS=1
       name: "clang osx"
 
 ###############################################################################################################
