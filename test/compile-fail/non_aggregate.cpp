@@ -6,7 +6,7 @@
 #include <boost/pfr/core.hpp>
 #include <boost/core/lightweight_test.hpp>
 
-#include <tuple>
+#include <tuple> ///< TODO: убрать
 
 int main() {
     (void)boost::pfr::tuple_size<std::pair<int, short>>::value; // Must be a compile time error

@@ -24,7 +24,7 @@
 #include <boost/pfr/detail/config.hpp>
 
 #include <type_traits>
-#include <utility>
+#include <boost/pfr/detail/utility.hpp>
 
 #include <boost/pfr/detail/cast_to_layout_compatible.hpp> // still needed for enums
 #include <boost/pfr/detail/offset_based_getter.hpp>
@@ -76,7 +76,7 @@ struct fn_def_lref {
 };
 template <class T, class U, std::size_t N, bool B>
 struct fn_def_rref {
-    friend auto loophole(tag<T,N>) { return std::move(boost::pfr::detail::unsafe_declval< std::remove_all_extents_t<U>& >()); }
+    friend auto loophole(tag<T,N>) { return detail::move(boost::pfr::detail::unsafe_declval< std::remove_all_extents_t<U>& >()); }
 };
 
 
@@ -116,7 +116,7 @@ template <class T, class U>
 struct loophole_type_list_lref;
 
 template <typename T, std::size_t... I>
-struct loophole_type_list_lref< T, std::index_sequence<I...> >
+struct loophole_type_list_lref< T, detail::index_sequence<I...> >
      // Instantiating loopholes:
     : sequence_tuple::tuple< decltype(T{ loophole_ubiq_lref<T, I>{}... }, 0) >
 {
@@ -128,7 +128,7 @@ template <class T, class U>
 struct loophole_type_list_rref;
 
 template <typename T, std::size_t... I>
-struct loophole_type_list_rref< T, std::index_sequence<I...> >
+struct loophole_type_list_rref< T, detail::index_sequence<I...> >
      // Instantiating loopholes:
     : sequence_tuple::tuple< decltype(T{ loophole_ubiq_rref<T, I>{}... }, 0) >
 {
@@ -176,12 +176,12 @@ auto tie_as_tuple(T& val) noexcept {
 }
 
 template <class T, class F, std::size_t... I>
-void for_each_field_dispatcher(T& t, F&& f, std::index_sequence<I...>) {
+void for_each_field_dispatcher(T& t, F&& f, detail::index_sequence<I...>) {
     static_assert(
         !std::is_union<T>::value,
         "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."
     );
-    std::forward<F>(f)(
+    detail::forward<F>(f)(
         boost::pfr::detail::tie_as_tuple_loophole_impl(t)
     );
 }

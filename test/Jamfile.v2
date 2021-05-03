@@ -5,14 +5,22 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 #
 
+import os ;
 import python ;
 import testing ;
 import ../../config/checks/config : requires ;
 
+local USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS = <define>BOOST_PFR_USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS=1 ;
+
+if ! [ os.environ BOOST_PFR_TEST_WITH_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS ]
+{
+    USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS = <define>BOOST_PFR_USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS=0 ;
+}
+
 project
     : source-location .
     : requirements
-        <define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1
+        <define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1 $(USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS)
         [ requires cxx14_constexpr ]
     ;
 
@@ -73,7 +81,7 @@ local BLACKLIST_TESTS_FOR_LOOPHOLE =
     tie_anonymous_const_field           # boost::pfr::structure_tie gives compile time error on const fields
   ;
 
-# Those tests are either 
+# Those tests are either
 # * reflecting a non literal type
 # * or calling boost::pfr::get and the result is a user defined structure
 local BLACKLIST_TESTS_FOR_CLASSIC =
@@ -95,12 +103,31 @@ local BLACKLIST_TESTS_FOR_CLASSIC =
     tie_anonymous_const_field
   ;
 
+local BLACKLIST_TESTS_FOR_BROKEN_STRUCTURED_BINDINGS =
+    tie_anonymous
+    tie_anonymous_const_field
+    destructuring_tie
+  ;
+
 for local source_file in [ glob ./run/*.cpp ] [ glob ../example/*.cpp ]
 {
     local target_name = $(source_file[1]:B) ;
-    pfr_tests += [ run $(source_file) : : : $(STRUCTURED_BINDING_ENGINE) : $(target_name)_sb ] ;
-    
-    if ! $(target_name) in $(BLACKLIST_TESTS_FOR_LOOPHOLE)
+
+    if ! [ os.environ BOOST_PFR_TEST_WITH_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS ]
+    {
+        BLACKLIST_TESTS_FOR_BROKEN_STRUCTURED_BINDINGS = ;
+    }
+
+    if ! $(target_name) in $(BLACKLIST_TESTS_FOR_BROKEN_STRUCTURED_BINDINGS)
+    {
+        pfr_tests += [ run $(source_file) : : : $(STRUCTURED_BINDING_ENGINE) : $(target_name)_sb ] ;
+    }
+    else
+    {
+        pfr_tests += [ compile-fail $(source_file) : $(STRUCTURED_BINDING_ENGINE) : $(target_name)_sb ] ;
+    }
+
+    if ! $(target_name) in $(BLACKLIST_TESTS_FOR_LOOPHOLE) && ! $(target_name) in $(BLACKLIST_TESTS_FOR_BROKEN_STRUCTURED_BINDINGS)
     {
         pfr_tests += [ run $(source_file) : : : $(LOOPHOLE_ENGINE) : $(target_name)_lh ] ;
     }
@@ -109,7 +136,7 @@ for local source_file in [ glob ./run/*.cpp ] [ glob ../example/*.cpp ]
         pfr_tests += [ compile-fail $(source_file) : $(LOOPHOLE_ENGINE) : $(target_name)_lh ] ;
     }
 
-    if ! $(target_name) in $(BLACKLIST_TESTS_FOR_CLASSIC)
+    if ! $(target_name) in $(BLACKLIST_TESTS_FOR_CLASSIC) && ! $(target_name) in $(BLACKLIST_TESTS_FOR_BROKEN_STRUCTURED_BINDINGS)
     {
         pfr_tests += [ run $(source_file) : : : $(CLASSIC_ENGINE) : $(target_name)_classic ] ;
     }

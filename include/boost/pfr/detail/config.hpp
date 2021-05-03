@@ -57,6 +57,14 @@
 #   endif
 #endif
 
+#ifndef BOOST_PFR_USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS
+#   define BOOST_PFR_USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS 0
+#endif
+
+#if BOOST_PFR_USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS != 0
+#   define BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE 0
+#endif
+
 #ifndef BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE
 // Assume that libstdc++ since GCC-7.3 does not have linear instantiation depth in std::make_integral_sequence
 #   if defined( __GLIBCXX__) && __GLIBCXX__ >= 20180101
@@ -86,6 +94,5 @@
 #ifndef BOOST_PFR_MAYBE_UNUSED
 #   define BOOST_PFR_MAYBE_UNUSED
 #endif
-
 
 #endif // BOOST_PFR_DETAIL_CONFIG_HPP

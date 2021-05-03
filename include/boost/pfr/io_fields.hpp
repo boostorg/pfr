@@ -13,7 +13,7 @@
 #include <boost/pfr/detail/core.hpp>
 
 #include <type_traits>
-#include <utility>      // metaprogramming stuff
+#include <boost/pfr/detail/utility.hpp>      // metaprogramming stuff
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/io.hpp>
@@ -156,7 +156,7 @@ std::basic_istream<Char, Traits>& operator>>(std::basic_istream<Char, Traits>& i
 /// \customio
 template <class T>
 auto io_fields(T&& value) noexcept {
-    return detail::io_fields_impl<T>{std::forward<T>(value)};
+    return detail::io_fields_impl<T>{detail::forward<T>(value)};
 }
 
 }} // namespace boost::pfr
