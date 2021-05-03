@@ -6,11 +6,17 @@
 #include <boost/pfr/core.hpp>
 #include <boost/core/lightweight_test.hpp>
 
-#include <tuple> ///< TODO: убрать
+struct non_aggregate
+{
+    int first;
+    int last;
+    non_aggregate(int first, int last)
+            : first(first), last(last)
+    {
+    }
+};
 
 int main() {
-    (void)boost::pfr::tuple_size<std::pair<int, short>>::value; // Must be a compile time error
+    (void)boost::pfr::tuple_size<non_aggregate>::value; // Must be a compile time error
     return boost::report_errors();
 }
-
-
