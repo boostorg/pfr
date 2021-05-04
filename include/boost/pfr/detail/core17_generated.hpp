@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2021 Antony Polukhin
+// Copyright (c) 2016-2020 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,6 +23,30 @@
 
 namespace boost { namespace pfr { namespace detail {
 
+struct GuaranteedSimpleAggregate {
+    bool test1 = true;
+};
+
+template <class T>
+constexpr bool do_structured_bindings_work() noexcept { // ******************************************* IN CASE OF ERROR READ THE FOLLOWING LINES IN boost/pfr/detail/core17_generated.hpp FILE:
+    T val{};
+    const auto& [a] = val; // ====================> Boost.PFR: Your compiler can not handle C++17 structured bindings. Read the below comments for workarounds.
+
+    /****************************************************************************
+    *
+    * It looks like your compiler or Standard Library can not handle C++17
+    * structured bindings.
+    *
+    * Workaround: Define BOOST_PFR_USE_CPP17 to 0
+    * It will disable the C++17 features for Boost.PFR library.
+    *
+    * Sorry for the inconvenience caused.
+    *
+    ****************************************************************************/
+
+    return a;
+}
+
 template <class... Args>
 constexpr auto make_tuple_of_references(Args&&... args) noexcept {
   return sequence_tuple::tuple<Args&...>{ args... };
@@ -30,11 +54,13 @@ constexpr auto make_tuple_of_references(Args&&... args) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& /*val*/, size_t_<0>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   return sequence_tuple::tuple<>{};
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<std::is_class< std::remove_cv_t<T> >::value>* = 0) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a);
 }
@@ -42,288 +68,336 @@ constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<std::is_class< 
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<!std::is_class< std::remove_cv_t<T> >::value>* = 0) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   return ::boost::pfr::detail::make_tuple_of_references( val );
 }
 
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<2>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<3>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<4>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<5>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<6>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<7>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<8>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<9>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<10>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<11>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<12>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<13>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<14>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<15>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<16>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<17>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<18>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<19>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<20>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<21>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<22>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<23>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<24>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<25>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<26>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<27>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<28>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<29>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<30>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<31>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<32>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<33>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<34>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<35>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<36>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<37>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<38>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<39>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<40>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<41>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<42>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<43>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<44>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<45>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<46>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<47>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z);
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<48>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa
@@ -337,6 +411,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<48>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<49>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab
@@ -350,6 +425,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<49>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<50>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac
@@ -363,6 +439,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<50>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<51>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad
@@ -376,6 +453,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<51>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<52>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae
@@ -389,6 +467,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<52>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<53>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af
@@ -402,6 +481,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<53>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<54>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag
@@ -415,6 +495,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<54>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<55>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah
@@ -428,6 +509,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<55>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<56>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj
@@ -441,6 +523,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<56>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<57>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak
@@ -454,6 +537,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<57>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<58>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al
@@ -467,6 +551,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<58>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<59>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am
@@ -480,6 +565,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<59>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<60>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an
@@ -493,6 +579,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<60>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<61>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap
@@ -506,6 +593,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<61>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<62>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq
@@ -519,6 +607,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<62>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<63>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar
@@ -532,6 +621,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<63>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<64>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as
@@ -545,6 +635,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<64>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<65>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at
@@ -558,6 +649,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<65>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<66>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au
@@ -571,6 +663,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<66>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<67>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av
@@ -584,6 +677,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<67>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<68>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw
@@ -597,6 +691,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<68>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<69>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax
@@ -610,6 +705,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<69>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<70>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay
@@ -623,6 +719,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<70>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<71>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az
@@ -636,6 +733,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<71>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<72>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA
@@ -649,6 +747,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<72>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<73>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB
@@ -662,6 +761,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<73>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<74>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC
@@ -675,6 +775,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<74>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<75>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD
@@ -688,6 +789,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<75>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<76>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE
@@ -701,6 +803,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<76>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<77>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF
@@ -714,6 +817,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<77>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<78>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG
@@ -727,6 +831,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<78>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<79>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH
@@ -740,6 +845,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<79>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<80>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ
@@ -753,6 +859,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<80>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<81>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK
@@ -766,6 +873,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<81>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<82>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL
@@ -779,6 +887,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<82>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<83>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM
@@ -792,6 +901,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<83>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<84>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN
@@ -805,6 +915,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<84>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<85>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP
@@ -818,6 +929,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<85>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<86>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ
@@ -831,6 +943,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<86>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<87>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR
@@ -844,6 +957,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<87>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<88>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS
@@ -857,6 +971,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<88>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<89>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU
@@ -870,6 +985,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<89>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<90>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV
@@ -883,6 +999,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<90>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<91>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW
@@ -896,6 +1013,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<91>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<92>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX
@@ -909,6 +1027,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<92>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<93>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY
@@ -922,6 +1041,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<93>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<94>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ
@@ -935,6 +1055,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<94>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<95>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
@@ -950,6 +1071,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<95>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<96>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
@@ -965,6 +1087,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<96>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<97>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
@@ -980,6 +1103,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<97>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<98>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
@@ -995,6 +1119,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<98>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<99>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
@@ -1010,6 +1135,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<99>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<100>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
@@ -1026,6 +1152,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<100>) noexcept {
 
 template <class T, std::size_t I>
 constexpr void tie_as_tuple(T& /*val*/, size_t_<I>) noexcept {
+  do_structured_bindings_work<GuaranteedSimpleAggregate>();
   static_assert(sizeof(T) && false,
                 "====================> Boost.PFR: Too many fields in a structure T. Regenerate include/boost/pfr/detail/core17_generated.hpp file for appropriate count of fields. For example: `python ./misc/generate_cpp17.py 300 > include/boost/pfr/detail/core17_generated.hpp`");
 }
