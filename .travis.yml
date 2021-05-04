@@ -94,8 +94,7 @@ matrix:
       dist: xenial
       env:
         - B2_ARGS='toolset=clang-3.5 cxxstd=14,1z'
-        # TODO:
-        #- BOOST_PFR_TEST_WITH_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS=1
+        - BOOST_PFR_TEST_WITH_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS=1
       name: "clang-3.5"
       addons:
         apt:
