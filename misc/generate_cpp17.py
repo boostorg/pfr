@@ -39,12 +39,12 @@ PROLOGUE = """// Copyright (c) 2016-2020 Antony Polukhin
 namespace boost { namespace pfr { namespace detail {
 
 struct GuaranteedSimpleAggregate {
-    bool test1 = true;
+    bool test1;
 };
 
 template <class T>
 constexpr bool do_structured_bindings_work() noexcept { // ******************************************* IN CASE OF ERROR READ THE FOLLOWING LINES IN boost/pfr/detail/core17_generated.hpp FILE:
-    T val{};
+    T val{true};
     const auto& [a] = val; // ====================> Boost.PFR: Your compiler can not handle C++17 structured bindings. Read the below comments for workarounds.
 
     /****************************************************************************
@@ -68,22 +68,25 @@ constexpr auto make_tuple_of_references(Args&&... args) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& /*val*/, size_t_<0>) noexcept {
-  do_structured_bindings_work<GuaranteedSimpleAggregate>();
+constexpr auto tie_as_tuple(T& /*val*/, size_t_<0>)
+    noexcept(do_structured_bindings_work<GuaranteedSimpleAggregate>()) // force the computation of structured bindings test
+{
   return sequence_tuple::tuple<>{};
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<std::is_class< std::remove_cv_t<T> >::value>* = 0) noexcept {
-  do_structured_bindings_work<GuaranteedSimpleAggregate>();
+constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<std::is_class< std::remove_cv_t<T> >::value>* = 0)
+    noexcept(do_structured_bindings_work<GuaranteedSimpleAggregate>()) // force the computation of structured bindings test
+{
   auto& [a] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(a);
 }
 
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<!std::is_class< std::remove_cv_t<T> >::value>* = 0) noexcept {
-  do_structured_bindings_work<GuaranteedSimpleAggregate>();
+constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<!std::is_class< std::remove_cv_t<T> >::value>* = 0)
+    noexcept(do_structured_bindings_work<GuaranteedSimpleAggregate>()) // force the computation of structured bindings test
+{
   return ::boost::pfr::detail::make_tuple_of_references( val );
 }
 
@@ -92,8 +95,9 @@ constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<!std::is_class<
 ############################################################################################################################
 EPILOGUE = """
 template <class T, std::size_t I>
-constexpr void tie_as_tuple(T& /*val*/, size_t_<I>) noexcept {
-  do_structured_bindings_work<GuaranteedSimpleAggregate>();
+constexpr void tie_as_tuple(T& /*val*/, size_t_<I>)
+    noexcept(do_structured_bindings_work<GuaranteedSimpleAggregate>()) // force the computation of structured bindings test
+{
   static_assert(sizeof(T) && false,
                 "====================> Boost.PFR: Too many fields in a structure T. Regenerate include/boost/pfr/detail/core17_generated.hpp file for appropriate count of fields. For example: `python ./misc/generate_cpp17.py 300 > include/boost/pfr/detail/core17_generated.hpp`");
 }
@@ -121,8 +125,9 @@ for i in range(1, funcs_count):
     indexes += ascii_letters[i % max_args_on_a_line]
 
     print("template <class T>")
-    print("constexpr auto tie_as_tuple(T& val, size_t_<" + str(i + 1) + ">) noexcept {")
-    print("  do_structured_bindings_work<GuaranteedSimpleAggregate>();")
+    print("constexpr auto tie_as_tuple(T& val, size_t_<" + str(i + 1) + ">)")
+    print("    noexcept(do_structured_bindings_work<GuaranteedSimpleAggregate>()) // force the computation of structured bindings test")
+    print("{")
     if i < max_args_on_a_line:
         print("  auto& [" + indexes.strip() + "] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.")
         print("  return ::boost::pfr::detail::make_tuple_of_references(" + indexes.strip() + ");")
