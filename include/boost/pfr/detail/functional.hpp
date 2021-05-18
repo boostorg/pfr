@@ -10,6 +10,7 @@
 #include <boost/pfr/detail/config.hpp>
 
 #include <functional>
+#include <cstdint>
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 
