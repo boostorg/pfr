@@ -40,7 +40,7 @@ jobs:
             install: clang-3.7
           - toolset: clang
             compiler: clang++-9
-            cxxstd: "03,11,14,17,2a"
+            cxxstd: "03,11,14,17"  # Do not run in 2a mode because of the "chrono:1345:24: error: unknown type name 'strong_ordering'"
             os: ubuntu-20.04
             cxxflags: "cxxflags=--coverage"
             linkflags: "linkflags=--coverage"
