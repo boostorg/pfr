@@ -24,7 +24,7 @@ jobs:
           - toolset: gcc-7
             cxxstd: "03,11,14,17"
             os: ubuntu-18.04
-          - toolset: gcc-9
+          - toolset: gcc-9  # Do not remove! It is the only toolset that tests misc/strip_boost_namespace.sh
             cxxstd: "03,11,14,17,2a"
             os: ubuntu-18.04
           - toolset: gcc-10
@@ -101,6 +101,10 @@ jobs:
           cd ../boost-root
           ./b2 -j3 libs/$LIBRARY/test toolset=${{matrix.toolset}} cxxstd=${{matrix.cxxstd}} variant=debug,release "${{matrix.cxxflags}}" "${{matrix.linkflags}}" "${{matrix.launcher}}"
           dist/bin/inspect libs/$LIBRARY
+
+      - name: Test boost namespace stripping
+        if: ${{matrix.compiler == 'gcc-9' }}
+        run: ../boost-root/libs/$LIBRARY/misc/strip_boost_namespace.sh
 
       - name: Prepare coverage data
         if: matrix.gcov_tool
