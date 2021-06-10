@@ -38,8 +38,9 @@ jobs:
             cxxstd: "03,11,14"
             os: ubuntu-16.04
             install: clang-3.7
-          - toolset: clang-9
+          - toolset: clang
             compiler: clang++-9
+            install: clang-9
             cxxstd: "03,11,14,17"  # Do not run in 2a mode because of the "chrono:1345:24: error: unknown type name 'strong_ordering'"
             os: ubuntu-20.04
             cxxflags: "cxxflags=--coverage"
