@@ -38,7 +38,7 @@ jobs:
             cxxstd: "03,11,14"
             os: ubuntu-16.04
             install: clang-3.7
-          - toolset: clang
+          - toolset: clang-9
             compiler: clang++-9
             cxxstd: "03,11,14,17"  # Do not run in 2a mode because of the "chrono:1345:24: error: unknown type name 'strong_ordering'"
             os: ubuntu-20.04
@@ -103,7 +103,7 @@ jobs:
           # dist/bin/inspect libs/$LIBRARY
 
       - name: Test boost namespace stripping
-        if: ${{matrix.compiler == 'gcc-9' }}
+        if: ${{matrix.toolset == 'gcc-9'}}
         run: ../boost-root/libs/$LIBRARY/misc/strip_boost_namespace.sh
 
       - name: Prepare coverage data
