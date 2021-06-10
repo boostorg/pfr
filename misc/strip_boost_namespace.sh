@@ -33,9 +33,10 @@ find ${TARGET_PATH} -type f | xargs sed -i 's/boost::pfr/pfr/g'
 find ${TARGET_PATH} -type f | xargs sed -i 's/BOOST_PFR_/PFR_/g'
 find ${TARGET_PATH} -type f | xargs sed -i 's|boost/pfr|pfr|g'
 
-find ${TARGET_PATH}/doc -type f | xargs sed -i '/\[xinclude autodoc_pfr.xml\]/d'
 find ${TARGET_PATH}/doc -type f | xargs sed -i 's|boost.pfr.|pfr.|g'
 find ${TARGET_PATH}/doc -type f | xargs sed -i 's|Boost.PFR|PFR|g'
+
+sed -i  's|# \[Boost.PFR\](https://boost.org/libs/pfr)|# [PFR](https://apolukhin.github.io/pfr_non_boost/)|g' ${TARGET_PATH}/README.md
 
 echo -n "***** Testing: "
 if g++-9 -std=c++17 -DPFR_USE_LOOPHOLE=0 -DPFR_USE_CPP17=1 -I ${TARGET_PATH}/include/ ${TARGET_PATH}/example/motivating_example0.cpp && ./a.out > /dev/null; then
