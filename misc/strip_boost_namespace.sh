@@ -5,16 +5,16 @@
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+echo "***** Making target path"
 TARGET_PATH="`dirname \"$0\"`/../../freestanding_pfr"
+rm -rf ${TARGET_PATH}
+mkdir ${TARGET_PATH}
 TARGET_PATH=`cd "${TARGET_PATH}";pwd`
+
 SOURCE_PATH="`dirname \"$0\"`/.."
 SOURCE_PATH=`cd "${SOURCE_PATH}";pwd`
 
-
 echo "***** Copying from ${SOURCE_PATH} to ${TARGET_PATH}"
-rm -rf ${TARGET_PATH}
-mkdir ${TARGET_PATH}
-
 cp -rf ${SOURCE_PATH}/* ${TARGET_PATH}
 
 mv ${TARGET_PATH}/include/boost/* ${TARGET_PATH}/include/
