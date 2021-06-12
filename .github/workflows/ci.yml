@@ -90,7 +90,7 @@ jobs:
           python tools/boostdep/depinst/depinst.py --include benchmark --include example --include examples --include tools --git_args "--depth 10 --jobs 3" $LIBRARY
           ./bootstrap.sh
           ./b2 -d0 headers
-          # ./b2 -j4 variant=debug tools/inspect/build
+          ./b2 -j4 variant=debug tools/inspect/build
 
       - name: Create user-config.jam
         if: matrix.compiler
@@ -101,7 +101,7 @@ jobs:
         run: |
           cd ../boost-root
           ./b2 -j3 libs/$LIBRARY/test toolset=${{matrix.toolset}} cxxstd=${{matrix.cxxstd}} variant=debug,release "${{matrix.cxxflags}}" "${{matrix.linkflags}}" "${{matrix.launcher}}"
-          # dist/bin/inspect libs/$LIBRARY
+          dist/bin/inspect libs/$LIBRARY
 
       - name: Test boost namespace stripping
         if: ${{matrix.toolset == 'gcc-9'}}
