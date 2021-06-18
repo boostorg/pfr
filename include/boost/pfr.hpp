@@ -10,6 +10,7 @@
 /// Includes all the Boost.PFR headers
 
 #include <boost/pfr/core.hpp>
+#include <boost/pfr/core_memptr.hpp>
 #include <boost/pfr/functions_for.hpp>
 #include <boost/pfr/functors.hpp>
 #include <boost/pfr/io.hpp>
