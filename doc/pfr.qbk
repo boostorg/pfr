@@ -169,7 +169,7 @@ Boost.PFR adds the following out-of-the-box functionality for aggregate initiali
 * methods for cooperation with `std::tuple`
 * methods to visit each field of the structure
 
-Boost.PFR is a header only library that does not depend on Boost. You can just copy the content of the "include" folder [@https://github.com/boostorg/pfr from the github] into your project, and the library will work fine.
+Boost.PFR is a header only library that does not depend on Boost. You can just copy the content of the "include" folder [@https://github.com/boostorg/pfr from the Boost.PFR github] into your project, and the library will work fine. For a version of the library without `boost::` namespace see [@https://github.com/apolukhin/pfr_non_boost PFR].
 
 [caution Recommended C++ Standards are C++17 and above. Library requires at least C++14! Pre C++14 compilers (C++11, C++03...) are not supported]
 
