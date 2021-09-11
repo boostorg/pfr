@@ -17,10 +17,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - toolset: gcc-4.8
-            cxxstd: "03,11"
-            os: ubuntu-16.04
-            install: g++-4.8
           - toolset: gcc-7
             cxxstd: "03,11,14,17"
             os: ubuntu-18.04
@@ -33,19 +29,6 @@ jobs:
             cxxflags: "cxxflags=--coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined"
             linkflags: "linkflags=--coverage -lasan -lubsan"
             gcov_tool: "gcov-10"
-          - toolset: clang
-            compiler: clang++-3.7
-            cxxstd: "03,11,14"
-            os: ubuntu-16.04
-            install: clang-3.7
-          - toolset: clang
-            compiler: clang++-9
-            install: clang-9
-            cxxstd: "03,11,14,17"  # Do not run in 2a mode because of the "chrono:1345:24: error: unknown type name 'strong_ordering'"
-            os: ubuntu-20.04
-            cxxflags: "cxxflags=--coverage"
-            linkflags: "linkflags=--coverage"
-            gcov_tool: "llvm-cov-9 gcov"
           - toolset: clang
             compiler: clang++-10
             cxxstd: "03,11,14,17,2a"
