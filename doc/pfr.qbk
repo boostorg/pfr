@@ -55,10 +55,10 @@ user_info retrieve_friend(std::string_view name) {
 
     db::insert(
         "INSERT INTO user_infos(id, name, email, login) VALUES ($0, $1, $2, $3)",
-        std::move(friend_info.id),    //////////////////////////////////////////////
-        std::move(friend_info.name),  // Users are forced to move individual fields
-        std::move(friend_info.email), // because your library can not iterate over
-        std::move(friend_info.login)  // the fields of a user provided structure
+        friend_info.id,    /////////////////////////////////////////////////////////
+        friend_info.name,  // Users are forced to enumerate fields because your
+        friend_info.email, // library can not iterate over the fields of a user
+        friend_info.login  // provided structure
     );
 
     return friend_info;
@@ -94,8 +94,8 @@ user_info retrieve_friend(std::string_view name) {
     db::insert(
         "INSERT INTO user_infos(id, name, email, login) VALUES ($0, $1, $2, $3)",
         friend_info     ////////////////////////////////////////////////////////////
-                        // Boost.PFR allows you to iterate over all the fields of a
-                        // user provided structure
+                        // Boost.PFR allows you to iterate over all the fields
+                        // of a user provided structure
                         //
     );
 
