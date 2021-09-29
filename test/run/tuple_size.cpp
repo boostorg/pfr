@@ -12,5 +12,8 @@ int main() {
 
     struct with_reference { int& i; char data; };
     static_assert(boost::pfr::tuple_size_v<with_reference> == 2, "");
+
+    struct empty {};
+    static_assert(boost::pfr::tuple_size_v<empty> == 0, "");
 }
 

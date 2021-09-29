@@ -54,6 +54,8 @@ struct simple {
     short d;
 };
 
+struct empty{};
+
 
 int main () {
     std::size_t control = 0;
@@ -108,6 +110,13 @@ int main () {
         ss << val << ' ';
     });
     BOOST_TEST_EQ("42 a 3 ", ss.str());
+    ss.str("");
+
+    boost::pfr::for_each_field(empty{},  [&ss](auto&& val) {
+        ss << val << ' ';
+    });
+    BOOST_TEST_EQ("", ss.str());
+    ss.str("");
 
     return boost::report_errors();
 }
