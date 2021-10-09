@@ -49,7 +49,7 @@ Edgar Allan Poe was born in 1809
 ### Motivating Example #1
 ```c++
 #include <iostream>
-#include "boost/pfr/precise.hpp"
+#include "boost/pfr.hpp"
 
 struct my_struct { // no ostream operator defined!
     int i;
@@ -74,7 +74,7 @@ my_struct has 3 fields: {100, H, 3.14159}
 
 ```c++
 #include <iostream>
-#include "boost/pfr/precise.hpp"
+#include "boost/pfr.hpp"
 
 struct my_struct { // no ostream operator defined!
     std::string s;
