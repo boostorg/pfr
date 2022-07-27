@@ -602,8 +602,8 @@ template <class T, std::size_t... I>
 struct is_constexpr_aggregate_initializable {
     template<class T2, std::size_t... I2>
     static constexpr void* constexpr_aggregate_initializer() {
-        const auto t = T2{ ubiq_constructor_constexpr_copy{I2}... };
-        (void)t;
+        T2 tmp{ ubiq_constructor_constexpr_copy{I2}... };
+        (void)tmp;
         return nullptr;
     }
 
