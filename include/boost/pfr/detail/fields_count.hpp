@@ -93,6 +93,13 @@ struct is_aggregate_initializable_n {
 
 #endif // #ifndef __cpp_lib_is_aggregate
 
+// Hand-made is_empty_array<T> trait
+template<class T>
+struct is_empty_array : std::false_type {};
+
+template<class T>
+struct is_empty_array<T[0]> : std::true_type {};
+
 ///////////////////// Detect aggregates with inheritance
 template <class Derived, class U>
 constexpr bool static_assert_non_inherited() noexcept {
@@ -256,7 +263,9 @@ constexpr std::size_t detect_fields_count_dispatch(size_t_<N>, int, int) noexcep
 
 ///////////////////// Returns fields count
 template <class T>
-constexpr std::size_t fields_count() noexcept {
+constexpr auto fields_count() noexcept
+    -> typename std::enable_if<!is_empty_array<T>::value, std::size_t>::type
+{
     using type = std::remove_cv_t<T>;
 
     static_assert(
@@ -319,6 +328,13 @@ constexpr std::size_t fields_count() noexcept {
     );
 
     return result;
+}
+
+template <class T>
+constexpr auto fields_count() noexcept
+    -> typename std::enable_if<is_empty_array<T>::value, std::size_t>::type
+{
+    return 0;
 }
 
 }}} // namespace boost::pfr::detail
