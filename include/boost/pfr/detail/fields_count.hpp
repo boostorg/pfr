@@ -11,6 +11,7 @@
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 #include <boost/pfr/detail/size_t_.hpp>
 #include <boost/pfr/detail/unsafe_declval.hpp>
+#include <boost/pfr/detail/type_identity.hpp>
 
 #include <climits>      // CHAR_BIT
 #include <type_traits>
@@ -256,7 +257,7 @@ constexpr std::size_t detect_fields_count_dispatch(size_t_<N>, int, int) noexcep
 
 ///////////////////// Returns fields count
 template <class T>
-constexpr std::size_t fields_count() noexcept {
+constexpr std::size_t fields_count(type_identity<T>) noexcept {
     using type = std::remove_cv_t<T>;
 
     static_assert(

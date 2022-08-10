@@ -56,7 +56,7 @@ struct io_fields_impl {
 template <class Char, class Traits, class T>
 std::basic_ostream<Char, Traits>& operator<<(std::basic_ostream<Char, Traits>& out, io_fields_impl<const T&>&& x) {
     const T& value = x.value;
-    constexpr std::size_t fields_count_val = boost::pfr::detail::fields_count<T>();
+    constexpr std::size_t fields_count_val = boost::pfr::detail::fields_count(detail::type_identity<T>());
     out << '{';
 #if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
     detail::print_impl<0, fields_count_val>::print(out, detail::tie_as_tuple(value));
@@ -66,7 +66,7 @@ std::basic_ostream<Char, Traits>& operator<<(std::basic_ostream<Char, Traits>& o
         [&out](const auto& val) {
             // We can not reuse `fields_count_val` in lambda because compilers had issues with
             // passing constexpr variables into lambdas. Computing is again is the most portable solution.
-            constexpr std::size_t fields_count_val_lambda = boost::pfr::detail::fields_count<T>();
+            constexpr std::size_t fields_count_val_lambda = boost::pfr::detail::fields_count(detail::type_identity<T>());
             detail::print_impl<0, fields_count_val_lambda>::print(out, val);
         },
         detail::make_index_sequence<fields_count_val>{}
@@ -84,7 +84,7 @@ std::basic_ostream<Char, Traits>& operator<<(std::basic_ostream<Char, Traits>& o
 template <class Char, class Traits, class T>
 std::basic_istream<Char, Traits>& operator>>(std::basic_istream<Char, Traits>& in, io_fields_impl<T&>&& x) {
     T& value = x.value;
-    constexpr std::size_t fields_count_val = boost::pfr::detail::fields_count<T>();
+    constexpr std::size_t fields_count_val = boost::pfr::detail::fields_count(detail::type_identity<T>());
 
     const auto prev_exceptions = in.exceptions();
     in.exceptions( typename std::basic_istream<Char, Traits>::iostate(0) );
@@ -102,7 +102,7 @@ std::basic_istream<Char, Traits>& operator>>(std::basic_istream<Char, Traits>& i
         [&in](const auto& val) {
             // We can not reuse `fields_count_val` in lambda because compilers had issues with
             // passing constexpr variables into lambdas. Computing is again is the most portable solution.
-            constexpr std::size_t fields_count_val_lambda = boost::pfr::detail::fields_count<T>();
+            constexpr std::size_t fields_count_val_lambda = boost::pfr::detail::fields_count(detail::type_identity<T>());
             detail::read_impl<0, fields_count_val_lambda>::read(in, val);
         },
         detail::make_index_sequence<fields_count_val>{}

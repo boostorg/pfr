@@ -150,7 +150,7 @@ struct loophole_type_list_selector<false /*IsCopyConstructible*/, T, U> {
 template <class T>
 auto tie_as_tuple_loophole_impl(T& lvalue) noexcept {
     using type = std::remove_cv_t<std::remove_reference_t<T>>;
-    using indexes = detail::make_index_sequence<fields_count<type>()>;
+    using indexes = detail::make_index_sequence<fields_count(detail::type_identity<type>())>;
     using loophole_type_list = typename detail::loophole_type_list_selector<
         std::is_copy_constructible<std::remove_all_extents_t<type>>::value, type, indexes
     >::type;

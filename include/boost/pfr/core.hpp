@@ -182,14 +182,14 @@ constexpr auto structure_tie(T&&, std::enable_if_t< std::is_rvalue_reference<T&&
 /// \endcode
 template <class T, class F>
 void for_each_field(T&& value, F&& func) {
-    constexpr std::size_t fields_count_val = boost::pfr::detail::fields_count<std::remove_reference_t<T>>();
+    constexpr std::size_t fields_count_val = boost::pfr::detail::fields_count(detail::type_identity< std::remove_reference_t<T> >());
 
     ::boost::pfr::detail::for_each_field_dispatcher(
         value,
         [f = std::forward<F>(func)](auto&& t) mutable {
             // MSVC related workaround. Its lambdas do not capture constexprs.
             constexpr std::size_t fields_count_val_in_lambda
-                = boost::pfr::detail::fields_count<std::remove_reference_t<T>>();
+                = boost::pfr::detail::fields_count(detail::type_identity< std::remove_reference_t<T> >());
 
             ::boost::pfr::detail::for_each_field_impl(
                 t,

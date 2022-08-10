@@ -20,6 +20,7 @@
 #include <boost/pfr/detail/size_array.hpp>
 #include <boost/pfr/detail/size_t_.hpp>
 #include <boost/pfr/detail/rvalue_t.hpp>
+#include <boost/pfr/detail/type_identity.hpp>
 
 #ifdef __clang__
 #   pragma clang diagnostic push
@@ -32,10 +33,6 @@
 namespace boost { namespace pfr { namespace detail {
 
 ///////////////////// General utility stuff
-
-template <class T> struct identity {
-    typedef T type;
-};
 
 template <class T>
 constexpr T construct_helper() noexcept { // adding const here allows to deal with copyable only types
@@ -113,15 +110,15 @@ using remove_1_ext = size_t_<
 
 ///////////////////// Forward declarations
 
-template <class Type> constexpr std::size_t type_to_id(identity<Type*>) noexcept;
-template <class Type> constexpr std::size_t type_to_id(identity<const Type*>) noexcept;
-template <class Type> constexpr std::size_t type_to_id(identity<const volatile Type*>) noexcept;
-template <class Type> constexpr std::size_t type_to_id(identity<volatile Type*>) noexcept;
-template <class Type> constexpr std::size_t type_to_id(identity<Type&>) noexcept;
-template <class Type> constexpr std::size_t type_to_id(identity<Type>, std::enable_if_t<std::is_enum<Type>::value>* = 0) noexcept;
-template <class Type> constexpr std::size_t type_to_id(identity<Type>, std::enable_if_t<std::is_empty<Type>::value>* = 0) noexcept;
-template <class Type> constexpr std::size_t type_to_id(identity<Type>, std::enable_if_t<std::is_union<Type>::value>* = 0) noexcept;
-template <class Type> constexpr size_array<sizeof(Type) * 3> type_to_id(identity<Type>, std::enable_if_t<!std::is_enum<Type>::value && !std::is_empty<Type>::value && !std::is_union<Type>::value>* = 0) noexcept;
+template <class Type> constexpr std::size_t type_to_id(type_identity<Type*>) noexcept;
+template <class Type> constexpr std::size_t type_to_id(type_identity<const Type*>) noexcept;
+template <class Type> constexpr std::size_t type_to_id(type_identity<const volatile Type*>) noexcept;
+template <class Type> constexpr std::size_t type_to_id(type_identity<volatile Type*>) noexcept;
+template <class Type> constexpr std::size_t type_to_id(type_identity<Type&>) noexcept;
+template <class Type> constexpr std::size_t type_to_id(type_identity<Type>, std::enable_if_t<std::is_enum<Type>::value>* = 0) noexcept;
+template <class Type> constexpr std::size_t type_to_id(type_identity<Type>, std::enable_if_t<std::is_empty<Type>::value>* = 0) noexcept;
+template <class Type> constexpr std::size_t type_to_id(type_identity<Type>, std::enable_if_t<std::is_union<Type>::value>* = 0) noexcept;
+template <class Type> constexpr size_array<sizeof(Type) * 3> type_to_id(type_identity<Type>, std::enable_if_t<!std::is_enum<Type>::value && !std::is_empty<Type>::value && !std::is_union<Type>::value>* = 0) noexcept;
 
 template <std::size_t Index> constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_const_ptr_type> = 0) noexcept;
 template <std::size_t Index> constexpr auto id_to_type(size_t_<Index >, if_extension<Index, native_ptr_type> = 0) noexcept;
@@ -133,7 +130,7 @@ template <std::size_t Index> constexpr auto id_to_type(size_t_<Index >, if_exten
 ///////////////////// Definitions of type_to_id and id_to_type for fundamental types
 /// @cond
 #define BOOST_MAGIC_GET_REGISTER_TYPE(Type, Index)              \
-    constexpr std::size_t type_to_id(identity<Type>) noexcept { \
+    constexpr std::size_t type_to_id(type_identity<Type>) noexcept { \
         return Index;                                           \
     }                                                           \
     constexpr Type id_to_type( size_t_<Index > ) noexcept {     \
@@ -174,8 +171,8 @@ constexpr std::size_t tuple_end_tag                 = 25;
 
 ///////////////////// Definitions of type_to_id and id_to_type for types with extensions and nested types
 template <class Type>
-constexpr std::size_t type_to_id(identity<Type*>) noexcept {
-    constexpr auto unptr = typeid_conversions::type_to_id(identity<Type>{});
+constexpr std::size_t type_to_id(type_identity<Type*>) noexcept {
+    constexpr auto unptr = typeid_conversions::type_to_id(type_identity<Type>{});
     static_assert(
         std::is_same<const std::size_t, decltype(unptr)>::value,
         "====================> Boost.PFR: Pointers to user defined types are not supported."
@@ -184,8 +181,8 @@ constexpr std::size_t type_to_id(identity<Type*>) noexcept {
 }
 
 template <class Type>
-constexpr std::size_t type_to_id(identity<const Type*>) noexcept {
-    constexpr auto unptr = typeid_conversions::type_to_id(identity<Type>{});
+constexpr std::size_t type_to_id(type_identity<const Type*>) noexcept {
+    constexpr auto unptr = typeid_conversions::type_to_id(type_identity<Type>{});
     static_assert(
         std::is_same<const std::size_t, decltype(unptr)>::value,
         "====================> Boost.PFR: Const pointers to user defined types are not supported."
@@ -194,8 +191,8 @@ constexpr std::size_t type_to_id(identity<const Type*>) noexcept {
 }
 
 template <class Type>
-constexpr std::size_t type_to_id(identity<const volatile Type*>) noexcept {
-    constexpr auto unptr = typeid_conversions::type_to_id(identity<Type>{});
+constexpr std::size_t type_to_id(type_identity<const volatile Type*>) noexcept {
+    constexpr auto unptr = typeid_conversions::type_to_id(type_identity<Type>{});
     static_assert(
         std::is_same<const std::size_t, decltype(unptr)>::value,
         "====================> Boost.PFR: Const volatile pointers to user defined types are not supported."
@@ -204,8 +201,8 @@ constexpr std::size_t type_to_id(identity<const volatile Type*>) noexcept {
 }
 
 template <class Type>
-constexpr std::size_t type_to_id(identity<volatile Type*>) noexcept {
-    constexpr auto unptr = typeid_conversions::type_to_id(identity<Type>{});
+constexpr std::size_t type_to_id(type_identity<volatile Type*>) noexcept {
+    constexpr auto unptr = typeid_conversions::type_to_id(type_identity<Type>{});
     static_assert(
         std::is_same<const std::size_t, decltype(unptr)>::value,
         "====================> Boost.PFR: Volatile pointers to user defined types are not supported."
@@ -214,8 +211,8 @@ constexpr std::size_t type_to_id(identity<volatile Type*>) noexcept {
 }
 
 template <class Type>
-constexpr std::size_t type_to_id(identity<Type&>) noexcept {
-    constexpr auto unptr = typeid_conversions::type_to_id(identity<Type>{});
+constexpr std::size_t type_to_id(type_identity<Type&>) noexcept {
+    constexpr auto unptr = typeid_conversions::type_to_id(type_identity<Type>{});
     static_assert(
         std::is_same<const std::size_t, decltype(unptr)>::value,
         "====================> Boost.PFR: References to user defined types are not supported."
@@ -224,18 +221,18 @@ constexpr std::size_t type_to_id(identity<Type&>) noexcept {
 }
 
 template <class Type>
-constexpr std::size_t type_to_id(identity<Type>, std::enable_if_t<std::is_enum<Type>::value>*) noexcept {
-    return typeid_conversions::type_to_id(identity<typename std::underlying_type<Type>::type >{});
+constexpr std::size_t type_to_id(type_identity<Type>, std::enable_if_t<std::is_enum<Type>::value>*) noexcept {
+    return typeid_conversions::type_to_id(type_identity<typename std::underlying_type<Type>::type >{});
 }
 
 template <class Type>
-constexpr std::size_t type_to_id(identity<Type>, std::enable_if_t<std::is_empty<Type>::value>*) noexcept {
+constexpr std::size_t type_to_id(type_identity<Type>, std::enable_if_t<std::is_empty<Type>::value>*) noexcept {
     static_assert(!std::is_empty<Type>::value, "====================> Boost.PFR: Empty classes/structures as members are not supported.");
     return 0;
 }
 
 template <class Type>
-constexpr std::size_t type_to_id(identity<Type>, std::enable_if_t<std::is_union<Type>::value>*) noexcept {
+constexpr std::size_t type_to_id(type_identity<Type>, std::enable_if_t<std::is_union<Type>::value>*) noexcept {
     static_assert(
         !std::is_union<Type>::value,
         "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."
@@ -244,7 +241,7 @@ constexpr std::size_t type_to_id(identity<Type>, std::enable_if_t<std::is_union<
 }
 
 template <class Type>
-constexpr size_array<sizeof(Type) * 3> type_to_id(identity<Type>, std::enable_if_t<!std::is_enum<Type>::value && !std::is_empty<Type>::value && !std::is_union<Type>::value>*) noexcept {
+constexpr size_array<sizeof(Type) * 3> type_to_id(type_identity<Type>, std::enable_if_t<!std::is_enum<Type>::value && !std::is_empty<Type>::value && !std::is_union<Type>::value>*) noexcept {
     constexpr auto t = detail::flat_array_of_type_ids<Type>();
     size_array<sizeof(Type) * 3> result {{tuple_begin_tag}};
     constexpr bool requires_tuplening = (
@@ -314,7 +311,7 @@ struct ubiq_val {
 
     template <class Type>
     constexpr operator Type() const noexcept {
-        constexpr auto typeids = typeid_conversions::type_to_id(identity<Type>{});
+        constexpr auto typeids = typeid_conversions::type_to_id(type_identity<Type>{});
         assign(typeids);
         return detail::construct_helper<Type>();
     }
@@ -367,7 +364,7 @@ constexpr void* flat_type_to_array_of_type_ids(std::size_t* types, std::index_se
 template <class T>
 constexpr size_array<sizeof(T) * 3> fields_count_and_type_ids_with_zeros() noexcept {
     size_array<sizeof(T) * 3> types{};
-    constexpr std::size_t N = detail::fields_count<T>();
+    constexpr std::size_t N = detail::fields_count(detail::type_identity<T>());
     detail::flat_type_to_array_of_type_ids<T, N>(types.data, detail::make_index_sequence<N>());
     return types;
 }
@@ -574,7 +571,7 @@ auto tie_as_tuple(T& val) noexcept {
         "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."
     );
     static_assert(
-        boost::pfr::detail::is_flat_refelectable<T>( detail::make_index_sequence<boost::pfr::detail::fields_count<T>()>{} ),
+        boost::pfr::detail::is_flat_refelectable<T>( detail::make_index_sequence<boost::pfr::detail::fields_count(detail::type_identity<T>())>{} ),
         "====================> Boost.PFR: Not possible in C++14 to represent that type without loosing information. Change type definition or enable C++17"
     );
     return boost::pfr::detail::tie_as_flat_tuple(val);
@@ -610,10 +607,10 @@ struct is_constexpr_aggregate_initializable { // TODO: try to fix it
 
 
 template <class T, class F, std::size_t I0, std::size_t... I, class... Fields>
-void for_each_field_in_depth(T& t, F&& f, std::index_sequence<I0, I...>, identity<Fields>...);
+void for_each_field_in_depth(T& t, F&& f, std::index_sequence<I0, I...>, type_identity<Fields>...);
 
 template <class T, class F, class... Fields>
-void for_each_field_in_depth(T& t, F&& f, std::index_sequence<>, identity<Fields>...);
+void for_each_field_in_depth(T& t, F&& f, std::index_sequence<>, type_identity<Fields>...);
 
 template <class T, class F, class IndexSeq, class... Fields>
 struct next_step {
@@ -626,8 +623,8 @@ struct next_step {
              t,
              std::forward<F>(f),
              IndexSeq{},
-             identity<Fields>{}...,
-             identity<Field>{}
+             type_identity<Fields>{}...,
+             type_identity<Field>{}
          );
 
          return {};
@@ -635,7 +632,7 @@ struct next_step {
 };
 
 template <class T, class F, std::size_t I0, std::size_t... I, class... Fields>
-void for_each_field_in_depth(T& t, F&& f, std::index_sequence<I0, I...>, identity<Fields>...) {
+void for_each_field_in_depth(T& t, F&& f, std::index_sequence<I0, I...>, type_identity<Fields>...) {
     (void)std::add_const_t<std::remove_reference_t<T>>{
         Fields{}...,
         next_step<T, F, std::index_sequence<I...>, Fields...>{t, f},
@@ -644,7 +641,7 @@ void for_each_field_in_depth(T& t, F&& f, std::index_sequence<I0, I...>, identit
 }
 
 template <class T, class F, class... Fields>
-void for_each_field_in_depth(T& lvalue, F&& f, std::index_sequence<>, identity<Fields>...) {
+void for_each_field_in_depth(T& lvalue, F&& f, std::index_sequence<>, type_identity<Fields>...) {
     using tuple_type = sequence_tuple::tuple<Fields...>;
 
     offset_based_getter<std::remove_cv_t<std::remove_reference_t<T>>, tuple_type> getter;

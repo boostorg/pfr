@@ -11,5 +11,5 @@ struct some_struct {
 };
 
 int main() {
-    static_assert(boost::pfr::detail::fields_count<const some_struct>() == 2, "");
+    static_assert(boost::pfr::detail::fields_count(boost::pfr::detail::type_identity<const some_struct>()) == 2, "");
 }

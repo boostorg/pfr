@@ -51,7 +51,7 @@ constexpr auto tie_as_tuple(T& val) noexcept {
     !std::is_union<T>::value,
     "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."
   );
-  typedef size_t_<boost::pfr::detail::fields_count<T>()> fields_count_tag;
+  typedef size_t_<boost::pfr::detail::fields_count(detail::type_identity<T>())> fields_count_tag;
   return boost::pfr::detail::tie_as_tuple(val, fields_count_tag{});
 }
 

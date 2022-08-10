@@ -103,7 +103,7 @@ namespace boost { namespace pfr {
     /// \returns combined hash of all the fields
     template <class T>
     std::size_t hash_fields(const T& x) {
-        constexpr std::size_t fields_count_val = boost::pfr::detail::fields_count<std::remove_reference_t<T>>();
+        constexpr std::size_t fields_count_val = boost::pfr::detail::fields_count(detail::type_identity< std::remove_reference_t<T> >());
 #if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
         return detail::hash_impl<0, fields_count_val>::compute(detail::tie_as_tuple(x));
 #else
@@ -113,7 +113,7 @@ namespace boost { namespace pfr {
             [&result](const auto& lhs) {
                 // We can not reuse `fields_count_val` in lambda because compilers had issues with
                 // passing constexpr variables into lambdas. Computing is again is the most portable solution.
-                constexpr std::size_t fields_count_val_lambda = boost::pfr::detail::fields_count<std::remove_reference_t<T>>();
+                constexpr std::size_t fields_count_val_lambda = boost::pfr::detail::fields_count(detail::type_identity< std::remove_reference_t<T> >());
                 result = detail::hash_impl<0, fields_count_val_lambda>::compute(lhs);
             },
             detail::make_index_sequence<fields_count_val>{}
