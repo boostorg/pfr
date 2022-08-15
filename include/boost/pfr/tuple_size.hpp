@@ -30,7 +30,8 @@ namespace boost { namespace pfr {
 ///     std::array<int, boost::pfr::tuple_size<my_structure>::value > a;
 /// \endcode
 template <class T>
-using tuple_size = detail::size_t_< boost::pfr::detail::fields_count<T>() >;
+struct tuple_size : detail::size_t_< boost::pfr::detail::fields_count<T>() > {};
+
 
 
 /// `tuple_size_v` is a template variable that contains fields count in a T and

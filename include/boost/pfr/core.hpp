@@ -78,17 +78,7 @@ constexpr auto get(T&& val, std::enable_if_t< std::is_rvalue_reference<T&&>::val
 ///     std::vector< boost::pfr::tuple_element<0, my_structure>::type > v;
 /// \endcode
 template <std::size_t I, class T>
-using tuple_element = detail::sequence_tuple::tuple_element<I, decltype( ::boost::pfr::detail::tie_as_tuple(std::declval<T&>()) ) >;
-
-
-/// \brief Type of a field with index `I` in \aggregate `T`.
-///
-/// \b Example:
-/// \code
-///     std::vector< boost::pfr::tuple_element_t<0, my_structure> > v;
-/// \endcode
-template <std::size_t I, class T>
-using tuple_element_t = typename tuple_element<I, T>::type;
+struct tuple_element : detail::sequence_tuple::tuple_element<I, decltype( ::boost::pfr::detail::tie_as_tuple(std::declval<T&>()) ) > {};
 
 
 /// \brief Creates a `std::tuple` from fields of an \aggregate `val`.
@@ -220,6 +210,16 @@ template <typename... Elements>
 constexpr detail::tie_from_structure_tuple<Elements...> tie_from_structure(Elements&... args) noexcept {
     return detail::tie_from_structure_tuple<Elements...>(args...);
 }
+
+
+/// \brief Type of a field with index `I` in \aggregate `T`.
+///
+/// \b Example:
+/// \code
+///     std::vector< boost::pfr::tuple_element_t<0, my_structure> > v;
+/// \endcode
+template <std::size_t I, class T>
+using tuple_element_t = typename tuple_element<I, T>::type;
 
 }} // namespace boost::pfr
 
