@@ -26,6 +26,9 @@
 
 namespace boost { namespace pfr { namespace detail {
 
+///////////////////// Tag that can be used to say that this type is not reflectable(for internal use only)
+struct guaranteed_nonreflectable {};
+
 ///////////////////// Structure that can be converted to reference to anything
 struct ubiq_lref_constructor {
     std::size_t ignore;
@@ -262,6 +265,11 @@ constexpr std::size_t fields_count() noexcept {
     static_assert(
         !std::is_reference<type>::value,
         "====================> Boost.PFR: Attempt to get fields count on a reference. This is not allowed because that could hide an issue and different library users expect different behavior in that case."
+    );
+
+    static_assert(
+        !std::is_base_of<guaranteed_nonreflectable, type>::value,
+        "====================> Boost.PFR: Type is non-reflectable"
     );
 
 #if !BOOST_PFR_HAS_GUARANTEED_COPY_ELISION
