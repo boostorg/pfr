@@ -601,7 +601,7 @@ struct ubiq_constructor_constexpr_copy {
 template <class T, std::size_t... I>
 struct is_constexpr_aggregate_initializable {
     template<class T2, std::size_t... I2>
-    static constexpr void* constexpr_aggregate_initializer() {
+    static constexpr void* constexpr_aggregate_initializer() noexcept {
         T2 tmp{ ubiq_constructor_constexpr_copy{I2}... };
         (void)tmp;
         return nullptr;
