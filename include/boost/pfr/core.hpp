@@ -77,9 +77,24 @@ constexpr auto get(T&& val, std::enable_if_t< std::is_rvalue_reference<T&&>::val
 /// \code
 ///     std::vector< boost::pfr::tuple_element<0, my_structure>::type > v;
 /// \endcode
+/// \note The behavior of a program that adds specializations for tuple_element is undefined.
 template <std::size_t I, class T>
 struct tuple_element : detail::sequence_tuple::tuple_element<I, decltype( ::boost::pfr::detail::tie_as_tuple(std::declval<T&>()) ) > {};
 
+template<std::size_t I, class T>
+struct tuple_element<I, const T> {
+    using type = std::add_const_t<typename boost::pfr::tuple_element<I, T>::type>;
+};
+
+template<std::size_t I, class T>
+struct tuple_element<I, volatile T> {
+    using type = std::add_volatile_t<typename boost::pfr::tuple_element<I, T>::type>;
+};
+
+template<std::size_t I, class T>
+struct tuple_element<I, const volatile T> {
+    using type = std::add_cv_t<typename boost::pfr::tuple_element<I, T>::type>;
+};
 
 /// \brief Creates a `std::tuple` from fields of an \aggregate `val`.
 ///

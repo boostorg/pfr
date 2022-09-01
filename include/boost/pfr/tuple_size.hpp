@@ -29,9 +29,18 @@ namespace boost { namespace pfr {
 /// \code
 ///     std::array<int, boost::pfr::tuple_size<my_structure>::value > a;
 /// \endcode
+/// \note The behavior of a program that adds specializations for tuple_size is undefined.
 template <class T>
 struct tuple_size : detail::size_t_< boost::pfr::detail::fields_count<T>() > {};
 
+template<class T>
+struct tuple_size<const T> : detail::size_t_< boost::pfr::tuple_size<T>::value > {};
+
+template<class T>
+struct tuple_size<volatile T> : detail::size_t_< boost::pfr::tuple_size<T>::value > {};
+
+template<class T>
+struct tuple_size<const volatile T> : detail::size_t_< boost::pfr::tuple_size<T>::value > {};
 
 
 /// `tuple_size_v` is a template variable that contains fields count in a T and
@@ -41,6 +50,7 @@ struct tuple_size : detail::size_t_< boost::pfr::detail::fields_count<T>() > {};
 /// \code
 ///     std::array<int, boost::pfr::tuple_size_v<my_structure> > a;
 /// \endcode
+/// \note The behavior of a program that adds specializations for tuple_size_v is undefined.
 template <class T>
 constexpr std::size_t tuple_size_v = tuple_size<T>::value;
 
