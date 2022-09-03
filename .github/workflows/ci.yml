@@ -35,11 +35,12 @@ jobs:
             os: ubuntu-20.04
             cxxflags: "cxxflags=-fsanitize=address,undefined,integer -fno-sanitize-recover=undefined"
             linkflags: "linkflags=-fsanitize=address,undefined,integer"
-          - toolset: clang
-            cxxstd: "03,11,14,17,2a"
-            os: macos-10.15
-            cxxflags: "cxxflags=-fsanitize=address,undefined -fno-sanitize-recover=undefined"
-            linkflags: "linkflags=-fsanitize=address,undefined"
+          # To low quota to use
+          #- toolset: clang
+          #  cxxstd: "03,11,14,17,2a"
+          #  os: macos-10.15
+          #  cxxflags: "cxxflags=-fsanitize=address,undefined -fno-sanitize-recover=undefined"
+          #  linkflags: "linkflags=-fsanitize=address,undefined"
 
     runs-on: ${{matrix.os}}
 
@@ -123,10 +124,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - toolset: msvc-14.1
+          - toolset: msvc
             cxxstd: "14,17,latest"
             addrmd: 32,64
-            os: windows-2016
+            os: windows-2022
           # TODO: fails the loophole tests
           #- toolset: msvc-14.2
           #  cxxstd: "14,17,latest"
