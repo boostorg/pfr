@@ -5,21 +5,14 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 #
 
-import os ;
 import python ;
 import testing ;
 import ../../config/checks/config : requires ;
 
-local USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS = <define>BOOST_PFR_USE_CPP17=0 ;
-
-if ! [ os.environ BOOST_PFR_TEST_WITH_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS ]
-{
-    USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS = ;
-}
 project
     : source-location .
     : requirements
-        <define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1 $(USE_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS)
+        <define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1
         [ requires cxx14_constexpr ]
     ;
 
@@ -105,12 +98,8 @@ local BLACKLIST_TESTS_FOR_CLASSIC =
 for local source_file in [ glob ./run/*.cpp ] [ glob ../example/*.cpp ]
 {
     local target_name = $(source_file[1]:B) ;
-
-    if ! [ os.environ BOOST_PFR_TEST_WITH_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS ]
-    {
-        pfr_tests += [ run $(source_file) : : : $(STRUCTURED_BINDING_ENGINE) : $(target_name)_sb ] ;
-    }
-
+    pfr_tests += [ run $(source_file) : : : $(STRUCTURED_BINDING_ENGINE) : $(target_name)_sb ] ;
+    
     if ! $(target_name) in $(BLACKLIST_TESTS_FOR_LOOPHOLE)
     {
         pfr_tests += [ run $(source_file) : : : $(LOOPHOLE_ENGINE) : $(target_name)_lh ] ;
@@ -133,12 +122,7 @@ for local source_file in [ glob ./run/*.cpp ] [ glob ../example/*.cpp ]
 for local source_file in [ glob ./compile-fail/*.cpp ]
 {
     local target_name = $(source_file[1]:B) ;
-
-    if ! [ os.environ BOOST_PFR_TEST_WITH_FALLBACK_FOR_BROKEN_STRUCTURED_BINDINGS ]
-    {
-        pfr_tests += [ compile-fail $(source_file) : $(STRUCTURED_BINDING_ENGINE) : $(target_name)_sb ] ;
-    }
-
+    pfr_tests += [ compile-fail $(source_file) : $(STRUCTURED_BINDING_ENGINE) : $(target_name)_sb ] ;
     pfr_tests += [ compile-fail $(source_file) : $(LOOPHOLE_ENGINE) : $(target_name)_lh ] ;
     pfr_tests += [ compile-fail $(source_file) : $(CLASSIC_ENGINE) : $(target_name)_classic ] ;
 }
