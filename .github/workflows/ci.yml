@@ -35,6 +35,17 @@ jobs:
             os: ubuntu-20.04
             cxxflags: "cxxflags=-fsanitize=address,undefined,integer -fno-sanitize-recover=undefined"
             linkflags: "linkflags=-fsanitize=address,undefined,integer"
+          - toolset: clang-5.0
+            cxxstd: "03,11,14,17,2a"
+            os: "ubuntu-20.04"
+            container: "ubuntu:16.04"
+            buildtype: "boost"
+            packages: "clang-5.0"
+            packages_to_remove: ""
+            cxx: "g++"
+            sources: ""
+            llvm_os: "xenial"
+            llvm_ver: "5.0"
           # To low quota to use
           #- toolset: clang
           #  cxxstd: "03,11,14,17,2a"
