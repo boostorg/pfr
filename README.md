@@ -15,6 +15,8 @@ Master:         | [![CI](https://github.com/boostorg/pfr/actions/workflows/ci.ym
 
 [Latest developer documentation](https://www.boost.org/doc/libs/develop/doc/html/boost_pfr.html)
 
+TODO: add boost spirit motivating example
+
 ### Motivating Example #0
 ```c++
 #include <iostream>

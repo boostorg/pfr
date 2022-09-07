@@ -400,6 +400,12 @@ All the `*_fields` functions do ignore user defined operators and work only with
 [endsect]
 
 
+
+[section Three ways Boost.PFR interacts with other libraries ]
+TODO write docs
+[endsect]
+
+
 [section Reflection of unions ]
 
 You could use tuple-like representation if a type contains union. But be sure that operations for union are manually defined:
