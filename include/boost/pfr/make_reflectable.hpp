@@ -27,25 +27,33 @@
 
 namespace boost { namespace pfr {
 
-template<class T, class... U, std::enable_if_t<!boost::pfr::is_view<T>::value>* = nullptr>
-constexpr T make_reflectable(U&&... u) {
+template<class T, class F>
+constexpr T make_reflectable(F&& make_element_func);
+
+namespace detail {
+template<class T, class... U>
+constexpr T make_reflectable_impl(std::false_type, U&&... u) {
     static_assert(!boost::pfr::is_reference<T>::value, "====================> Boost.PFR: Can't return a reference to anything");
     return T{std::forward<U>(u)...};
 }
 
-template<class T, class... U, std::enable_if_t<boost::pfr::is_view<T>::value>* = nullptr>
-constexpr T make_reflectable(U&&... u) {
-    using underlying_type = detail::remove_cvref_t<decltype(std::declval<T>().value)>;
+template<class T, class... U>
+constexpr T make_reflectable_impl(std::true_type, U&&... u) {
+    using underlying_type = std::remove_reference_t<decltype(std::declval<T>().value)>;
     static_assert(!boost::pfr::is_reference<T>::value, "====================> Boost.PFR: Can't return a reference to anything");
     return boost::pfr::view(underlying_type{std::forward<U>(u)...});
 }
 
-namespace detail {
 template<class T, class F, std::size_t... I>
 constexpr T make_reflectable_impl(F&& make_element_func, std::index_sequence<I...>) {
     return boost::pfr::make_reflectable<T>(make_element_func(size_t_<I>{})...);
 }
 } // namespace detail
+
+template<class T, class... U>
+constexpr T make_reflectable(U&&... u) {
+    return detail::make_reflectable_impl<T>(boost::pfr::is_view<T>{}, std::forward<U>(u)...);
+}
 
 template<class T, class F>
 constexpr T make_reflectable(F&& make_element_func) {

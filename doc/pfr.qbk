@@ -168,6 +168,8 @@ Boost.PFR adds the following out-of-the-box functionality for aggregate initiali
 * member type retrieval
 * methods for cooperation with `std::tuple`
 * methods to visit each field of the structure
+* trait to detect an ability to reflect type
+* methods for make some type reflectable
 
 Boost.PFR is a header only library that does not depend on Boost. You can just copy the content of the "include" folder [@https://github.com/boostorg/pfr from the Boost.PFR github] into your project, and the library will work fine. For a version of the library without `boost::` namespace see [@https://github.com/apolukhin/pfr_non_boost PFR].
 
@@ -402,7 +404,37 @@ All the `*_fields` functions do ignore user defined operators and work only with
 
 
 [section Three ways Boost.PFR interacts with other libraries ]
-TODO write docs
+
+There are three ways to start using Boost.PFR from other library for type `T` in your code. Each method has its own drawbacks and suits own cases.
+
+[table:ops_comp Different approaches for interaction
+    [[ Approach
+    ][ When to use
+    ][ Works for local types ][ Usable locally, without affecting code from other scopes ][ Respects reflection from a type's own library ]]
+
+    [[
+        [headerref boost/pfr/view.hpp boost/pfr/view.hpp: view]
+    ][
+        Use when you need to access values by library's provided for them reflection or via field-by-field reflection.
+    ][ yes ][ yes ][ yes ]]
+
+    [[
+        [macroref BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_ALL BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_ALL(T)]
+    ][
+        Use near the type definition to adapt type for the whole set of PFR supported libraries.
+    ][ no ][ no ] [ no (compile time error) ]]
+
+    [[
+        [macroref BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_MANY BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_MANY(T)]
+    ][
+        Use to adapt type for the required set of PFR supported libraries.
+    ][ no ][ no ] [ no (compile time error) ]]
+]
+
+More detailed description follows:
+TODO: continue
+TODO: check that macro dont respect library's reflection and produce compile time error, put example for it here
+
 [endsect]
 
 

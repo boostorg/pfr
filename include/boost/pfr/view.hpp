@@ -11,8 +11,6 @@
 
 #include <boost/pfr/core.hpp>
 
-// TODO: here must be external link to boost::fusion::at_c, x3::*
-
 /// \file boost/pfr/view.hpp
 /// Contains View manipulator \forcedlink{view} for types.
 /// If type is reflectable using its own library, then the library's reflection is used.
@@ -31,11 +29,9 @@
 ///
 ///    adaptable_struct s;
 ///    const std::string str = "3.141 10";
-///    x3::phrase_parse(str.begin(),
-///                     str.end(),
-///                     x3::double_ >> x3::int_,
-///                     x3::blank,
-///                     boost::pfr::view(s));
+///    const auto b = str.begin(), e = str.end();
+///    const auto v = boost::pfr::view(s);
+///    x3::phrase_parse(b, e, x3::double_ >> x3::int_, x3::blank, v);
 ///    std::cout << s.f << ", " << s.s; // Outputs: 3.141, 10
 /// \endcode
 ///
@@ -46,93 +42,99 @@
 namespace boost { namespace pfr {
 
 template<std::size_t I, class T>
-constexpr decltype(auto) get( detail::view_impl<T>& t ) noexcept {
+constexpr decltype(auto) get(
+#ifdef BOOST_PFR_DOXYGEN_INVOKED
+                             view_t<T>&
+#else
+                             detail::view_impl<T>&
+#endif
+                             t ) noexcept {
     return boost::pfr::get<I>(t.value);
 }
 
+// TODO: more BOOST_PFR_DOXYGEN_INVOKED
 template<std::size_t I, class T>
-constexpr decltype(auto) get( detail::view_impl<T>&& t ) noexcept {
+constexpr decltype(auto) get( view_t<T>&& t ) noexcept {
     return boost::pfr::get<I>(std::forward<T>(t.value));
 }
 
 template<std::size_t I, class T>
-constexpr decltype(auto) get( const detail::view_impl<T>& t ) noexcept {
+constexpr decltype(auto) get( const view_t<T>& t ) noexcept {
     return boost::pfr::get<I>(t.value);
 }
 
 template<std::size_t I, class T>
-constexpr decltype(auto) get( const detail::view_impl<T>&& t ) noexcept {
+constexpr decltype(auto) get( const view_t<T>&& t ) noexcept {
     return boost::pfr::get<I>(std::forward<T>(t.value));
 }
 
 template<std::size_t I, class T>
-struct tuple_element<I, detail::view_impl<T> >
+struct tuple_element<I, view_t<T> >
     : boost::pfr::tuple_element<I, std::remove_reference_t<T>>
 {};
 
-// TODO: fix unspecified in the docs
 template <class T>
-constexpr auto structure_to_tuple(detail::view_impl<T>& t) noexcept {
+constexpr auto structure_to_tuple(view_t<T>& t) noexcept {
     return boost::pfr::structure_to_tuple(t.value);
 }
 
 template <class T>
-constexpr auto structure_to_tuple(detail::view_impl<T>&& t) noexcept {
+constexpr auto structure_to_tuple(view_t<T>&& t) noexcept {
     return boost::pfr::structure_to_tuple(std::forward<T>(t.value));
 }
 
 template <class T>
-constexpr auto structure_to_tuple(const detail::view_impl<T>& t) noexcept {
+constexpr auto structure_to_tuple(const view_t<T>& t) noexcept {
     return boost::pfr::structure_to_tuple(t.value);
 }
 
 template <class T>
-constexpr auto structure_to_tuple(const detail::view_impl<T>&& t) noexcept {
+constexpr auto structure_to_tuple(const view_t<T>&& t) noexcept {
     return boost::pfr::structure_to_tuple(std::forward<T>(t.value));
 }
 
 template <class T>
-constexpr auto structure_tie(detail::view_impl<T>& t) noexcept {
+constexpr auto structure_tie(view_t<T>& t) noexcept {
     return boost::pfr::structure_tie(t.value);
 }
 
 template <class T>
-constexpr auto structure_tie(detail::view_impl<T>&& t) noexcept {
+constexpr auto structure_tie(view_t<T>&& t) noexcept {
     return boost::pfr::structure_tie(std::forward<T>(t.value));
 }
 
 template <class T>
-constexpr auto structure_tie(const detail::view_impl<T>& t) noexcept {
+constexpr auto structure_tie(const view_t<T>& t) noexcept {
     return boost::pfr::structure_tie(t.value);
 }
 
 template <class T>
-constexpr auto structure_tie(const detail::view_impl<T>&& t) noexcept {
+constexpr auto structure_tie(const view_t<T>&& t) noexcept {
     return boost::pfr::structure_tie(std::forward<T>(t.value));
 }
 
 template <class T, class F>
-void for_each_field(detail::view_impl<T>& t, F&& func) {
+void for_each_field(view_t<T>& t, F&& func) {
     boost::pfr::for_each_field(t.value, func);
 }
 
 template <class T, class F>
-void for_each_field(detail::view_impl<T>&& t, F&& func) {
+void for_each_field(view_t<T>&& t, F&& func) {
     boost::pfr::for_each_field(std::forward<T>(t.value), func);
 }
 
 template <class T, class F>
-void for_each_field(const detail::view_impl<T>& t, F&& func) {
+void for_each_field(const view_t<T>& t, F&& func) {
     boost::pfr::for_each_field(t.value, func);
 }
 
 template <class T, class F>
-void for_each_field(const detail::view_impl<T>&& t, F&& func) {
+void for_each_field(const view_t<T>&& t, F&& func) {
     boost::pfr::for_each_field(std::forward<T>(t.value), func);
 }
 
 template <class T>
-struct tuple_size<detail::view_impl<T>>
+struct tuple_size<view_t<T>>
     : boost::pfr::tuple_size<std::remove_reference_t<T>>
 {};
 
