@@ -17,8 +17,9 @@
 ///
 /// \b Example:
 /// \code
+///     #include <boost/pfr/view.hpp>
 ///     #include <boost/spirit/home/x3.hpp>
-///     #include <boost/fusion/adapted/boost_pfr.hpp> // contains inclusion of `boost/pfr/view.hpp` inside
+///     #include <boost/fusion/adapted/boost_pfr.hpp>
 ///
 ///     namespace x3 = boost::spirit::x3;
 ///

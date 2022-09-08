@@ -421,19 +421,83 @@ There are three ways to start using Boost.PFR from other library for type `T` in
     [[
         [macroref BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_ALL BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_ALL(T)]
     ][
-        Use near the type definition to adapt type for the whole set of PFR supported libraries.
-    ][ no ][ no ] [ no (compile time error) ]]
+        Use near the type definition to adapt type for the whole set of Boost.PFR supported libraries.
+    ][ no ][ no ] [ no (undefined behavior) ]]
 
     [[
-        [macroref BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_MANY BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_MANY(T)]
+        [macroref BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_MANY BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_MANY(T, ...)]
     ][
-        Use to adapt type for the required set of PFR supported libraries.
-    ][ no ][ no ] [ no (compile time error) ]]
+        Use to adapt type for the required set of Boost.PFR supported libraries.
+    ][ no ][ no ] [ no (undefined behavior) ]]
 ]
 
 More detailed description follows:
-TODO: continue
-TODO: check that macro dont respect library's reflection and produce compile time error, put example for it here
+
+[*1. `view` approach]
+
+This method is good if you're writing generic algorithms using a library with tuple-like requirements for a type and need to use reflection from Boost.PFR only if the type can't be recognized by the library:
+
+```
+#include <boost/pfr/view.hpp>
+#include <boost/fusion/adapted/boost_pfr.hpp>
+#include <boost/fusion/sequence/comparison/less.hpp>
+
+template <class T>
+struct uniform_comparator_less {
+    bool operator()(const T& lhs, const T& rhs) const noexcept {
+        // If T is a Fusion Sequence then Boost.PFR won't be used
+        return boost::fusion::less(boost::pfr::view(lhs), boost::pfr::view(rhs));
+    }
+};
+```
+This methods effects are local to the function. It works even for local types, like structures defined in functions.
+
+
+[*2. BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_ALL(T) approach]
+
+This method is good if you're writing a structure and wish to declare this structure reflectable using Boost.PFR and reflectable for all Boost.PFR-supported libraries.
+```
+#include <boost/pfr/registrate_reflectable.hpp>
+#include <boost/fusion/adapted/boost_pfr.hpp>
+#include <boost/fusion/sequence/comparison/less.hpp>
+
+
+struct pair_like {
+    int first;
+    short second;
+};
+
+BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_ALL(pair_like)   // Tells that `pair_like` reflectable
+
+// ...
+
+static_assert(boost::pfr::is_reflectable_v<pair_like>, "");
+assert(boost::fusion::less(pair_like{1, 2}, pair_like{1, 3}));
+```
+
+[*3. BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_MANY(T, ...) approach]
+
+This method is good if you're willing to declare your type reflectable using Boost.PFR and reflectable for only some Boost.PFR-supported libraries.
+
+```
+#include <boost/pfr/registrate_reflectable.hpp>
+#include <boost/fusion/adapted/boost_pfr.hpp>
+#include <boost/fusion/sequence/comparison/less.hpp>
+
+
+struct pair_like {
+    int first;
+    short second;
+};
+
+BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_MANY(pair_like, boost::pfr::boost_fusion_tag)        // Tells that `pair_like` reflectable only for Boost.Fusion
+
+// ...
+
+static_assert(!boost::pfr::is_reflectable_v<pair_like>, "");                              // type `pair_like` isn't reflectable for all...
+static_assert(boost::pfr::is_reflectable_v<pair_like, boost::pfr::boost_fusion_tag>, ""); // ...it's only reflectable for Boost.Fusion
+assert(boost::fusion::less(pair_like{1, 2}, pair_like{1, 3}));
+```
 
 [endsect]
 
