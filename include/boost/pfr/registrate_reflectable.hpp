@@ -29,7 +29,7 @@
 ///
 /// \b Synopsis:
 
-/// \def BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_ALL(T)
+/// \def BOOST_PFR_REGISTRATE_REFLECTABLE(T)
 /// Makes type T reflectable everywhere.
 ///
 /// \b Example:
@@ -44,7 +44,7 @@
 ///     struct reflectable_struct {      // This structure can be reflectable by Boost.PFR, but by default compiler don't know it
 ///         int i; short s; char data[7]; bool bl; int a,b,c,d,e,f;
 ///     };
-///     BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_ALL(reflectable_struct)
+///     BOOST_PFR_REGISTRATE_REFLECTABLE(reflectable_struct)
 ///     // ...
 ///
 ///     static_assert(boost::pfr::is_reflectable_v<reflectable_struct>, "");
@@ -56,10 +56,10 @@
 ///
 /// \podinteraction for other ways to use Boost.PFR with other libraries and more details.
 
-#define BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_ALL(T)
+#define BOOST_PFR_REGISTRATE_REFLECTABLE(T)
 
 /// \def BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_MANY(T, ...)
-/// Makes type T reflectable in all __VA_ARGS__ libraries.
+/// Makes type T reflectable in all libraries listed in last arguments.
 ///
 /// \b Example:
 /// \code
@@ -88,13 +88,13 @@
 
 #define BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_MANY(T, ...)
 
-/// \def BOOST_PFR_REGISTRATE_REFLECTABLE(T)
-/// This macro is just alias for \forcedlink{BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_ALL} macro.
+/// \def BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_ALL(T)
+/// This macro is just alias for BOOST_PFR_REGISTRATE_REFLECTABLE macro.
 ///
 /// \podinteraction for other ways to use Boost.PFR with other libraries and more details.
 
 
-#define BOOST_PFR_REGISTRATE_REFLECTABLE(T) BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_ALL(T)
+#define BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_ALL(T) BOOST_PFR_REGISTRATE_REFLECTABLE(T)
 
 #endif // BOOST_PFR_REGISTRATE_REFLECTABLE_HPP
 

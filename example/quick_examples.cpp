@@ -9,8 +9,6 @@
 #include <unordered_set>
 #include <set>
 
-// TODO: add boost fusion quick example
-
 #include <boost/pfr.hpp>
 #include <boost/type_index.hpp>
 
