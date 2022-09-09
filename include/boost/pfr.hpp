@@ -20,6 +20,5 @@
 #include <boost/pfr/traits.hpp>
 #include <boost/pfr/registrate_reflectable.hpp>
 #include <boost/pfr/view.hpp>
-#include <boost/pfr/make_reflectable.hpp>
 
 #endif // BOOST_PFR_HPP

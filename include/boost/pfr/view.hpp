@@ -13,7 +13,7 @@
 
 /// \file boost/pfr/view.hpp
 /// Contains View manipulator \forcedlink{view} for types.
-/// If type is reflectable using its own library, then the library's reflection is used.
+/// If type can be reflected by its own library, then the library's reflection is used.
 ///
 /// \b Example:
 /// \code
@@ -36,7 +36,7 @@
 ///    std::cout << s.f << ", " << s.s; // Outputs: 3.141, 10
 /// \endcode
 ///
-/// \podview for other ways to use Boost.PFR with other libraries and more details.
+/// \podinteraction for other ways to use Boost.PFR with other libraries and more details.
 ///
 /// \b Synopsis:
 

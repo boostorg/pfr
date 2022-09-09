@@ -32,8 +32,10 @@ local doxygen_params =
         <doxygen:param>"ALIASES= \\
             \"forcedlink{1}=\\xmlonly<link linkend='boost.pfr.\\1'>\\endxmlonly boost::pfr::\\1\\xmlonly</link>\\endxmlonly\" \\
             \"podops=\\b See \\b Also : \\xmlonly<link linkend='boost_pfr.tutorial.three_ways_of_getting_operators'>\\endxmlonly 'Three ways of getting operators' \\xmlonly</link>\\endxmlonly\" \\
-            \"podview=\\b See \\b Also : \\xmlonly<link linkend='boost_pfr.tutorial.three_ways_boost_pfr_interacts_w'>\\endxmlonly 'Three ways Boost.PFR interacts with other libraries' \\xmlonly</link>\\endxmlonly\" \\
+            \"podinteraction=\\b See \\b Also : \\xmlonly<link linkend='boost_pfr.tutorial.three_ways_boost_pfr_interacts_w'>\\endxmlonly 'Three ways Boost.PFR interacts with other libraries' \\xmlonly</link>\\endxmlonly\" \\
+            \"podview=\\b See \\b Also : \\xmlonly<link linkend='header.boost.pfr.view_hpp'>\\endxmlonly 'boost/pfr/view.hpp' \\xmlonly</link>\\endxmlonly\" \\
             \"customio=\\b See \\b Also : \\xmlonly<link linkend='boost_pfr.tutorial.custom_printing_of_aggregates'>\\endxmlonly 'Custom printing of aggregates' \\xmlonly</link>\\endxmlonly for info on how to implement your own manipulator with custom format.\" \\
+            \"customadaptor=\\b See \\b Also : \\xmlonly<link linkend='boost_pfr.tutorial.custom_boost_pfr_integration_int'>\\endxmlonly 'Custom Boost.PFR integration into other library' \\xmlonly</link>\\endxmlonly for info on how to adapt Boost.PFR into an another library \" \\
             \"aggregate=\\xmlonly<link linkend='boost_pfr.limitations_and_configuration'>\\endxmlonly simple aggregate \\xmlonly</link>\\endxmlonly\" \\
             \"BOOST_PFR_DOXYGEN_INVOKED\" \\
         "
