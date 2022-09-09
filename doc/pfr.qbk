@@ -243,6 +243,9 @@ Boost.PFR is a header only library that does not depend on Boost. You can just c
 ][
     [ [pfr_quick_examples_structure_tie] ]
     [ [funcref boost::pfr::structure_tie] ]
+][
+    [ [pfr_quick_examples_boost_fusion] ]
+    [ [funcref boost::pfr::view] ]
 ]]
 
 
@@ -436,7 +439,7 @@ More detailed description follows:
 
 [*1. `view` approach]
 
-This method is good if you're writing generic algorithms using a library with tuple-like requirements for a type and need to use reflection from Boost.PFR only if the type can't be recognized by the library:
+This method is good if you're writing generic algorithms using a library with Boost.PFR support and need to use reflection from Boost.PFR only if the type can't be recognized by the library:
 
 ```
 #include <boost/pfr/view.hpp>
@@ -499,6 +502,8 @@ static_assert(!boost::pfr::is_reflectable_v<pair_like>, "");                    
 static_assert(boost::pfr::is_reflectable_v<pair_like, boost::pfr::boost_fusion_tag>, ""); // ...it's only reflectable for Boost.Fusion
 assert(boost::fusion::less(pair_like{1, 2}, pair_like{1, 3}));
 ```
+
+[caution Unrecommended to combinate BOOST_PFR_REGISTRATE_REFLECTABLE(T), BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_MANY(T, ...) and BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_ALL(T) with BOOST_PFR_FUNCTIONS_FOR(T) or with user defined operators for T. Consider using [@https://www.boost.org/doc/libs/release/libs/fusion/doc/html/fusion/sequence/operator.html Boost.Fusion sequences' operators] instead of [link boost_pfr.tutorial.three_ways_of_getting_operators [*Three ways of getting operators]]. ]
 
 [endsect]
 

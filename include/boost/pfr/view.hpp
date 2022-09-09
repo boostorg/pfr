@@ -116,22 +116,22 @@ constexpr auto structure_tie(const view_t<T>&& t) noexcept {
 
 template <class T, class F>
 void for_each_field(view_t<T>& t, F&& func) {
-    boost::pfr::for_each_field(t.value, func);
+    boost::pfr::for_each_field(t.value, std::forward<F>(func));
 }
 
 template <class T, class F>
 void for_each_field(view_t<T>&& t, F&& func) {
-    boost::pfr::for_each_field(std::forward<T>(t.value), func);
+    boost::pfr::for_each_field(std::forward<T>(t.value), std::forward<F>(func));
 }
 
 template <class T, class F>
 void for_each_field(const view_t<T>& t, F&& func) {
-    boost::pfr::for_each_field(t.value, func);
+    boost::pfr::for_each_field(t.value, std::forward<F>(func));
 }
 
 template <class T, class F>
 void for_each_field(const view_t<T>&& t, F&& func) {
-    boost::pfr::for_each_field(std::forward<T>(t.value), func);
+    boost::pfr::for_each_field(std::forward<T>(t.value), std::forward<F>(func));
 }
 
 template <class T>
@@ -139,7 +139,7 @@ struct tuple_size<view_t<T>>
     : boost::pfr::tuple_size<std::remove_reference_t<T>>
 {};
 
-/// View manupulator to access \aggregate `value` from other library that expects tuple-like interface.
+/// View manupulator to access \aggregate `value` from other library that supports Boost.PFR.
 ///
 /// \b Example:
 /// \code

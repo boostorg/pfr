@@ -15,6 +15,7 @@
 #include <boost/pfr/detail/stdtuple.hpp>
 #include <boost/pfr/tuple_size.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
+#include <boost/pfr/traits.hpp>
 
 #include <tuple>
 
@@ -31,6 +32,7 @@ struct tie_from_structure_tuple : std::tuple<Elements&...> {
 
     template <typename T>
     constexpr tie_from_structure_tuple& operator= (T const& t) {
+		static_assert(!boost::pfr::is_view_v<T>, "====================> Boost.PFR: Using `boost::pfr::tie_from_structure` with View manipulator is not supported");
         base::operator=(
             detail::make_stdtiedtuple_from_tietuple(
                 detail::tie_as_tuple(t),

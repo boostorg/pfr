@@ -6,7 +6,7 @@
 
 //[pfr_sample_adapting
 /*`
-    The following example shows how to adapt Boost.PFR into an other library(like Boost.JSON):
+    The following example shows how to adapt Boost.PFR into another library that can works with tuple-like interface(like Boost.JSON):
 */
 #include <boost/json.hpp>
 #include <boost/pfr/traits.hpp>

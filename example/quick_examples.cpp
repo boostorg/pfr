@@ -11,6 +11,10 @@
 
 #include <boost/pfr.hpp>
 #include <boost/type_index.hpp>
+#include <boost/fusion/include/filter.hpp>
+#include <boost/fusion/include/io.hpp>
+// FIXME enable this include for building
+// #include <boost/fusion/include/adapt_boost_pfr.hpp>
 
 // boost-no-inspect
 void test_examples() {
@@ -142,6 +146,25 @@ void test_examples() {
     std::get<1>(t) = foo{1, 2};
 
     std::cout << boost::pfr::io(var.f); // Outputs: {1, 2}
+//]
+  }
+#endif
+
+  // FIXME enable this example for building
+#if 0
+  {
+//[pfr_quick_examples_boost_fusion
+    // Using Boost.Fusion to print only int fields from structure
+
+    using boost::fusion::operator<<;
+
+    struct sample {
+        int a, b;
+        double c, d;
+    };
+
+    sample var{1,2,3.0,4.0};
+    std::cout << boost::fusion::filter<int>(boost::pfr::view(var)); // Outputs: [1, 2]
 //]
   }
 #endif

@@ -10,6 +10,7 @@
 #include <boost/pfr/detail/config.hpp>
 
 #include <boost/pfr/detail/traits_fwd.hpp>
+#include <type_traits>
 
 /// \file boost/pfr/traits.hpp
 /// Contains trait \forcedlink{is_reflectable} for detecting an ability to reflect type. Also contain traits(like \forcedlink{is_view}) to extract additional information about reflectable or non-reflectable types.
@@ -38,6 +39,15 @@ struct all_default_tag;
 template<class T, class WhatFor = all_default_tag>
 struct is_reflectable; // TODO: Impl
 
+template<class T>
+struct is_reflectable<const T> : std::integral_constant< bool, boost::pfr::is_reflectable<T>::value > {};
+
+template<class T>
+struct is_reflectable<volatile T> : std::integral_constant< bool, boost::pfr::is_reflectable<T>::value > {};
+
+template<class T>
+struct is_reflectable<const volatile T> : std::integral_constant< bool, boost::pfr::is_reflectable<T>::value > {};
+
 /// Has a static const member variable `value` that equals true when type T is a View manipulator.
 ///
 /// \b Example:
@@ -52,6 +62,15 @@ struct is_reflectable; // TODO: Impl
 /// \customadaptor using is_view trait and so others.
 template<class T>
 struct is_view; // TODO: Impl
+
+template<class T>
+struct is_view<const T> : std::integral_constant< bool, boost::pfr::is_view<T>::value > {};
+
+template<class T>
+struct is_view<volatile T> : std::integral_constant< bool, boost::pfr::is_view<T>::value > {};
+
+template<class T>
+struct is_view<const volatile T> : std::integral_constant< bool, boost::pfr::is_view<T>::value > {};
 
 
 
