@@ -88,10 +88,8 @@
 
 #define BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_MANY(T, ...)
 
-// TODO: need link to BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_ALL in the doc
-
 /// \def BOOST_PFR_REGISTRATE_REFLECTABLE(T)
-/// This macro is just alias for BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_ALL macro.
+/// This macro is just alias for \forcedlink{BOOST_PFR_REGISTRATE_REFLECTABLE_FOR_ALL} macro.
 ///
 /// \podinteraction for other ways to use Boost.PFR with other libraries and more details.
 

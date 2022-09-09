@@ -15,8 +15,6 @@ Master:         | [![CI](https://github.com/boostorg/pfr/actions/workflows/ci.ym
 
 [Latest developer documentation](https://www.boost.org/doc/libs/develop/doc/html/boost_pfr.html)
 
-TODO: add boost spirit motivating example
-
 ### Motivating Example #0
 ```c++
 #include <iostream>
@@ -94,6 +92,60 @@ int main() {
 Outputs:
 ```
 my_struct has 2 fields: {"Das ist fantastisch!", 100}
+```
+
+### Motivating Example #3
+
+```c++
+#include <iostream>
+#include <string>
+
+#include <boost/config/warning_disable.hpp>
+#include <boost/spirit/home/x3.hpp>
+#include <boost/fusion/include/adapt_boost_pfr.hpp>
+
+#include "boost/pfr/view.hpp"
+#include "boost/pfr/io.hpp"
+
+namespace x3 = boost::spirit::x3;
+
+struct ast_employee { // No BOOST_FUSION_ADAPT_STRUCT defined
+    int age;
+    std::string forename;
+    std::string surname;
+    double salary;
+};
+
+auto const quoted_string = x3::lexeme['"' >> +(x3::ascii::char_ - '"') >> '"'];
+
+x3::rule<class employee, boost::pfr::view_t<ast_employee>> const employee = "employee";
+auto const employee_def =
+    x3::lit("employee")
+    >> '{'
+    >>  x3::int_ >> ','
+    >>  quoted_string >> ','
+    >>  quoted_string >> ','
+    >>  x3::double_
+    >>  '}'
+    ;
+BOOST_SPIRIT_DEFINE(employee);
+
+int main() {
+    std::string str = R"(employee{34, "Chip", "Douglas", 2500.00})";
+    ast_employee emp;
+    x3::phrase_parse(str.begin(),
+                     str.end(),
+                     employee,
+                     x3::ascii::space,
+                     emp);
+    std::cout << boost::pfr::io(emp) << std::endl;
+}
+
+```
+
+Outputs:
+```
+(34 Chip Douglas 2500)
 ```
 
 

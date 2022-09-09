@@ -19,7 +19,7 @@
 namespace boost { namespace pfr {
 
 // Special tag
-struct for_everywhat_tag; // TODO: rename
+struct all_default_tag;
 
 
 
@@ -35,7 +35,7 @@ struct for_everywhat_tag; // TODO: rename
 /// \podinteraction if you want to know how to make a user-defined type reflectable.
 ///
 /// \customadaptor using is_reflectable trait and so others.
-template<class T, class WhatFor=for_everywhat_tag>
+template<class T, class WhatFor = all_default_tag>
 struct is_reflectable; // TODO: Impl
 
 /// Has a static const member variable `value` that equals true when type T is a View manipulator.
@@ -66,7 +66,7 @@ struct is_view; // TODO: Impl
 /// \podinteraction if you want to know how to make a user-defined type reflectable.
 ///
 /// \customadaptor using is_reflectable_v template variable and so others.
-template<class T, class WhatFor=for_everywhat_tag>
+template<class T, class WhatFor = all_default_tag>
 constexpr bool is_reflectable_v = is_reflectable<T, WhatFor>::value;
 
 /// `is_view_v` is a template variable that equals true when type T is a View manipulator.
