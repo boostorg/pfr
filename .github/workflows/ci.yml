@@ -125,7 +125,7 @@ jobs:
       matrix:
         include:
           - toolset: msvc
-            cxxstd: "14,17,latest"
+            cxxstd: "17,latest"
             addrmd: 32,64
             os: windows-2022
           # TODO: fails the loophole tests
