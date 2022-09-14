@@ -3,7 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// Example from https://github.com/apolukhin/magic_get/issues/21
+// Example from https://github.com/boostorg/pfr/issues/21
 
 
 // boost::pfr::for_each_field crashes when sizeof(MyConfig) > 248 (probably >= 256)

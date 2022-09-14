@@ -23,7 +23,7 @@
 namespace boost { namespace pfr {
 
 /// Has a static const member variable `value` that contains fields count in a T.
-/// Works for any T that supports aggregate initialization.
+/// Works for any T that satisfies \aggregate.
 ///
 /// \b Example:
 /// \code
@@ -34,7 +34,7 @@ using tuple_size = detail::size_t_< boost::pfr::detail::fields_count<T>() >;
 
 
 /// `tuple_size_v` is a template variable that contains fields count in a T and
-/// works for any T that supports aggregate initialization.
+/// works for any T that satisfies \aggregate.
 ///
 /// \b Example:
 /// \code

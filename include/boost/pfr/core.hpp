@@ -97,7 +97,7 @@ using tuple_element_t = typename tuple_element<I, T>::type;
 /// \code
 ///     struct my_struct { int i, short s; };
 ///     my_struct s {10, 11};
-///     std::tuple<int, short> t = make_tuple(s);
+///     std::tuple<int, short> t = boost::pfr::structure_to_tuple(s);
 ///     assert(get<0>(t) == 10);
 /// \endcode
 template <class T>
@@ -119,10 +119,10 @@ constexpr auto structure_to_tuple(const T& val) noexcept {
 ///     struct my_struct { int i, short s; };
 ///
 ///     const my_struct const_s{1, 2};
-///     std::apply(foo, structure_tie(const_s));
+///     std::apply(foo, boost::pfr::structure_tie(const_s));
 ///
 ///     my_struct s;
-///     structure_tie(s) = std::tuple<int, short>{10, 11};
+///     boost::pfr::structure_tie(s) = std::tuple<int, short>{10, 11};
 ///     assert(s.s == 11);
 /// \endcode
 template <class T>
@@ -177,7 +177,7 @@ constexpr auto structure_tie(T&&, std::enable_if_t< std::is_rvalue_reference<T&&
 /// \code
 ///     struct my_struct { int i, short s; };
 ///     int sum = 0;
-///     for_each_field(my_struct{20, 22}, [&sum](const auto& field) { sum += field; });
+///     boost::pfr::for_each_field(my_struct{20, 22}, [&sum](const auto& field) { sum += field; });
 ///     assert(sum == 42);
 /// \endcode
 template <class T, class F>
@@ -214,7 +214,7 @@ void for_each_field(T&& value, F&& func) {
 ///       return res;
 ///     }
 ///     auto [p, s] = f();
-///     tie_from_structure(p, s) = f();
+///     boost::pfr::tie_from_structure(p, s) = f();
 /// \endcode
 template <typename... Elements>
 constexpr detail::tie_from_structure_tuple<Elements...> tie_from_structure(Elements&... args) noexcept {
