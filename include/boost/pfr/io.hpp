@@ -89,7 +89,7 @@ enable_istreamable_t<std::basic_istream<Char, Traits>, T> operator>>(std::basic_
 
 } // namespace detail
 
-/// IO manipulator to read/write \aggregate `value` using its IO stream operators or using \forcedlink{io_fields} if operators are not awailable.
+/// IO manipulator to read/write \aggregate `value` using its IO stream operators or using \forcedlink{io_fields} if operators are not available.
 ///
 /// \b Example:
 /// \code

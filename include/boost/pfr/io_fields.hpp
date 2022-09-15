@@ -21,7 +21,7 @@
 #include <boost/pfr/tuple_size.hpp>
 
 /// \file boost/pfr/io_fields.hpp
-/// Contains IO manipulator \forcedlink{io_fields} to read/write an \aggregate field-by-field.
+/// Contains IO manipulator \forcedlink{io_fields} to read/write any \aggregate field-by-field.
 ///
 /// \b Example:
 /// \code
