@@ -99,18 +99,24 @@ my_struct has 2 fields: {"Das ist fantastisch!", 100}
 ```c++
 #include <iostream>
 #include <string>
+
 #include <boost/config/warning_disable.hpp>
 #include <boost/spirit/home/x3.hpp>
 #include <boost/fusion/include/adapt_boost_pfr.hpp>
+
 #include "boost/pfr/io.hpp"
+
 namespace x3 = boost::spirit::x3;
+
 struct ast_employee { // No BOOST_FUSION_ADAPT_STRUCT defined
     int age;
     std::string forename;
     std::string surname;
     double salary;
 };
+
 auto const quoted_string = x3::lexeme['"' >> +(x3::ascii::char_ - '"') >> '"'];
+
 x3::rule<class employee, ast_employee> const employee = "employee";
 auto const employee_def =
     x3::lit("employee")
@@ -122,6 +128,7 @@ auto const employee_def =
     >>  '}'
     ;
 BOOST_SPIRIT_DEFINE(employee);
+
 int main() {
     std::string str = R"(employee{34, "Chip", "Douglas", 2500.00})";
     ast_employee emp;
@@ -132,6 +139,7 @@ int main() {
                      emp);
     std::cout << boost::pfr::io(emp) << std::endl;
 }
+
 ```
 Outputs:
 ```
