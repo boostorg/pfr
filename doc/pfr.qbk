@@ -168,6 +168,7 @@ Boost.PFR adds the following out-of-the-box functionality for aggregate initiali
 * member type retrieval
 * methods for cooperation with `std::tuple`
 * methods to visit each field of the structure
+* trait to detect potential ability to reflect type, and ability to override trait's decision in user-side code
 
 Boost.PFR is a header only library that does not depend on Boost. You can just copy the content of the "include" folder [@https://github.com/boostorg/pfr from the Boost.PFR github] into your project, and the library will work fine. For a version of the library without `boost::` namespace see [@https://github.com/apolukhin/pfr_non_boost PFR].
 
