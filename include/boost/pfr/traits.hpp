@@ -70,3 +70,4 @@ constexpr bool is_implicitly_reflectable_v = is_implicitly_reflectable<T, WhatFo
 }} // namespace boost::pfr
 
 #endif // BOOST_PFR_TRAITS_HPP
+
