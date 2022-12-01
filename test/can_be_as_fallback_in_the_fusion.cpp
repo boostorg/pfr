@@ -4,30 +4,34 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #include <type_traits>
-#include <boost/pfr/traits.hpp>
 
 struct Aggregate {};
 using NonAggregate = int;
 
-namespace boost { namespace pfr {
-    struct boost_fusion_tag;
-}}
+template<class T>
+struct is_implicitly_reflectable : std::false_type
+{};
+
+template<>
+struct is_implicitly_reflectable<Aggregate> : std::true_type
+{};
 
 template<class T, class E=void>
-struct tag_of_fallback : std::false_type {
+struct tag_of_fallback {
+    using type = int; // unknown
 };
 
 template<class T>
 struct tag_of_fallback<T, std::enable_if_t<std::is_same<T,T>::value>>
 {
     using type = std::conditional_t<
-        boost::pfr::is_implicitly_reflectable<T, boost::pfr::boost_fusion_tag>::value
+        is_implicitly_reflectable<T>::value
       , std::true_type
       , std::false_type
     >;
 };
 
-static_assert(tag_of_fallback<Aggregate>::type{} == true, "");
-static_assert(tag_of_fallback<NonAggregate>::type{} == false, "");
+static_assert(tag_of_fallback<Aggregate>::type::value == true, "");
+static_assert(tag_of_fallback<NonAggregate>::type::value == false, "");
 
 int main() { }
