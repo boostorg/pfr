@@ -53,6 +53,8 @@ test-suite pfr_tests
 
     [ run offset_based_getter.cpp ]
 
+    [ run can_be_as_fallback_in_the_fusion.cpp ]
+
     [ run test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=char : test_tuple_sizes_on_chars ]
     [ run test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=int : test_tuple_sizes_on_ints ]
     [ run test_tuple_sizes_on.cpp : : : <define>BOOST_PFR_RUN_TEST_ON=short : test_tuple_sizes_on_shorts ]
