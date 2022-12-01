@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2021 Antony Polukhin
+// Copyright (c) 2016-2022 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -54,6 +54,8 @@ struct simple {
     short d;
 };
 
+struct empty{};
+
 
 int main () {
     std::size_t control = 0;
@@ -108,6 +110,13 @@ int main () {
         ss << val << ' ';
     });
     BOOST_TEST_EQ("42 a 3 ", ss.str());
+    ss.str("");
+
+    boost::pfr::for_each_field(empty{},  [&ss](auto&& val) {
+        ss << val << ' ';
+    });
+    BOOST_TEST_EQ("", ss.str());
+    ss.str("");
 
     return boost::report_errors();
 }
