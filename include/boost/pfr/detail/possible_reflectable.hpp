@@ -22,9 +22,8 @@ constexpr decltype(is_reflectable<T, WhatFor>::value) possible_reflectable(long)
 
 template <class T, class WhatFor>
 constexpr bool possible_reflectable(int) noexcept {
-    using type = std::remove_cv_t<T>;
-    // TODO: it should work in C++14
 #   if  defined(__cpp_lib_is_aggregate)
+    using type = std::remove_cv_t<T>;
     return std::is_aggregate<type>();
 #   else
     return true;

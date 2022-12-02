@@ -46,11 +46,12 @@ struct is_reflectable<volatile T, WhatFor> : std::integral_constant< bool, boost
 template<class T, class WhatFor>
 struct is_reflectable<const volatile T, WhatFor> : std::integral_constant< bool, boost::pfr::is_reflectable<T, WhatFor>::value > {};
 
+#if BOOST_PFR_ENABLE_IMPLICITLY_REFLECTION
 /// Checks the input type for the potential to be reflected.
 /// Use is_reflectable specializations if you are disagree with is_implicitly_reflectable's default decision.
 template<class T, class WhatFor>
 using is_implicitly_reflectable = std::integral_constant< bool, boost::pfr::detail::possible_reflectable<T, WhatFor>(1L) >;
-
+#endif
 
 /// `is_reflectable_v` is a template variable that valid when it known that type T can or can't be reflected using Boost.PFR.
 ///
@@ -62,10 +63,12 @@ using is_implicitly_reflectable = std::integral_constant< bool, boost::pfr::deta
 template<class T, class WhatFor>
 constexpr bool is_reflectable_v = is_reflectable<T, WhatFor>::value;
 
+#if BOOST_PFR_ENABLE_IMPLICITLY_REFLECTION
 /// Checks the input type for the potential to be reflected.
 /// Use is_reflectable specializations if you are disagree with is_implicitly_reflectable_v's default decision.
 template<class T, class WhatFor>
 constexpr bool is_implicitly_reflectable_v = is_implicitly_reflectable<T, WhatFor>::value;
+#endif
 
 }} // namespace boost::pfr
 

@@ -77,6 +77,15 @@
 #   endif
 #endif
 
+#ifndef BOOST_PFR_ENABLE_IMPLICITLY_REFLECTION
+#   if  defined(__cpp_lib_is_aggregate)
+#       define BOOST_PFR_ENABLE_IMPLICITLY_REFLECTION 1
+#   else
+// There is no way to detect potential ability to be reflectable without std::is_aggregare
+#       define BOOST_PFR_ENABLE_IMPLICITLY_REFLECTION 0
+#   endif
+#endif
+
 #if defined(__has_cpp_attribute)
 #   if __has_cpp_attribute(maybe_unused)
 #       define BOOST_PFR_MAYBE_UNUSED [[maybe_unused]]
