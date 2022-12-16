@@ -36,15 +36,16 @@ namespace boost { namespace pfr {
 template<class T, class WhatFor>
 struct is_reflectable { /*  do not has 'value' because value is unknown */ };
 
-// TODO: need tests to show that these specs are sfinae-friendly
+// these specs can't be inherited from 'std::integral_constant< bool, boost::pfr::is_reflectable<T, WhatFor>::value >',
+// because it will break the sfinae-friendliness
 template<class T, class WhatFor>
-struct is_reflectable<const T, WhatFor> : std::integral_constant< bool, boost::pfr::is_reflectable<T, WhatFor>::value > {};
+struct is_reflectable<const T, WhatFor> : boost::pfr::is_reflectable<T, WhatFor> {};
 
 template<class T, class WhatFor>
-struct is_reflectable<volatile T, WhatFor> : std::integral_constant< bool, boost::pfr::is_reflectable<T, WhatFor>::value > {};
+struct is_reflectable<volatile T, WhatFor> : boost::pfr::is_reflectable<T, WhatFor> {};
 
 template<class T, class WhatFor>
-struct is_reflectable<const volatile T, WhatFor> : std::integral_constant< bool, boost::pfr::is_reflectable<T, WhatFor>::value > {};
+struct is_reflectable<const volatile T, WhatFor> : boost::pfr::is_reflectable<T, WhatFor> {};
 
 #if BOOST_PFR_ENABLE_IMPLICITLY_REFLECTION
 /// Checks the input type for the potential to be reflected.
