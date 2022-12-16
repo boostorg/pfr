@@ -468,7 +468,7 @@ By default Boost.PFR [*auto-detects your compiler abilities] and automatically d
     [[*BOOST_PFR_USE_LOOPHOLE*] [Define to `1` if you wish to override Boost.PFR choice and exploit [@http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#2118 CWG 2118] for reflection. Define to `0` to override Boost.PFR choice and disable CWG 2118 usage.]]
     [[*BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE*] [Define to `0` if you are hit by the template instantiation depth issues with `std::make_integer_sequence` and wish to use Boost.PFR version of that metafunction. Define to `1` to override Boost.PFR detection logic. ]]
     [[*BOOST_PFR_HAS_GUARANTEED_COPY_ELISION*] [Define to `0` if your compiler does not implement C++17 guaranteed copy elision properly and fails to reflect aggregates with non-movable fields. Define to `1` to override Boost.PFR detection logic. ]]
-    [[*BOOST_PFR_ENABLE_IMPLICITLY_REFLECTION*] [Define to `0` if you are hit by lots of non-effective choices made by implicitly reflection. Define to `1` to override Boost.PFR detection logic. ]]
+    [[*BOOST_PFR_ENABLE_IMPLICIT_REFLECTION*] [Define to `0` if you are hit by lots of non-effective choices made by implicitly reflection. Define to `1` to override Boost.PFR detection logic. ]]
 ]
 
 

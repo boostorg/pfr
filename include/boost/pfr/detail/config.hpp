@@ -77,12 +77,12 @@
 #   endif
 #endif
 
-#ifndef BOOST_PFR_ENABLE_IMPLICITLY_REFLECTION
+#ifndef BOOST_PFR_ENABLE_IMPLICIT_REFLECTION
 #   if  defined(__cpp_lib_is_aggregate)
-#       define BOOST_PFR_ENABLE_IMPLICITLY_REFLECTION 1
+#       define BOOST_PFR_ENABLE_IMPLICIT_REFLECTION 1
 #   else
 // There is no way to detect potential ability to be reflectable without std::is_aggregare
-#       define BOOST_PFR_ENABLE_IMPLICITLY_REFLECTION 0
+#       define BOOST_PFR_ENABLE_IMPLICIT_REFLECTION 0
 #   endif
 #endif
 
