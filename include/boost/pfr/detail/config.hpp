@@ -1,3 +1,4 @@
+// Copyright (c) 2016-2022 Antony Polukhin
 // Copyright (c) 2022 Denis Mikhailov
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -13,10 +14,11 @@
 
 #error Boost.PFR library is not supported in your environment.             \
        Try one of the possible solutions:                                  \
-       1. enable C++14;                                                    \
-       2. enable C++17;                                                    \
-       3. update your compiler;                                            \
-       or disable this error by '-DBOOST_NO_PFR=0' if you know what you do.
+       1. try to take away an '-DBOOST_NO_PFR=1', if it exists             \
+       2. enable C++14;                                                    \
+       3. enable C++17;                                                    \
+       4. update your compiler;                                            \
+       or disable this error by '-DBOOST_NO_PFR=0' if you really know what are you doing.
 
 #endif // BOOST_NO_PFR
 
