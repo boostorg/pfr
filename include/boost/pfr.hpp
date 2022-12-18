@@ -9,6 +9,7 @@
 /// \file boost/pfr.hpp
 /// Includes all the Boost.PFR headers
 
+#include <boost/pfr/config.hpp>
 #include <boost/pfr/core.hpp>
 #include <boost/pfr/functions_for.hpp>
 #include <boost/pfr/functors.hpp>
