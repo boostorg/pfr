@@ -101,11 +101,11 @@
 #   define BOOST_PFR_MAYBE_UNUSED
 #endif
 
-#ifndef BOOST_NO_PFR
+#ifndef BOOST_PFR_ENABLED
 #   ifdef BOOST_PFR_NOT_SUPPORTED
-#       define BOOST_NO_PFR 1
+#       define BOOST_PFR_ENABLED 0
 #   else
-#       define BOOST_NO_PFR 0
+#       define BOOST_PFR_ENABLED 1
 #   endif
 #endif
 

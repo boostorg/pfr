@@ -10,17 +10,17 @@
 
 #include <boost/pfr/config.hpp>
 
-#if BOOST_NO_PFR
+#if !BOOST_PFR_ENABLED
 
 #error Boost.PFR library is not supported in your environment.             \
        Try one of the possible solutions:                                  \
-       1. try to take away an '-DBOOST_NO_PFR=1', if it exists             \
+       1. try to take away an '-DBOOST_PFR_ENABLED=0', if it exists        \
        2. enable C++14;                                                    \
        3. enable C++17;                                                    \
        4. update your compiler;                                            \
-       or disable this error by '-DBOOST_NO_PFR=0' if you really know what are you doing.
+       or disable this error by '-DBOOST_PFR_ENABLED=1' if you really know what are you doing.
 
-#endif // BOOST_NO_PFR
+#endif // !BOOST_PFR_ENABLED
 
 #endif // BOOST_PFR_DETAIL_CONFIG_HPP
 
