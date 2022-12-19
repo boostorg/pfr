@@ -14,6 +14,9 @@ namespace boost { namespace pfr {
 template<class T, class WhatFor>
 struct is_reflectable;
 
+template<class T>
+struct is_view;
+
 }} // namespace boost::pfr
 
 #endif // BOOST_PFR_DETAIL_TRAITS_FWD_HPP

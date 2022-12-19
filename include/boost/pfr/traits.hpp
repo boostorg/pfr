@@ -51,12 +51,26 @@ struct is_reflectable<const volatile T, WhatFor> : boost::pfr::is_reflectable<T,
 /// Specialize is_reflectable if you are disagree with is_implicitly_reflectable's default decision.
 template<class T, class WhatFor>
 using is_implicitly_reflectable = std::integral_constant< bool, boost::pfr::detail::possible_reflectable<T, WhatFor>(1L) >;
+#endif
 
+/// Checks the input type for having of reference semantic.
+/// Returns true if T can be passed by value as cheap as any reference.
+/// \note The behavior of a program that adds specializations for is_view is undefined.
+///
+template<class T>
+struct is_view : std::integral_constant<bool, false> {};
+
+#if BOOST_PFR_ENABLE_IMPLICIT_REFLECTION
 /// Checks the input type for the potential to be reflected.
 /// Specialize is_reflectable if you are disagree with is_implicitly_reflectable_v's default decision.
 template<class T, class WhatFor>
 constexpr bool is_implicitly_reflectable_v = is_implicitly_reflectable<T, WhatFor>::value;
 #endif
+
+/// Checks the input type for having of reference semantic.
+/// Equals true for T that can be passed by value as cheap as any reference.
+template<class T>
+constexpr bool is_view_v = is_view<T>::value;
 
 }} // namespace boost::pfr
 
