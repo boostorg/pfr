@@ -17,7 +17,7 @@
 //  * MSVC++ 12.0 _MSC_VER == 1800 (Visual Studio 2013)
 
 #ifdef BOOST_PFR_NOT_SUPPORTED
-#   error Please, don't set BOOST_PFR_NOT_SUPPORTED value manually, use '-DBOOST_PFR_ENABLED=0' instead of it
+#   error Please, do not set BOOST_PFR_NOT_SUPPORTED value manually, use '-DBOOST_PFR_ENABLED=0' instead of it
 #endif
 
 #if defined(_MSC_VER)
