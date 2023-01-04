@@ -23,7 +23,7 @@
 #endif
 
 
-#if BOOST_PFR_TEST_HAS_OPTIONAL
+#if BOOST_PFR_TEST_HAS_OPTIONAL && !BOOST_PFR_USE_LOOPHOLE && BOOST_PFR_USE_CPP17
 // This class mimics libc++ implementation of std::chrono::duration with unfxed LWG3050
 template <class Rep, class Period>
 class bogus_duration {
@@ -66,7 +66,7 @@ struct struct_with_optional {
 #endif
 
 int main() {
-#if BOOST_PFR_TEST_HAS_OPTIONAL
+#if BOOST_PFR_TEST_HAS_OPTIONAL && !BOOST_PFR_USE_LOOPHOLE && BOOST_PFR_USE_CPP17
     struct_with_optional val{
         std::chrono::seconds{1},
         std::chrono::seconds{2},
