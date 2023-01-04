@@ -1,4 +1,5 @@
 // Copyright (c) 2016-2022 Antony Polukhin
+// Copyright (c) 2023 Denis Mikhailov
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,12 +21,29 @@
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/size_t_.hpp>
+#include <type_traits> // for std::conditional_t, std::is_reference_v
 
 namespace boost { namespace pfr { namespace detail {
 
 template <class... Args>
 constexpr auto make_tuple_of_references(Args&&... args) noexcept {
   return sequence_tuple::tuple<Args&...>{ args... };
+}
+
+template<typename T, typename Arg>
+constexpr decltype(auto) add_cv_like(Arg& arg) noexcept {
+    if constexpr (std::is_const<T>::value && std::is_volatile<T>::value) {
+        return const_cast<const volatile Arg&>(arg);
+    }
+    else if constexpr (std::is_const<T>::value) {
+        return const_cast<const Arg&>(arg);
+    }
+    else if constexpr (std::is_volatile<T>::value) {
+        return const_cast<volatile Arg&>(arg);
+    }
+    else {
+        return const_cast<Arg&>(arg);
+    }
 }
 
 template <class T>
@@ -35,8 +53,9 @@ constexpr auto tie_as_tuple(T& /*val*/, size_t_<0>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<std::is_class< std::remove_cv_t<T> >::value>* = 0) noexcept {
-  auto& [a] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a);
+  auto& [a] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a) >;
+  return ::boost::pfr::detail::make_tuple_of_references(const_cast<a_t>(a));
 }
 
 
@@ -48,278 +67,1729 @@ constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<!std::is_class<
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<2>) noexcept {
-  auto& [a,b] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b);
+  auto& [a,b] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  return ::boost::pfr::detail::make_tuple_of_references(const_cast<a_t>(a),const_cast<b_t>(b));
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<3>) noexcept {
-  auto& [a,b,c] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c);
+  auto& [a,b,c] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  return ::boost::pfr::detail::make_tuple_of_references(const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c));
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<4>) noexcept {
-  auto& [a,b,c,d] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d);
+  auto& [a,b,c,d] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  return ::boost::pfr::detail::make_tuple_of_references(const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d));
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<5>) noexcept {
-  auto& [a,b,c,d,e] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e);
+  auto& [a,b,c,d,e] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  return ::boost::pfr::detail::make_tuple_of_references(const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e));
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<6>) noexcept {
-  auto& [a,b,c,d,e,f] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f);
+  auto& [a,b,c,d,e,f] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<7>) noexcept {
-  auto& [a,b,c,d,e,f,g] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g);
+  auto& [a,b,c,d,e,f,g] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<8>) noexcept {
-  auto& [a,b,c,d,e,f,g,h] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h);
+  auto& [a,b,c,d,e,f,g,h] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<9>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j);
+  auto& [a,b,c,d,e,f,g,h,j] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<10>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k);
+  auto& [a,b,c,d,e,f,g,h,j,k] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<11>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l);
+  auto& [a,b,c,d,e,f,g,h,j,k,l] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<12>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<13>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<14>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<15>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<16>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<17>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<18>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<19>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<20>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<21>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<22>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<23>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<24>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<25>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<26>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<27>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<28>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<29>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<30>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<31>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<32>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<33>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<34>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<35>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<36>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<37>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<38>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<39>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<40>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<41>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<42>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<43>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<44>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<45>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<46>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y)
+  );
 }
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<47>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z);
+  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+
+  return ::boost::pfr::detail::make_tuple_of_references(
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z)
+  );
 }
 
 template <class T>
@@ -327,11 +1797,68 @@ constexpr auto tie_as_tuple(T& val, size_t_<48>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa)
   );
 }
 
@@ -340,11 +1867,69 @@ constexpr auto tie_as_tuple(T& val, size_t_<49>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab)
   );
 }
 
@@ -353,11 +1938,70 @@ constexpr auto tie_as_tuple(T& val, size_t_<50>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac)
   );
 }
 
@@ -366,11 +2010,72 @@ constexpr auto tie_as_tuple(T& val, size_t_<51>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad)
   );
 }
 
@@ -379,11 +2084,73 @@ constexpr auto tie_as_tuple(T& val, size_t_<52>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae)
   );
 }
 
@@ -392,11 +2159,74 @@ constexpr auto tie_as_tuple(T& val, size_t_<53>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af)
   );
 }
 
@@ -405,11 +2235,75 @@ constexpr auto tie_as_tuple(T& val, size_t_<54>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag)
   );
 }
 
@@ -418,11 +2312,76 @@ constexpr auto tie_as_tuple(T& val, size_t_<55>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah)
   );
 }
 
@@ -431,11 +2390,78 @@ constexpr auto tie_as_tuple(T& val, size_t_<56>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj)
   );
 }
 
@@ -444,11 +2470,79 @@ constexpr auto tie_as_tuple(T& val, size_t_<57>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak)
   );
 }
 
@@ -457,11 +2551,80 @@ constexpr auto tie_as_tuple(T& val, size_t_<58>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al)
   );
 }
 
@@ -470,11 +2633,81 @@ constexpr auto tie_as_tuple(T& val, size_t_<59>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am)
   );
 }
 
@@ -483,11 +2716,82 @@ constexpr auto tie_as_tuple(T& val, size_t_<60>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an)
   );
 }
 
@@ -496,11 +2800,84 @@ constexpr auto tie_as_tuple(T& val, size_t_<61>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap)
   );
 }
 
@@ -509,11 +2886,85 @@ constexpr auto tie_as_tuple(T& val, size_t_<62>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq)
   );
 }
 
@@ -522,11 +2973,86 @@ constexpr auto tie_as_tuple(T& val, size_t_<63>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar)
   );
 }
 
@@ -535,11 +3061,87 @@ constexpr auto tie_as_tuple(T& val, size_t_<64>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as)
   );
 }
 
@@ -548,11 +3150,88 @@ constexpr auto tie_as_tuple(T& val, size_t_<65>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at)
   );
 }
 
@@ -561,11 +3240,90 @@ constexpr auto tie_as_tuple(T& val, size_t_<66>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au)
   );
 }
 
@@ -574,11 +3332,91 @@ constexpr auto tie_as_tuple(T& val, size_t_<67>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av)
   );
 }
 
@@ -587,11 +3425,92 @@ constexpr auto tie_as_tuple(T& val, size_t_<68>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw)
   );
 }
 
@@ -600,11 +3519,93 @@ constexpr auto tie_as_tuple(T& val, size_t_<69>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax)
   );
 }
 
@@ -613,11 +3614,94 @@ constexpr auto tie_as_tuple(T& val, size_t_<70>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay)
   );
 }
 
@@ -626,11 +3710,96 @@ constexpr auto tie_as_tuple(T& val, size_t_<71>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az)
   );
 }
 
@@ -639,11 +3808,97 @@ constexpr auto tie_as_tuple(T& val, size_t_<72>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA)
   );
 }
 
@@ -652,11 +3907,98 @@ constexpr auto tie_as_tuple(T& val, size_t_<73>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB)
   );
 }
 
@@ -665,11 +4007,99 @@ constexpr auto tie_as_tuple(T& val, size_t_<74>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC)
   );
 }
 
@@ -678,11 +4108,100 @@ constexpr auto tie_as_tuple(T& val, size_t_<75>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD)
   );
 }
 
@@ -691,11 +4210,102 @@ constexpr auto tie_as_tuple(T& val, size_t_<76>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE)
   );
 }
 
@@ -704,11 +4314,103 @@ constexpr auto tie_as_tuple(T& val, size_t_<77>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF)
   );
 }
 
@@ -717,11 +4419,104 @@ constexpr auto tie_as_tuple(T& val, size_t_<78>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG)
   );
 }
 
@@ -730,11 +4525,105 @@ constexpr auto tie_as_tuple(T& val, size_t_<79>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH)
   );
 }
 
@@ -743,11 +4632,106 @@ constexpr auto tie_as_tuple(T& val, size_t_<80>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ)
   );
 }
 
@@ -756,11 +4740,108 @@ constexpr auto tie_as_tuple(T& val, size_t_<81>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
+  using aK_t = std::conditional_t<!std::is_reference_v<decltype(aK)>, decltype(::boost::pfr::detail::add_cv_like<T>(aK)), decltype(aK)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ),
+    const_cast<aK_t>(aK)
   );
 }
 
@@ -769,11 +4850,109 @@ constexpr auto tie_as_tuple(T& val, size_t_<82>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
+  using aK_t = std::conditional_t<!std::is_reference_v<decltype(aK)>, decltype(::boost::pfr::detail::add_cv_like<T>(aK)), decltype(aK)>;
+  using aL_t = std::conditional_t<!std::is_reference_v<decltype(aL)>, decltype(::boost::pfr::detail::add_cv_like<T>(aL)), decltype(aL)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ),
+    const_cast<aK_t>(aK),const_cast<aL_t>(aL)
   );
 }
 
@@ -782,11 +4961,110 @@ constexpr auto tie_as_tuple(T& val, size_t_<83>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
+  using aK_t = std::conditional_t<!std::is_reference_v<decltype(aK)>, decltype(::boost::pfr::detail::add_cv_like<T>(aK)), decltype(aK)>;
+  using aL_t = std::conditional_t<!std::is_reference_v<decltype(aL)>, decltype(::boost::pfr::detail::add_cv_like<T>(aL)), decltype(aL)>;
+  using aM_t = std::conditional_t<!std::is_reference_v<decltype(aM)>, decltype(::boost::pfr::detail::add_cv_like<T>(aM)), decltype(aM)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ),
+    const_cast<aK_t>(aK),const_cast<aL_t>(aL),const_cast<aM_t>(aM)
   );
 }
 
@@ -795,11 +5073,111 @@ constexpr auto tie_as_tuple(T& val, size_t_<84>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
+  using aK_t = std::conditional_t<!std::is_reference_v<decltype(aK)>, decltype(::boost::pfr::detail::add_cv_like<T>(aK)), decltype(aK)>;
+  using aL_t = std::conditional_t<!std::is_reference_v<decltype(aL)>, decltype(::boost::pfr::detail::add_cv_like<T>(aL)), decltype(aL)>;
+  using aM_t = std::conditional_t<!std::is_reference_v<decltype(aM)>, decltype(::boost::pfr::detail::add_cv_like<T>(aM)), decltype(aM)>;
+  using aN_t = std::conditional_t<!std::is_reference_v<decltype(aN)>, decltype(::boost::pfr::detail::add_cv_like<T>(aN)), decltype(aN)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ),
+    const_cast<aK_t>(aK),const_cast<aL_t>(aL),const_cast<aM_t>(aM),const_cast<aN_t>(aN)
   );
 }
 
@@ -808,11 +5186,112 @@ constexpr auto tie_as_tuple(T& val, size_t_<85>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
+  using aK_t = std::conditional_t<!std::is_reference_v<decltype(aK)>, decltype(::boost::pfr::detail::add_cv_like<T>(aK)), decltype(aK)>;
+  using aL_t = std::conditional_t<!std::is_reference_v<decltype(aL)>, decltype(::boost::pfr::detail::add_cv_like<T>(aL)), decltype(aL)>;
+  using aM_t = std::conditional_t<!std::is_reference_v<decltype(aM)>, decltype(::boost::pfr::detail::add_cv_like<T>(aM)), decltype(aM)>;
+  using aN_t = std::conditional_t<!std::is_reference_v<decltype(aN)>, decltype(::boost::pfr::detail::add_cv_like<T>(aN)), decltype(aN)>;
+  using aP_t = std::conditional_t<!std::is_reference_v<decltype(aP)>, decltype(::boost::pfr::detail::add_cv_like<T>(aP)), decltype(aP)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ),
+    const_cast<aK_t>(aK),const_cast<aL_t>(aL),const_cast<aM_t>(aM),const_cast<aN_t>(aN),const_cast<aP_t>(aP)
   );
 }
 
@@ -821,11 +5300,114 @@ constexpr auto tie_as_tuple(T& val, size_t_<86>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
+  using aK_t = std::conditional_t<!std::is_reference_v<decltype(aK)>, decltype(::boost::pfr::detail::add_cv_like<T>(aK)), decltype(aK)>;
+  using aL_t = std::conditional_t<!std::is_reference_v<decltype(aL)>, decltype(::boost::pfr::detail::add_cv_like<T>(aL)), decltype(aL)>;
+  using aM_t = std::conditional_t<!std::is_reference_v<decltype(aM)>, decltype(::boost::pfr::detail::add_cv_like<T>(aM)), decltype(aM)>;
+  using aN_t = std::conditional_t<!std::is_reference_v<decltype(aN)>, decltype(::boost::pfr::detail::add_cv_like<T>(aN)), decltype(aN)>;
+  using aP_t = std::conditional_t<!std::is_reference_v<decltype(aP)>, decltype(::boost::pfr::detail::add_cv_like<T>(aP)), decltype(aP)>;
+  using aQ_t = std::conditional_t<!std::is_reference_v<decltype(aQ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aQ)), decltype(aQ)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ),
+    const_cast<aK_t>(aK),const_cast<aL_t>(aL),const_cast<aM_t>(aM),const_cast<aN_t>(aN),const_cast<aP_t>(aP),
+    const_cast<aQ_t>(aQ)
   );
 }
 
@@ -834,11 +5416,115 @@ constexpr auto tie_as_tuple(T& val, size_t_<87>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
+  using aK_t = std::conditional_t<!std::is_reference_v<decltype(aK)>, decltype(::boost::pfr::detail::add_cv_like<T>(aK)), decltype(aK)>;
+  using aL_t = std::conditional_t<!std::is_reference_v<decltype(aL)>, decltype(::boost::pfr::detail::add_cv_like<T>(aL)), decltype(aL)>;
+  using aM_t = std::conditional_t<!std::is_reference_v<decltype(aM)>, decltype(::boost::pfr::detail::add_cv_like<T>(aM)), decltype(aM)>;
+  using aN_t = std::conditional_t<!std::is_reference_v<decltype(aN)>, decltype(::boost::pfr::detail::add_cv_like<T>(aN)), decltype(aN)>;
+  using aP_t = std::conditional_t<!std::is_reference_v<decltype(aP)>, decltype(::boost::pfr::detail::add_cv_like<T>(aP)), decltype(aP)>;
+  using aQ_t = std::conditional_t<!std::is_reference_v<decltype(aQ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aQ)), decltype(aQ)>;
+  using aR_t = std::conditional_t<!std::is_reference_v<decltype(aR)>, decltype(::boost::pfr::detail::add_cv_like<T>(aR)), decltype(aR)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ),
+    const_cast<aK_t>(aK),const_cast<aL_t>(aL),const_cast<aM_t>(aM),const_cast<aN_t>(aN),const_cast<aP_t>(aP),
+    const_cast<aQ_t>(aQ),const_cast<aR_t>(aR)
   );
 }
 
@@ -847,11 +5533,116 @@ constexpr auto tie_as_tuple(T& val, size_t_<88>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
+  using aK_t = std::conditional_t<!std::is_reference_v<decltype(aK)>, decltype(::boost::pfr::detail::add_cv_like<T>(aK)), decltype(aK)>;
+  using aL_t = std::conditional_t<!std::is_reference_v<decltype(aL)>, decltype(::boost::pfr::detail::add_cv_like<T>(aL)), decltype(aL)>;
+  using aM_t = std::conditional_t<!std::is_reference_v<decltype(aM)>, decltype(::boost::pfr::detail::add_cv_like<T>(aM)), decltype(aM)>;
+  using aN_t = std::conditional_t<!std::is_reference_v<decltype(aN)>, decltype(::boost::pfr::detail::add_cv_like<T>(aN)), decltype(aN)>;
+  using aP_t = std::conditional_t<!std::is_reference_v<decltype(aP)>, decltype(::boost::pfr::detail::add_cv_like<T>(aP)), decltype(aP)>;
+  using aQ_t = std::conditional_t<!std::is_reference_v<decltype(aQ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aQ)), decltype(aQ)>;
+  using aR_t = std::conditional_t<!std::is_reference_v<decltype(aR)>, decltype(::boost::pfr::detail::add_cv_like<T>(aR)), decltype(aR)>;
+  using aS_t = std::conditional_t<!std::is_reference_v<decltype(aS)>, decltype(::boost::pfr::detail::add_cv_like<T>(aS)), decltype(aS)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ),
+    const_cast<aK_t>(aK),const_cast<aL_t>(aL),const_cast<aM_t>(aM),const_cast<aN_t>(aN),const_cast<aP_t>(aP),
+    const_cast<aQ_t>(aQ),const_cast<aR_t>(aR),const_cast<aS_t>(aS)
   );
 }
 
@@ -860,11 +5651,117 @@ constexpr auto tie_as_tuple(T& val, size_t_<89>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
+  using aK_t = std::conditional_t<!std::is_reference_v<decltype(aK)>, decltype(::boost::pfr::detail::add_cv_like<T>(aK)), decltype(aK)>;
+  using aL_t = std::conditional_t<!std::is_reference_v<decltype(aL)>, decltype(::boost::pfr::detail::add_cv_like<T>(aL)), decltype(aL)>;
+  using aM_t = std::conditional_t<!std::is_reference_v<decltype(aM)>, decltype(::boost::pfr::detail::add_cv_like<T>(aM)), decltype(aM)>;
+  using aN_t = std::conditional_t<!std::is_reference_v<decltype(aN)>, decltype(::boost::pfr::detail::add_cv_like<T>(aN)), decltype(aN)>;
+  using aP_t = std::conditional_t<!std::is_reference_v<decltype(aP)>, decltype(::boost::pfr::detail::add_cv_like<T>(aP)), decltype(aP)>;
+  using aQ_t = std::conditional_t<!std::is_reference_v<decltype(aQ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aQ)), decltype(aQ)>;
+  using aR_t = std::conditional_t<!std::is_reference_v<decltype(aR)>, decltype(::boost::pfr::detail::add_cv_like<T>(aR)), decltype(aR)>;
+  using aS_t = std::conditional_t<!std::is_reference_v<decltype(aS)>, decltype(::boost::pfr::detail::add_cv_like<T>(aS)), decltype(aS)>;
+  using aU_t = std::conditional_t<!std::is_reference_v<decltype(aU)>, decltype(::boost::pfr::detail::add_cv_like<T>(aU)), decltype(aU)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ),
+    const_cast<aK_t>(aK),const_cast<aL_t>(aL),const_cast<aM_t>(aM),const_cast<aN_t>(aN),const_cast<aP_t>(aP),
+    const_cast<aQ_t>(aQ),const_cast<aR_t>(aR),const_cast<aS_t>(aS),const_cast<aU_t>(aU)
   );
 }
 
@@ -873,11 +5770,118 @@ constexpr auto tie_as_tuple(T& val, size_t_<90>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
+  using aK_t = std::conditional_t<!std::is_reference_v<decltype(aK)>, decltype(::boost::pfr::detail::add_cv_like<T>(aK)), decltype(aK)>;
+  using aL_t = std::conditional_t<!std::is_reference_v<decltype(aL)>, decltype(::boost::pfr::detail::add_cv_like<T>(aL)), decltype(aL)>;
+  using aM_t = std::conditional_t<!std::is_reference_v<decltype(aM)>, decltype(::boost::pfr::detail::add_cv_like<T>(aM)), decltype(aM)>;
+  using aN_t = std::conditional_t<!std::is_reference_v<decltype(aN)>, decltype(::boost::pfr::detail::add_cv_like<T>(aN)), decltype(aN)>;
+  using aP_t = std::conditional_t<!std::is_reference_v<decltype(aP)>, decltype(::boost::pfr::detail::add_cv_like<T>(aP)), decltype(aP)>;
+  using aQ_t = std::conditional_t<!std::is_reference_v<decltype(aQ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aQ)), decltype(aQ)>;
+  using aR_t = std::conditional_t<!std::is_reference_v<decltype(aR)>, decltype(::boost::pfr::detail::add_cv_like<T>(aR)), decltype(aR)>;
+  using aS_t = std::conditional_t<!std::is_reference_v<decltype(aS)>, decltype(::boost::pfr::detail::add_cv_like<T>(aS)), decltype(aS)>;
+  using aU_t = std::conditional_t<!std::is_reference_v<decltype(aU)>, decltype(::boost::pfr::detail::add_cv_like<T>(aU)), decltype(aU)>;
+  using aV_t = std::conditional_t<!std::is_reference_v<decltype(aV)>, decltype(::boost::pfr::detail::add_cv_like<T>(aV)), decltype(aV)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ),
+    const_cast<aK_t>(aK),const_cast<aL_t>(aL),const_cast<aM_t>(aM),const_cast<aN_t>(aN),const_cast<aP_t>(aP),
+    const_cast<aQ_t>(aQ),const_cast<aR_t>(aR),const_cast<aS_t>(aS),const_cast<aU_t>(aU),const_cast<aV_t>(aV)
   );
 }
 
@@ -886,11 +5890,120 @@ constexpr auto tie_as_tuple(T& val, size_t_<91>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
+  using aK_t = std::conditional_t<!std::is_reference_v<decltype(aK)>, decltype(::boost::pfr::detail::add_cv_like<T>(aK)), decltype(aK)>;
+  using aL_t = std::conditional_t<!std::is_reference_v<decltype(aL)>, decltype(::boost::pfr::detail::add_cv_like<T>(aL)), decltype(aL)>;
+  using aM_t = std::conditional_t<!std::is_reference_v<decltype(aM)>, decltype(::boost::pfr::detail::add_cv_like<T>(aM)), decltype(aM)>;
+  using aN_t = std::conditional_t<!std::is_reference_v<decltype(aN)>, decltype(::boost::pfr::detail::add_cv_like<T>(aN)), decltype(aN)>;
+  using aP_t = std::conditional_t<!std::is_reference_v<decltype(aP)>, decltype(::boost::pfr::detail::add_cv_like<T>(aP)), decltype(aP)>;
+  using aQ_t = std::conditional_t<!std::is_reference_v<decltype(aQ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aQ)), decltype(aQ)>;
+  using aR_t = std::conditional_t<!std::is_reference_v<decltype(aR)>, decltype(::boost::pfr::detail::add_cv_like<T>(aR)), decltype(aR)>;
+  using aS_t = std::conditional_t<!std::is_reference_v<decltype(aS)>, decltype(::boost::pfr::detail::add_cv_like<T>(aS)), decltype(aS)>;
+  using aU_t = std::conditional_t<!std::is_reference_v<decltype(aU)>, decltype(::boost::pfr::detail::add_cv_like<T>(aU)), decltype(aU)>;
+  using aV_t = std::conditional_t<!std::is_reference_v<decltype(aV)>, decltype(::boost::pfr::detail::add_cv_like<T>(aV)), decltype(aV)>;
+  using aW_t = std::conditional_t<!std::is_reference_v<decltype(aW)>, decltype(::boost::pfr::detail::add_cv_like<T>(aW)), decltype(aW)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ),
+    const_cast<aK_t>(aK),const_cast<aL_t>(aL),const_cast<aM_t>(aM),const_cast<aN_t>(aN),const_cast<aP_t>(aP),
+    const_cast<aQ_t>(aQ),const_cast<aR_t>(aR),const_cast<aS_t>(aS),const_cast<aU_t>(aU),const_cast<aV_t>(aV),
+    const_cast<aW_t>(aW)
   );
 }
 
@@ -899,11 +6012,121 @@ constexpr auto tie_as_tuple(T& val, size_t_<92>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
+  using aK_t = std::conditional_t<!std::is_reference_v<decltype(aK)>, decltype(::boost::pfr::detail::add_cv_like<T>(aK)), decltype(aK)>;
+  using aL_t = std::conditional_t<!std::is_reference_v<decltype(aL)>, decltype(::boost::pfr::detail::add_cv_like<T>(aL)), decltype(aL)>;
+  using aM_t = std::conditional_t<!std::is_reference_v<decltype(aM)>, decltype(::boost::pfr::detail::add_cv_like<T>(aM)), decltype(aM)>;
+  using aN_t = std::conditional_t<!std::is_reference_v<decltype(aN)>, decltype(::boost::pfr::detail::add_cv_like<T>(aN)), decltype(aN)>;
+  using aP_t = std::conditional_t<!std::is_reference_v<decltype(aP)>, decltype(::boost::pfr::detail::add_cv_like<T>(aP)), decltype(aP)>;
+  using aQ_t = std::conditional_t<!std::is_reference_v<decltype(aQ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aQ)), decltype(aQ)>;
+  using aR_t = std::conditional_t<!std::is_reference_v<decltype(aR)>, decltype(::boost::pfr::detail::add_cv_like<T>(aR)), decltype(aR)>;
+  using aS_t = std::conditional_t<!std::is_reference_v<decltype(aS)>, decltype(::boost::pfr::detail::add_cv_like<T>(aS)), decltype(aS)>;
+  using aU_t = std::conditional_t<!std::is_reference_v<decltype(aU)>, decltype(::boost::pfr::detail::add_cv_like<T>(aU)), decltype(aU)>;
+  using aV_t = std::conditional_t<!std::is_reference_v<decltype(aV)>, decltype(::boost::pfr::detail::add_cv_like<T>(aV)), decltype(aV)>;
+  using aW_t = std::conditional_t<!std::is_reference_v<decltype(aW)>, decltype(::boost::pfr::detail::add_cv_like<T>(aW)), decltype(aW)>;
+  using aX_t = std::conditional_t<!std::is_reference_v<decltype(aX)>, decltype(::boost::pfr::detail::add_cv_like<T>(aX)), decltype(aX)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ),
+    const_cast<aK_t>(aK),const_cast<aL_t>(aL),const_cast<aM_t>(aM),const_cast<aN_t>(aN),const_cast<aP_t>(aP),
+    const_cast<aQ_t>(aQ),const_cast<aR_t>(aR),const_cast<aS_t>(aS),const_cast<aU_t>(aU),const_cast<aV_t>(aV),
+    const_cast<aW_t>(aW),const_cast<aX_t>(aX)
   );
 }
 
@@ -912,11 +6135,122 @@ constexpr auto tie_as_tuple(T& val, size_t_<93>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
+  using aK_t = std::conditional_t<!std::is_reference_v<decltype(aK)>, decltype(::boost::pfr::detail::add_cv_like<T>(aK)), decltype(aK)>;
+  using aL_t = std::conditional_t<!std::is_reference_v<decltype(aL)>, decltype(::boost::pfr::detail::add_cv_like<T>(aL)), decltype(aL)>;
+  using aM_t = std::conditional_t<!std::is_reference_v<decltype(aM)>, decltype(::boost::pfr::detail::add_cv_like<T>(aM)), decltype(aM)>;
+  using aN_t = std::conditional_t<!std::is_reference_v<decltype(aN)>, decltype(::boost::pfr::detail::add_cv_like<T>(aN)), decltype(aN)>;
+  using aP_t = std::conditional_t<!std::is_reference_v<decltype(aP)>, decltype(::boost::pfr::detail::add_cv_like<T>(aP)), decltype(aP)>;
+  using aQ_t = std::conditional_t<!std::is_reference_v<decltype(aQ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aQ)), decltype(aQ)>;
+  using aR_t = std::conditional_t<!std::is_reference_v<decltype(aR)>, decltype(::boost::pfr::detail::add_cv_like<T>(aR)), decltype(aR)>;
+  using aS_t = std::conditional_t<!std::is_reference_v<decltype(aS)>, decltype(::boost::pfr::detail::add_cv_like<T>(aS)), decltype(aS)>;
+  using aU_t = std::conditional_t<!std::is_reference_v<decltype(aU)>, decltype(::boost::pfr::detail::add_cv_like<T>(aU)), decltype(aU)>;
+  using aV_t = std::conditional_t<!std::is_reference_v<decltype(aV)>, decltype(::boost::pfr::detail::add_cv_like<T>(aV)), decltype(aV)>;
+  using aW_t = std::conditional_t<!std::is_reference_v<decltype(aW)>, decltype(::boost::pfr::detail::add_cv_like<T>(aW)), decltype(aW)>;
+  using aX_t = std::conditional_t<!std::is_reference_v<decltype(aX)>, decltype(::boost::pfr::detail::add_cv_like<T>(aX)), decltype(aX)>;
+  using aY_t = std::conditional_t<!std::is_reference_v<decltype(aY)>, decltype(::boost::pfr::detail::add_cv_like<T>(aY)), decltype(aY)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ),
+    const_cast<aK_t>(aK),const_cast<aL_t>(aL),const_cast<aM_t>(aM),const_cast<aN_t>(aN),const_cast<aP_t>(aP),
+    const_cast<aQ_t>(aQ),const_cast<aR_t>(aR),const_cast<aS_t>(aS),const_cast<aU_t>(aU),const_cast<aV_t>(aV),
+    const_cast<aW_t>(aW),const_cast<aX_t>(aX),const_cast<aY_t>(aY)
   );
 }
 
@@ -925,11 +6259,123 @@ constexpr auto tie_as_tuple(T& val, size_t_<94>) noexcept {
   auto& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
+  using aK_t = std::conditional_t<!std::is_reference_v<decltype(aK)>, decltype(::boost::pfr::detail::add_cv_like<T>(aK)), decltype(aK)>;
+  using aL_t = std::conditional_t<!std::is_reference_v<decltype(aL)>, decltype(::boost::pfr::detail::add_cv_like<T>(aL)), decltype(aL)>;
+  using aM_t = std::conditional_t<!std::is_reference_v<decltype(aM)>, decltype(::boost::pfr::detail::add_cv_like<T>(aM)), decltype(aM)>;
+  using aN_t = std::conditional_t<!std::is_reference_v<decltype(aN)>, decltype(::boost::pfr::detail::add_cv_like<T>(aN)), decltype(aN)>;
+  using aP_t = std::conditional_t<!std::is_reference_v<decltype(aP)>, decltype(::boost::pfr::detail::add_cv_like<T>(aP)), decltype(aP)>;
+  using aQ_t = std::conditional_t<!std::is_reference_v<decltype(aQ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aQ)), decltype(aQ)>;
+  using aR_t = std::conditional_t<!std::is_reference_v<decltype(aR)>, decltype(::boost::pfr::detail::add_cv_like<T>(aR)), decltype(aR)>;
+  using aS_t = std::conditional_t<!std::is_reference_v<decltype(aS)>, decltype(::boost::pfr::detail::add_cv_like<T>(aS)), decltype(aS)>;
+  using aU_t = std::conditional_t<!std::is_reference_v<decltype(aU)>, decltype(::boost::pfr::detail::add_cv_like<T>(aU)), decltype(aU)>;
+  using aV_t = std::conditional_t<!std::is_reference_v<decltype(aV)>, decltype(::boost::pfr::detail::add_cv_like<T>(aV)), decltype(aV)>;
+  using aW_t = std::conditional_t<!std::is_reference_v<decltype(aW)>, decltype(::boost::pfr::detail::add_cv_like<T>(aW)), decltype(aW)>;
+  using aX_t = std::conditional_t<!std::is_reference_v<decltype(aX)>, decltype(::boost::pfr::detail::add_cv_like<T>(aX)), decltype(aX)>;
+  using aY_t = std::conditional_t<!std::is_reference_v<decltype(aY)>, decltype(::boost::pfr::detail::add_cv_like<T>(aY)), decltype(aY)>;
+  using aZ_t = std::conditional_t<!std::is_reference_v<decltype(aZ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aZ)), decltype(aZ)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ),
+    const_cast<aK_t>(aK),const_cast<aL_t>(aL),const_cast<aM_t>(aM),const_cast<aN_t>(aN),const_cast<aP_t>(aP),
+    const_cast<aQ_t>(aQ),const_cast<aR_t>(aR),const_cast<aS_t>(aS),const_cast<aU_t>(aU),const_cast<aV_t>(aV),
+    const_cast<aW_t>(aW),const_cast<aX_t>(aX),const_cast<aY_t>(aY),const_cast<aZ_t>(aZ)
   );
 }
 
@@ -939,12 +6385,124 @@ constexpr auto tie_as_tuple(T& val, size_t_<95>) noexcept {
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
     ba
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
+  using aK_t = std::conditional_t<!std::is_reference_v<decltype(aK)>, decltype(::boost::pfr::detail::add_cv_like<T>(aK)), decltype(aK)>;
+  using aL_t = std::conditional_t<!std::is_reference_v<decltype(aL)>, decltype(::boost::pfr::detail::add_cv_like<T>(aL)), decltype(aL)>;
+  using aM_t = std::conditional_t<!std::is_reference_v<decltype(aM)>, decltype(::boost::pfr::detail::add_cv_like<T>(aM)), decltype(aM)>;
+  using aN_t = std::conditional_t<!std::is_reference_v<decltype(aN)>, decltype(::boost::pfr::detail::add_cv_like<T>(aN)), decltype(aN)>;
+  using aP_t = std::conditional_t<!std::is_reference_v<decltype(aP)>, decltype(::boost::pfr::detail::add_cv_like<T>(aP)), decltype(aP)>;
+  using aQ_t = std::conditional_t<!std::is_reference_v<decltype(aQ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aQ)), decltype(aQ)>;
+  using aR_t = std::conditional_t<!std::is_reference_v<decltype(aR)>, decltype(::boost::pfr::detail::add_cv_like<T>(aR)), decltype(aR)>;
+  using aS_t = std::conditional_t<!std::is_reference_v<decltype(aS)>, decltype(::boost::pfr::detail::add_cv_like<T>(aS)), decltype(aS)>;
+  using aU_t = std::conditional_t<!std::is_reference_v<decltype(aU)>, decltype(::boost::pfr::detail::add_cv_like<T>(aU)), decltype(aU)>;
+  using aV_t = std::conditional_t<!std::is_reference_v<decltype(aV)>, decltype(::boost::pfr::detail::add_cv_like<T>(aV)), decltype(aV)>;
+  using aW_t = std::conditional_t<!std::is_reference_v<decltype(aW)>, decltype(::boost::pfr::detail::add_cv_like<T>(aW)), decltype(aW)>;
+  using aX_t = std::conditional_t<!std::is_reference_v<decltype(aX)>, decltype(::boost::pfr::detail::add_cv_like<T>(aX)), decltype(aX)>;
+  using aY_t = std::conditional_t<!std::is_reference_v<decltype(aY)>, decltype(::boost::pfr::detail::add_cv_like<T>(aY)), decltype(aY)>;
+  using aZ_t = std::conditional_t<!std::is_reference_v<decltype(aZ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aZ)), decltype(aZ)>;
+  using ba_t = std::conditional_t<!std::is_reference_v<decltype(ba)>, decltype(::boost::pfr::detail::add_cv_like<T>(ba)), decltype(ba)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
-    ba
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ),
+    const_cast<aK_t>(aK),const_cast<aL_t>(aL),const_cast<aM_t>(aM),const_cast<aN_t>(aN),const_cast<aP_t>(aP),
+    const_cast<aQ_t>(aQ),const_cast<aR_t>(aR),const_cast<aS_t>(aS),const_cast<aU_t>(aU),const_cast<aV_t>(aV),
+    const_cast<aW_t>(aW),const_cast<aX_t>(aX),const_cast<aY_t>(aY),const_cast<aZ_t>(aZ),const_cast<ba_t>(ba)
   );
 }
 
@@ -954,12 +6512,126 @@ constexpr auto tie_as_tuple(T& val, size_t_<96>) noexcept {
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
     ba,bb
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
+  using aK_t = std::conditional_t<!std::is_reference_v<decltype(aK)>, decltype(::boost::pfr::detail::add_cv_like<T>(aK)), decltype(aK)>;
+  using aL_t = std::conditional_t<!std::is_reference_v<decltype(aL)>, decltype(::boost::pfr::detail::add_cv_like<T>(aL)), decltype(aL)>;
+  using aM_t = std::conditional_t<!std::is_reference_v<decltype(aM)>, decltype(::boost::pfr::detail::add_cv_like<T>(aM)), decltype(aM)>;
+  using aN_t = std::conditional_t<!std::is_reference_v<decltype(aN)>, decltype(::boost::pfr::detail::add_cv_like<T>(aN)), decltype(aN)>;
+  using aP_t = std::conditional_t<!std::is_reference_v<decltype(aP)>, decltype(::boost::pfr::detail::add_cv_like<T>(aP)), decltype(aP)>;
+  using aQ_t = std::conditional_t<!std::is_reference_v<decltype(aQ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aQ)), decltype(aQ)>;
+  using aR_t = std::conditional_t<!std::is_reference_v<decltype(aR)>, decltype(::boost::pfr::detail::add_cv_like<T>(aR)), decltype(aR)>;
+  using aS_t = std::conditional_t<!std::is_reference_v<decltype(aS)>, decltype(::boost::pfr::detail::add_cv_like<T>(aS)), decltype(aS)>;
+  using aU_t = std::conditional_t<!std::is_reference_v<decltype(aU)>, decltype(::boost::pfr::detail::add_cv_like<T>(aU)), decltype(aU)>;
+  using aV_t = std::conditional_t<!std::is_reference_v<decltype(aV)>, decltype(::boost::pfr::detail::add_cv_like<T>(aV)), decltype(aV)>;
+  using aW_t = std::conditional_t<!std::is_reference_v<decltype(aW)>, decltype(::boost::pfr::detail::add_cv_like<T>(aW)), decltype(aW)>;
+  using aX_t = std::conditional_t<!std::is_reference_v<decltype(aX)>, decltype(::boost::pfr::detail::add_cv_like<T>(aX)), decltype(aX)>;
+  using aY_t = std::conditional_t<!std::is_reference_v<decltype(aY)>, decltype(::boost::pfr::detail::add_cv_like<T>(aY)), decltype(aY)>;
+  using aZ_t = std::conditional_t<!std::is_reference_v<decltype(aZ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aZ)), decltype(aZ)>;
+  using ba_t = std::conditional_t<!std::is_reference_v<decltype(ba)>, decltype(::boost::pfr::detail::add_cv_like<T>(ba)), decltype(ba)>;
+  using bb_t = std::conditional_t<!std::is_reference_v<decltype(bb)>, decltype(::boost::pfr::detail::add_cv_like<T>(bb)), decltype(bb)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
-    ba,bb
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ),
+    const_cast<aK_t>(aK),const_cast<aL_t>(aL),const_cast<aM_t>(aM),const_cast<aN_t>(aN),const_cast<aP_t>(aP),
+    const_cast<aQ_t>(aQ),const_cast<aR_t>(aR),const_cast<aS_t>(aS),const_cast<aU_t>(aU),const_cast<aV_t>(aV),
+    const_cast<aW_t>(aW),const_cast<aX_t>(aX),const_cast<aY_t>(aY),const_cast<aZ_t>(aZ),const_cast<ba_t>(ba),
+    const_cast<bb_t>(bb)
   );
 }
 
@@ -969,12 +6641,127 @@ constexpr auto tie_as_tuple(T& val, size_t_<97>) noexcept {
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
     ba,bb,bc
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
+  using aK_t = std::conditional_t<!std::is_reference_v<decltype(aK)>, decltype(::boost::pfr::detail::add_cv_like<T>(aK)), decltype(aK)>;
+  using aL_t = std::conditional_t<!std::is_reference_v<decltype(aL)>, decltype(::boost::pfr::detail::add_cv_like<T>(aL)), decltype(aL)>;
+  using aM_t = std::conditional_t<!std::is_reference_v<decltype(aM)>, decltype(::boost::pfr::detail::add_cv_like<T>(aM)), decltype(aM)>;
+  using aN_t = std::conditional_t<!std::is_reference_v<decltype(aN)>, decltype(::boost::pfr::detail::add_cv_like<T>(aN)), decltype(aN)>;
+  using aP_t = std::conditional_t<!std::is_reference_v<decltype(aP)>, decltype(::boost::pfr::detail::add_cv_like<T>(aP)), decltype(aP)>;
+  using aQ_t = std::conditional_t<!std::is_reference_v<decltype(aQ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aQ)), decltype(aQ)>;
+  using aR_t = std::conditional_t<!std::is_reference_v<decltype(aR)>, decltype(::boost::pfr::detail::add_cv_like<T>(aR)), decltype(aR)>;
+  using aS_t = std::conditional_t<!std::is_reference_v<decltype(aS)>, decltype(::boost::pfr::detail::add_cv_like<T>(aS)), decltype(aS)>;
+  using aU_t = std::conditional_t<!std::is_reference_v<decltype(aU)>, decltype(::boost::pfr::detail::add_cv_like<T>(aU)), decltype(aU)>;
+  using aV_t = std::conditional_t<!std::is_reference_v<decltype(aV)>, decltype(::boost::pfr::detail::add_cv_like<T>(aV)), decltype(aV)>;
+  using aW_t = std::conditional_t<!std::is_reference_v<decltype(aW)>, decltype(::boost::pfr::detail::add_cv_like<T>(aW)), decltype(aW)>;
+  using aX_t = std::conditional_t<!std::is_reference_v<decltype(aX)>, decltype(::boost::pfr::detail::add_cv_like<T>(aX)), decltype(aX)>;
+  using aY_t = std::conditional_t<!std::is_reference_v<decltype(aY)>, decltype(::boost::pfr::detail::add_cv_like<T>(aY)), decltype(aY)>;
+  using aZ_t = std::conditional_t<!std::is_reference_v<decltype(aZ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aZ)), decltype(aZ)>;
+  using ba_t = std::conditional_t<!std::is_reference_v<decltype(ba)>, decltype(::boost::pfr::detail::add_cv_like<T>(ba)), decltype(ba)>;
+  using bb_t = std::conditional_t<!std::is_reference_v<decltype(bb)>, decltype(::boost::pfr::detail::add_cv_like<T>(bb)), decltype(bb)>;
+  using bc_t = std::conditional_t<!std::is_reference_v<decltype(bc)>, decltype(::boost::pfr::detail::add_cv_like<T>(bc)), decltype(bc)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
-    ba,bb,bc
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ),
+    const_cast<aK_t>(aK),const_cast<aL_t>(aL),const_cast<aM_t>(aM),const_cast<aN_t>(aN),const_cast<aP_t>(aP),
+    const_cast<aQ_t>(aQ),const_cast<aR_t>(aR),const_cast<aS_t>(aS),const_cast<aU_t>(aU),const_cast<aV_t>(aV),
+    const_cast<aW_t>(aW),const_cast<aX_t>(aX),const_cast<aY_t>(aY),const_cast<aZ_t>(aZ),const_cast<ba_t>(ba),
+    const_cast<bb_t>(bb),const_cast<bc_t>(bc)
   );
 }
 
@@ -984,12 +6771,128 @@ constexpr auto tie_as_tuple(T& val, size_t_<98>) noexcept {
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
     ba,bb,bc,bd
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
+  using aK_t = std::conditional_t<!std::is_reference_v<decltype(aK)>, decltype(::boost::pfr::detail::add_cv_like<T>(aK)), decltype(aK)>;
+  using aL_t = std::conditional_t<!std::is_reference_v<decltype(aL)>, decltype(::boost::pfr::detail::add_cv_like<T>(aL)), decltype(aL)>;
+  using aM_t = std::conditional_t<!std::is_reference_v<decltype(aM)>, decltype(::boost::pfr::detail::add_cv_like<T>(aM)), decltype(aM)>;
+  using aN_t = std::conditional_t<!std::is_reference_v<decltype(aN)>, decltype(::boost::pfr::detail::add_cv_like<T>(aN)), decltype(aN)>;
+  using aP_t = std::conditional_t<!std::is_reference_v<decltype(aP)>, decltype(::boost::pfr::detail::add_cv_like<T>(aP)), decltype(aP)>;
+  using aQ_t = std::conditional_t<!std::is_reference_v<decltype(aQ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aQ)), decltype(aQ)>;
+  using aR_t = std::conditional_t<!std::is_reference_v<decltype(aR)>, decltype(::boost::pfr::detail::add_cv_like<T>(aR)), decltype(aR)>;
+  using aS_t = std::conditional_t<!std::is_reference_v<decltype(aS)>, decltype(::boost::pfr::detail::add_cv_like<T>(aS)), decltype(aS)>;
+  using aU_t = std::conditional_t<!std::is_reference_v<decltype(aU)>, decltype(::boost::pfr::detail::add_cv_like<T>(aU)), decltype(aU)>;
+  using aV_t = std::conditional_t<!std::is_reference_v<decltype(aV)>, decltype(::boost::pfr::detail::add_cv_like<T>(aV)), decltype(aV)>;
+  using aW_t = std::conditional_t<!std::is_reference_v<decltype(aW)>, decltype(::boost::pfr::detail::add_cv_like<T>(aW)), decltype(aW)>;
+  using aX_t = std::conditional_t<!std::is_reference_v<decltype(aX)>, decltype(::boost::pfr::detail::add_cv_like<T>(aX)), decltype(aX)>;
+  using aY_t = std::conditional_t<!std::is_reference_v<decltype(aY)>, decltype(::boost::pfr::detail::add_cv_like<T>(aY)), decltype(aY)>;
+  using aZ_t = std::conditional_t<!std::is_reference_v<decltype(aZ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aZ)), decltype(aZ)>;
+  using ba_t = std::conditional_t<!std::is_reference_v<decltype(ba)>, decltype(::boost::pfr::detail::add_cv_like<T>(ba)), decltype(ba)>;
+  using bb_t = std::conditional_t<!std::is_reference_v<decltype(bb)>, decltype(::boost::pfr::detail::add_cv_like<T>(bb)), decltype(bb)>;
+  using bc_t = std::conditional_t<!std::is_reference_v<decltype(bc)>, decltype(::boost::pfr::detail::add_cv_like<T>(bc)), decltype(bc)>;
+  using bd_t = std::conditional_t<!std::is_reference_v<decltype(bd)>, decltype(::boost::pfr::detail::add_cv_like<T>(bd)), decltype(bd)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
-    ba,bb,bc,bd
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ),
+    const_cast<aK_t>(aK),const_cast<aL_t>(aL),const_cast<aM_t>(aM),const_cast<aN_t>(aN),const_cast<aP_t>(aP),
+    const_cast<aQ_t>(aQ),const_cast<aR_t>(aR),const_cast<aS_t>(aS),const_cast<aU_t>(aU),const_cast<aV_t>(aV),
+    const_cast<aW_t>(aW),const_cast<aX_t>(aX),const_cast<aY_t>(aY),const_cast<aZ_t>(aZ),const_cast<ba_t>(ba),
+    const_cast<bb_t>(bb),const_cast<bc_t>(bc),const_cast<bd_t>(bd)
   );
 }
 
@@ -999,12 +6902,129 @@ constexpr auto tie_as_tuple(T& val, size_t_<99>) noexcept {
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
     ba,bb,bc,bd,be
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
+  using aK_t = std::conditional_t<!std::is_reference_v<decltype(aK)>, decltype(::boost::pfr::detail::add_cv_like<T>(aK)), decltype(aK)>;
+  using aL_t = std::conditional_t<!std::is_reference_v<decltype(aL)>, decltype(::boost::pfr::detail::add_cv_like<T>(aL)), decltype(aL)>;
+  using aM_t = std::conditional_t<!std::is_reference_v<decltype(aM)>, decltype(::boost::pfr::detail::add_cv_like<T>(aM)), decltype(aM)>;
+  using aN_t = std::conditional_t<!std::is_reference_v<decltype(aN)>, decltype(::boost::pfr::detail::add_cv_like<T>(aN)), decltype(aN)>;
+  using aP_t = std::conditional_t<!std::is_reference_v<decltype(aP)>, decltype(::boost::pfr::detail::add_cv_like<T>(aP)), decltype(aP)>;
+  using aQ_t = std::conditional_t<!std::is_reference_v<decltype(aQ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aQ)), decltype(aQ)>;
+  using aR_t = std::conditional_t<!std::is_reference_v<decltype(aR)>, decltype(::boost::pfr::detail::add_cv_like<T>(aR)), decltype(aR)>;
+  using aS_t = std::conditional_t<!std::is_reference_v<decltype(aS)>, decltype(::boost::pfr::detail::add_cv_like<T>(aS)), decltype(aS)>;
+  using aU_t = std::conditional_t<!std::is_reference_v<decltype(aU)>, decltype(::boost::pfr::detail::add_cv_like<T>(aU)), decltype(aU)>;
+  using aV_t = std::conditional_t<!std::is_reference_v<decltype(aV)>, decltype(::boost::pfr::detail::add_cv_like<T>(aV)), decltype(aV)>;
+  using aW_t = std::conditional_t<!std::is_reference_v<decltype(aW)>, decltype(::boost::pfr::detail::add_cv_like<T>(aW)), decltype(aW)>;
+  using aX_t = std::conditional_t<!std::is_reference_v<decltype(aX)>, decltype(::boost::pfr::detail::add_cv_like<T>(aX)), decltype(aX)>;
+  using aY_t = std::conditional_t<!std::is_reference_v<decltype(aY)>, decltype(::boost::pfr::detail::add_cv_like<T>(aY)), decltype(aY)>;
+  using aZ_t = std::conditional_t<!std::is_reference_v<decltype(aZ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aZ)), decltype(aZ)>;
+  using ba_t = std::conditional_t<!std::is_reference_v<decltype(ba)>, decltype(::boost::pfr::detail::add_cv_like<T>(ba)), decltype(ba)>;
+  using bb_t = std::conditional_t<!std::is_reference_v<decltype(bb)>, decltype(::boost::pfr::detail::add_cv_like<T>(bb)), decltype(bb)>;
+  using bc_t = std::conditional_t<!std::is_reference_v<decltype(bc)>, decltype(::boost::pfr::detail::add_cv_like<T>(bc)), decltype(bc)>;
+  using bd_t = std::conditional_t<!std::is_reference_v<decltype(bd)>, decltype(::boost::pfr::detail::add_cv_like<T>(bd)), decltype(bd)>;
+  using be_t = std::conditional_t<!std::is_reference_v<decltype(be)>, decltype(::boost::pfr::detail::add_cv_like<T>(be)), decltype(be)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
-    ba,bb,bc,bd,be
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ),
+    const_cast<aK_t>(aK),const_cast<aL_t>(aL),const_cast<aM_t>(aM),const_cast<aN_t>(aN),const_cast<aP_t>(aP),
+    const_cast<aQ_t>(aQ),const_cast<aR_t>(aR),const_cast<aS_t>(aS),const_cast<aU_t>(aU),const_cast<aV_t>(aV),
+    const_cast<aW_t>(aW),const_cast<aX_t>(aX),const_cast<aY_t>(aY),const_cast<aZ_t>(aZ),const_cast<ba_t>(ba),
+    const_cast<bb_t>(bb),const_cast<bc_t>(bc),const_cast<bd_t>(bd),const_cast<be_t>(be)
   );
 }
 
@@ -1014,12 +7034,130 @@ constexpr auto tie_as_tuple(T& val, size_t_<100>) noexcept {
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
     ba,bb,bc,bd,be,bf
-  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+
+  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a)>;
+  using b_t = std::conditional_t<!std::is_reference_v<decltype(b)>, decltype(::boost::pfr::detail::add_cv_like<T>(b)), decltype(b)>;
+  using c_t = std::conditional_t<!std::is_reference_v<decltype(c)>, decltype(::boost::pfr::detail::add_cv_like<T>(c)), decltype(c)>;
+  using d_t = std::conditional_t<!std::is_reference_v<decltype(d)>, decltype(::boost::pfr::detail::add_cv_like<T>(d)), decltype(d)>;
+  using e_t = std::conditional_t<!std::is_reference_v<decltype(e)>, decltype(::boost::pfr::detail::add_cv_like<T>(e)), decltype(e)>;
+  using f_t = std::conditional_t<!std::is_reference_v<decltype(f)>, decltype(::boost::pfr::detail::add_cv_like<T>(f)), decltype(f)>;
+  using g_t = std::conditional_t<!std::is_reference_v<decltype(g)>, decltype(::boost::pfr::detail::add_cv_like<T>(g)), decltype(g)>;
+  using h_t = std::conditional_t<!std::is_reference_v<decltype(h)>, decltype(::boost::pfr::detail::add_cv_like<T>(h)), decltype(h)>;
+  using j_t = std::conditional_t<!std::is_reference_v<decltype(j)>, decltype(::boost::pfr::detail::add_cv_like<T>(j)), decltype(j)>;
+  using k_t = std::conditional_t<!std::is_reference_v<decltype(k)>, decltype(::boost::pfr::detail::add_cv_like<T>(k)), decltype(k)>;
+  using l_t = std::conditional_t<!std::is_reference_v<decltype(l)>, decltype(::boost::pfr::detail::add_cv_like<T>(l)), decltype(l)>;
+  using m_t = std::conditional_t<!std::is_reference_v<decltype(m)>, decltype(::boost::pfr::detail::add_cv_like<T>(m)), decltype(m)>;
+  using n_t = std::conditional_t<!std::is_reference_v<decltype(n)>, decltype(::boost::pfr::detail::add_cv_like<T>(n)), decltype(n)>;
+  using p_t = std::conditional_t<!std::is_reference_v<decltype(p)>, decltype(::boost::pfr::detail::add_cv_like<T>(p)), decltype(p)>;
+  using q_t = std::conditional_t<!std::is_reference_v<decltype(q)>, decltype(::boost::pfr::detail::add_cv_like<T>(q)), decltype(q)>;
+  using r_t = std::conditional_t<!std::is_reference_v<decltype(r)>, decltype(::boost::pfr::detail::add_cv_like<T>(r)), decltype(r)>;
+  using s_t = std::conditional_t<!std::is_reference_v<decltype(s)>, decltype(::boost::pfr::detail::add_cv_like<T>(s)), decltype(s)>;
+  using t_t = std::conditional_t<!std::is_reference_v<decltype(t)>, decltype(::boost::pfr::detail::add_cv_like<T>(t)), decltype(t)>;
+  using u_t = std::conditional_t<!std::is_reference_v<decltype(u)>, decltype(::boost::pfr::detail::add_cv_like<T>(u)), decltype(u)>;
+  using v_t = std::conditional_t<!std::is_reference_v<decltype(v)>, decltype(::boost::pfr::detail::add_cv_like<T>(v)), decltype(v)>;
+  using w_t = std::conditional_t<!std::is_reference_v<decltype(w)>, decltype(::boost::pfr::detail::add_cv_like<T>(w)), decltype(w)>;
+  using x_t = std::conditional_t<!std::is_reference_v<decltype(x)>, decltype(::boost::pfr::detail::add_cv_like<T>(x)), decltype(x)>;
+  using y_t = std::conditional_t<!std::is_reference_v<decltype(y)>, decltype(::boost::pfr::detail::add_cv_like<T>(y)), decltype(y)>;
+  using z_t = std::conditional_t<!std::is_reference_v<decltype(z)>, decltype(::boost::pfr::detail::add_cv_like<T>(z)), decltype(z)>;
+  using A_t = std::conditional_t<!std::is_reference_v<decltype(A)>, decltype(::boost::pfr::detail::add_cv_like<T>(A)), decltype(A)>;
+  using B_t = std::conditional_t<!std::is_reference_v<decltype(B)>, decltype(::boost::pfr::detail::add_cv_like<T>(B)), decltype(B)>;
+  using C_t = std::conditional_t<!std::is_reference_v<decltype(C)>, decltype(::boost::pfr::detail::add_cv_like<T>(C)), decltype(C)>;
+  using D_t = std::conditional_t<!std::is_reference_v<decltype(D)>, decltype(::boost::pfr::detail::add_cv_like<T>(D)), decltype(D)>;
+  using E_t = std::conditional_t<!std::is_reference_v<decltype(E)>, decltype(::boost::pfr::detail::add_cv_like<T>(E)), decltype(E)>;
+  using F_t = std::conditional_t<!std::is_reference_v<decltype(F)>, decltype(::boost::pfr::detail::add_cv_like<T>(F)), decltype(F)>;
+  using G_t = std::conditional_t<!std::is_reference_v<decltype(G)>, decltype(::boost::pfr::detail::add_cv_like<T>(G)), decltype(G)>;
+  using H_t = std::conditional_t<!std::is_reference_v<decltype(H)>, decltype(::boost::pfr::detail::add_cv_like<T>(H)), decltype(H)>;
+  using J_t = std::conditional_t<!std::is_reference_v<decltype(J)>, decltype(::boost::pfr::detail::add_cv_like<T>(J)), decltype(J)>;
+  using K_t = std::conditional_t<!std::is_reference_v<decltype(K)>, decltype(::boost::pfr::detail::add_cv_like<T>(K)), decltype(K)>;
+  using L_t = std::conditional_t<!std::is_reference_v<decltype(L)>, decltype(::boost::pfr::detail::add_cv_like<T>(L)), decltype(L)>;
+  using M_t = std::conditional_t<!std::is_reference_v<decltype(M)>, decltype(::boost::pfr::detail::add_cv_like<T>(M)), decltype(M)>;
+  using N_t = std::conditional_t<!std::is_reference_v<decltype(N)>, decltype(::boost::pfr::detail::add_cv_like<T>(N)), decltype(N)>;
+  using P_t = std::conditional_t<!std::is_reference_v<decltype(P)>, decltype(::boost::pfr::detail::add_cv_like<T>(P)), decltype(P)>;
+  using Q_t = std::conditional_t<!std::is_reference_v<decltype(Q)>, decltype(::boost::pfr::detail::add_cv_like<T>(Q)), decltype(Q)>;
+  using R_t = std::conditional_t<!std::is_reference_v<decltype(R)>, decltype(::boost::pfr::detail::add_cv_like<T>(R)), decltype(R)>;
+  using S_t = std::conditional_t<!std::is_reference_v<decltype(S)>, decltype(::boost::pfr::detail::add_cv_like<T>(S)), decltype(S)>;
+  using U_t = std::conditional_t<!std::is_reference_v<decltype(U)>, decltype(::boost::pfr::detail::add_cv_like<T>(U)), decltype(U)>;
+  using V_t = std::conditional_t<!std::is_reference_v<decltype(V)>, decltype(::boost::pfr::detail::add_cv_like<T>(V)), decltype(V)>;
+  using W_t = std::conditional_t<!std::is_reference_v<decltype(W)>, decltype(::boost::pfr::detail::add_cv_like<T>(W)), decltype(W)>;
+  using X_t = std::conditional_t<!std::is_reference_v<decltype(X)>, decltype(::boost::pfr::detail::add_cv_like<T>(X)), decltype(X)>;
+  using Y_t = std::conditional_t<!std::is_reference_v<decltype(Y)>, decltype(::boost::pfr::detail::add_cv_like<T>(Y)), decltype(Y)>;
+  using Z_t = std::conditional_t<!std::is_reference_v<decltype(Z)>, decltype(::boost::pfr::detail::add_cv_like<T>(Z)), decltype(Z)>;
+  using aa_t = std::conditional_t<!std::is_reference_v<decltype(aa)>, decltype(::boost::pfr::detail::add_cv_like<T>(aa)), decltype(aa)>;
+  using ab_t = std::conditional_t<!std::is_reference_v<decltype(ab)>, decltype(::boost::pfr::detail::add_cv_like<T>(ab)), decltype(ab)>;
+  using ac_t = std::conditional_t<!std::is_reference_v<decltype(ac)>, decltype(::boost::pfr::detail::add_cv_like<T>(ac)), decltype(ac)>;
+  using ad_t = std::conditional_t<!std::is_reference_v<decltype(ad)>, decltype(::boost::pfr::detail::add_cv_like<T>(ad)), decltype(ad)>;
+  using ae_t = std::conditional_t<!std::is_reference_v<decltype(ae)>, decltype(::boost::pfr::detail::add_cv_like<T>(ae)), decltype(ae)>;
+  using af_t = std::conditional_t<!std::is_reference_v<decltype(af)>, decltype(::boost::pfr::detail::add_cv_like<T>(af)), decltype(af)>;
+  using ag_t = std::conditional_t<!std::is_reference_v<decltype(ag)>, decltype(::boost::pfr::detail::add_cv_like<T>(ag)), decltype(ag)>;
+  using ah_t = std::conditional_t<!std::is_reference_v<decltype(ah)>, decltype(::boost::pfr::detail::add_cv_like<T>(ah)), decltype(ah)>;
+  using aj_t = std::conditional_t<!std::is_reference_v<decltype(aj)>, decltype(::boost::pfr::detail::add_cv_like<T>(aj)), decltype(aj)>;
+  using ak_t = std::conditional_t<!std::is_reference_v<decltype(ak)>, decltype(::boost::pfr::detail::add_cv_like<T>(ak)), decltype(ak)>;
+  using al_t = std::conditional_t<!std::is_reference_v<decltype(al)>, decltype(::boost::pfr::detail::add_cv_like<T>(al)), decltype(al)>;
+  using am_t = std::conditional_t<!std::is_reference_v<decltype(am)>, decltype(::boost::pfr::detail::add_cv_like<T>(am)), decltype(am)>;
+  using an_t = std::conditional_t<!std::is_reference_v<decltype(an)>, decltype(::boost::pfr::detail::add_cv_like<T>(an)), decltype(an)>;
+  using ap_t = std::conditional_t<!std::is_reference_v<decltype(ap)>, decltype(::boost::pfr::detail::add_cv_like<T>(ap)), decltype(ap)>;
+  using aq_t = std::conditional_t<!std::is_reference_v<decltype(aq)>, decltype(::boost::pfr::detail::add_cv_like<T>(aq)), decltype(aq)>;
+  using ar_t = std::conditional_t<!std::is_reference_v<decltype(ar)>, decltype(::boost::pfr::detail::add_cv_like<T>(ar)), decltype(ar)>;
+  using as_t = std::conditional_t<!std::is_reference_v<decltype(as)>, decltype(::boost::pfr::detail::add_cv_like<T>(as)), decltype(as)>;
+  using at_t = std::conditional_t<!std::is_reference_v<decltype(at)>, decltype(::boost::pfr::detail::add_cv_like<T>(at)), decltype(at)>;
+  using au_t = std::conditional_t<!std::is_reference_v<decltype(au)>, decltype(::boost::pfr::detail::add_cv_like<T>(au)), decltype(au)>;
+  using av_t = std::conditional_t<!std::is_reference_v<decltype(av)>, decltype(::boost::pfr::detail::add_cv_like<T>(av)), decltype(av)>;
+  using aw_t = std::conditional_t<!std::is_reference_v<decltype(aw)>, decltype(::boost::pfr::detail::add_cv_like<T>(aw)), decltype(aw)>;
+  using ax_t = std::conditional_t<!std::is_reference_v<decltype(ax)>, decltype(::boost::pfr::detail::add_cv_like<T>(ax)), decltype(ax)>;
+  using ay_t = std::conditional_t<!std::is_reference_v<decltype(ay)>, decltype(::boost::pfr::detail::add_cv_like<T>(ay)), decltype(ay)>;
+  using az_t = std::conditional_t<!std::is_reference_v<decltype(az)>, decltype(::boost::pfr::detail::add_cv_like<T>(az)), decltype(az)>;
+  using aA_t = std::conditional_t<!std::is_reference_v<decltype(aA)>, decltype(::boost::pfr::detail::add_cv_like<T>(aA)), decltype(aA)>;
+  using aB_t = std::conditional_t<!std::is_reference_v<decltype(aB)>, decltype(::boost::pfr::detail::add_cv_like<T>(aB)), decltype(aB)>;
+  using aC_t = std::conditional_t<!std::is_reference_v<decltype(aC)>, decltype(::boost::pfr::detail::add_cv_like<T>(aC)), decltype(aC)>;
+  using aD_t = std::conditional_t<!std::is_reference_v<decltype(aD)>, decltype(::boost::pfr::detail::add_cv_like<T>(aD)), decltype(aD)>;
+  using aE_t = std::conditional_t<!std::is_reference_v<decltype(aE)>, decltype(::boost::pfr::detail::add_cv_like<T>(aE)), decltype(aE)>;
+  using aF_t = std::conditional_t<!std::is_reference_v<decltype(aF)>, decltype(::boost::pfr::detail::add_cv_like<T>(aF)), decltype(aF)>;
+  using aG_t = std::conditional_t<!std::is_reference_v<decltype(aG)>, decltype(::boost::pfr::detail::add_cv_like<T>(aG)), decltype(aG)>;
+  using aH_t = std::conditional_t<!std::is_reference_v<decltype(aH)>, decltype(::boost::pfr::detail::add_cv_like<T>(aH)), decltype(aH)>;
+  using aJ_t = std::conditional_t<!std::is_reference_v<decltype(aJ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aJ)), decltype(aJ)>;
+  using aK_t = std::conditional_t<!std::is_reference_v<decltype(aK)>, decltype(::boost::pfr::detail::add_cv_like<T>(aK)), decltype(aK)>;
+  using aL_t = std::conditional_t<!std::is_reference_v<decltype(aL)>, decltype(::boost::pfr::detail::add_cv_like<T>(aL)), decltype(aL)>;
+  using aM_t = std::conditional_t<!std::is_reference_v<decltype(aM)>, decltype(::boost::pfr::detail::add_cv_like<T>(aM)), decltype(aM)>;
+  using aN_t = std::conditional_t<!std::is_reference_v<decltype(aN)>, decltype(::boost::pfr::detail::add_cv_like<T>(aN)), decltype(aN)>;
+  using aP_t = std::conditional_t<!std::is_reference_v<decltype(aP)>, decltype(::boost::pfr::detail::add_cv_like<T>(aP)), decltype(aP)>;
+  using aQ_t = std::conditional_t<!std::is_reference_v<decltype(aQ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aQ)), decltype(aQ)>;
+  using aR_t = std::conditional_t<!std::is_reference_v<decltype(aR)>, decltype(::boost::pfr::detail::add_cv_like<T>(aR)), decltype(aR)>;
+  using aS_t = std::conditional_t<!std::is_reference_v<decltype(aS)>, decltype(::boost::pfr::detail::add_cv_like<T>(aS)), decltype(aS)>;
+  using aU_t = std::conditional_t<!std::is_reference_v<decltype(aU)>, decltype(::boost::pfr::detail::add_cv_like<T>(aU)), decltype(aU)>;
+  using aV_t = std::conditional_t<!std::is_reference_v<decltype(aV)>, decltype(::boost::pfr::detail::add_cv_like<T>(aV)), decltype(aV)>;
+  using aW_t = std::conditional_t<!std::is_reference_v<decltype(aW)>, decltype(::boost::pfr::detail::add_cv_like<T>(aW)), decltype(aW)>;
+  using aX_t = std::conditional_t<!std::is_reference_v<decltype(aX)>, decltype(::boost::pfr::detail::add_cv_like<T>(aX)), decltype(aX)>;
+  using aY_t = std::conditional_t<!std::is_reference_v<decltype(aY)>, decltype(::boost::pfr::detail::add_cv_like<T>(aY)), decltype(aY)>;
+  using aZ_t = std::conditional_t<!std::is_reference_v<decltype(aZ)>, decltype(::boost::pfr::detail::add_cv_like<T>(aZ)), decltype(aZ)>;
+  using ba_t = std::conditional_t<!std::is_reference_v<decltype(ba)>, decltype(::boost::pfr::detail::add_cv_like<T>(ba)), decltype(ba)>;
+  using bb_t = std::conditional_t<!std::is_reference_v<decltype(bb)>, decltype(::boost::pfr::detail::add_cv_like<T>(bb)), decltype(bb)>;
+  using bc_t = std::conditional_t<!std::is_reference_v<decltype(bc)>, decltype(::boost::pfr::detail::add_cv_like<T>(bc)), decltype(bc)>;
+  using bd_t = std::conditional_t<!std::is_reference_v<decltype(bd)>, decltype(::boost::pfr::detail::add_cv_like<T>(bd)), decltype(bd)>;
+  using be_t = std::conditional_t<!std::is_reference_v<decltype(be)>, decltype(::boost::pfr::detail::add_cv_like<T>(be)), decltype(be)>;
+  using bf_t = std::conditional_t<!std::is_reference_v<decltype(bf)>, decltype(::boost::pfr::detail::add_cv_like<T>(bf)), decltype(bf)>;
 
   return ::boost::pfr::detail::make_tuple_of_references(
-    a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
-    aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
-    ba,bb,bc,bd,be,bf
+    const_cast<a_t>(a),const_cast<b_t>(b),const_cast<c_t>(c),const_cast<d_t>(d),const_cast<e_t>(e),
+    const_cast<f_t>(f),const_cast<g_t>(g),const_cast<h_t>(h),const_cast<j_t>(j),const_cast<k_t>(k),
+    const_cast<l_t>(l),const_cast<m_t>(m),const_cast<n_t>(n),const_cast<p_t>(p),const_cast<q_t>(q),
+    const_cast<r_t>(r),const_cast<s_t>(s),const_cast<t_t>(t),const_cast<u_t>(u),const_cast<v_t>(v),
+    const_cast<w_t>(w),const_cast<x_t>(x),const_cast<y_t>(y),const_cast<z_t>(z),const_cast<A_t>(A),
+    const_cast<B_t>(B),const_cast<C_t>(C),const_cast<D_t>(D),const_cast<E_t>(E),const_cast<F_t>(F),
+    const_cast<G_t>(G),const_cast<H_t>(H),const_cast<J_t>(J),const_cast<K_t>(K),const_cast<L_t>(L),
+    const_cast<M_t>(M),const_cast<N_t>(N),const_cast<P_t>(P),const_cast<Q_t>(Q),const_cast<R_t>(R),
+    const_cast<S_t>(S),const_cast<U_t>(U),const_cast<V_t>(V),const_cast<W_t>(W),const_cast<X_t>(X),
+    const_cast<Y_t>(Y),const_cast<Z_t>(Z),const_cast<aa_t>(aa),const_cast<ab_t>(ab),const_cast<ac_t>(ac),
+    const_cast<ad_t>(ad),const_cast<ae_t>(ae),const_cast<af_t>(af),const_cast<ag_t>(ag),const_cast<ah_t>(ah),
+    const_cast<aj_t>(aj),const_cast<ak_t>(ak),const_cast<al_t>(al),const_cast<am_t>(am),const_cast<an_t>(an),
+    const_cast<ap_t>(ap),const_cast<aq_t>(aq),const_cast<ar_t>(ar),const_cast<as_t>(as),const_cast<at_t>(at),
+    const_cast<au_t>(au),const_cast<av_t>(av),const_cast<aw_t>(aw),const_cast<ax_t>(ax),const_cast<ay_t>(ay),
+    const_cast<az_t>(az),const_cast<aA_t>(aA),const_cast<aB_t>(aB),const_cast<aC_t>(aC),const_cast<aD_t>(aD),
+    const_cast<aE_t>(aE),const_cast<aF_t>(aF),const_cast<aG_t>(aG),const_cast<aH_t>(aH),const_cast<aJ_t>(aJ),
+    const_cast<aK_t>(aK),const_cast<aL_t>(aL),const_cast<aM_t>(aM),const_cast<aN_t>(aN),const_cast<aP_t>(aP),
+    const_cast<aQ_t>(aQ),const_cast<aR_t>(aR),const_cast<aS_t>(aS),const_cast<aU_t>(aU),const_cast<aV_t>(aV),
+    const_cast<aW_t>(aW),const_cast<aX_t>(aX),const_cast<aY_t>(aY),const_cast<aZ_t>(aZ),const_cast<ba_t>(ba),
+    const_cast<bb_t>(bb),const_cast<bc_t>(bc),const_cast<bd_t>(bd),const_cast<be_t>(be),const_cast<bf_t>(bf)
   );
 }
 
