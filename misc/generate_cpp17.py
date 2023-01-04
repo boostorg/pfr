@@ -13,6 +13,7 @@ import string
 
 # Skipping some letters that may produce keywords or are hard to read, or shadow template parameters
 ascii_letters = string.ascii_letters.replace("o", "").replace("O", "").replace("i", "").replace("I", "").replace("T", "")
+CONST_CAST_EXPRESSIONS_LIMIT_PER_LINE = 5
 
 PROLOGUE = """// Copyright (c) 2016-2022 Antony Polukhin
 // Copyright (c) 2023 Denis Mikhailov
@@ -37,7 +38,7 @@ PROLOGUE = """// Copyright (c) 2016-2022 Antony Polukhin
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/size_t_.hpp>
-#include <type_traits> // for std::conditional_t, std::is_reference_v
+#include <type_traits> // for std::conditional_t, std::is_reference
 
 namespace boost { namespace pfr { namespace detail {
 
@@ -70,7 +71,7 @@ constexpr auto tie_as_tuple(T& /*val*/, size_t_<0>) noexcept {
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<std::is_class< std::remove_cv_t<T> >::value>* = 0) noexcept {
   auto& [a] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  using a_t = std::conditional_t<!std::is_reference_v<decltype(a)>, decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a) >;
+  using a_t = std::conditional_t<!std::is_reference<decltype(a)>(), decltype(::boost::pfr::detail::add_cv_like<T>(a)), decltype(a) >;
   return ::boost::pfr::detail::make_tuple_of_references(const_cast<a_t>(a));
 }
 
@@ -99,14 +100,13 @@ constexpr void tie_as_tuple(T& /*val*/, size_t_<I>) noexcept {
 
 def fold_using(indexes, divider):
     LINE_TEMPLATE = """
-using {tok}_t = std::conditional_t<!std::is_reference_v<decltype({tok})>, decltype(::boost::pfr::detail::add_cv_like<T>({tok})), decltype({tok})>
+using {tok}_t = std::conditional_t<!std::is_reference<decltype({tok})>(), decltype(::boost::pfr::detail::add_cv_like<T>({tok})), decltype({tok})>
 """
     tokens = [x.strip() for x in indexes.split(',')]
     result_lines = [LINE_TEMPLATE.strip().format(tok=tok)
                     for tok in tokens]
     return divider.join(result_lines)
 
-# TODO: extract constant
 def fold_const_cast(indexes, divider):
     CONST_CAST_TEMPLATE = """
 const_cast<{type}>({value})
@@ -117,7 +117,7 @@ const_cast<{type}>({value})
     casts = [CONST_CAST_TEMPLATE.strip().format(type=tok+'_t',value=tok)
              for tok in tokens]
     for i in range(0, len(casts)):
-        if i%5==0:
+        if i%CONST_CAST_EXPRESSIONS_LIMIT_PER_LINE==0:
             div = ''
             lines.append('')
         lines[-1] += div + casts[i]
