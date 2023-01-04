@@ -66,7 +66,7 @@ constexpr auto get(T&, std::enable_if_t<!std::is_assignable<T, T>::value>* = nul
 
 /// \overload get
 template <std::size_t I, class T>
-constexpr auto get(T&& val, std::enable_if_t< std::is_rvalue_reference<T&&>::value>* = 0) noexcept {
+constexpr auto get(T&& val, std::enable_if_t< std::is_rvalue_reference<T&&>::value>* = nullptr) noexcept {
     return std::move(detail::sequence_tuple::get<I>( detail::tie_as_tuple(val) ));
 }
 
@@ -159,7 +159,7 @@ constexpr auto structure_tie(T&, std::enable_if_t<!std::is_assignable<T, T>::val
 
 /// \overload structure_tie
 template <class T>
-constexpr auto structure_tie(T&&, std::enable_if_t< std::is_rvalue_reference<T&&>::value>* = 0) noexcept {
+constexpr auto structure_tie(T&&, std::enable_if_t< std::is_rvalue_reference<T&&>::value>* = nullptr) noexcept {
     static_assert(sizeof(T) && false, "====================> Boost.PFR: Calling boost::pfr::structure_tie on rvalue references is forbidden");
     return 0;
 }

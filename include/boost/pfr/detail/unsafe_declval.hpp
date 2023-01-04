@@ -24,7 +24,7 @@ template <class T>
 constexpr T unsafe_declval() noexcept {
     report_if_you_see_link_error_with_this_function();
 
-    typename std::remove_reference<T>::type* ptr = 0;
+    typename std::remove_reference<T>::type* ptr = nullptr;
     ptr += 42; // suppresses 'null pointer dereference' warnings
     return static_cast<T>(*ptr);
 }
