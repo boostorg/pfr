@@ -15,7 +15,7 @@
 // boost-no-inspect
 void test_examples() {
 
-#if BOOST_PFR_USE_CPP17
+#if BOOST_PFR_USE_CPP17 && defined(__cpp_lib_string_view)
   {
 //[pfr_quick_examples_ops
     // Assert equality.
