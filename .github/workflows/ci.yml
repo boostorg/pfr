@@ -47,6 +47,7 @@ jobs:
             sources: ""
             llvm_os: "xenial"
             llvm_ver: "5.0"
+            install: "sudo wget"
           # To low quota to use
           #- toolset: clang
           #  cxxstd: "03,11,14,17,2a"
