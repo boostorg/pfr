@@ -13,7 +13,6 @@ project
     : source-location .
     : requirements
         <define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1
-        [ requires cxx14_constexpr ]
     ;
 
 
