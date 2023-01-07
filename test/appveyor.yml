@@ -32,6 +32,10 @@ skip_tags: true
 
 environment:
   matrix:
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+      TOOLSET: msvc-9.0
+      ADDRMD: 32
+      CXXSTD: latest # fake
 #    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
 #      TOOLSET: msvc # TODO: clang-win ???
 #      ADDRMD: 32,64
