@@ -1,0 +1,22 @@
+#  Copyright (C) 2023 Denis Mikhailov
+#
+# Use, modification and distribution is subject to the Boost Software License,
+# Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt)
+#
+
+import python ;
+import testing ;
+import ../../config/checks/config : requires ;
+
+project
+    : source-location .
+    : requirements
+        <define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1
+    ;
+
+
+test-suite pfr_tests
+  :
+    [ run print_config.cpp : : : <test-info>always_show_run_output : auto_engine_config ]
+  ;

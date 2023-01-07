@@ -8,7 +8,14 @@
 #define BOOST_PFR_CONFIG_HPP
 #pragma once
 
+#if __cplusplus >= 201402L || (defined(_MSC_VER) && defined(_MSVC_LANG) && _MSC_VER > 1900)
 #include <type_traits> // to get non standard platform macro definitions (__GLIBCXX__ for example)
+#endif
+
+/// \file boost/pfr/config.hpp
+/// Contains all the macros that describe Boost.PFR configuration, like BOOST_PFR_ENABLED
+///
+/// \note This header file doesn't require C++14 Standard and supports all C++ compilers, even pre C++14 compilers (C++11, C++03...).
 
 // Reminder:
 //  * MSVC++ 14.2 _MSC_VER == 1927 <- Loophole is known to work (Visual Studio ????)
