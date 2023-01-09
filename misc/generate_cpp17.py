@@ -66,7 +66,7 @@ constexpr decltype(auto) add_cv_like(Arg& arg) noexcept {
 // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=78939
 template<typename T, typename Sb, typename Arg>
 constexpr decltype(auto) workaround_cast(Arg& arg) noexcept {
-    using output_arg_t = std::conditional_t<!std::is_reference<Sb>(), decltype(add_cv_like<T>(arg)), Sb>;
+    using output_arg_t = std::conditional_t<!std::is_reference<Sb>(), decltype(detail::add_cv_like<T>(arg)), Sb>;
     return const_cast<output_arg_t>(arg);
 }
 
