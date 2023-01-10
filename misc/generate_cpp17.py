@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 # Copyright (c) 2016-2022 Antony Polukhin
+# Copyright (c) 2023 Denis Mikhailov
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,8 +13,10 @@ import string
 
 # Skipping some letters that may produce keywords or are hard to read, or shadow template parameters
 ascii_letters = string.ascii_letters.replace("o", "").replace("O", "").replace("i", "").replace("I", "").replace("T", "")
+WORKAROUND_CAST_EXPRESSIONS_LIMIT_PER_LINE = 3
 
-PROLOGUE = """// Copyright (c) 2016-2020 Antony Polukhin
+PROLOGUE = """// Copyright (c) 2016-2022 Antony Polukhin
+// Copyright (c) 2023 Denis Mikhailov
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -35,12 +38,36 @@ PROLOGUE = """// Copyright (c) 2016-2020 Antony Polukhin
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/size_t_.hpp>
+#include <type_traits> // for std::conditional_t, std::is_reference
 
 namespace boost { namespace pfr { namespace detail {
 
 template <class... Args>
 constexpr auto make_tuple_of_references(Args&&... args) noexcept {
   return sequence_tuple::tuple<Args&...>{ args... };
+}
+
+template<typename T, typename Arg>
+constexpr decltype(auto) add_cv_like(Arg& arg) noexcept {
+    if constexpr (std::is_const<T>::value && std::is_volatile<T>::value) {
+        return const_cast<const volatile Arg&>(arg);
+    }
+    else if constexpr (std::is_const<T>::value) {
+        return const_cast<const Arg&>(arg);
+    }
+    else if constexpr (std::is_volatile<T>::value) {
+        return const_cast<volatile Arg&>(arg);
+    }
+    else {
+        return const_cast<Arg&>(arg);
+    }
+}
+
+// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=78939
+template<typename T, typename Sb, typename Arg>
+constexpr decltype(auto) workaround_cast(Arg& arg) noexcept {
+    using output_arg_t = std::conditional_t<!std::is_reference<Sb>(), decltype(detail::add_cv_like<T>(arg)), Sb>;
+    return const_cast<output_arg_t>(arg);
 }
 
 template <class T>
@@ -50,8 +77,8 @@ constexpr auto tie_as_tuple(T& /*val*/, size_t_<0>) noexcept {
 
 template <class T>
 constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<std::is_class< std::remove_cv_t<T> >::value>* = 0) noexcept {
-  auto& [a] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
-  return ::boost::pfr::detail::make_tuple_of_references(a);
+  auto& [a] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+  return ::boost::pfr::detail::make_tuple_of_references(detail::workaround_cast<T, decltype(a)>(a));
 }
 
 
@@ -77,6 +104,33 @@ constexpr void tie_as_tuple(T& /*val*/, size_t_<I>) noexcept {
 
 ############################################################################################################################
 
+def fold_workaround_cast(indexes, divider):
+    WORKAROUND_CAST_TEMPLATE = """
+detail::workaround_cast<T, decltype({arg})>({arg})
+"""
+    lines = []
+    div = ''
+    tokens = [x.strip() for x in indexes.split(',')]
+    casts = [WORKAROUND_CAST_TEMPLATE.strip().format(arg=tok)
+             for tok in tokens]
+    for i in range(0, len(casts)):
+        if i%WORKAROUND_CAST_EXPRESSIONS_LIMIT_PER_LINE==0:
+            div = ''
+            lines.append('')
+        lines[-1] += div + casts[i]
+        div = ','
+    return divider.join(lines)
+
+def calc_indexes_count(indexes):
+    tokens = [x.strip() for x in indexes.split(',')]
+    return len(tokens)
+
+class EmptyLinePrinter:
+    def print_once(self):
+        if not self.printed:
+            print("")
+            self.printed = True
+    printed = False
 
 indexes = "    a"
 print(PROLOGUE)
@@ -92,18 +146,26 @@ for i in range(1, funcs_count):
         indexes += ascii_letters[i // max_args_on_a_line - 1]
     indexes += ascii_letters[i % max_args_on_a_line]
 
+    printed_casts = fold_workaround_cast(indexes.strip(), ",\n    ")
+    indexes_count = calc_indexes_count(indexes.strip())
+    empty_printer = EmptyLinePrinter()
+
     print("template <class T>")
     print("constexpr auto tie_as_tuple(T& val, size_t_<" + str(i + 1) + ">) noexcept {")
     if i < max_args_on_a_line:
-        print("  auto& [" + indexes.strip() + "] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.")
-        print("  return ::boost::pfr::detail::make_tuple_of_references(" + indexes.strip() + ");")
+        print("  auto& [" + indexes.strip() + "] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.")
     else:
         print("  auto& [")
         print(indexes)
-        print("  ] = val; // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.")
-        print("")
+        print("  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.")
+        empty_printer.print_once()
+ 
+    if indexes_count < WORKAROUND_CAST_EXPRESSIONS_LIMIT_PER_LINE:
+        print("  return ::boost::pfr::detail::make_tuple_of_references(" + printed_casts + ");")
+    else:
+        empty_printer.print_once()
         print("  return ::boost::pfr::detail::make_tuple_of_references(")
-        print(indexes)
+        print("    " + printed_casts)
         print("  );")
 
     print("}\n")
