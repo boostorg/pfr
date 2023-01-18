@@ -156,6 +156,7 @@ template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<
 constexpr auto enable_if_constructible_helper(std::index_sequence<I...>) noexcept
     -> typename std::add_pointer<decltype(T{ ubiq_rref_constructor{I}... })>::type;
 
+// Note that this takes O(N) compile time and memory!
 template <class T, std::size_t N, class /*Enable*/ = decltype( enable_if_constructible_helper<T>(detail::make_index_sequence<N>()) ) >
 using enable_if_constructible_helper_t = std::size_t;
 
@@ -166,9 +167,10 @@ using is_one_element_range = std::integral_constant<bool, Begin == Last>;
 using multi_element_range = std::false_type;
 using one_element_range = std::true_type;
 
-///////////////////// Non greedy fields count search. Templates instantiation depth is log(sizeof(T)), templates instantiation count is log(sizeof(T)).
+///////////////////// Fields count binary search.
+// Templates instantiation depth is O(log(result)), templates instantiation count is O(log(result)), templates instantiation cost is O(result*log(result)).
 template <class T, std::size_t Begin, std::size_t Middle>
-constexpr std::size_t detect_fields_count(detail::one_element_range, long) noexcept {
+constexpr std::size_t fields_count_binary_search(detail::one_element_range, long) noexcept {
     static_assert(
         Begin == Middle,
         "====================> Boost.PFR: Internal logic error."
@@ -177,81 +179,120 @@ constexpr std::size_t detect_fields_count(detail::one_element_range, long) noexc
 }
 
 template <class T, std::size_t Begin, std::size_t Middle>
-constexpr std::size_t detect_fields_count(detail::multi_element_range, int) noexcept;
+constexpr std::size_t fields_count_binary_search(detail::multi_element_range, int) noexcept;
 
 template <class T, std::size_t Begin, std::size_t Middle>
-constexpr auto detect_fields_count(detail::multi_element_range, long) noexcept
+constexpr auto fields_count_binary_search(detail::multi_element_range, long) noexcept
     -> detail::enable_if_constructible_helper_t<T, Middle>
 {
     constexpr std::size_t next_v = Middle + (Middle - Begin + 1) / 2;
-    return detail::detect_fields_count<T, Middle, next_v>(detail::is_one_element_range<Middle, next_v>{}, 1L);
+    return detail::fields_count_binary_search<T, Middle, next_v>(detail::is_one_element_range<Middle, next_v>{}, 1L);
 }
 
 template <class T, std::size_t Begin, std::size_t Middle>
-constexpr std::size_t detect_fields_count(detail::multi_element_range, int) noexcept {
+constexpr std::size_t fields_count_binary_search(detail::multi_element_range, int) noexcept {
     constexpr std::size_t next_v = Begin + (Middle - Begin) / 2;
-    return detail::detect_fields_count<T, Begin, next_v>(detail::is_one_element_range<Begin, next_v>{}, 1L);
+    return detail::fields_count_binary_search<T, Begin, next_v>(detail::is_one_element_range<Begin, next_v>{}, 1L);
 }
 
-///////////////////// Greedy search. Templates instantiation depth is log(sizeof(T)), templates instantiation count is log(sizeof(T))*T in worst case.
+template <class T, std::size_t Begin, std::size_t I = 1>
+constexpr std::size_t fields_count_upper_bound(int) noexcept {
+    return Begin + I;
+}
+
+template <class T, std::size_t Begin, std::size_t I = 1>
+constexpr auto fields_count_upper_bound(long) noexcept
+    -> detail::enable_if_constructible_helper_t<T, Begin + I>
+{
+    return detail::fields_count_upper_bound<T, Begin, I * 2>(1L);
+}
+
+template <class T, std::size_t Begin = 0>
+constexpr std::size_t fields_count_binary_search_unbounded() noexcept
+{
+    constexpr std::size_t last = detail::fields_count_upper_bound<T, Begin>(1L);
+    constexpr std::size_t middle = (Begin + last + 1) / 2;
+    return detail::fields_count_binary_search<T, Begin, middle>(detail::is_one_element_range<Begin, middle>{}, 1L);
+}
+
+///////////////////// Fields count lower bound linear search.
+// Templates instantiation depth is O(log(sizeof(T))), templates instantiation count is O(sizeof(T)), templates instantiation cost is O(sizeof(T)^2).
+// If result < log(sizeof(T)), which can be expected for large structs without array fields, templates instantiation count reduces to O(log(sizeof(T))), templates instantiation cost reduces to O(result^2 + log(sizeof(T))).
 template <class T, std::size_t N>
-constexpr auto detect_fields_count_greedy_remember(long) noexcept
+constexpr auto fields_count_lower_bound_remember(long) noexcept
     -> detail::enable_if_constructible_helper_t<T, N>
 {
     return N;
 }
 
 template <class T, std::size_t N>
-constexpr std::size_t detect_fields_count_greedy_remember(int) noexcept {
+constexpr std::size_t fields_count_lower_bound_remember(int) noexcept {
     return 0;
 }
 
+template <class T, std::size_t Begin, std::size_t Last, class RangeSize, std::size_t Result>
+constexpr std::size_t fields_count_lower_bound(RangeSize, size_t_<Result>) noexcept {
+    return Result;
+}
+
 template <class T, std::size_t Begin, std::size_t Last>
-constexpr std::size_t detect_fields_count_greedy(detail::one_element_range) noexcept {
+constexpr std::size_t fields_count_lower_bound(detail::one_element_range, size_t_<0> = {}) noexcept {
     static_assert(
         Begin == Last,
         "====================> Boost.PFR: Internal logic error."
     );
-    return detail::detect_fields_count_greedy_remember<T, Begin>(1L);
+    return detail::fields_count_lower_bound_remember<T, Begin>(1L);
 }
 
 template <class T, std::size_t Begin, std::size_t Last>
-constexpr std::size_t detect_fields_count_greedy(detail::multi_element_range) noexcept {
+constexpr std::size_t fields_count_lower_bound(detail::multi_element_range, size_t_<0> = {}) noexcept {
+    // Binary partition to limit template depth.
     constexpr std::size_t middle = Begin + (Last - Begin) / 2;
-    constexpr std::size_t fields_count_big_range = detail::detect_fields_count_greedy<T, middle + 1, Last>(
-        detail::is_one_element_range<middle + 1, Last>{}
+    constexpr std::size_t result_maybe = detail::fields_count_lower_bound<T, Begin, middle>(
+        detail::is_one_element_range<Begin, middle>{}
     );
-
-    constexpr std::size_t small_range_begin = (fields_count_big_range ? 0 : Begin);
-    constexpr std::size_t small_range_last = (fields_count_big_range ? 0 : middle);
-    constexpr std::size_t fields_count_small_range = detail::detect_fields_count_greedy<T, small_range_begin, small_range_last>(
-        detail::is_one_element_range<small_range_begin, small_range_last>{}
+    return detail::fields_count_lower_bound<T, middle + 1, Last>(
+        detail::is_one_element_range<middle + 1, Last>{},
+        size_t_<result_maybe>{}
     );
-    return fields_count_big_range ? fields_count_big_range : fields_count_small_range;
 }
 
-///////////////////// Choosing between array size, greedy and non greedy search.
-template <class T, std::size_t N>
-constexpr auto detect_fields_count_dispatch(size_t_<N>, long, long) noexcept
+template <class T, std::size_t Begin = 1, std::size_t Result>
+constexpr std::size_t fields_count_lower_bound_unbounded(size_t_<Result>) noexcept {
+    return Result;
+}
+
+template <class T, std::size_t Begin = 1>
+constexpr std::size_t fields_count_lower_bound_unbounded(size_t_<0> = {}) noexcept
+{
+    constexpr std::size_t last = Begin * 2 - 1;
+    constexpr std::size_t result_maybe = detail::fields_count_lower_bound<T, Begin, last>(
+        detail::is_one_element_range<Begin, last>{}
+    );
+    return detail::fields_count_lower_bound_unbounded<T, last + 1>(size_t_<result_maybe>{});
+}
+
+///////////////////// Choosing between array size, unbounded binary search, and linear search followed by unbounded binary search.
+template <class T>
+constexpr auto fields_count_dispatch(long, long) noexcept
     -> typename std::enable_if<std::is_array<T>::value, std::size_t>::type
 {
     return sizeof(T) / sizeof(typename std::remove_all_extents<T>::type);
 }
 
-template <class T, std::size_t N>
-constexpr auto detect_fields_count_dispatch(size_t_<N>, long, int) noexcept
+template <class T>
+constexpr auto fields_count_dispatch(long, int) noexcept
     -> decltype(sizeof(T{}))
 {
-    constexpr std::size_t middle = N / 2 + 1;
-    return detail::detect_fields_count<T, 0, middle>(detail::multi_element_range{}, 1L);
+    return detail::fields_count_binary_search_unbounded<T>();
 }
 
-template <class T, std::size_t N>
-constexpr std::size_t detect_fields_count_dispatch(size_t_<N>, int, int) noexcept {
-    // T is not default aggregate initialzable. It means that at least one of the members is not default constructible,
-    // so we have to check all the aggregate initializations for T up to N parameters and return the bigest succeeded
-    // (we can not use binary search for detecting fields count).
-    return detail::detect_fields_count_greedy<T, 0, N>(detail::multi_element_range{});
+template <class T>
+constexpr std::size_t fields_count_dispatch(int, int) noexcept {
+    // T is not default aggregate initializable. This means that at least one of the members is not default-constructible.
+    // Use linear search to find the smallest valid initializer, after which we unbounded binary search for the largest.
+    constexpr std::size_t begin = detail::fields_count_lower_bound_unbounded<T>();
+    return detail::fields_count_binary_search_unbounded<T, begin>();
 }
 
 ///////////////////// Returns fields count
@@ -295,15 +336,7 @@ constexpr std::size_t fields_count() noexcept {
 //    );
 //#endif
 
-#if defined(_MSC_VER) && (_MSC_VER <= 1920)
-    // Workaround for msvc compilers. Versions <= 1920 have a limit of max 1024 elements in template parameter pack
-    constexpr std::size_t max_fields_count = (sizeof(type) * CHAR_BIT >= 1024 ? 1024 : sizeof(type) * CHAR_BIT);
-#else
-    constexpr std::size_t max_fields_count = (sizeof(type) * CHAR_BIT); // We multiply by CHAR_BIT because the type may have bitfields in T
-#endif
-
-    constexpr std::size_t result = detail::detect_fields_count_dispatch<type>(size_t_<max_fields_count>{}, 1L, 1L);
-
+    constexpr std::size_t result = detail::fields_count_dispatch<type>(1L, 1L);
     detail::assert_first_not_base<type>(detail::make_index_sequence<result>{});
 
 #ifndef __cpp_lib_is_aggregate
