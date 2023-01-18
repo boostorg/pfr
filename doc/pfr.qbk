@@ -478,8 +478,8 @@ By default Boost.PFR [*auto-detects your compiler abilities] and automatically d
 The Boost.PFRs reflection has some limitations that depend on a C++ Standard and compiler capabilities:
 
 * Static variables are ignored
-* T must be aggregate initializable without empty base classes
-* if T contains C arrays or it is inherited from non-empty type then the result of reflection may differ depending on the C++ version and library configuration
+* T must be aggregate initializable without base classes
+* if T contains C arrays then the result of reflection may differ depending on the C++ version and library configuration
 * Additional limitations if [*BOOST_PFR_USE_CPP17 == 0]:
     * Non of the member fields should have a template constructor from one parameter.
     * Additional limitations if [*BOOST_PFR_USE_LOOPHOLE == 0]:
@@ -521,7 +521,7 @@ Description of the [*BOOST_PFR_USE_LOOPHOLE == 1] technique by its inventor Alex
 
 [section Acknowledgements]
 
-Many thanks to Bruno Dutra for showing the technique to precisely reflect aggregate initializable type in C++14 [@https://github.com/apolukhin/magic_get/issues/5 Manual type registering/structured bindings might be unnecessary].
+Many thanks to Bruno Dutra for showing the technique to precisely reflect aggregate initializable type in C++14 [@https://github.com/boostorg/pfr/issues/5 Manual type registering/structured bindings might be unnecessary].
 
 Many thanks to Alexandr Poltavsky for initial implementation the [*BOOST_PFR_USE_LOOPHOLE == 1] technique and for describing it [@http://alexpolt.github.io/type-loophole.html in his blog].
 
