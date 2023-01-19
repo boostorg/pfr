@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2016-2022 Antony Polukhin
+# Copyright (c) 2016-2023 Antony Polukhin
 # Copyright (c) 2023 Denis Mikhailov
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -15,7 +15,7 @@ import string
 ascii_letters = string.ascii_letters.replace("o", "").replace("O", "").replace("i", "").replace("I", "").replace("T", "")
 WORKAROUND_CAST_EXPRESSIONS_LIMIT_PER_LINE = 3
 
-PROLOGUE = """// Copyright (c) 2016-2022 Antony Polukhin
+PROLOGUE = """// Copyright (c) 2016-2023 Antony Polukhin
 // Copyright (c) 2023 Denis Mikhailov
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
