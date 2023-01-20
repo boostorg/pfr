@@ -6,6 +6,7 @@
 
 #ifndef BOOST_PFR_DETAIL_CORE17_HPP
 #define BOOST_PFR_DETAIL_CORE17_HPP
+#pragma once
 
 #include <boost/pfr/detail/core17_generated.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
