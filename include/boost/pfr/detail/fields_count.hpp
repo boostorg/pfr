@@ -168,7 +168,7 @@ using multi_element_range = std::false_type;
 using one_element_range = std::true_type;
 
 ///////////////////// Fields count binary search.
-// Templates instantiation depth is O(log(result)), templates instantiation count is O(log(result)), templates instantiation cost is O(result*log(result)).
+// Template instantiation: depth is O(log(result)), count is O(log(result)), cost is O(result * log(result)).
 template <class T, std::size_t Begin, std::size_t Middle>
 constexpr std::size_t fields_count_binary_search(detail::one_element_range, long) noexcept {
     static_assert(
@@ -216,8 +216,7 @@ constexpr std::size_t fields_count_binary_search_unbounded() noexcept
 }
 
 ///////////////////// Fields count lower bound linear search.
-// Templates instantiation depth is O(log(sizeof(T))), templates instantiation count is O(sizeof(T)), templates instantiation cost is O(sizeof(T)^2).
-// If result < log(sizeof(T)), which can be expected for large structs without array fields, templates instantiation count reduces to O(log(sizeof(T))), templates instantiation cost reduces to O(result^2 + log(sizeof(T))).
+// Template instantiation: depth is O(log(result)), count is O(result), cost is O(result^2).
 template <class T, std::size_t N>
 constexpr auto fields_count_lower_bound_remember(long) noexcept
     -> detail::enable_if_constructible_helper_t<T, N>
