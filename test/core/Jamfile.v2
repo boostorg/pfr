@@ -63,6 +63,10 @@ test-suite pfr_tests
     [ run ../../example/sample_printing.cpp  : : : : auto_engine_sample_printing ]
     [ run ../../example/get.cpp              : : : : auto_engine_get ]
     [ run ../../example/quick_examples.cpp   : : : : auto_engine_quick ]
+
+    [ compile-fail fields_count_on_incomplete_type.cpp : <define>BOOST_PFR_RUN_TEST_ON=void : fields_count_on_incomplete_type_void ]
+    [ compile-fail fields_count_on_incomplete_type.cpp : <define>BOOST_PFR_RUN_TEST_ON="void()" : fields_count_on_incomplete_type_function ]
+    [ compile-fail fields_count_on_incomplete_type.cpp : <define>BOOST_PFR_RUN_TEST_ON=Foo : fields_count_on_incomplete_type_struct ]
   ;
 
 local BLACKLIST_TESTS_FOR_LOOPHOLE =
