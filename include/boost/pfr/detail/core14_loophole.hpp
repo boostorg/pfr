@@ -20,6 +20,7 @@
 
 #ifndef BOOST_PFR_DETAIL_CORE14_LOOPHOLE_HPP
 #define BOOST_PFR_DETAIL_CORE14_LOOPHOLE_HPP
+#pragma once
 
 #include <boost/pfr/detail/config.hpp>
 

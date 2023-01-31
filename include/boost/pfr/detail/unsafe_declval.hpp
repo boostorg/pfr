@@ -5,6 +5,7 @@
 
 #ifndef BOOST_PFR_DETAIL_UNSAFE_DECLVAL_HPP
 #define BOOST_PFR_DETAIL_UNSAFE_DECLVAL_HPP
+#pragma once
 
 #include <boost/pfr/detail/config.hpp>
 
