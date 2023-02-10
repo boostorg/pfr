@@ -85,6 +85,6 @@ static_assert(sizeof(bf24) == 3, "");
 int main() {
     static_assert(boost::pfr::tuple_size_v<bf7> == 7, "");
     static_assert(boost::pfr::tuple_size_v<bf8> == 8, "");
-    static_assert(boost::pfr::tuple_size_v<bf8> == 16, "");
+    static_assert(boost::pfr::tuple_size_v<bf16> == 16, "");
     static_assert(boost::pfr::tuple_size_v<bf24> == 24, "");
 }
