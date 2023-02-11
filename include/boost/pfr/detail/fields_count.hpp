@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2022 Antony Polukhin
+// Copyright (c) 2016-2023 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,6 +12,7 @@
 #include <boost/pfr/detail/size_t_.hpp>
 #include <boost/pfr/detail/unsafe_declval.hpp>
 
+#include <algorithm>    // min
 #include <climits>      // CHAR_BIT
 #include <type_traits>
 #include <utility>      // metaprogramming stuff
@@ -155,7 +156,8 @@ constexpr void* assert_first_not_base(std::index_sequence<>) noexcept
     return nullptr;
 }
 
-///////////////////// Helper for SFINAE on fields count
+///////////////////// Helpers for constructible detection
+// Note that these take O(N) compile time and memory!
 template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<std::is_copy_constructible<T>::value>::type>
 constexpr auto enable_if_constructible_helper(std::index_sequence<I...>) noexcept
     -> typename std::add_pointer<decltype(T{ ubiq_lref_constructor{I}... })>::type;
@@ -164,9 +166,20 @@ template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<
 constexpr auto enable_if_constructible_helper(std::index_sequence<I...>) noexcept
     -> typename std::add_pointer<decltype(T{ ubiq_rref_constructor{I}... })>::type;
 
-// Note that this takes O(N) compile time and memory!
-template <class T, std::size_t N, class /*Enable*/ = decltype( enable_if_constructible_helper<T>(detail::make_index_sequence<N>()) ) >
-using enable_if_constructible_helper_t = std::size_t;
+template <class T, std::size_t N, class U = std::size_t, class /*Enable*/ = decltype( enable_if_constructible_helper<T>(detail::make_index_sequence<N>()) ) >
+using enable_if_constructible_helper_t = U;
+
+template <class T, std::size_t N>
+constexpr auto is_constructible(long) noexcept
+    -> detail::enable_if_constructible_helper_t<T, N, bool>
+{
+    return true;
+}
+
+template <class T, std::size_t N>
+constexpr bool is_constructible(int) noexcept {
+    return false;
+}
 
 ///////////////////// Helpers for range size detection
 template <std::size_t Begin, std::size_t Last>
@@ -174,6 +187,13 @@ using is_one_element_range = std::integral_constant<bool, Begin == Last>;
 
 using multi_element_range = std::false_type;
 using one_element_range = std::true_type;
+
+
+///////////////////// Fields count upper bound based on sizeof(T)
+template <class T>
+constexpr std::size_t fields_count_upper_bound_loose() noexcept {
+    return sizeof(T) * CHAR_BIT;
+}
 
 ///////////////////// Fields count binary search.
 // Template instantiation: depth is O(log(result)), count is O(log(result)), cost is O(result * log(result)).
@@ -204,39 +224,38 @@ constexpr std::size_t fields_count_binary_search(detail::multi_element_range, in
 }
 
 template <class T, std::size_t Begin, std::size_t I = 1>
-constexpr std::size_t fields_count_upper_bound(int) noexcept {
-    return Begin + I;
+constexpr std::size_t fields_count_upper_bound(int, int) noexcept {
+    return Begin + I - 1;
 }
 
 template <class T, std::size_t Begin, std::size_t I = 1>
-constexpr auto fields_count_upper_bound(long) noexcept
+constexpr auto fields_count_upper_bound(long, long) noexcept
+    -> std::enable_if_t<(Begin + I > fields_count_upper_bound_loose<T>()), std::size_t>
+{
+    static_assert(
+        !detail::is_constructible<T, fields_count_upper_bound_loose<T>() + 1>(1L),
+        "====================> Boost.PFR: Types with user specified constructors (non-aggregate initializable types) are not supported."
+    );
+    return fields_count_upper_bound_loose<T>();
+}
+
+template <class T, std::size_t Begin, std::size_t I = 1>
+constexpr auto fields_count_upper_bound(long, int) noexcept
     -> detail::enable_if_constructible_helper_t<T, Begin + I>
 {
-    return detail::fields_count_upper_bound<T, Begin, I * 2>(1L);
+    return detail::fields_count_upper_bound<T, Begin, I * 2>(1L, 1L);
 }
 
 template <class T, std::size_t Begin = 0>
 constexpr std::size_t fields_count_binary_search_unbounded() noexcept
 {
-    constexpr std::size_t last = detail::fields_count_upper_bound<T, Begin>(1L);
+    constexpr std::size_t last = detail::fields_count_upper_bound<T, Begin>(1L, 1L);
     constexpr std::size_t middle = (Begin + last + 1) / 2;
     return detail::fields_count_binary_search<T, Begin, middle>(detail::is_one_element_range<Begin, middle>{}, 1L);
 }
 
 ///////////////////// Fields count lower bound linear search.
 // Template instantiation: depth is O(log(result)), count is O(result), cost is O(result^2).
-template <class T, std::size_t N>
-constexpr auto fields_count_lower_bound_remember(long) noexcept
-    -> detail::enable_if_constructible_helper_t<T, N>
-{
-    return N;
-}
-
-template <class T, std::size_t N>
-constexpr std::size_t fields_count_lower_bound_remember(int) noexcept {
-    return 0;
-}
-
 template <class T, std::size_t Begin, std::size_t Last, class RangeSize, std::size_t Result>
 constexpr std::size_t fields_count_lower_bound(RangeSize, size_t_<Result>) noexcept {
     return Result;
@@ -248,7 +267,7 @@ constexpr std::size_t fields_count_lower_bound(detail::one_element_range, size_t
         Begin == Last,
         "====================> Boost.PFR: Internal logic error."
     );
-    return detail::fields_count_lower_bound_remember<T, Begin>(1L);
+    return detail::is_constructible<T, Begin>(1L) ? Begin : 0;
 }
 
 template <class T, std::size_t Begin, std::size_t Last>
@@ -265,18 +284,29 @@ constexpr std::size_t fields_count_lower_bound(detail::multi_element_range, size
 }
 
 template <class T, std::size_t Begin = 1, std::size_t Result>
-constexpr std::size_t fields_count_lower_bound_unbounded(size_t_<Result>) noexcept {
+constexpr std::size_t fields_count_lower_bound_unbounded(int, size_t_<Result>) noexcept {
     return Result;
 }
 
 template <class T, std::size_t Begin = 1>
-constexpr std::size_t fields_count_lower_bound_unbounded(size_t_<0> = {}) noexcept
+constexpr auto fields_count_lower_bound_unbounded(long, size_t_<0> = {}) noexcept
+    -> std::enable_if_t<(Begin >= fields_count_upper_bound_loose<T>()), std::size_t>
 {
-    constexpr std::size_t last = Begin * 2 - 1;
+    static_assert(
+        detail::is_constructible<T, fields_count_upper_bound_loose<T>()>(1L),
+        "====================> Boost.PFR: Type must be aggregate initializable."
+    );
+    return fields_count_upper_bound_loose<T>();
+}
+
+template <class T, std::size_t Begin = 1>
+constexpr std::size_t fields_count_lower_bound_unbounded(int, size_t_<0> = {}) noexcept
+{
+    constexpr std::size_t last = std::min(Begin * 2, fields_count_upper_bound_loose<T>()) - 1;
     constexpr std::size_t result_maybe = detail::fields_count_lower_bound<T, Begin, last>(
         detail::is_one_element_range<Begin, last>{}
     );
-    return detail::fields_count_lower_bound_unbounded<T, last + 1>(size_t_<result_maybe>{});
+    return detail::fields_count_lower_bound_unbounded<T, last + 1>(1L, size_t_<result_maybe>{});
 }
 
 ///////////////////// Choosing between array size, unbounded binary search, and linear search followed by unbounded binary search.
@@ -298,7 +328,7 @@ template <class T>
 constexpr std::size_t fields_count_dispatch(int, int) noexcept {
     // T is not default aggregate initializable. This means that at least one of the members is not default-constructible.
     // Use linear search to find the smallest valid initializer, after which we unbounded binary search for the largest.
-    constexpr std::size_t begin = detail::fields_count_lower_bound_unbounded<T>();
+    constexpr std::size_t begin = detail::fields_count_lower_bound_unbounded<T>(1L);
     return detail::fields_count_binary_search_unbounded<T, begin>();
 }
 
@@ -349,7 +379,7 @@ constexpr std::size_t fields_count() noexcept {
         precondition5,
         "====================> Boost.PFR: Type must be aggregate initializable."
     );
-#endif  // #ifdef __cpp_lib_is_aggregate
+#endif  // #ifndef __cpp_lib_is_aggregate
 
 // Can't use the standard layout check. See the non_std_layout.cpp test.
 #if 1 || BOOST_PFR_USE_CPP17
