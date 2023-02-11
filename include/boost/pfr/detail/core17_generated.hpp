@@ -27,59 +27,78 @@ namespace boost { namespace pfr { namespace detail {
 
 template <class... Args>
 constexpr auto make_tuple_of_references(Args&&... args) noexcept {
-  return sequence_tuple::tuple<Args&...>{ args... };
+  return sequence_tuple::tuple<Args&&...>{ static_cast<Args&&>(args)... };
 }
 
 template<typename T, typename Arg>
 constexpr decltype(auto) add_cv_like(Arg& arg) noexcept {
-    if constexpr (std::is_const<T>::value && std::is_volatile<T>::value) {
-        return const_cast<const volatile Arg&>(arg);
-    }
-    else if constexpr (std::is_const<T>::value) {
-        return const_cast<const Arg&>(arg);
-    }
-    else if constexpr (std::is_volatile<T>::value) {
-        return const_cast<volatile Arg&>(arg);
-    }
-    else {
-        return const_cast<Arg&>(arg);
+    if constexpr (std::is_rvalue_reference<T&&>::value) {
+        if constexpr (std::is_const<T>::value && std::is_volatile<T>::value) {
+            return const_cast<const volatile Arg&&>(arg);
+        }
+        else if constexpr (std::is_const<T>::value) {
+            return const_cast<const Arg&&>(arg);
+        }
+        else if constexpr (std::is_volatile<T>::value) {
+            return const_cast<volatile Arg&&>(arg);
+        }
+        else {
+            return const_cast<Arg&&>(arg);
+        }
+    } else {
+      if constexpr (std::is_const<T>::value && std::is_volatile<T>::value) {
+          return const_cast<const volatile Arg&>(arg);
+      }
+      else if constexpr (std::is_const<T>::value) {
+          return const_cast<const Arg&>(arg);
+      }
+      else if constexpr (std::is_volatile<T>::value) {
+          return const_cast<volatile Arg&>(arg);
+      }
+      else {
+          return const_cast<Arg&>(arg);
+      }
     }
 }
 
 // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=78939
 template<typename T, typename Sb, typename Arg>
 constexpr decltype(auto) workaround_cast(Arg& arg) noexcept {
-    using output_arg_t = std::conditional_t<!std::is_reference<Sb>(), decltype(detail::add_cv_like<T>(arg)), Sb>;
+    using output_arg_t = std::conditional_t<
+        !std::is_reference<Sb>(),
+        decltype(detail::add_cv_like<T>(arg)),
+        std::conditional_t<std::is_rvalue_reference<T&&>::value, Sb&&, Sb&>
+    >;
     return const_cast<output_arg_t>(arg);
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& /*val*/, size_t_<0>) noexcept {
+constexpr auto tie_as_tuple(T&& /*val*/, size_t_<0>) noexcept {
   return sequence_tuple::tuple<>{};
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<std::is_class< std::remove_cv_t<T> >::value>* = nullptr) noexcept {
-  auto& [a] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<1>, std::enable_if_t<std::is_class< std::remove_cv_t<T> >::value>* = nullptr) noexcept {
+  auto&& [a] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(detail::workaround_cast<T, decltype(a)>(a));
 }
 
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<!std::is_class< std::remove_cv_t<T> >::value>* = nullptr) noexcept {
+constexpr auto tie_as_tuple(T&& val, size_t_<1>, std::enable_if_t<!std::is_class< std::remove_cv_t<T> >::value>* = nullptr) noexcept {
   return ::boost::pfr::detail::make_tuple_of_references( val );
 }
 
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<2>) noexcept {
-  auto& [a,b] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<2>) noexcept {
+  auto&& [a,b] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b));
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<3>) noexcept {
-  auto& [a,b,c] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<3>) noexcept {
+  auto&& [a,b,c] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c)
@@ -87,8 +106,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<3>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<4>) noexcept {
-  auto& [a,b,c,d] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<4>) noexcept {
+  auto&& [a,b,c,d] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -97,8 +116,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<4>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<5>) noexcept {
-  auto& [a,b,c,d,e] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<5>) noexcept {
+  auto&& [a,b,c,d,e] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -107,8 +126,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<5>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<6>) noexcept {
-  auto& [a,b,c,d,e,f] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<6>) noexcept {
+  auto&& [a,b,c,d,e,f] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -117,8 +136,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<6>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<7>) noexcept {
-  auto& [a,b,c,d,e,f,g] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<7>) noexcept {
+  auto&& [a,b,c,d,e,f,g] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -128,8 +147,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<7>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<8>) noexcept {
-  auto& [a,b,c,d,e,f,g,h] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<8>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -139,8 +158,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<8>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<9>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<9>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -150,8 +169,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<9>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<10>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<10>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -162,8 +181,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<10>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<11>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<11>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -174,8 +193,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<11>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<12>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<12>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -186,8 +205,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<12>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<13>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<13>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -199,8 +218,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<13>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<14>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<14>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -212,8 +231,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<14>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<15>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<15>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -225,8 +244,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<15>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<16>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<16>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -239,8 +258,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<16>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<17>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<17>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -253,8 +272,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<17>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<18>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<18>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -267,8 +286,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<18>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<19>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<19>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -282,8 +301,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<19>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<20>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<20>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -297,8 +316,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<20>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<21>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<21>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -312,8 +331,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<21>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<22>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<22>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -328,8 +347,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<22>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<23>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<23>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -344,8 +363,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<23>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<24>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<24>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -360,8 +379,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<24>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<25>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<25>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -377,8 +396,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<25>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<26>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<26>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -394,8 +413,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<26>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<27>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<27>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -411,8 +430,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<27>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<28>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<28>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -429,8 +448,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<28>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<29>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<29>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -447,8 +466,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<29>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<30>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<30>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -465,8 +484,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<30>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<31>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<31>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -484,8 +503,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<31>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<32>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<32>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -503,8 +522,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<32>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<33>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<33>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -522,8 +541,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<33>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<34>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<34>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -542,8 +561,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<34>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<35>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<35>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -562,8 +581,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<35>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<36>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<36>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -582,8 +601,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<36>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<37>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<37>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -603,8 +622,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<37>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<38>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<38>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -624,8 +643,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<38>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<39>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<39>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -645,8 +664,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<39>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<40>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<40>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -667,8 +686,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<40>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<41>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<41>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -689,8 +708,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<41>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<42>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<42>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -711,8 +730,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<42>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<43>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<43>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -734,8 +753,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<43>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<44>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<44>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -757,8 +776,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<44>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<45>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<45>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -780,8 +799,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<45>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<46>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<46>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -804,8 +823,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<46>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<47>) noexcept {
-  auto& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<47>) noexcept {
+  auto&& [a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
 
   return ::boost::pfr::detail::make_tuple_of_references(
     detail::workaround_cast<T, decltype(a)>(a),detail::workaround_cast<T, decltype(b)>(b),detail::workaround_cast<T, decltype(c)>(c),
@@ -828,8 +847,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<47>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<48>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<48>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -855,8 +874,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<48>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<49>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<49>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -883,8 +902,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<49>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<50>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<50>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -911,8 +930,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<50>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<51>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<51>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -939,8 +958,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<51>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<52>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<52>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -968,8 +987,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<52>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<53>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<53>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -997,8 +1016,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<53>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<54>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<54>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1026,8 +1045,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<54>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<55>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<55>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1056,8 +1075,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<55>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<56>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<56>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1086,8 +1105,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<56>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<57>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<57>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1116,8 +1135,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<57>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<58>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<58>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1147,8 +1166,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<58>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<59>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<59>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1178,8 +1197,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<59>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<60>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<60>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1209,8 +1228,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<60>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<61>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<61>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1241,8 +1260,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<61>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<62>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<62>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1273,8 +1292,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<62>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<63>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<63>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1305,8 +1324,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<63>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<64>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<64>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1338,8 +1357,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<64>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<65>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<65>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1371,8 +1390,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<65>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<66>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<66>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1404,8 +1423,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<66>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<67>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<67>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1438,8 +1457,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<67>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<68>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<68>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1472,8 +1491,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<68>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<69>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<69>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1506,8 +1525,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<69>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<70>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<70>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1541,8 +1560,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<70>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<71>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<71>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1576,8 +1595,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<71>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<72>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<72>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1611,8 +1630,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<72>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<73>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<73>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1647,8 +1666,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<73>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<74>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<74>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1683,8 +1702,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<74>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<75>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<75>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1719,8 +1738,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<75>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<76>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<76>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1756,8 +1775,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<76>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<77>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<77>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1793,8 +1812,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<77>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<78>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<78>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1830,8 +1849,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<78>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<79>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<79>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1868,8 +1887,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<79>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<80>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<80>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1906,8 +1925,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<80>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<81>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<81>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1944,8 +1963,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<81>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<82>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<82>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -1983,8 +2002,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<82>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<83>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<83>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -2022,8 +2041,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<83>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<84>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<84>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -2061,8 +2080,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<84>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<85>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<85>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -2101,8 +2120,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<85>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<86>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<86>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -2141,8 +2160,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<86>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<87>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<87>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -2181,8 +2200,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<87>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<88>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<88>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -2222,8 +2241,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<88>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<89>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<89>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -2263,8 +2282,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<89>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<90>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<90>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -2304,8 +2323,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<90>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<91>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<91>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -2346,8 +2365,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<91>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<92>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<92>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -2388,8 +2407,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<92>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<93>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<93>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -2430,8 +2449,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<93>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<94>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<94>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ
   ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
@@ -2473,8 +2492,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<94>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<95>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<95>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
     ba
@@ -2517,8 +2536,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<95>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<96>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<96>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
     ba,bb
@@ -2561,8 +2580,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<96>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<97>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<97>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
     ba,bb,bc
@@ -2606,8 +2625,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<97>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<98>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<98>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
     ba,bb,bc,bd
@@ -2651,8 +2670,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<98>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<99>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<99>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
     ba,bb,bc,bd,be
@@ -2696,8 +2715,8 @@ constexpr auto tie_as_tuple(T& val, size_t_<99>) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<100>) noexcept {
-  auto& [
+constexpr auto tie_as_tuple(T&& val, size_t_<100>) noexcept {
+  auto&& [
     a,b,c,d,e,f,g,h,j,k,l,m,n,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,J,K,L,M,N,P,Q,R,S,U,V,W,X,Y,Z,
     aa,ab,ac,ad,ae,af,ag,ah,aj,ak,al,am,an,ap,aq,ar,as,at,au,av,aw,ax,ay,az,aA,aB,aC,aD,aE,aF,aG,aH,aJ,aK,aL,aM,aN,aP,aQ,aR,aS,aU,aV,aW,aX,aY,aZ,
     ba,bb,bc,bd,be,bf
@@ -2743,7 +2762,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<100>) noexcept {
 
 
 template <class T, std::size_t I>
-constexpr void tie_as_tuple(T& /*val*/, size_t_<I>) noexcept {
+constexpr void tie_as_tuple(T&& /*val*/, size_t_<I>) noexcept {
   static_assert(sizeof(T) && false,
                 "====================> Boost.PFR: Too many fields in a structure T. Regenerate include/boost/pfr/detail/core17_generated.hpp file for appropriate count of fields. For example: `python ./misc/generate_cpp17.py 300 > include/boost/pfr/detail/core17_generated.hpp`");
 }

@@ -66,8 +66,8 @@ constexpr auto get(T&, std::enable_if_t<!std::is_assignable<T, T>::value>* = nul
 
 /// \overload get
 template <std::size_t I, class T>
-constexpr auto get(T&& val, std::enable_if_t< std::is_rvalue_reference<T&&>::value>* = nullptr) noexcept {
-    return std::move(detail::sequence_tuple::get<I>( detail::tie_as_tuple(val) ));
+constexpr decltype(auto) get(T&& val, std::enable_if_t< std::is_rvalue_reference<T&&>::value>* = nullptr) noexcept {
+    return detail::sequence_tuple::get<I>( detail::tie_as_tuple(std::forward<T>(val)) );
 }
 
 
