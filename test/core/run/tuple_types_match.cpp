@@ -35,9 +35,16 @@ void test_get_matches_tuple(T x, U y) {
     static_assert(std::is_same_v<decltype(boost::pfr::get<1>(std::move(x_cref))), decltype(std::get<1>(std::move(y_cref)))>);
     static_assert(std::is_same_v<decltype(boost::pfr::get<0>(std::move(x))), decltype(std::get<0>(std::move(y)))>);
     static_assert(std::is_same_v<decltype(boost::pfr::get<1>(std::move(x))), decltype(std::get<1>(std::move(y)))>);
+
+    // TODO: tuple_element_t
+    //static_assert(std::is_same_v<boost::pfr::tuple_element_t<0, T>, std::tuple_element_t<0, U> >);
+    //static_assert(std::is_same_v<boost::pfr::tuple_element_t<1, T>, std::tuple_element_t<1, U> >);
+    //static_assert(std::is_same_v<boost::pfr::tuple_element_t<0, const T>, std::tuple_element_t<0, const U> >);
+    //static_assert(std::is_same_v<boost::pfr::tuple_element_t<1, const T>, std::tuple_element_t<1, const U> >);
 }
 
 int main() {
+#if BOOST_PFR_USE_CPP17
     struct aggregate { int first; char second; };
     struct aggregate_const { const int first; const char second; };
 
@@ -66,5 +73,8 @@ int main() {
         aggregate_const_rref{std::move(first), std::move(second)},
         std::tuple<const int&&, const char&&>{std::move(first), std::move(second)}
     );
+#endif  // #if BOOST_PFR_USE_CPP17
+
+    return boost::report_errors();
 }
 
