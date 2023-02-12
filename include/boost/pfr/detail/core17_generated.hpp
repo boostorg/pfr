@@ -73,7 +73,7 @@ constexpr decltype(auto) workaround_cast(Arg& arg) noexcept {
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T&& /*val*/, size_t_<0>) noexcept {
+constexpr auto tie_as_tuple(const T& /*val*/, size_t_<0>) noexcept {
   return sequence_tuple::tuple<>{};
 }
 
@@ -86,7 +86,7 @@ constexpr auto tie_as_tuple(T&& val, size_t_<1>, std::enable_if_t<std::is_class<
 
 template <class T>
 constexpr auto tie_as_tuple(T&& val, size_t_<1>, std::enable_if_t<!std::is_class< std::remove_cv_t<T> >::value>* = nullptr) noexcept {
-  return ::boost::pfr::detail::make_tuple_of_references( val );
+  return ::boost::pfr::detail::make_tuple_of_references( std::forward<T>(val) );
 }
 
 
