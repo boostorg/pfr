@@ -25,22 +25,22 @@ void test_get_matches_tuple(T x, U y) {
     BOOST_TEST_EQ(boost::pfr::get<0>(std::move(x)),  std::get<0>(std::move(y)));
     BOOST_TEST_EQ(boost::pfr::get<1>(std::move(x)),  std::get<1>(std::move(y)));
     
-    static_assert(std::is_same_v<decltype(boost::pfr::get<0>(x)), decltype(std::get<0>(y))>);
-    static_assert(std::is_same_v<decltype(boost::pfr::get<1>(x)), decltype(std::get<1>(y))>);
+    static_assert(std::is_same<decltype(boost::pfr::get<0>(x)), decltype(std::get<0>(y))>::value, "");
+    static_assert(std::is_same<decltype(boost::pfr::get<1>(x)), decltype(std::get<1>(y))>::value, "");
     
-    static_assert(std::is_same_v<decltype(boost::pfr::get<0>(x_cref)), decltype(std::get<0>(y_cref))>);
-    static_assert(std::is_same_v<decltype(boost::pfr::get<1>(x_cref)), decltype(std::get<1>(y_cref))>);
+    static_assert(std::is_same<decltype(boost::pfr::get<0>(x_cref)), decltype(std::get<0>(y_cref))>::value, "");
+    static_assert(std::is_same<decltype(boost::pfr::get<1>(x_cref)), decltype(std::get<1>(y_cref))>::value, "");
     
-    static_assert(std::is_same_v<decltype(boost::pfr::get<0>(std::move(x_cref))), decltype(std::get<0>(std::move(y_cref)))>);
-    static_assert(std::is_same_v<decltype(boost::pfr::get<1>(std::move(x_cref))), decltype(std::get<1>(std::move(y_cref)))>);
-    static_assert(std::is_same_v<decltype(boost::pfr::get<0>(std::move(x))), decltype(std::get<0>(std::move(y)))>);
-    static_assert(std::is_same_v<decltype(boost::pfr::get<1>(std::move(x))), decltype(std::get<1>(std::move(y)))>);
+    static_assert(std::is_same<decltype(boost::pfr::get<0>(std::move(x_cref))), decltype(std::get<0>(std::move(y_cref)))>::value, "");
+    static_assert(std::is_same<decltype(boost::pfr::get<1>(std::move(x_cref))), decltype(std::get<1>(std::move(y_cref)))>::value, "");
+    static_assert(std::is_same<decltype(boost::pfr::get<0>(std::move(x))), decltype(std::get<0>(std::move(y)))>::value, "");
+    static_assert(std::is_same<decltype(boost::pfr::get<1>(std::move(x))), decltype(std::get<1>(std::move(y)))>::value, "");
 
-    // TODO: tuple_element_t
-    //static_assert(std::is_same_v<boost::pfr::tuple_element_t<0, T>, std::tuple_element_t<0, U> >);
-    //static_assert(std::is_same_v<boost::pfr::tuple_element_t<1, T>, std::tuple_element_t<1, U> >);
-    //static_assert(std::is_same_v<boost::pfr::tuple_element_t<0, const T>, std::tuple_element_t<0, const U> >);
-    //static_assert(std::is_same_v<boost::pfr::tuple_element_t<1, const T>, std::tuple_element_t<1, const U> >);
+    // TODO: seems to take a lot of effort with close to 0 profit
+    //static_assert(std::is_same<boost::pfr::tuple_element_t<0, T>, std::tuple_element_t<0, U> >::value, "");
+    //static_assert(std::is_same<boost::pfr::tuple_element_t<1, T>, std::tuple_element_t<1, U> >::value, "");
+    //static_assert(std::is_same<boost::pfr::tuple_element_t<0, const T>, std::tuple_element_t<0, const U> >::value, "");
+    //static_assert(std::is_same<boost::pfr::tuple_element_t<1, const T>, std::tuple_element_t<1, const U> >::value, "");
 }
 
 int main() {
