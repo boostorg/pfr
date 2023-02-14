@@ -30,19 +30,24 @@
 namespace boost { namespace pfr {
 
 /// \brief Returns reference or const reference to a field with index `I` in \aggregate `val`.
+/// Overload taking the type `U` returns reference or const reference to a field
+/// with provided type `U` in \aggregate `val` if there's only one field of such type in `val`.
 ///
 /// \b Example:
 /// \code
 ///     struct my_struct { int i, short s; };
 ///     my_struct s {10, 11};
+///
 ///     assert(boost::pfr::get<0>(s) == 10);
 ///     boost::pfr::get<1>(s) = 0;
+///
+///     assert(boost::pfr::get<int>(s) == 10);
+///     boost::pfr::get<short>(s) = 11;
 /// \endcode
 template <std::size_t I, class T>
 constexpr decltype(auto) get(const T& val) noexcept {
     return detail::sequence_tuple::get<I>( detail::tie_as_tuple(val) );
 }
-
 
 /// \overload get
 template <std::size_t I, class T>
@@ -68,6 +73,40 @@ constexpr auto get(T&, std::enable_if_t<!std::is_assignable<T, T>::value>* = nul
 template <std::size_t I, class T>
 constexpr auto get(T&& val, std::enable_if_t< std::is_rvalue_reference<T&&>::value>* = nullptr) noexcept {
     return std::move(detail::sequence_tuple::get<I>( detail::tie_as_tuple(val) ));
+}
+
+
+/// \overload get
+template <class U, class T>
+constexpr const U& get(const T& val) noexcept {
+    return detail::sequence_tuple::get_by_type_impl<const U&>( detail::tie_as_tuple(val) );
+}
+
+
+/// \overload get
+template <class U, class T>
+constexpr U& get(T& val
+#if !BOOST_PFR_USE_CPP17
+    , std::enable_if_t<std::is_assignable<T, T>::value>* = nullptr
+#endif
+) noexcept {
+    return detail::sequence_tuple::get_by_type_impl<U&>( detail::tie_as_tuple(val) );
+}
+
+#if !BOOST_PFR_USE_CPP17
+/// \overload get
+template <class U, class T>
+constexpr U& get(T&, std::enable_if_t<!std::is_assignable<T, T>::value>* = nullptr) noexcept {
+    static_assert(sizeof(T) && false, "====================> Boost.PFR: Calling boost::pfr::get on non const non assignable type is allowed only in C++17");
+    return 0;
+}
+#endif
+
+
+/// \overload get
+template <class U, class T>
+constexpr U&& get(T&& val, std::enable_if_t< std::is_rvalue_reference<T&&>::value>* = nullptr) noexcept {
+    return std::move(detail::sequence_tuple::get_by_type_impl<U&>( detail::tie_as_tuple(val) ));
 }
 
 
