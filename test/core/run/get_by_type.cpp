@@ -34,9 +34,21 @@ void test_get_by_type() {
 }
 
 void test_const_get_by_type() {
+#if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
     const Aggregate t{1, 2, 3.4, 5.6, 7};
-
     BOOST_TEST_EQ(boost::pfr::get<short>(t), 7);
+#endif
+}
+
+void test_get_by_type_pod() {
+    struct PodAggregate {
+      int i;
+      short s;
+    };
+
+    PodAggregate pod{1, 2};
+    BOOST_TEST_EQ(boost::pfr::get<int>(pod), 1);
+    BOOST_TEST_EQ(boost::pfr::get<short>(pod), 2);
 }
 
 } // anonymous namespace
@@ -47,6 +59,7 @@ void test_const_get_by_type() {
 int main() {
     testing::test_get_by_type();
     testing::test_const_get_by_type();
+    testing::test_get_by_type_pod();
 
     return boost::report_errors();
 }
