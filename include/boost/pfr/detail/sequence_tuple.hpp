@@ -79,6 +79,45 @@ constexpr T&& get_impl(base_from_member<N, T>&& t) noexcept {
 }
 
 
+template <class T, std::size_t N>
+constexpr T& get_by_type_impl(base_from_member<N, T>& t) noexcept {
+    // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.UndefReturn)
+    return t.value;
+}
+
+template <class T, std::size_t N>
+constexpr const T& get_by_type_impl(const base_from_member<N, T>& t) noexcept {
+    // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.UndefReturn)
+    return t.value;
+}
+
+template <class T, std::size_t N>
+constexpr volatile T& get_by_type_impl(volatile base_from_member<N, T>& t) noexcept {
+    // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.UndefReturn)
+    return t.value;
+}
+
+template <class T, std::size_t N>
+constexpr const volatile T& get_by_type_impl(const volatile base_from_member<N, T>& t) noexcept {
+    // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.UndefReturn)
+    return t.value;
+}
+
+template <class T, std::size_t N>
+constexpr T&& get_by_type_impl(base_from_member<N, T>&& t) noexcept {
+    // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.UndefReturn)
+    return std::forward<T>(t.value);
+}
+
+template <class T, std::size_t N>
+constexpr const T&& get_by_type_impl(const base_from_member<N, T>&& t) noexcept {
+    // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.UndefReturn)
+    return std::forward<T>(t.value);
+}
+
+
+
+
 template <class ...Values>
 struct tuple: tuple_base<
     detail::index_sequence_for<Values...>,
