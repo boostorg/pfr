@@ -19,8 +19,8 @@
 
 namespace boost { namespace pfr {
 
-/// Has a static const member variable `value` when it known that type T can or can't be reflected using Boost.PFR; otherwise, there is no member variable.
-/// Every user may(and in some difficult cases - should) specialize is_reflectable on his own.
+/// Has a static const member variable `value` when it is known that type T can or can't be reflected using Boost.PFR; otherwise, there is no member variable.
+/// Every user may (and in some difficult cases - should) specialize is_reflectable on his own.
 ///
 /// \b Example:
 /// \code
@@ -29,11 +29,9 @@ namespace boost { namespace pfr {
 ///         template<> struct is_reflectable<B, boost_fusion_tag> : std::false_type {};   // 'B' won't be interpreted as reflectable in only Boost Fusion
 ///     }}
 /// \endcode
-/// \note is_reflectable affects is_implicitly_reflectable, the decision made by is_reflectable has more priority than is_implicitly_reflectable,
-///       because is_reflectable is more sharp than is_implicitly_reflectable
-///
+/// \note is_reflectable affects is_implicitly_reflectable, the decision made by is_reflectable is used by is_implicitly_reflectable.
 template<class T, class WhatFor>
-struct is_reflectable { /*  do not has 'value' because value is unknown */ };
+struct is_reflectable { /*  does not have 'value' because value is unknown */ };
 
 // these specs can't be inherited from 'std::integral_constant< bool, boost::pfr::is_reflectable<T, WhatFor>::value >',
 // because it will break the sfinae-friendliness
@@ -46,17 +44,15 @@ struct is_reflectable<volatile T, WhatFor> : boost::pfr::is_reflectable<T, WhatF
 template<class T, class WhatFor>
 struct is_reflectable<const volatile T, WhatFor> : boost::pfr::is_reflectable<T, WhatFor> {};
 
-#if BOOST_PFR_ENABLE_IMPLICIT_REFLECTION
 /// Checks the input type for the potential to be reflected.
-/// Specialize is_reflectable if you are disagree with is_implicitly_reflectable's default decision.
+/// Specialize is_reflectable if you disagree with is_implicitly_reflectable's default decision.
 template<class T, class WhatFor>
 using is_implicitly_reflectable = std::integral_constant< bool, boost::pfr::detail::possible_reflectable<T, WhatFor>(1L) >;
 
 /// Checks the input type for the potential to be reflected.
-/// Specialize is_reflectable if you are disagree with is_implicitly_reflectable_v's default decision.
+/// Specialize is_reflectable if you disagree with is_implicitly_reflectable_v's default decision.
 template<class T, class WhatFor>
 constexpr bool is_implicitly_reflectable_v = is_implicitly_reflectable<T, WhatFor>::value;
-#endif
 
 }} // namespace boost::pfr
 
