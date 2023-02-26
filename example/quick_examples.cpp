@@ -91,7 +91,7 @@ void test_examples() {
 
   {
 //[pfr_quick_examples_get
-    // Get field by index and assign new value to that field
+    // Get field by index/type and assign new value to that field
 
     struct sample {
         char c;
@@ -100,8 +100,9 @@ void test_examples() {
 
     sample var{};
     boost::pfr::get<1>(var) = 42.01f;
+    boost::pfr::get<char>(var) = 'A';
 
-    std::cout << var.f; // Outputs: 42.01
+    std::cout << var.c << var.f; // Outputs: A 42.01
 //]
   }
 

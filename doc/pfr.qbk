@@ -17,6 +17,7 @@ Boost.PFR is a C++14 library for a very basic reflection. It gives you access to
 [import ../example/motivating_example0.cpp]
 [pfr_motivating_example]
 
+Experiment with the sample [@https://godbolt.org/z/PfYsWKb7v online].
 See [link boost_pfr.limitations_and_configuration [*limitations]].
 
 
@@ -42,20 +43,20 @@ user_info retrieve_friend(std::string_view name) {
         name
     );
 
-    ////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
     user_info info {
         std::move(std::get<0>(info_tuple)),
         std::move(std::get<1>(info_tuple)),
         std::move(std::get<2>(info_tuple)),
         std::move(std::get<3>(info_tuple)),
     }
-    ////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
 
     auto friend_info = ask_user_for_friend(std::move(info));
 
     db::insert(
         "INSERT INTO user_infos(id, name, email, login) VALUES ($0, $1, $2, $3)",
-        friend_info.id,    /////////////////////////////////////////////////////////
+        friend_info.id,    //////////////////////////////////////////////////////
         friend_info.name,  // Users are forced to enumerate fields because your
         friend_info.email, // library can not iterate over the fields of a user
         friend_info.login  // provided structure
@@ -80,20 +81,20 @@ user_info retrieve_friend(std::string_view name) {
         name
     );
 
-    ////////////////// No boilerplate code to move data around /////////////////////
+    ////////////////// No boilerplate code to move data around //////////////////
 
 
 
 
 
 
-    ////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
 
     auto friend_info = ask_user_for_friend(std::move(info));
 
     db::insert(
         "INSERT INTO user_infos(id, name, email, login) VALUES ($0, $1, $2, $3)",
-        friend_info     ////////////////////////////////////////////////////////////
+        friend_info     /////////////////////////////////////////////////////////
                         // Boost.PFR allows you to iterate over all the fields
                         // of a user provided structure
                         //
@@ -119,7 +120,7 @@ struct user_info {
     std::string name, email, login;
 };
 
-/// Customizations via hand-written code or macro like BOOST_FUSION_ADAPT_STRUCT ///
+/// Customizations via hand-written code ////////////////////////////////////////
 auto db_api_tie(user_info& ui) noexcept {
     return std::tie(ui.id, ui.name, ui.email, ui.login);
 }
@@ -127,7 +128,7 @@ auto db_api_tie(user_info& ui) noexcept {
 auto db_api_tie(const user_info& ui) noexcept {
     return std::tie(ui.id, ui.name, ui.email, ui.login);
 }
-////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
 ```
 ][
 ```
@@ -138,7 +139,7 @@ struct user_info {
     std::string name, email, login;
 };
 
-//////// With Boost.PFR there's no need in hand written customizations /////////////
+//////// With Boost.PFR there's no need in hand written customizations //////////
 
 
 
@@ -146,14 +147,29 @@ struct user_info {
 
 
 
-////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
 ```
 ]]
 ]
 
 
+Imagine that you are writing a serialization library. Serialization of user
+provided structures (and nested structures) with Boost.PFR it is just as simple as:
+
+```
+void Write(Writer& writer, int value);
+void Write(Writer& writer, std::string_view value);
+
+template <typename T>
+std::enable_if_t<std::is_aggregate_v<T>> Write(Writer& writer, const T& value) {
+  boost::pfr::for_each_field(
+      value, [&writer](const auto& field) { Write(writer, field); });
+}
+```
+
 With Boost.PFR the code is shorter, more readable and more pleasant to write.
 
+[note All the above examples were inspired by the Boost.PFR usage in [@https://github.com/userver-framework/userver 🐙 userver framework].]
 
 
 [h2 Out of the box functionality ]
@@ -164,7 +180,7 @@ Boost.PFR adds the following out-of-the-box functionality for aggregate initiali
 * heterogeneous comparators
 * hash
 * IO streaming
-* access to members by index
+* access to members by index or type
 * member type retrieval
 * methods for cooperation with `std::tuple`
 * methods to visit each field of the structure
