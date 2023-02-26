@@ -20,16 +20,27 @@ constexpr decltype(is_reflectable<T, WhatFor>::value) possible_reflectable(long)
     return is_reflectable<T, WhatFor>::value;
 }
 
+#if BOOST_PFR_ENABLE_IMPLICIT_REFLECTION
+
 template <class T, class WhatFor>
 constexpr bool possible_reflectable(int) noexcept {
-#if !BOOST_PFR_ENABLE_IMPLICIT_REFLECTION
-    return false;
-#elif defined(__cpp_lib_is_aggregate)
-    return std::is_aggregate< std::remove_cv_t<T> >();
-#else
+#   if  defined(__cpp_lib_is_aggregate)
+    using type = std::remove_cv_t<T>;
+    return std::is_aggregate<type>();
+#   else
     return true;
-#endif
+#   endif
 }
+
+#else
+
+template <class T, class WhatFor>
+constexpr bool possible_reflectable(int) noexcept {
+    // negative answer here won't change behaviour in PFR-dependent libraries(like Fusion)
+    return false;
+}
+
+#endif
 
 }}} // namespace boost::pfr::detail
 
