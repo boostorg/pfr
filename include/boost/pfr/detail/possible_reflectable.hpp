@@ -20,6 +20,8 @@ constexpr decltype(is_reflectable<T, WhatFor>::value) possible_reflectable(long)
     return is_reflectable<T, WhatFor>::value;
 }
 
+#if BOOST_PFR_ENABLE_IMPLICIT_REFLECTION
+
 template <class T, class WhatFor>
 constexpr bool possible_reflectable(int) noexcept {
 #   if  defined(__cpp_lib_is_aggregate)
@@ -29,6 +31,16 @@ constexpr bool possible_reflectable(int) noexcept {
     return true;
 #   endif
 }
+
+#else
+
+template <class T, class WhatFor>
+constexpr bool possible_reflectable(int) noexcept {
+    // negative answer here won't change behaviour in PFR-dependent libraries(like Fusion)
+    return false;
+}
+
+#endif
 
 }}} // namespace boost::pfr::detail
 
