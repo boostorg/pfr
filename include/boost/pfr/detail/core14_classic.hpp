@@ -53,7 +53,7 @@ namespace typeid_conversions {
 #ifdef _MSC_VER
 #   pragma warning( push )
     // '<<': check operator precedence for possible error; use parentheses to clarify precedence
-#   pragma warning( disable : 4554 ) 
+#   pragma warning( disable : 4554 )
 #endif
 
 constexpr std::size_t native_types_mask = 31;
