@@ -6,6 +6,7 @@
 // Test case for https://github.com/boostorg/pfr/issues/33
 
 #include <iostream>
+#include <memory>
 #include <vector>
 #include <boost/pfr.hpp>
 #include <boost/core/lightweight_test.hpp>
