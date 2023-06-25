@@ -1,0 +1,56 @@
+# Copyright (c) 2023 Bela Schaum, X-Ryl669, Denis Mikhailov.
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+
+# Initial implementation by Bela Schaum, https://github.com/schaumb
+# The way to make it union and UB free by X-Ryl669, https://github.com/X-Ryl669
+#
+
+import python ;
+import testing ;
+import ../../config/checks/config : requires ;
+
+########## BEGIN of helpers to detect C++20 non-type template args support
+
+actions mp_simple_run_action
+{
+      $(>) > $(<)
+}
+
+rule mp-run-simple ( sources + : args * : input-files * : requirements * : target-name )
+{
+   exe $(target-name)_exe : $(sources) : $(requirements) ;
+   explicit $(target-name)_exe ;
+   make $(target-name).output : $(target-name)_exe : @mp_simple_run_action ;
+   explicit $(target-name).output ;
+   alias $(target-name) : $(target-name).output ;
+}
+
+mp-run-simple cxx20_nontype_template_args_detection.cpp : : : : compiler_supports_cxx20_nontype_template_args ;
+explicit compiler_supports_cxx20_nontype_template_args ;
+
+########## END of helpers to detect C++20 non-type template args support
+
+
+local REQUIRE_CXX20_NONTYPE_TEMPLATE_ARGS =
+    [ check-target-builds ../core_name//compiler_supports_cxx20_nontype_template_args : : <build>no ]
+  ;
+
+project
+    : source-location .
+    : requirements
+        <define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1
+        [ check-target-builds ../core_name//compiler_supports_cxx20_nontype_template_args : : <build>no ]
+    ;
+
+
+
+test-suite pfr_tests
+  :
+    [ run fields_names.cpp : : : : ]
+    [ run fields_names_constexpr.cpp : : : : ]
+  ;
+
+
