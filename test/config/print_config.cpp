@@ -14,6 +14,7 @@ int main() {
         << "BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE == " << BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE << '\n'
         << "BOOST_PFR_HAS_GUARANTEED_COPY_ELISION == " << BOOST_PFR_HAS_GUARANTEED_COPY_ELISION << '\n'
         << "BOOST_PFR_ENABLE_IMPLICIT_REFLECTION == " << BOOST_PFR_ENABLE_IMPLICIT_REFLECTION << '\n'
+	<< "BOOST_PFR_ENABLE_GETTING_NAMES == " << BOOST_PFR_ENABLE_GETTING_NAMES << '\n'
         << "BOOST_PFR_ENABLED == " << BOOST_PFR_ENABLED << '\n'
         << "__cplusplus == " << __cplusplus << '\n'
 #ifdef __cpp_structured_bindings

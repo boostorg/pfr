@@ -98,6 +98,14 @@
 #   endif
 #endif
 
+#ifndef BOOST_PFR_ENABLE_GETTING_NAMES
+#   if defined(__cpp_nontype_template_args) && __cpp_nontype_template_args >= 201911
+#       define BOOST_PFR_ENABLE_GETTING_NAMES 1
+#   else
+#       define BOOST_PFR_ENABLE_GETTING_NAMES 0
+#   endif
+#endif
+
 #if defined(__has_cpp_attribute)
 #   if __has_cpp_attribute(maybe_unused)
 #       define BOOST_PFR_MAYBE_UNUSED [[maybe_unused]]
