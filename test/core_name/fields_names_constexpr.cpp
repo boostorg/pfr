@@ -30,11 +30,11 @@ static_assert(boost::pfr::get_name<2, Aggregate>() == "c");
 static_assert(boost::pfr::get_name<3, Aggregate>() == "Forth");
 
 static_assert(boost::pfr::names_as_array<Aggregate>() == std::array<std::string_view, 4>{
-		"member1",
-		"this_is_a_name",
-		"c",
-		"Forth"
-		});
+        "member1",
+        "this_is_a_name",
+        "c",
+        "Forth"
+});
 
 int main() {}
 

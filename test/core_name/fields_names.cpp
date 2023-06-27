@@ -47,9 +47,9 @@ void test_get_name_by_type() {
 void test_names_as_array() {
     const auto expected = std::array<std::string_view, 4>{
         "member1",
-	"this_is_a_name",
-	"c",
-	"Forth"
+        "this_is_a_name",
+        "c",
+        "Forth"
     };
     const auto value = boost::pfr::names_as_array<Aggregate>();
     BOOST_TEST_EQ(expected.size(), value.size());

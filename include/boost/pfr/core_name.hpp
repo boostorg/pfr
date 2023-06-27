@@ -40,8 +40,8 @@ constexpr auto get_name() noexcept {
 template <class T>
 constexpr auto names_as_array() noexcept {
     return detail::make_stdarray_from_tietuple(
-	detail::tie_as_names_tuple<T>(),
-	detail::make_index_sequence< tuple_size_v<T> >()
+        detail::tie_as_names_tuple<T>(),
+        detail::make_index_sequence< tuple_size_v<T> >()
     );
 }
 

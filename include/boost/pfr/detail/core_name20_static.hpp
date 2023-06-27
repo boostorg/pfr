@@ -67,7 +67,7 @@ constexpr auto tie_as_names_tuple() noexcept {
     );
     static_assert(
         sizeof(T) && BOOST_PFR_USE_CPP17,
-	"====================> Boost.PFR: Extraction of field's names is allowed only when the BOOST_PFR_USE_CPP17 macro enabled."
+        "====================> Boost.PFR: Extraction of field's names is allowed only when the BOOST_PFR_USE_CPP17 macro enabled."
     );
 
     return tie_as_names_tuple_impl<T>(detail::make_index_sequence<detail::fields_count<T>()>{});
