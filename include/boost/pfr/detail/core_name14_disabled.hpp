@@ -28,7 +28,7 @@ template <class T>
 constexpr auto tie_as_names_tuple() noexcept {
     static_assert(
         sizeof(T) && false,
-	"====================> Boost.PFR: Extraction of field's names is allowed only in C++20"
+        "====================> Boost.PFR: Extraction of field's names is allowed only in C++20"
     );
 
     return detail::make_sequence_tuple(); 
