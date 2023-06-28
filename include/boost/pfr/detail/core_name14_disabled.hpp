@@ -23,12 +23,21 @@ constexpr auto make_sequence_tuple(Args... args) noexcept {
     return sequence_tuple::tuple<Args...>{ args... };
 }
 
+template <class T, std::size_t I>
+constexpr auto get_name() noexcept {
+    static_assert(
+        sizeof(T) && false,
+        "====================> Boost.PFR: Field's names extracting functionality requires C++20 and compiler that supports __PRETTY_FUNCTION__ or __FUNCSIG__ macro (GCC, Clang or MSVC)."
+    );
+    
+    return nullptr;
+}
 
 template <class T>
 constexpr auto tie_as_names_tuple() noexcept {
     static_assert(
         sizeof(T) && false,
-        "====================> Boost.PFR: Extraction of field's names is allowed only in C++20"
+        "====================> Boost.PFR: Field's names extracting functionality requires C++20 and compiler that supports __PRETTY_FUNCTION__ or __FUNCSIG__ macro (GCC, Clang or MSVC)."
     );
 
     return detail::make_sequence_tuple(); 

@@ -51,6 +51,8 @@ test-suite pfr_tests
   :
     [ run fields_names.cpp : : : : ]
     [ run fields_names_constexpr.cpp : : : : ]
+    [ run fields_names_nonascii.cpp : : : : ]
+    [ run fields_names_unnamed_struct.cpp : : : <cxxflags>"-fpermissive" : ]
   ;
 
 

@@ -20,6 +20,7 @@
 #include <type_traits>
 #include <string_view>
 #include <array>
+#include <algorithm> // for std::ranges::copy
 
 namespace boost { namespace pfr { namespace detail {
 
@@ -30,7 +31,7 @@ constexpr auto make_sequence_tuple(Args... args) noexcept {
 }
 
 template <auto& ptr> 
-constexpr auto name_of_field_impl() noexcept {
+consteval auto name_of_field_impl() noexcept {
 #ifdef _MSC_VER
     constexpr std::string_view sv = __FUNCSIG__;
     constexpr auto last = sv.find_last_not_of(" >(", sv.size() - 6);
@@ -38,11 +39,11 @@ constexpr auto name_of_field_impl() noexcept {
     constexpr std::string_view sv = __PRETTY_FUNCTION__;
     constexpr auto last = sv.find_last_not_of(" ])");
 #endif
-    constexpr auto first = sv.find_last_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789", last);
-    std::array<char, last - first + 1> res{};
-    auto it = res.data();
-    for (auto a = first+1; a <= last; ++a)
-        *it++ = sv[a];
+    constexpr auto first = sv.find_last_of(":", last);
+    auto res = std::array<char, last - first + 1>{};
+    std::ranges::copy(sv.begin()+first+1,
+                      sv.begin()+last+1,
+                      res.begin());
     return res;
 }
 
@@ -57,6 +58,20 @@ constexpr auto stored_name_of_field = name_of_field_impl<detail::sequence_tuple:
 template <class T, std::size_t... I>
 constexpr auto tie_as_names_tuple_impl(std::index_sequence<I...>) noexcept {
     return detail::make_sequence_tuple(std::string_view{stored_name_of_field<T, I>.data()}...);
+}
+
+template <class T, std::size_t I>
+constexpr std::string_view get_name() noexcept {
+    static_assert(
+        !std::is_union<T>::value,
+        "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."
+    );
+    static_assert(
+        sizeof(T) && BOOST_PFR_USE_CPP17,
+        "====================> Boost.PFR: Extraction of field's names is allowed only when the BOOST_PFR_USE_CPP17 macro enabled."
+   );
+   
+   return stored_name_of_field<T, I>.data();  
 }
 
 template <class T>
