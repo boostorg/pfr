@@ -14,8 +14,8 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-// Each core_name provides `TODO:` and
-// `TODO:` functions.
+// Each core_name provides `boost::pfr::detail::get_name` and
+// `boost::pfr::detail::tie_as_names_tuple` functions.
 //
 // The whole functional of extracting field's names is build on top of those
 // two functions.

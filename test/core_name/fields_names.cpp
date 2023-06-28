@@ -58,6 +58,7 @@ void test_names_as_array() {
     }
 }
 
+
 } // anonymous namespace
 
 

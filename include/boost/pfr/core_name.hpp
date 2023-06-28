@@ -28,7 +28,7 @@ namespace boost { namespace pfr {
 
 template <std::size_t I, class T>
 constexpr auto get_name() noexcept {
-    return detail::sequence_tuple::get<I>( detail::tie_as_names_tuple<T>() );
+    return detail::get_name<T, I>();
 }
 
 // FIXME: implement this

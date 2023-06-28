@@ -98,8 +98,16 @@
 #   endif
 #endif
 
+#ifndef BOOST_PFR_FUNCTION_MACRO_SUPPORTED
+#   if defined(__clang__) || defined(__GNUC__) || defined(_MSC_VER)
+#       define BOOST_PFR_FUNCTION_MACRO_SUPPORTED 1
+#   else
+#       define BOOST_PFR_FUNCTION_MACRO_SUPPORTED 0
+#   endif
+#endif
+
 #ifndef BOOST_PFR_ENABLE_GETTING_NAMES
-#   if defined(__cpp_nontype_template_args) && __cpp_nontype_template_args >= 201911
+#   if defined(__cpp_nontype_template_args) && __cpp_nontype_template_args >= 201911 && BOOST_PFR_FUNCTION_MACRO_SUPPORTED
 #       define BOOST_PFR_ENABLE_GETTING_NAMES 1
 #   else
 #       define BOOST_PFR_ENABLE_GETTING_NAMES 0
