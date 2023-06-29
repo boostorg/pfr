@@ -19,13 +19,13 @@ jobs:
         include:
           - toolset: gcc-7
             cxxstd: "03,11,14,17"
-            os: ubuntu-18.04
+            os: ubuntu-20.04
           - toolset: gcc-9  # Do not remove! It is the only toolset that tests misc/strip_boost_namespace.sh
             cxxstd: "03,11,14,17,2a"
-            os: ubuntu-18.04
+            os: ubuntu-20.04
           - toolset: gcc-10
             cxxstd: "03,11,14,17,2a"
-            os: ubuntu-18.04
+            os: ubuntu-20.04
             cxxflags: "cxxflags=--coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined"
             linkflags: "linkflags=--coverage -lasan -lubsan"
             gcov_tool: "gcov-10"
