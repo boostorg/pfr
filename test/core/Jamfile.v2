@@ -95,6 +95,17 @@ local BLACKLIST_TESTS_FOR_CLASSIC =
     tie_anonymous_const_field
   ;
 
+# FIXME: https://github.com/boostorg/pfr/issues/133
+# FIXME: https://github.com/boostorg/pfr/issues/132
+# FIXME: https://github.com/boostorg/pfr/issues/131
+local BLACKLIST_TESTS_FOR_COMPILE_FAIL = 
+    issue30
+    issue33
+    get_rvalue
+    non_movable
+    template_constructor
+  ;
+
 for local source_file in [ glob ./run/*.cpp ] [ glob ../../example/*.cpp ]
 {
     local target_name = $(source_file[1]:B) ;
@@ -104,7 +115,7 @@ for local source_file in [ glob ./run/*.cpp ] [ glob ../../example/*.cpp ]
     {
         pfr_tests += [ run $(source_file) : : : $(LOOPHOLE_ENGINE) : $(target_name)_lh ] ;
     }
-    else
+    else if ! $(target_name) in $(BLACKLIST_TESTS_FOR_COMPILE_FAIL)
     {
         pfr_tests += [ compile-fail $(source_file) : $(LOOPHOLE_ENGINE) : $(target_name)_lh ] ;
     }
@@ -113,7 +124,7 @@ for local source_file in [ glob ./run/*.cpp ] [ glob ../../example/*.cpp ]
     {
         pfr_tests += [ run $(source_file) : : : $(CLASSIC_ENGINE) : $(target_name)_classic ] ;
     }
-    else
+    else if ! $(target_name) in $(BLACKLIST_TESTS_FOR_COMPILE_FAIL)
     {
         pfr_tests += [ compile-fail $(source_file) : $(CLASSIC_ENGINE) : $(target_name)_classic ] ;
     }
