@@ -12,11 +12,7 @@ struct constrained_template {
     constrained_template() = default;
 
     template <
-      class U = T,
-      std::enable_if_t<
-          std::is_constructible<T, U&&>::value
-          || sizeof(decltype(T{std::declval<U&&>()}))
-      , bool> = false>
+      class U = T>
     constexpr constrained_template(U&& val)
         : value_{std::forward<U>(val)}
     {}
