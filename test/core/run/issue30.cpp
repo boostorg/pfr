@@ -5,6 +5,9 @@
 
 // Test case for https://github.com/boostorg/pfr/issues/30
 
+// FIXME: https://github.com/boostorg/pfr/issues/132
+#if !defined(_MSC_VER) || _MSC_VER < 1925
+
 #include <memory>
 #include <boost/pfr.hpp>
 #include <boost/core/lightweight_test.hpp>
@@ -35,3 +38,8 @@ int main() {
 
   return boost::report_errors();
 }
+
+#else
+int main() {}
+#endif
+
