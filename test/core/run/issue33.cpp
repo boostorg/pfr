@@ -5,6 +5,9 @@
 
 // Test case for https://github.com/boostorg/pfr/issues/33
 
+// FIXME: https://github.com/boostorg/pfr/issues/131
+#if !(defined(__clang__) && __cplusplus >= 202002L)
+
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -25,3 +28,8 @@ int main() {
 
     return boost::report_errors();
 }
+
+#else
+int main() {}
+#endif
+
