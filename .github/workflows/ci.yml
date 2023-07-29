@@ -106,14 +106,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - toolset: msvc-14.2
-            cxxstd: "14,17,latest"
+          - toolset: msvc-14.3
+            cxxstd: "14,17,20,latest"
             addrmd: 32,64
-            os: windows-2019
+            os: windows-latest
           - toolset: gcc
             cxxstd: "03,11,14,17,2a"
             addrmd: 64
-            os: windows-2019
+            os: windows-latest
 
     runs-on: ${{matrix.os}}
 
