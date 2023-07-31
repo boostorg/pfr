@@ -109,11 +109,11 @@ jobs:
           - toolset: msvc-14.3
             cxxstd: "14,17,20,latest"
             addrmd: 32,64
-            os: windows-latest
+            os: windows-2022
           - toolset: gcc
             cxxstd: "03,11,14,17,2a"
             addrmd: 64
-            os: windows-latest
+            os: windows-2019
 
     runs-on: ${{matrix.os}}
 
