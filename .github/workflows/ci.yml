@@ -146,7 +146,7 @@ jobs:
         shell: cmd
         run: |
           cd ../boost-root
-          b2 -j1 libs/%LIBRARY%/test toolset=${{matrix.toolset}} cxxstd=${{matrix.cxxstd}} address-model=${{matrix.addrmd}} variant=debug,release
+          b2 -j2 libs/%LIBRARY%/test toolset=${{matrix.toolset}} cxxstd=${{matrix.cxxstd}} address-model=${{matrix.addrmd}} variant=debug,release
 
   finish:
     needs: posix
