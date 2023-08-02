@@ -106,7 +106,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - toolset: msvc-14.3
+          - toolset: msvc
             cxxstd: "14,17,20,latest"
             addrmd: 32,64
             os: windows-2022
