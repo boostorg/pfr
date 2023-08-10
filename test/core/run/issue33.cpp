@@ -15,20 +15,17 @@ struct TestStruct {
     std::vector<std::unique_ptr<int>> vec;
 };
 
-// FIXME: https://github.com/boostorg/pfr/issues/131
-#if !(defined(__clang__) && __cplusplus >= 202002L)
 
 int main() {
     TestStruct temp;
     temp.vec.emplace_back();
 
+// FIXME: https://github.com/boostorg/pfr/issues/131
+#if !(defined(__clang__) && __cplusplus >= 201703L)
     boost::pfr::for_each_field(temp, [](const auto& value) {
         BOOST_TEST_EQ(value.size(), 1);
     });
+#endif
 
     return boost::report_errors();
 }
-
-#else
-int main() {}
-#endif
