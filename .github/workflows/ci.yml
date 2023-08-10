@@ -17,30 +17,21 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - toolset: gcc-7
-            cxxstd: "03,11,14,17"
-            os: ubuntu-18.04
-          - toolset: gcc-9  # Do not remove! It is the only toolset that tests misc/strip_boost_namespace.sh
+          - toolset: gcc-12
             cxxstd: "03,11,14,17,2a"
-            os: ubuntu-18.04
-          - toolset: gcc-10
-            cxxstd: "03,11,14,17,2a"
-            os: ubuntu-18.04
+            os: ubuntu-22.04
             cxxflags: "cxxflags=--coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined"
             linkflags: "linkflags=--coverage -lasan -lubsan"
-            gcov_tool: "gcov-10"
+            gcov_tool: "gcov-12"
           - toolset: clang
-            compiler: clang++-10
+            compiler: clang++-14
             cxxstd: "03,11,14,17,2a"
-            os: ubuntu-20.04
-            cxxflags: "cxxflags=-fsanitize=address,undefined,integer -fno-sanitize-recover=undefined"
-            linkflags: "linkflags=-fsanitize=address,undefined,integer"
-          # To low quota to use
-          #- toolset: clang
-          #  cxxstd: "03,11,14,17,2a"
-          #  os: macos-10.15
-          #  cxxflags: "cxxflags=-fsanitize=address,undefined -fno-sanitize-recover=undefined"
-          #  linkflags: "linkflags=-fsanitize=address,undefined"
+            os: ubuntu-22.04
+          # - toolset: clang
+          #   cxxstd: "03,11,14,17,2a"
+          #   os: macos-10.15
+          #   cxxflags: "cxxflags=-fsanitize=address,undefined -fno-sanitize-recover=undefined"
+          #   linkflags: "linkflags=-fsanitize=address,undefined"
 
     runs-on: ${{matrix.os}}
 
@@ -76,11 +67,6 @@ jobs:
           ./b2 -d0 headers
           ./b2 -j4 variant=debug tools/inspect/build
 
-      - name: Create user-config.jam
-        if: matrix.compiler
-        run: |
-          echo "using ${{matrix.toolset}} : : ${{matrix.compiler}} ;" > ~/user-config.jam
-
       - name: Run tests
         run: |
           cd ../boost-root
@@ -98,9 +84,9 @@ jobs:
 
           echo -e "#!/bin/bash\nexec ${{matrix.gcov_tool}} \"\$@\"" > $GITHUB_WORKSPACE/coveralls/gcov_wrapper.sh
           chmod +x $GITHUB_WORKSPACE/coveralls/gcov_wrapper.sh
-          wget https://github.com/linux-test-project/lcov/archive/v1.15.zip
-          unzip v1.15.zip
-          LCOV="`pwd`/lcov-1.15/bin/lcov --gcov-tool $GITHUB_WORKSPACE/coveralls/gcov_wrapper.sh"
+          wget https://github.com/linux-test-project/lcov/archive/v1.16.zip
+          unzip v1.16.zip
+          LCOV="`pwd`/lcov-1.16/bin/lcov --gcov-tool $GITHUB_WORKSPACE/coveralls/gcov_wrapper.sh"
 
           echo "$LCOV --directory ../boost-root/bin.v2/libs/$LIBRARY/ --base-directory `pwd`/libs/$LIBRARY/test --capture --output-file $GITHUB_WORKSPACE/coveralls/coverage.info"
           $LCOV --directory ../boost-root/bin.v2/libs/$LIBRARY/ --base-directory ../boost-root/ --capture --output-file $GITHUB_WORKSPACE/coveralls/coverage.info
@@ -124,16 +110,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # TODO: fails the loophole tests
-          #- toolset: msvc
-          #  cxxstd: "14,17,latest"
-          #  addrmd: 32,64
-          #  os: windows-2022
-          # TODO: fails the loophole tests
-          #- toolset: msvc-14.2
-          #  cxxstd: "14,17,latest"
-          #  addrmd: 32,64
-          #  os: windows-2019
+          - toolset: msvc-14.2
+            cxxstd: "14,17,latest"
+            addrmd: 32,64
+            os: windows-2019
           - toolset: gcc
             cxxstd: "03,11,14,17,2a"
             addrmd: 64
