@@ -64,7 +64,12 @@ constexpr std::size_t get_field_count_through_for_each_field() {
     });
     return counter;
 }
+
+// MSVC-14.1 fails to compile the following code
+#if !defined(_MSC_VER) || _MSC_VER > 1916
 static_assert(3 == get_field_count_through_for_each_field());
+#endif
+
 #endif
 
 int main () {
