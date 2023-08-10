@@ -42,7 +42,7 @@ jobs:
             linkflags: "linkflags=--coverage -lasan -lubsan"
             gcov_tool: "gcov-9"
           - toolset: clang-14
-            cxxstd: "03,11,14,17"  # 20 fails https://github.com/boostorg/pfr/issues/131
+            cxxstd: "03,11,14,17,20"
             os: ubuntu-22.04
           - toolset: clang-13
             cxxstd: "03,11,14,17,20"
@@ -135,12 +135,8 @@ jobs:
             addrmd: 32,64
             os: windows-2019
           - toolset: msvc-14.3
-            cxxstd: "14,17,20,latest"
-            addrmd: 32,64
-            os: windows-2022
-          - toolset: clang-win
-            cxxstd: "14,17,latest"
-            addrmd: 32,64
+            cxxstd: "latest"
+            addrmd: 64
             os: windows-2022
           - toolset: gcc
             cxxstd: "03,11,14,17,2a"
