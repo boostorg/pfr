@@ -5,9 +5,6 @@
 
 // Test case for https://github.com/boostorg/pfr/issues/33
 
-// FIXME: https://github.com/boostorg/pfr/issues/131
-#if !defined(__clang__)
-
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -17,6 +14,9 @@
 struct TestStruct {
     std::vector<std::unique_ptr<int>> vec;
 };
+
+// FIXME: https://github.com/boostorg/pfr/issues/131
+#if !(defined(__clang__) && __cplusplus >= 202002L)
 
 int main() {
     TestStruct temp;
