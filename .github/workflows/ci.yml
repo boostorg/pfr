@@ -134,14 +134,17 @@ jobs:
             cxxstd: "14,latest"
             addrmd: 32,64
             os: windows-2019
+            threads: "-j3"
           - toolset: gcc
             cxxstd: "03,11,14,17,2a"
             addrmd: 64
             os: windows-2019
+            threads: "-j3"
           - toolset: msvc-14.3
             cxxstd: "20,latest"
             addrmd: 64
             os: windows-2022
+            threads: "-j1"
 
     runs-on: ${{matrix.os}}
 
@@ -174,7 +177,7 @@ jobs:
         shell: cmd
         run: |
           cd ../boost-root
-          b2 -j2 libs/%LIBRARY%/test toolset=${{matrix.toolset}} cxxstd=${{matrix.cxxstd}} address-model=${{matrix.addrmd}} variant=debug,release
+          b2 ${{matrix.threads}} libs/%LIBRARY%/test toolset=${{matrix.toolset}} cxxstd=${{matrix.cxxstd}} address-model=${{matrix.addrmd}} variant=debug,release
 
   finish:
     needs: posix
