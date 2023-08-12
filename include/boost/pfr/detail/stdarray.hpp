@@ -29,7 +29,7 @@ constexpr auto make_stdarray_from_tietuple(const T& t, std::index_sequence<I...>
     );
 }
 
-}}}
+}}} // namespace boost::pfr::detail
 
 #endif // BOOST_PFR_DETAIL_STDARRAY_HPP
 

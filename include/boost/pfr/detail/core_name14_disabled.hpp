@@ -43,7 +43,7 @@ constexpr auto tie_as_names_tuple() noexcept {
     return detail::make_sequence_tuple(); 
 }
 
-}}}
+}}} // namespace boost::pfr::detail
 
 #endif // BOOST_PFR_DETAIL_CORE_NAME14_DISABLED_HPP
 

@@ -88,7 +88,7 @@ constexpr auto tie_as_names_tuple() noexcept {
     return tie_as_names_tuple_impl<T>(detail::make_index_sequence<detail::fields_count<T>()>{});
 }
 
-}}}
+}}} // namespace boost::pfr::detail
 
 #endif // BOOST_PFR_DETAIL_CORE_NAME20_STATIC_HPP
 
