@@ -46,7 +46,7 @@ constexpr auto names_as_array() noexcept {
 }
 
 
-}}
+}} // namespace boost::pfr
 
 #endif // BOOST_PFR_CORE_NAME_HPP 
 
