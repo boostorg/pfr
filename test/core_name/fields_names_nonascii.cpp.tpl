@@ -17,16 +17,16 @@ namespace testing {
 namespace {
 
 struct Aggregate {
-    int _π;
+    int _%ARG%;
 };
 
 void test_get_name() {
-    BOOST_TEST_EQ( ((boost::pfr::get_name<0, Aggregate>())), "_π");
+    BOOST_TEST_EQ( ((boost::pfr::get_name<0, Aggregate>())), "_%ARG%");
 }
 
 void test_names_as_array() {
     const auto expected = std::array<std::string_view, 1>{
-        "_π"
+        "_%ARG%"
     };
     const auto value = boost::pfr::names_as_array<Aggregate>();
     BOOST_TEST_EQ(expected.size(), value.size());

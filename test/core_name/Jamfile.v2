@@ -33,7 +33,6 @@ explicit compiler_supports_cxx20_nontype_template_args ;
 
 ########## END of helpers to detect C++20 non-type template args support
 
-
 local REQUIRE_CXX20_NONTYPE_TEMPLATE_ARGS =
     [ check-target-builds ../core_name//compiler_supports_cxx20_nontype_template_args : : <build>no ]
   ;
@@ -46,6 +45,16 @@ project
     ;
 
 
+########## BEGIN of helpers to prepare the test with non-ascii field name
+
+actions insert_utf8_action
+{
+        sed 's/%ARG%/\xcf\x80/' $(>) > $(<)
+}
+
+make fields_names_nonascii.cpp : fields_names_nonascii.cpp.tpl : @insert_utf8_action ;
+
+########## END of helpers to prepare the test with non-ascii field name
 
 test-suite pfr_tests
   :
