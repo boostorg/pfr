@@ -477,6 +477,26 @@ struct aggregate : empty { // not a SimpleAggregate
 ```
 The library may work with aggregates that don't satisfy the requirements of `SimpleAggregate`, but the behavior tends to be non-portable.
 
+Boost.PFR's extraction of field name works with a `SimpleAggregate` which variables are able to be declared in any other translation unit.
+It's better not to use this feature with anonymous or local structure.
+
+```
+struct external_simple_aggregate {
+    std::string name;
+    int age;
+    boost::uuids::uuid uuid;
+};
+auto v1 = external_simple_aggregate{};       // can be declared outside via `extern`
+
+struct {
+    std::string name;
+    int age;
+    boost::uuids::uuid uuid;
+} anonymous;                                 // can't be declared outside
+```
+Field's name extraction may work with a `SimpleAggregate` that does't satisfy such requirements, but the behavior tends to be non-portable.
+Try using `-fpermissive` if you have any issue with it.
+
 [h2 Configuration Macro]
 
 By default Boost.PFR [*auto-detects your compiler abilities] and automatically defines the configuration macro into appropriate values. If you wish to override that behavior, just define:
