@@ -29,11 +29,19 @@ struct Aggregate {
     std::string Forth; 
 };
 
+struct A {
+    int first;
+    int second;
+};
+
 void test_get_name_by_id() {
     BOOST_TEST_EQ( ((boost::pfr::get_name<0, Aggregate>())), "member1");
     BOOST_TEST_EQ( ((boost::pfr::get_name<1, Aggregate>())), "this_is_a_name");
     BOOST_TEST_EQ( ((boost::pfr::get_name<2, Aggregate>())), "c");
     BOOST_TEST_EQ( ((boost::pfr::get_name<3, Aggregate>())), "Forth");
+
+    BOOST_TEST_EQ( ((boost::pfr::get_name<0, A>())), "first");
+    BOOST_TEST_EQ( ((boost::pfr::get_name<1, A>())), "second");
 }
 
 void test_get_name_by_type() {

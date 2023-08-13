@@ -30,17 +30,18 @@ constexpr auto make_sequence_tuple(Args... args) noexcept {
     return sequence_tuple::tuple<Args...>{ args... };
 }
 
-template <auto& ptr> 
+template <typename MsvcWorkaround, auto* ptr> 
 consteval auto name_of_field_impl() noexcept {
 #ifdef _MSC_VER
     constexpr std::string_view sv = __FUNCSIG__;
-    constexpr auto last = sv.find_last_not_of(" >(", sv.size() - 6);
+    // - strlen("(void)") - strlen(" noexcept")
+    constexpr auto last = sv.find_last_not_of(" >(", sv.size() - 6 - 9);
 #else
     constexpr std::string_view sv = __PRETTY_FUNCTION__;
     constexpr auto last = sv.find_last_not_of(" ])");
 #endif
-    constexpr auto first = sv.find_last_of(":", last);
-    auto res = std::array<char, last - first + 1>{};
+    constexpr auto first = sv.find_last_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789", last);
+    auto res = std::array<char, last - first + 2>{};
     std::ranges::copy(sv.begin()+first+1,
                       sv.begin()+last+1,
                       res.begin());
@@ -50,8 +51,9 @@ consteval auto name_of_field_impl() noexcept {
 template <typename T>
 extern const T fake_object;
 
+// Without passing 'T' into 'name_of_field_impl' different fields from different structures might have the same name!
 template <class T, std::size_t I>
-constexpr auto stored_name_of_field = name_of_field_impl<detail::sequence_tuple::get<I>(
+constexpr auto stored_name_of_field = name_of_field_impl<T, &detail::sequence_tuple::get<I>(
     detail::tie_as_tuple(fake_object<T>) 
 )>();
 
