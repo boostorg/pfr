@@ -14,8 +14,6 @@
 
 namespace testing {
 
-namespace {
-
 struct Aggregate {
     int _%ARG%;
 };
@@ -34,8 +32,6 @@ void test_names_as_array() {
         BOOST_TEST_EQ(value[i], expected[i]);
     }
 }
-
-} // anonymous namespace
 
 
 } // namespace testing

@@ -478,7 +478,7 @@ struct aggregate : empty { // not a SimpleAggregate
 The library may work with aggregates that don't satisfy the requirements of `SimpleAggregate`, but the behavior tends to be non-portable.
 
 Boost.PFR's extraction of field name works with a `SimpleAggregate` which variables are able to be declared in any other translation unit.
-It's better not to use this feature with anonymous or local structure.
+It's better not to use this feature with anonymous structure, local structure or a structure defined inside anonymous namespace.
 
 ```
 struct external_simple_aggregate {

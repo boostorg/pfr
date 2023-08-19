@@ -30,15 +30,15 @@ constexpr auto make_sequence_tuple(Args... args) noexcept {
     return sequence_tuple::tuple<Args...>{ args... };
 }
 
-template <typename MsvcWorkaround, auto* ptr> 
+template <typename MsvcWorkaround, auto ptr> 
 consteval auto name_of_field_impl() noexcept {
 #ifdef _MSC_VER
     constexpr std::string_view sv = __FUNCSIG__;
     // - strlen("(void)") - strlen(" noexcept")
-    constexpr auto last = sv.find_last_not_of(" >(", sv.size() - 6 - 9);
+    constexpr auto last = sv.find_last_not_of(" >(}", sv.size() - 6 - 9);
 #else
     constexpr std::string_view sv = __PRETTY_FUNCTION__;
-    constexpr auto last = sv.find_last_not_of(" ])");
+    constexpr auto last = sv.find_last_not_of(" ])}");
 #endif
     constexpr auto first = sv.find_last_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789", last);
     auto res = std::array<char, last - first + 2>{};
@@ -51,11 +51,40 @@ consteval auto name_of_field_impl() noexcept {
 template <typename T>
 extern const T fake_object;
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wundefined-var-template"
+
+template<class T>
+struct clang_workaround_t {
+    T v;
+};
+template<class T>
+clang_workaround_t(T) -> clang_workaround_t<T>;
+
+template<typename T>
+constexpr auto clang_workaround(const T& arg) noexcept {
+    return clang_workaround_t{arg};
+}
+
+#else
+
+template<typename T>
+constexpr const T& clang_workaround(const T& arg) noexcept {
+    return arg;
+}
+
+#endif
+
 // Without passing 'T' into 'name_of_field_impl' different fields from different structures might have the same name!
 template <class T, std::size_t I>
-constexpr auto stored_name_of_field = name_of_field_impl<T, &detail::sequence_tuple::get<I>(
+constexpr auto stored_name_of_field = name_of_field_impl<T, clang_workaround(&detail::sequence_tuple::get<I>(
     detail::tie_as_tuple(fake_object<T>) 
-)>();
+))>();
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 template <class T, std::size_t... I>
 constexpr auto tie_as_names_tuple_impl(std::index_sequence<I...>) noexcept {

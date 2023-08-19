@@ -12,7 +12,7 @@ import python ;
 import testing ;
 import ../../config/checks/config : requires ;
 
-########## BEGIN of helpers to detect C++20 non-type template args support
+########## BEGIN of helpers to detect C++20 features support
 
 actions mp_simple_run_action
 {
@@ -31,17 +31,16 @@ rule mp-run-simple ( sources + : args * : input-files * : requirements * : targe
 mp-run-simple cxx20_nontype_template_args_detection.cpp : : : : compiler_supports_cxx20_nontype_template_args ;
 explicit compiler_supports_cxx20_nontype_template_args ;
 
-########## END of helpers to detect C++20 non-type template args support
+mp-run-simple cxx20_clang_workaround_detection.cpp : : : : compiler_supports_cxx20_clang_workaround ;
+explicit compiler_supports_cxx20_clang_workaround ;
 
-local REQUIRE_CXX20_NONTYPE_TEMPLATE_ARGS =
-    [ check-target-builds ../core_name//compiler_supports_cxx20_nontype_template_args : : <build>no ]
-  ;
+########## END of helpers to detect C++20 features support
 
 project
     : source-location .
     : requirements
         <define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1
-        [ check-target-builds ../core_name//compiler_supports_cxx20_nontype_template_args : : <build>no ]
+        [ check-target-builds ../core_name//compiler_supports_cxx20_nontype_template_args : : [ check-target-builds ../core_name//compiler_supports_cxx20_clang_workaround : : <build>no ] ]
     ;
 
 

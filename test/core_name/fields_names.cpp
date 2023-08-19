@@ -16,8 +16,6 @@
 
 namespace testing {
 
-namespace {
-
 struct nonconstexpr {
     nonconstexpr() {};
 };
@@ -65,9 +63,6 @@ void test_names_as_array() {
         BOOST_TEST_EQ(value[i], expected[i]);
     }
 }
-
-
-} // anonymous namespace
 
 
 } // namespace testing

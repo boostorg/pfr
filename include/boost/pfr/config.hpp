@@ -107,8 +107,12 @@
 #endif
 
 #ifndef BOOST_PFR_ENABLE_GETTING_NAMES
-#   if defined(__cpp_nontype_template_args) && __cpp_nontype_template_args >= 201911 && BOOST_PFR_FUNCTION_MACRO_SUPPORTED
-#       define BOOST_PFR_ENABLE_GETTING_NAMES 1
+#   if (defined(__cpp_nontype_template_args) && __cpp_nontype_template_args >= 201911) || (__cplusplus >= 202002L && defined(__clang_major__) && __clang_major__ >= 12)
+#       if BOOST_PFR_FUNCTION_MACRO_SUPPORTED
+#          define BOOST_PFR_ENABLE_GETTING_NAMES 1
+#       else
+#          define BOOST_PFR_ENABLE_GETTING_NAMES 0
+#       endif
 #   else
 #       define BOOST_PFR_ENABLE_GETTING_NAMES 0
 #   endif
