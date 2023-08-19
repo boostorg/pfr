@@ -40,7 +40,7 @@ consteval auto name_of_field_impl() noexcept {
     constexpr std::string_view sv = __PRETTY_FUNCTION__;
     constexpr auto last = sv.find_last_not_of(" ])}");
 #endif
-    constexpr auto first = sv.find_last_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789", last);
+    constexpr auto first = sv.find_last_of(".:->", last);
     auto res = std::array<char, last - first + 2>{};
     std::ranges::copy(sv.begin()+first+1,
                       sv.begin()+last+1,
