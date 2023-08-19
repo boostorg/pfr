@@ -44,23 +44,20 @@ project
     ;
 
 
-########## BEGIN of helpers to prepare the test with non-ascii field name
 
-# TODO: fix it
-# actions insert_utf8_action
-# {
-#         sed 's/%ARG%/\xcf\x80/' $(>) > $(<)
-# }
 
-# make fields_names_nonascii.cpp : fields_names_nonascii.cpp.tpl : @insert_utf8_action ;
+actions invoke_python_generator
+{
+        python $(>) > $(<)
+}
 
-########## END of helpers to prepare the test with non-ascii field name
+make fields_names_nonascii.cpp : generate_fields_names_nonascii.cpp.py : @invoke_python_generator ;
 
 test-suite pfr_tests
   :
     [ run fields_names.cpp : : : : ]
     [ run fields_names_constexpr.cpp : : : : ]
-    # [ run fields_names_nonascii.cpp : : : : ]
+    [ run fields_names_nonascii.cpp : : : <toolset>msvc:<cxxflags>"/utf-8" : ]
   ;
 
 
