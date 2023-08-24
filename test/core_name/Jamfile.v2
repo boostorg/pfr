@@ -52,12 +52,14 @@ actions invoke_python_generator
 }
 
 make fields_names_nonascii.cpp : generate_fields_names_nonascii.cpp.py : @invoke_python_generator ;
+make fields_names_big.cpp : generate_fields_names_big.cpp.py : @invoke_python_generator ;
 
 test-suite pfr_tests
   :
     [ run fields_names.cpp : : : : ]
     [ run fields_names_constexpr.cpp : : : : ]
     [ run fields_names_nonascii.cpp : : : <toolset>msvc:<cxxflags>"/utf-8" : ]
+    [ run fields_names_big.cpp : : : <toolset>msvc:<cxxflags>"/bigobj" : ]
   ;
 
 
