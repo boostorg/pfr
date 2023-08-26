@@ -24,7 +24,7 @@ constexpr auto make_stdarray(const Types&... t) noexcept {
 
 template <class T, std::size_t... I>
 constexpr auto make_stdarray_from_tietuple(const T& t, std::index_sequence<I...>) noexcept {
-    return make_stdarray(
+    return detail::make_stdarray(
         boost::pfr::detail::sequence_tuple::get<I>(t)...
     );
 }

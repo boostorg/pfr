@@ -17,19 +17,13 @@
 
 namespace boost { namespace pfr { namespace detail {
 
-// TODO: move it outside
-template <class... Args>
-constexpr auto make_sequence_tuple(Args... args) noexcept {
-    return sequence_tuple::tuple<Args...>{ args... };
-}
-
 template <class T, std::size_t I>
 constexpr auto get_name() noexcept {
     static_assert(
         sizeof(T) && false,
         "====================> Boost.PFR: Field's names extracting functionality requires C++20 and compiler that supports __PRETTY_FUNCTION__ or __FUNCSIG__ macro (GCC, Clang or MSVC)."
     );
-    
+
     return nullptr;
 }
 
@@ -40,7 +34,7 @@ constexpr auto tie_as_names_tuple() noexcept {
         "====================> Boost.PFR: Field's names extracting functionality requires C++20 and compiler that supports __PRETTY_FUNCTION__ or __FUNCSIG__ macro (GCC, Clang or MSVC)."
     );
 
-    return detail::make_sequence_tuple(); 
+    return detail::sequence_tuple::make_sequence_tuple();
 }
 
 }}} // namespace boost::pfr::detail

@@ -24,12 +24,6 @@
 
 namespace boost { namespace pfr { namespace detail {
 
-// TODO: move it outside
-template <class... Args>
-constexpr auto make_sequence_tuple(Args... args) noexcept {
-    return sequence_tuple::tuple<Args...>{ args... };
-}
-
 consteval std::string_view name_of_field_parse(std::string_view sv,
                                                std::size_t size_at_begin,
                                                std::size_t size_at_end,
@@ -39,7 +33,7 @@ consteval std::string_view name_of_field_parse(std::string_view sv,
     return sv.substr(sv.rfind(until_runtime_last) + until_runtime_last.size());
 }
 
-template <typename MsvcWorkaround, auto ptr> 
+template <typename MsvcWorkaround, auto ptr>
 consteval auto name_of_field_impl() noexcept {
 #ifdef _MSC_VER
     constexpr auto sv = __FUNCSIG__;
@@ -90,7 +84,7 @@ constexpr const T& clang_workaround(const T& arg) noexcept {
 // Without passing 'T' into 'name_of_field_impl' different fields from different structures might have the same name!
 template <class T, std::size_t I>
 constexpr auto stored_name_of_field = name_of_field_impl<T, clang_workaround(&detail::sequence_tuple::get<I>(
-    detail::tie_as_tuple(fake_object<T>) 
+    detail::tie_as_tuple(fake_object<T>)
 ))>();
 
 #ifdef __clang__
@@ -99,7 +93,7 @@ constexpr auto stored_name_of_field = name_of_field_impl<T, clang_workaround(&de
 
 template <class T, std::size_t... I>
 constexpr auto tie_as_names_tuple_impl(std::index_sequence<I...>) noexcept {
-    return detail::make_sequence_tuple(std::string_view{stored_name_of_field<T, I>.data()}...);
+    return detail::sequence_tuple::make_sequence_tuple(std::string_view{stored_name_of_field<T, I>.data()}...);
 }
 
 template <class T, std::size_t I>
@@ -112,8 +106,8 @@ constexpr std::string_view get_name() noexcept {
         sizeof(T) && BOOST_PFR_USE_CPP17,
         "====================> Boost.PFR: Extraction of field's names is allowed only when the BOOST_PFR_USE_CPP17 macro enabled."
    );
-   
-   return stored_name_of_field<T, I>.data();  
+
+   return stored_name_of_field<T, I>.data();
 }
 
 template <class T>

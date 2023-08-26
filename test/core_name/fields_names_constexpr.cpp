@@ -19,9 +19,9 @@ struct nonconstexpr {
 
 struct Aggregate {
     int member1;
-    nonconstexpr this_is_a_name; 
+    nonconstexpr this_is_a_name;
     std::reference_wrapper<char> c;
-    std::string Forth; 
+    std::string Forth;
 };
 
 static_assert(boost::pfr::get_name<0, Aggregate>() == "member1");

@@ -39,13 +39,19 @@ find ${TARGET_PATH}/doc -type f | xargs sed -i 's|Boost.PFR|PFR|g'
 sed -i  's|# \[Boost.PFR\](https://boost.org/libs/pfr)|# [PFR](https://apolukhin.github.io/pfr_non_boost/)|g' ${TARGET_PATH}/README.md
 
 echo -n "***** Testing: "
-if g++-12 -std=c++2a -DPFR_USE_LOOPHOLE=0 -DPFR_USE_CPP17=1 -DPFR_ENABLE_GETTING_NAMES=1 -I ${TARGET_PATH}/include/ ${TARGET_PATH}/example/motivating_example0.cpp && ./a.out > /dev/null; then
+if g++-12 -std=c++2a -DPFR_ENABLE_GET_NAME_STATIC=1 -I ${TARGET_PATH}/include/ ${TARGET_PATH}/example/motivating_example0.cpp && ./a.out > /dev/null; then
     echo -n "OK"
 else
     echo -n "FAIL"
     exit 2
 fi
-if g++-12 -std=c++2a -DPFR_USE_LOOPHOLE=0 -DPFR_USE_CPP17=1 -DPFR_ENABLE_GETTING_NAMES=0 -I ${TARGET_PATH}/include/ ${TARGET_PATH}/example/motivating_example0.cpp && ./a.out > /dev/null; then
+if g++-12 -std=c++2a -DPFR_ENABLE_GET_NAME_STATIC=0 -I ${TARGET_PATH}/include/ ${TARGET_PATH}/example/motivating_example0.cpp && ./a.out > /dev/null; then
+    echo -n "OK"
+else
+    echo -n "FAIL"
+    exit 2
+fi
+if g++-12 -std=c++2a -DPFR_USE_LOOPHOLE=0 -DPFR_USE_CPP17=1 -I ${TARGET_PATH}/include/ ${TARGET_PATH}/example/motivating_example0.cpp && ./a.out > /dev/null; then
     echo -n "OK"
 else
     echo -n "FAIL"

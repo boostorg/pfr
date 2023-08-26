@@ -98,23 +98,16 @@
 #   endif
 #endif
 
-#ifndef BOOST_PFR_FUNCTION_MACRO_SUPPORTED
-#   if defined(__clang__) || defined(__GNUC__) || defined(_MSC_VER)
-#       define BOOST_PFR_FUNCTION_MACRO_SUPPORTED 1
-#   else
-#       define BOOST_PFR_FUNCTION_MACRO_SUPPORTED 0
-#   endif
-#endif
-
-#ifndef BOOST_PFR_ENABLE_GETTING_NAMES
+#ifndef BOOST_PFR_ENABLE_GET_NAME_STATIC
 #   if (defined(__cpp_nontype_template_args) && __cpp_nontype_template_args >= 201911) || (__cplusplus >= 202002L && defined(__clang_major__) && __clang_major__ >= 12)
-#       if BOOST_PFR_FUNCTION_MACRO_SUPPORTED
-#          define BOOST_PFR_ENABLE_GETTING_NAMES 1
+// Only these 3 compilers have a macro to extract func name
+#       if defined(__clang__) || defined(__GNUC__) || defined(_MSC_VER)
+#          define BOOST_PFR_ENABLE_GET_NAME_STATIC 1
 #       else
-#          define BOOST_PFR_ENABLE_GETTING_NAMES 0
+#          define BOOST_PFR_ENABLE_GET_NAME_STATIC 0
 #       endif
 #   else
-#       define BOOST_PFR_ENABLE_GETTING_NAMES 0
+#       define BOOST_PFR_ENABLE_GET_NAME_STATIC 0
 #   endif
 #endif
 
