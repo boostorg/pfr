@@ -30,21 +30,32 @@ constexpr auto make_sequence_tuple(Args... args) noexcept {
     return sequence_tuple::tuple<Args...>{ args... };
 }
 
+consteval std::string_view name_of_field_parse(std::string_view sv,
+                                               std::size_t size_at_begin,
+                                               std::size_t size_at_end,
+                                               std::string_view until_runtime_last) noexcept {
+    sv.remove_prefix(size_at_begin);
+    sv.remove_suffix(size_at_end);
+    return sv.substr(sv.rfind(until_runtime_last) + until_runtime_last.size());
+}
+
 template <typename MsvcWorkaround, auto ptr> 
 consteval auto name_of_field_impl() noexcept {
 #ifdef _MSC_VER
-    constexpr std::string_view sv = __FUNCSIG__;
-    // - strlen("(void)") - strlen(" noexcept")
-    constexpr auto last = sv.find_last_not_of(" >(}", sv.size() - 6 - 9);
-#else
-    constexpr std::string_view sv = __PRETTY_FUNCTION__;
-    constexpr auto last = sv.find_last_not_of(" ])}");
+    constexpr auto sv = __FUNCSIG__;
+    // sizeof("auto __cdecl boost::pfr::detail::name_of_field_impl<") - 1, sizeof(">(void) noexcept") - 1
+    constexpr auto fn = detail::name_of_field_parse(sv, 52, 16, "->");
+#elif __clang__
+    constexpr auto sv = __PRETTY_FUNCTION__;
+    // sizeof("auto boost::pfr::detail::name_of_field_impl() [MsvcWorkaround = ") - 1, sizeof("}]") - 1
+    constexpr auto fn = detail::name_of_field_parse(sv, 64, 2, ".");
+#else // GCC
+    constexpr auto sv = __PRETTY_FUNCTION__;
+    // sizeof("consteval auto boost::pfr::detail::name_of_field_impl() [with MsvcWorkaround = ") - 1, sizeof(")]") - 1
+    constexpr auto fn = detail::name_of_field_parse(sv, 79, 2, "::");
 #endif
-    constexpr auto first = sv.find_last_of(".:->", last);
-    auto res = std::array<char, last - first + 2>{};
-    std::ranges::copy(sv.begin()+first+1,
-                      sv.begin()+last+1,
-                      res.begin());
+    auto res = std::array<char, fn.size()+1>{};
+    std::ranges::copy(fn, res.begin());
     return res;
 }
 
