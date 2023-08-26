@@ -9,7 +9,7 @@
 //
 
 #ifndef BOOST_PFR_CORE_NAME_HPP
-#define BOOST_PFR_CORE_NAME_HPP 
+#define BOOST_PFR_CORE_NAME_HPP
 #pragma once
 
 #include <boost/pfr/detail/config.hpp>
@@ -48,5 +48,5 @@ constexpr auto names_as_array() noexcept {
 
 }} // namespace boost::pfr
 
-#endif // BOOST_PFR_CORE_NAME_HPP 
+#endif // BOOST_PFR_CORE_NAME_HPP
 

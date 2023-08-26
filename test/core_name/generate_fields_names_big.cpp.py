@@ -73,7 +73,7 @@ TEST_GET_NAMES_AS_ARRAY_TEMPLATE = """void test_names_as_array_%TEST_ID%() {
     for (std::size_t i=0;i<expected.size();++i) {
         BOOST_TEST_EQ(value[i], expected[i]);
     }
-}   
+}
 """
 
 FIELD_NAME_TEMPLATE = """std::string_view{"%FIELD_NAME%"}
@@ -87,7 +87,105 @@ TEST_GET_NAMES_AS_ARRAY_CALL_TEMPLATE = """testing::test_names_as_array_%TEST_ID
 
 ############################################################################################################################
 
-field_names = {}
+field_names = {
+    "alignas": True,
+    "alignof": True,
+    "and": True,
+    "and_eq": True,
+    "asm": True,
+    "atomic_cancel": True,
+    "atomic_commit": True,
+    "atomic_noexcept": True,
+    "auto": True,
+    "bitand": True,
+    "bitor": True,
+    "bool": True,
+    "break": True,
+    "case": True,
+    "catch": True,
+    "char": True,
+    "char8_t": True,
+    "char16_t": True,
+    "char32_t": True,
+    "class": True,
+    "compl": True,
+    "concept": True,
+    "const": True,
+    "consteval": True,
+    "constexpr": True,
+    "constinit": True,
+    "const_cast": True,
+    "continue": True,
+    "co_await": True,
+    "co_return": True,
+    "co_yield": True,
+    "decltype": True,
+    "default": True,
+    "delete": True,
+    "do": True,
+    "double": True,
+    "dynamic_cast": True,
+    "else": True,
+    "enum": True,
+    "explicit": True,
+    "export": True,
+    "extern": True,
+    "false": True,
+    "float": True,
+    "for": True,
+    "friend": True,
+    "goto": True,
+    "if": True,
+    "inline": True,
+    "int": True,
+    "long": True,
+    "mutable": True,
+    "namespace": True,
+    "new": True,
+    "noexcept": True,
+    "not": True,
+    "not_eq": True,
+    "nullptr": True,
+    "operator": True,
+    "or": True,
+    "or_eq": True,
+    "private": True,
+    "protected": True,
+    "public": True,
+    "reflexpr": True,
+    "register": True,
+    "reinterpret_cast": True,
+    "requires": True,
+    "return": True,
+    "short": True,
+    "signed": True,
+    "sizeof": True,
+    "static": True,
+    "static_assert": True,
+    "static_cast": True,
+    "struct": True,
+    "switch": True,
+    "synchronized": True,
+    "template": True,
+    "this": True,
+    "thread_local": True,
+    "throw": True,
+    "true": True,
+    "try": True,
+    "typedef": True,
+    "typeid": True,
+    "typename": True,
+    "union": True,
+    "unsigned": True,
+    "using": True,
+    "virtual": True,
+    "void": True,
+    "volatile": True,
+    "wchar_t": True,
+    "while": True,
+    "xor": True,
+    "xor_eq": True
+}
 field_names_by_id = {}
 
 def generate_new_field_name():
@@ -96,7 +194,7 @@ def generate_new_field_name():
     result += random.choice("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_")
     for i in range(name_len-1):
         result += random.choice("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789")
-    return result  
+    return result
 
 def generate_field_name(struct_id, field_id):
     key = (struct_id, field_id)

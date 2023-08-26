@@ -165,6 +165,10 @@ using tuple_element = std::remove_reference< decltype(
         ::boost::pfr::detail::sequence_tuple::get<I>( std::declval<T>() )
     ) >;
 
+template <class... Args>
+constexpr auto make_sequence_tuple(Args... args) noexcept {
+    return ::boost::pfr::detail::sequence_tuple::tuple<Args...>{ args... };
+}
 
 }}}} // namespace boost::pfr::detail::sequence_tuple
 
