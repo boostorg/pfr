@@ -21,7 +21,7 @@ template <class T, std::size_t I>
 constexpr auto get_name() noexcept {
     static_assert(
         sizeof(T) && false,
-        "====================> Boost.PFR: Field's names extracting functionality requires C++20 and compiler that supports __PRETTY_FUNCTION__ or __FUNCSIG__ macro (GCC, Clang or MSVC)."
+        "====================> Boost.PFR: Field's names extracting functionality requires C++20."
     );
 
     return nullptr;
@@ -31,7 +31,7 @@ template <class T>
 constexpr auto tie_as_names_tuple() noexcept {
     static_assert(
         sizeof(T) && false,
-        "====================> Boost.PFR: Field's names extracting functionality requires C++20 and compiler that supports __PRETTY_FUNCTION__ or __FUNCSIG__ macro (GCC, Clang or MSVC)."
+        "====================> Boost.PFR: Field's names extracting functionality requires C++20."
     );
 
     return detail::sequence_tuple::make_sequence_tuple();

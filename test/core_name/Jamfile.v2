@@ -43,6 +43,8 @@ project
         [ check-target-builds ../core_name//compiler_supports_cxx20_nontype_template_args : : [ check-target-builds ../core_name//compiler_supports_cxx20_clang_workaround : : <build>no ] ]
     ;
 
+local ENABLED_ENGINE = <define>BOOST_PFR_ENABLE_GET_NAME_STATIC=1 ;
+local DISABLED_ENGINE = <define>BOOST_PFR_ENABLE_GET_NAME_STATIC=0 ;
 
 
 
@@ -54,12 +56,20 @@ actions invoke_python_generator
 make fields_names_nonascii.cpp : generate_fields_names_nonascii.cpp.py : @invoke_python_generator ;
 make fields_names_big.cpp : generate_fields_names_big.cpp.py : @invoke_python_generator ;
 
-test-suite pfr_tests
+test-suite pfr_name_tests
   :
     [ run fields_names.cpp : : : : ]
     [ run fields_names_constexpr.cpp : : : : ]
     [ run fields_names_nonascii.cpp : : : <toolset>msvc:<cxxflags>"/utf-8" : ]
     [ run fields_names_big.cpp : : : <toolset>msvc:<cxxflags>"/bigobj" : ]
+    [ run print_name.cpp : : : <test-info>always_show_run_output ]
   ;
+
+for local source_file in [ glob ./compile-fail/*.cpp ]
+{
+    local target_name = $(source_file[1]:B) ;
+    pfr_name_tests += [ compile-fail $(source_file) : $(ENABLED_ENGINE) : $(target_name)_on ] ;
+    pfr_name_tests += [ compile-fail $(source_file) : $(DISABLED_ENGINE) : $(target_name)_off ] ;
+}
 
 
