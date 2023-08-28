@@ -17,6 +17,7 @@
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
+#include <boost/pfr/detail/stdarray.hpp>
 #include <type_traits>
 #include <string_view>
 #include <array>
@@ -24,33 +25,72 @@
 
 namespace boost { namespace pfr { namespace detail {
 
-consteval std::string_view name_of_field_parse(std::string_view sv,
-                                               std::size_t size_at_begin,
-                                               std::size_t size_at_end,
-                                               std::string_view until_runtime_last) noexcept {
-    sv.remove_prefix(size_at_begin);
-    sv.remove_suffix(size_at_end);
-    return sv.substr(sv.rfind(until_runtime_last) + until_runtime_last.size());
+struct core_name_skip {
+    std::size_t size_at_begin;
+    std::size_t size_at_end;
+    bool more_at_runtime;
+    std::string_view until_runtime_last;
+};
+
+consteval core_name_skip make_core_name_skip(std::size_t size_at_begin,
+                                             std::size_t size_at_end,
+                                             bool more_at_runtime,
+                                             std::string_view until_runtime_last) noexcept
+{
+    return core_name_skip{size_at_begin, size_at_end, more_at_runtime, until_runtime_last};
+}
+
+consteval core_name_skip make_core_name_skip(std::size_t size_at_begin,
+                                             std::size_t size_at_end,
+                                             std::string_view until_runtime_last) noexcept
+{
+    return core_name_skip{size_at_begin, size_at_end, true, until_runtime_last};
+}
+
+consteval std::string_view apply_core_name_skip(std::string_view sv,
+                                                core_name_skip s) noexcept {
+    sv.remove_prefix((std::min)(s.size_at_begin, sv.size()));
+    sv.remove_suffix((std::min)(s.size_at_end, sv.size()));
+    return s.more_at_runtime ? sv.substr((std::min)(sv.rfind(s.until_runtime_last) + s.until_runtime_last.size(), sv.size()))
+                             : sv;
+                             ;
+}
+
+template <bool Condition>
+consteval void assert_compile_time_legths() noexcept {
+    static_assert(
+        Condition,
+        "PFRs extraction of field name is misconfigured for your compiler. "
+        "Please define BOOST_PFR_CORE_NAME_PARSING to correct values. See section "
+        "Limitations of field's names reflection' of the documentation for more information."
+    );
+}
+
+template <class T>
+consteval void failed_to_get_function_name() noexcept {
+    static_assert(
+        sizeof(T) && false,
+        "PFRs extraction of field name could not detect your compiler. "
+        "Please make the BOOST_PFR_FUNCTION_SIGNATURE macro use "
+        "correct compiler macro for getting the whole function name. "
+        "Define BOOST_PFR_CORE_NAME_PARSING to correct value after that."
+    );
 }
 
 template <typename MsvcWorkaround, auto ptr>
 consteval auto name_of_field_impl() noexcept {
-#ifdef _MSC_VER
-    constexpr auto sv = __FUNCSIG__;
-    // sizeof("auto __cdecl boost::pfr::detail::name_of_field_impl<") - 1, sizeof(">(void) noexcept") - 1
-    constexpr auto fn = detail::name_of_field_parse(sv, 52, 16, "->");
-#elif __clang__
-    constexpr auto sv = __PRETTY_FUNCTION__;
-    // sizeof("auto boost::pfr::detail::name_of_field_impl() [MsvcWorkaround = ") - 1, sizeof("}]") - 1
-    constexpr auto fn = detail::name_of_field_parse(sv, 64, 2, ".");
-#else // GCC
-    constexpr auto sv = __PRETTY_FUNCTION__;
-    // sizeof("consteval auto boost::pfr::detail::name_of_field_impl() [with MsvcWorkaround = ") - 1, sizeof(")]") - 1
-    constexpr auto fn = detail::name_of_field_parse(sv, 79, 2, "::");
-#endif
-    auto res = std::array<char, fn.size()+1>{};
-    std::ranges::copy(fn, res.begin());
-    return res;
+    constexpr std::string_view sv = BOOST_PFR_FUNCTION_SIGNATURE;
+    if constexpr (sv.empty()) {
+        detail::failed_to_get_function_name<MsvcWorkaround>();
+        return detail::make_stdarray<char>(0);
+    } else {
+        constexpr auto skip = detail::make_core_name_skip BOOST_PFR_CORE_NAME_PARSING;
+        constexpr auto fn = detail::apply_core_name_skip(sv, skip);
+        auto res = std::array<char, fn.size()+1>{};
+        detail::assert_compile_time_legths<!fn.empty()>();
+        std::ranges::copy(fn, res.begin());
+        return res;
+    }
 }
 
 template <typename T>

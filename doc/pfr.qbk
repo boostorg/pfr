@@ -508,6 +508,8 @@ By default Boost.PFR [*auto-detects your compiler abilities] and automatically d
     [[*BOOST_PFR_HAS_GUARANTEED_COPY_ELISION*] [Define to `0` if your compiler does not implement C++17 guaranteed copy elision properly and fails to reflect aggregates with non-movable fields. Define to `1` to override Boost.PFR detection logic. ]]
     [[*BOOST_PFR_ENABLE_IMPLICIT_REFLECTION*] [Define to `0` if you are hit by lots of non-effective choices made by implicitly reflection. Define to `1` to override Boost.PFR detection logic. ]]
     [[*BOOST_PFR_ENABLE_GET_NAME_STATIC*] [On platforms where field's names extracting is not supported, the 'boost/pfr/config.hpp' header defines the BOOST_PFR_ENABLE_GET_NAME_STATIC macro equal to 0. Defining this macro as 0 before including the header disables the ability to get a field's name. ]]
+    [[*BOOST_PFR_FUNCTION_SIGNATURE*] [TODO: desc it ]]
+    [[*BOOST_PFR_CORE_NAME_PARSING*] [TODO: desc it ]]
     [[*BOOST_PFR_ENABLED*] [On platforms where Boost.PFR is not supported, the `boost/pfr/config.hpp` header defines the BOOST_PFR_ENABLED macro equal to 0. Defining this macro as 0 before including the header disables the Boost.PFR library. ]]
 ]
 
@@ -525,6 +527,13 @@ The Boost.PFRs reflection has some limitations that depend on a C++ Standard and
         * T must be constexpr aggregate initializable and all its fields must be constexpr default constructible
         * [funcref boost::pfr::get], [funcref boost::pfr::structure_to_tuple], [funcref boost::pfr::structure_tie], [headerref boost/pfr/core.hpp boost::pfr::tuple_element] require T to be a POD type with built-in types only.
 
+
+[endsect]
+
+
+[section Limitations of field's names reflection]
+
+TODO: write the article and make a link on it inside "Limitations and Configuration"
 
 [endsect]
 

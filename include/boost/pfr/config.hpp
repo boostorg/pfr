@@ -99,15 +99,42 @@
 #endif
 
 #ifndef BOOST_PFR_ENABLE_GET_NAME_STATIC
-#   if (defined(__cpp_nontype_template_args) && __cpp_nontype_template_args >= 201911) || (__cplusplus >= 202002L && defined(__clang_major__) && __clang_major__ >= 12)
-// Only these 3 compilers have a macro to extract func name
-#       if defined(__clang__) || defined(__GNUC__) || defined(_MSC_VER)
-#          define BOOST_PFR_ENABLE_GET_NAME_STATIC 1
-#       else
-#          define BOOST_PFR_ENABLE_GET_NAME_STATIC 0
-#       endif
+#   if (defined(__cpp_nontype_template_args) && __cpp_nontype_template_args >= 201911) \
+     || (__cplusplus >= 202002L && defined(__clang_major__) && __clang_major__ >= 12)
+#       define BOOST_PFR_ENABLE_GET_NAME_STATIC 1
 #   else
 #       define BOOST_PFR_ENABLE_GET_NAME_STATIC 0
+#   endif
+#endif
+
+#ifndef BOOST_PFR_FUNCTION_SIGNATURE
+#   if defined(__FUNCSIG__)
+#       define BOOST_PFR_FUNCTION_SIGNATURE __FUNCSIG__
+#   elif defined(__PRETTY_FUNCTION__) \
+                   || defined(__GNUC__) \
+                   || defined(__clang__)
+#       define BOOST_PFR_FUNCTION_SIGNATURE __PRETTY_FUNCTION__
+#   else
+// TODO: specify in the doc that this is unsupported value
+#       define BOOST_PFR_FUNCTION_SIGNATURE ""
+#   endif
+#endif
+
+#ifndef BOOST_PFR_CORE_NAME_PARSING
+#   if defined(_MSC_VER)
+        // sizeof("auto __cdecl boost::pfr::detail::name_of_field_impl<") - 1, sizeof(">(void) noexcept") - 1
+#       define BOOST_PFR_CORE_NAME_PARSING (52, 16, "->")
+#   elif defined(__clang__)
+        // sizeof("auto boost::pfr::detail::name_of_field_impl() [MsvcWorkaround = ") - 1, sizeof("}]") - 1
+#       define BOOST_PFR_CORE_NAME_PARSING (64, 2, ".")
+#   elif defined(__GNUC__)
+        // sizeof("consteval auto boost::pfr::detail::name_of_field_impl() [with MsvcWorkaround = ") - 1, sizeof(")]") - 1
+#       define BOOST_PFR_CORE_NAME_PARSING (79, 2, "::")
+#   else
+// TODO: specify in the doc that this is unsupported value
+// TODO: .. and even if value is supported, there still no gurantee that it correct! also make a compile-fail test for such case
+        // Deafult parser for other platforms... Just skip nothing!
+#       define BOOST_PFR_CORE_NAME_PARSING (0, 0, "")
 #   endif
 #endif
 
