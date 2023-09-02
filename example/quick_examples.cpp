@@ -106,7 +106,8 @@ void test_examples() {
 //]
   }
 
-#if BOOST_PFR_ENABLE_GET_NAME_STATIC
+  // Disabled from testing since it's unportable
+#if 0
   {
 //[pfr_quick_examples_get_name
     // Get name of field by index

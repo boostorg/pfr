@@ -110,9 +110,17 @@ consteval void failed_to_get_function_name() noexcept {
     );
 }
 
+// it might be compilation failed without this workaround sometimes
+// See https://github.com/llvm/llvm-project/issues/41751 for details
+template <class>
+consteval std::string_view clang_workaround(std::string_view value) noexcept
+{
+    return value;
+}
+
 template <typename MsvcWorkaround, auto ptr>
 consteval auto name_of_field_impl() noexcept {
-    constexpr std::string_view sv = BOOST_PFR_FUNCTION_SIGNATURE;
+    constexpr std::string_view sv = detail::clang_workaround<MsvcWorkaround>(BOOST_PFR_FUNCTION_SIGNATURE);
     if constexpr (sv.empty()) {
         detail::failed_to_get_function_name<MsvcWorkaround>();
         return detail::make_stdarray<char>(0);
@@ -140,32 +148,37 @@ extern const T fake_object;
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wundefined-var-template"
 
+// clang 16 doesn't support address of non-static member as template parameter
+// but fortunately it's possible to use C++20 non-type template parameters in another way
+// even in clang 16 and more older clangs
+// all we need is to wrap pointer into 'clang_wrapper_t' and then pass it into template
 template<class T>
-struct clang_workaround_t {
+struct clang_wrapper_t {
     T v;
 };
 template<class T>
-clang_workaround_t(T) -> clang_workaround_t<T>;
+clang_wrapper_t(T) -> clang_wrapper_t<T>;
 
 template<typename T>
-constexpr auto clang_workaround(const T& arg) noexcept {
-    return clang_workaround_t{arg};
+constexpr auto make_clang_wrapper(const T& arg) noexcept {
+    return clang_wrapper_t{arg};
 }
 
 #else
 
 template<typename T>
-constexpr const T& clang_workaround(const T& arg) noexcept {
-    // It's everything OK with this compiler
-    // so we don't need a workaround here
+constexpr const T& make_clang_wrapper(const T& arg) noexcept {
+    // It's everything OK with address of non-static member as template parameter support on this compiler
+    // so we don't need a wrapper here, just pass the pointer into template
     return arg;
 }
 
 #endif
 
 // Without passing 'T' into 'name_of_field_impl' different fields from different structures might have the same name!
+// See https://developercommunity.visualstudio.com/t/__FUNCSIG__-outputs-wrong-value-with-C/10458554 for details
 template <class T, std::size_t I>
-constexpr auto stored_name_of_field = name_of_field_impl<T, clang_workaround(&detail::sequence_tuple::get<I>(
+constexpr auto stored_name_of_field = name_of_field_impl<T, make_clang_wrapper(&detail::sequence_tuple::get<I>(
     detail::tie_as_tuple(fake_object<T>)
 ))>();
 
