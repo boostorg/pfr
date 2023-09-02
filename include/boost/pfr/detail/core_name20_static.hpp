@@ -29,31 +29,64 @@ struct core_name_skip {
     std::size_t size_at_begin;
     std::size_t size_at_end;
     bool more_at_runtime;
-    std::string_view until_runtime_last;
+    bool is_backward;
+    std::string_view until_runtime;
+
+    consteval std::string_view fail() const noexcept {
+        return "";
+    }
+
+    consteval std::string_view apply(std::string_view sv) const noexcept {
+        sv.remove_prefix((std::min)(size_at_begin, sv.size()));
+        sv.remove_suffix((std::min)(size_at_end, sv.size()));
+        if (!more_at_runtime) {
+            if (!until_runtime.empty())
+                return fail(); ///< useless skip condition
+            return sv;
+        }
+        else {
+            // so, we're asked to skip more
+            if (until_runtime.empty())
+                return fail(); ///< condition to skip more wasn't specified
+            const auto found = is_backward ? sv.rfind(until_runtime)
+                                             : sv.find(until_runtime);
+                                             ;
+            const auto cut_until = found + until_runtime.size();
+            const auto safe_cut_until = (std::min)(cut_until, sv.size());
+            return sv.substr(safe_cut_until);
+        }
+    }
+};
+
+struct backward {
+    explicit consteval backward(std::string_view value) noexcept
+        : value(value)
+    {}
+    
+    std::string_view value;
 };
 
 consteval core_name_skip make_core_name_skip(std::size_t size_at_begin,
                                              std::size_t size_at_end,
                                              bool more_at_runtime,
-                                             std::string_view until_runtime_last) noexcept
+                                             std::string_view until_runtime) noexcept
 {
-    return core_name_skip{size_at_begin, size_at_end, more_at_runtime, until_runtime_last};
+    return core_name_skip{size_at_begin, size_at_end, more_at_runtime, false, until_runtime};
 }
 
 consteval core_name_skip make_core_name_skip(std::size_t size_at_begin,
                                              std::size_t size_at_end,
-                                             std::string_view until_runtime_last) noexcept
+                                             bool more_at_runtime,
+                                             backward until_runtime) noexcept
 {
-    return core_name_skip{size_at_begin, size_at_end, true, until_runtime_last};
+    return core_name_skip{size_at_begin, size_at_end, more_at_runtime, true, until_runtime.value};
 }
 
-consteval std::string_view apply_core_name_skip(std::string_view sv,
-                                                core_name_skip s) noexcept {
-    sv.remove_prefix((std::min)(s.size_at_begin, sv.size()));
-    sv.remove_suffix((std::min)(s.size_at_end, sv.size()));
-    return s.more_at_runtime ? sv.substr((std::min)(sv.rfind(s.until_runtime_last) + s.until_runtime_last.size(), sv.size()))
-                             : sv;
-                             ;
+consteval core_name_skip make_core_name_skip(std::size_t size_at_begin,
+                                             std::size_t size_at_end,
+                                             auto until_runtime) noexcept
+{
+    return detail::make_core_name_skip(size_at_begin, size_at_end, true, until_runtime);
 }
 
 template <bool Condition>
@@ -85,7 +118,14 @@ consteval auto name_of_field_impl() noexcept {
         return detail::make_stdarray<char>(0);
     } else {
         constexpr auto skip = detail::make_core_name_skip BOOST_PFR_CORE_NAME_PARSING;
-        constexpr auto fn = detail::apply_core_name_skip(sv, skip);
+        static_assert(
+            skip.more_at_runtime || skip.until_runtime.empty(),
+            "====================> Boost.PFR: Parser configured in a wrong way. "
+            "It wasn't requested to skip more, but such skip condition was specified in vain. "
+            "Please read your definition of BOOST_PFR_CORE_NAME_PARSING macro patiently "
+            "and fix it."
+        );
+        constexpr auto fn = skip.apply(sv);
         auto res = std::array<char, fn.size()+1>{};
         detail::assert_compile_time_legths<!fn.empty()>();
         std::ranges::copy(fn, res.begin());
