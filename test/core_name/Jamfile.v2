@@ -62,6 +62,8 @@ test-suite pfr_name_tests
     [ run fields_names_constexpr.cpp : : : : ]
     [ run fields_names_nonascii.cpp : : : <toolset>msvc:<cxxflags>"/utf-8" : ]
     [ run fields_names_big.cpp : : : <toolset>msvc:<cxxflags>"/bigobj" : ]
+    [ run fields_names_correctly_configured_compiler.cpp : : : : ]
+    [ run fields_names_internal_parser.cpp : : : : ]
     [ run print_name.cpp : : : <test-info>always_show_run_output ]
   ;
 
