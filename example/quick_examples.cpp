@@ -106,6 +106,22 @@ void test_examples() {
 //]
   }
 
+#if BOOST_PFR_ENABLE_GET_NAME_STATIC
+  {
+//[pfr_quick_examples_get_name
+    // Get name of field by index
+
+    struct sample {
+        int f1;
+        long f2;
+    };
+
+    std::cout << boost::pfr::get_name<0, sample>()
+              << boost::pfr::get_name<1, sample>(); // Outputs: f1 f2
+//]
+  }
+#endif
+
 #if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
   {
 //[pfr_quick_examples_structure_to_tuple
