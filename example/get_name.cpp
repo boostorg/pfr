@@ -10,7 +10,7 @@
 
 #include <boost/pfr/config.hpp>
 
-#if BOOST_PFR_ENABLE_GET_NAME_STATIC
+#if BOOST_PFR_ENABLE_GET_NAME_STATIC && BOOST_PFR_USE_CPP17
 //[pfr_example_get_name
 /*`
     Since C++20 it's possible to read name of structure fields by index using Boost.PFR library.
@@ -34,7 +34,7 @@ constexpr auto r2 = boost::pfr::get_name<1, foo>(); // reading name of field wit
 #endif
 
 int main() {
-#if BOOST_PFR_ENABLE_GET_NAME_STATIC
+#if BOOST_PFR_ENABLE_GET_NAME_STATIC && BOOST_PFR_USE_CPP17
     if (r1 != "some_integer") return 1;
     if (r2 != "c") return 2;
 #endif
