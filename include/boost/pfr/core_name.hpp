@@ -24,8 +24,24 @@
 
 #include <boost/pfr/tuple_size.hpp>
 
+/// \file boost/pfr/core_name.hpp
+/// Contains functions \forcedlink{get_name} and \forcedlink{names_as_array} to know which names each field of any \aggregate has.
+///
+/// \fnrefl for details.
+///
+/// \b Synopsis:
+
 namespace boost { namespace pfr {
 
+/// \brief Returns name of a field with index `I` in \aggregate `T`.
+///
+/// \b Example:
+/// \code
+///     struct my_struct { int i, short s; };
+///
+///     assert(boost::pfr::get_name<0, my_struct>() == "i");
+///     assert(boost::pfr::get_name<1, my_struct>() == "s");
+/// \endcode
 template <std::size_t I, class T>
 constexpr auto get_name() noexcept {
     return detail::get_name<T, I>();
@@ -37,6 +53,14 @@ constexpr auto get_name() noexcept {
 //     return detail::sequence_tuple::get_by_type_impl<U>( detail::tie_as_names_tuple<T>() );
 // }
 
+/// \brief Creates a `std::array` from names of fields of an \aggregate `T`.
+///
+/// \b Example:
+/// \code
+///     struct my_struct { int i, short s; };
+///     std::array<std::string_view> t = boost::pfr::structure_to_tuple<my_struct>();
+///     assert(get<0>(t) == "i");
+/// \endcode
 template <class T>
 constexpr auto names_as_array() noexcept {
     return detail::make_stdarray_from_tietuple(

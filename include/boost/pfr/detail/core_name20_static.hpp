@@ -116,6 +116,8 @@ constexpr auto clang_workaround(const T& arg) noexcept {
 
 template<typename T>
 constexpr const T& clang_workaround(const T& arg) noexcept {
+    // It's everything OK with this compiler
+    // so we don't need a workaround here
     return arg;
 }
 

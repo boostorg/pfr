@@ -115,25 +115,22 @@
                    || defined(__clang__)
 #       define BOOST_PFR_FUNCTION_SIGNATURE __PRETTY_FUNCTION__
 #   else
-// TODO: specify in the doc that this is unsupported value
 #       define BOOST_PFR_FUNCTION_SIGNATURE ""
 #   endif
 #endif
 
 #ifndef BOOST_PFR_CORE_NAME_PARSING
 #   if defined(_MSC_VER)
-        // sizeof("auto __cdecl boost::pfr::detail::name_of_field_impl<") - 1, sizeof(">(void) noexcept") - 1
+// sizeof("auto __cdecl boost::pfr::detail::name_of_field_impl<") - 1, sizeof(">(void) noexcept") - 1
 #       define BOOST_PFR_CORE_NAME_PARSING (52, 16, "->")
 #   elif defined(__clang__)
-        // sizeof("auto boost::pfr::detail::name_of_field_impl() [MsvcWorkaround = ") - 1, sizeof("}]") - 1
+// sizeof("auto boost::pfr::detail::name_of_field_impl() [MsvcWorkaround = ") - 1, sizeof("}]") - 1
 #       define BOOST_PFR_CORE_NAME_PARSING (64, 2, ".")
 #   elif defined(__GNUC__)
-        // sizeof("consteval auto boost::pfr::detail::name_of_field_impl() [with MsvcWorkaround = ") - 1, sizeof(")]") - 1
+// sizeof("consteval auto boost::pfr::detail::name_of_field_impl() [with MsvcWorkaround = ") - 1, sizeof(")]") - 1
 #       define BOOST_PFR_CORE_NAME_PARSING (79, 2, "::")
 #   else
-// TODO: specify in the doc that this is unsupported value
-// TODO: .. and even if value is supported, there still no gurantee that it correct! also make a compile-fail test for such case
-        // Deafult parser for other platforms... Just skip nothing!
+// Deafult parser for other platforms... Just skip nothing!
 #       define BOOST_PFR_CORE_NAME_PARSING (0, 0, "")
 #   endif
 #endif
