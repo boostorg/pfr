@@ -43,7 +43,13 @@ namespace boost { namespace pfr {
 ///     assert(boost::pfr::get_name<1, my_struct>() == "s");
 /// \endcode
 template <std::size_t I, class T>
-constexpr auto get_name() noexcept {
+constexpr
+#ifdef BOOST_PFR_DOXYGEN_INVOKED
+std::string_view
+#else
+auto
+#endif
+get_name() noexcept {
     return detail::get_name<T, I>();
 }
 
@@ -58,11 +64,17 @@ constexpr auto get_name() noexcept {
 /// \b Example:
 /// \code
 ///     struct my_struct { int i, short s; };
-///     std::array<std::string_view> t = boost::pfr::structure_to_tuple<my_struct>();
-///     assert(get<0>(t) == "i");
+///     std::array<std::string_view, 2> t = boost::pfr::names_as_array<my_struct>();
+///     assert(t[0] == "i");
 /// \endcode
 template <class T>
-constexpr auto names_as_array() noexcept {
+constexpr
+#ifdef BOOST_PFR_DOXYGEN_INVOKED
+std::array<std::string_view, boost::pfr::tuple_size_v<T>>
+#else
+auto
+#endif
+names_as_array() noexcept {
     return detail::make_stdarray_from_tietuple(
         detail::tie_as_names_tuple<T>(),
         detail::make_index_sequence< tuple_size_v<T> >()
