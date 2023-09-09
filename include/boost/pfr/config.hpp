@@ -98,12 +98,16 @@
 #   endif
 #endif
 
-#ifndef BOOST_PFR_ENABLE_GET_NAME_STATIC
-#   if (defined(__cpp_nontype_template_args) && __cpp_nontype_template_args >= 201911) \
-     || (__cplusplus >= 202002L && defined(__clang_major__) && __clang_major__ >= 12)
-#       define BOOST_PFR_ENABLE_GET_NAME_STATIC 1
+#ifndef BOOST_PFR_CORE_NAME_ENABLED
+#   if  (__cplusplus >= 202002L) || (defined(_MSVC_LANG) && (_MSVC_LANG >= 202002L))
+#       if (defined(__cpp_nontype_template_args) && __cpp_nontype_template_args >= 201911) \
+         || (defined(__clang_major__) && __clang_major__ >= 12)
+#           define BOOST_PFR_CORE_NAME_ENABLED 1
+#       else
+#           define BOOST_PFR_CORE_NAME_ENABLED 0
+#       endif
 #   else
-#       define BOOST_PFR_ENABLE_GET_NAME_STATIC 0
+#       define BOOST_PFR_CORE_NAME_ENABLED 0
 #   endif
 #endif
 

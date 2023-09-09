@@ -16,7 +16,7 @@
 namespace testing
 {
 
-constexpr std::string_view fake_func_name = " ******************** [fake_text1->fake_text2->fake_text3] **********";    
+constexpr std::string_view fake_func_name = " ******************** [fake_text1->fake_text2->fake_text3] **********";
 
 void test_general()
 {

@@ -32,6 +32,8 @@ struct A {
     int second;
 };
 
+struct empty {};
+
 void test_get_name_by_id() {
     BOOST_TEST_EQ( ((boost::pfr::get_name<0, Aggregate>())), "member1");
     BOOST_TEST_EQ( ((boost::pfr::get_name<1, Aggregate>())), "this_is_a_name");
@@ -64,6 +66,11 @@ void test_names_as_array() {
     }
 }
 
+void test_names_as_array_for_empty() {
+    const auto value = boost::pfr::names_as_array<empty>();
+    BOOST_TEST_EQ(value.size(), 0);
+    BOOST_TEST_EQ(value.empty(), true);
+}
 
 } // namespace testing
 
@@ -71,6 +78,7 @@ int main() {
     testing::test_get_name_by_id();
     testing::test_get_name_by_type();
     testing::test_names_as_array();
+    testing::test_names_as_array_for_empty();
 
     return boost::report_errors();
 }

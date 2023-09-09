@@ -10,8 +10,9 @@
 #include <boost/pfr/detail/config.hpp>
 
 #include <utility> // metaprogramming stuff
-#include <tuple>
+#include <array>
 #include <type_traits> // for std::common_type_t
+#include <cstddef>
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 
@@ -27,6 +28,10 @@ constexpr auto make_stdarray_from_tietuple(const T& t, std::index_sequence<I...>
     return detail::make_stdarray(
         boost::pfr::detail::sequence_tuple::get<I>(t)...
     );
+}
+
+constexpr auto make_empty_stdarray() noexcept {
+    return std::array<std::nullptr_t, 0>{};
 }
 
 }}} // namespace boost::pfr::detail

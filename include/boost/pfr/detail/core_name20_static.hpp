@@ -18,10 +18,12 @@
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
 #include <boost/pfr/detail/stdarray.hpp>
+#include <boost/pfr/detail/fake_object.hpp>
 #include <type_traits>
 #include <string_view>
 #include <array>
 #include <algorithm> // for std::ranges::copy
+#include <memory> // for std::addressof
 
 namespace boost { namespace pfr { namespace detail {
 
@@ -62,7 +64,7 @@ struct backward {
     explicit consteval backward(std::string_view value) noexcept
         : value(value)
     {}
-    
+
     std::string_view value;
 };
 
@@ -93,7 +95,7 @@ template <bool Condition>
 consteval void assert_compile_time_legths() noexcept {
     static_assert(
         Condition,
-        "PFRs extraction of field name is misconfigured for your compiler. "
+        "====================> Boost.PFR: Extraction of field name is misconfigured for your compiler. "
         "Please define BOOST_PFR_CORE_NAME_PARSING to correct values. See section "
         "Limitations of field's names reflection' of the documentation for more information."
     );
@@ -103,7 +105,7 @@ template <class T>
 consteval void failed_to_get_function_name() noexcept {
     static_assert(
         sizeof(T) && false,
-        "PFRs extraction of field name could not detect your compiler. "
+        "====================> Boost.PFR: Extraction of field name could not detect your compiler. "
         "Please make the BOOST_PFR_FUNCTION_SIGNATURE macro use "
         "correct compiler macro for getting the whole function name. "
         "Define BOOST_PFR_CORE_NAME_PARSING to correct value after that."
@@ -118,7 +120,7 @@ consteval std::string_view clang_workaround(std::string_view value) noexcept
     return value;
 }
 
-template <typename MsvcWorkaround, auto ptr>
+template <class MsvcWorkaround, auto ptr>
 consteval auto name_of_field_impl() noexcept {
     constexpr std::string_view sv = detail::clang_workaround<MsvcWorkaround>(BOOST_PFR_FUNCTION_SIGNATURE);
     if constexpr (sv.empty()) {
@@ -141,32 +143,29 @@ consteval auto name_of_field_impl() noexcept {
     }
 }
 
-template <typename T>
-extern const T fake_object;
-
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wundefined-var-template"
 
-// clang 16 doesn't support address of non-static member as template parameter
+// clang 16 and earlier don't support address of non-static member as template parameter
 // but fortunately it's possible to use C++20 non-type template parameters in another way
 // even in clang 16 and more older clangs
 // all we need is to wrap pointer into 'clang_wrapper_t' and then pass it into template
-template<class T>
+template <class T>
 struct clang_wrapper_t {
     T v;
 };
-template<class T>
+template <class T>
 clang_wrapper_t(T) -> clang_wrapper_t<T>;
 
-template<typename T>
+template <class T>
 constexpr auto make_clang_wrapper(const T& arg) noexcept {
     return clang_wrapper_t{arg};
 }
 
 #else
 
-template<typename T>
+template <class T>
 constexpr const T& make_clang_wrapper(const T& arg) noexcept {
     // It's everything OK with address of non-static member as template parameter support on this compiler
     // so we don't need a wrapper here, just pass the pointer into template
@@ -178,9 +177,9 @@ constexpr const T& make_clang_wrapper(const T& arg) noexcept {
 // Without passing 'T' into 'name_of_field_impl' different fields from different structures might have the same name!
 // See https://developercommunity.visualstudio.com/t/__FUNCSIG__-outputs-wrong-value-with-C/10458554 for details
 template <class T, std::size_t I>
-constexpr auto stored_name_of_field = name_of_field_impl<T, make_clang_wrapper(&detail::sequence_tuple::get<I>(
+constexpr auto stored_name_of_field = detail::name_of_field_impl<T, detail::make_clang_wrapper(std::addressof(detail::sequence_tuple::get<I>(
     detail::tie_as_tuple(fake_object<T>)
-))>();
+)))>();
 
 #ifdef __clang__
 #pragma clang diagnostic pop
@@ -216,7 +215,7 @@ constexpr auto tie_as_names_tuple() noexcept {
         "====================> Boost.PFR: Extraction of field's names is allowed only when the BOOST_PFR_USE_CPP17 macro enabled."
     );
 
-    return tie_as_names_tuple_impl<T>(detail::make_index_sequence<detail::fields_count<T>()>{});
+    return detail::tie_as_names_tuple_impl<T>(detail::make_index_sequence<detail::fields_count<T>()>{});
 }
 
 }}} // namespace boost::pfr::detail
