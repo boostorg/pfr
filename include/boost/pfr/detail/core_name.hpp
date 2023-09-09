@@ -19,7 +19,7 @@
 //
 // The whole functional of extracting field's names is build on top of those
 // two functions.
-#if BOOST_PFR_ENABLE_GET_NAME_STATIC
+#if BOOST_PFR_CORE_NAME_ENABLED
 #include <boost/pfr/detail/core_name20_static.hpp>
 #else
 #include <boost/pfr/detail/core_name14_disabled.hpp>

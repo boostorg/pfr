@@ -127,6 +127,9 @@ struct tuple: tuple_base<
         detail::index_sequence_for<Values...>,
         Values...
     >::tuple_base;
+
+    constexpr static std::size_t size() noexcept { return sizeof...(Values); }
+    constexpr static bool empty() noexcept { return size() == 0; }
 };
 
 
