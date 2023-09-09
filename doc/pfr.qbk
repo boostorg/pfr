@@ -274,6 +274,7 @@ Boost.PFR is a header only library that does not depend on Boost. You can just c
 
 [import ../example/sample_printing.cpp]
 [import ../example/get.cpp]
+[import ../example/get_name.cpp]
 
 
 [section Why tuples are bad and aggregates are more preferable?]
@@ -458,7 +459,7 @@ error: static_assert failed "====================> Boost.PFR: For safety reasons
 
 [pfr_example_get_name]
 
-See [link boost_pfr.limitations_of_field_names_reflection [*Limitations of field names reflection]] and [link boost_pfr.limitations_and_configuration [*Limitations and Configuration]].
+See [link boost_pfr.limitations_of_field_names_refle [*Limitations of field names reflection]] and [link boost_pfr.limitations_and_configuration [*Limitations and Configuration]].
 
 [endsect]
 
@@ -509,7 +510,7 @@ struct {
 Field's name extraction may work with a `SimpleAggregate` that does't satisfy such requirements, but the behavior tends to be non-portable.
 Try using `-fpermissive` if you have any issue with it.
 
-As you see above extraction of field name feature has requirements of input type, additionally it has some requirements of compiler, see [link boost_pfr.limitations_of_field_names_reflection [*Limitations of field names reflection]] for details.
+As you see above extraction of field name feature has requirements of input type, additionally it has some requirements of compiler, see [link boost_pfr.limitations_of_field_names_refle [*Limitations of field names reflection]] for details.
 
 [h2 Configuration Macro]
 
@@ -522,8 +523,8 @@ By default Boost.PFR [*auto-detects your compiler abilities] and automatically d
     [[*BOOST_PFR_HAS_GUARANTEED_COPY_ELISION*] [Define to `0` if your compiler does not implement C++17 guaranteed copy elision properly and fails to reflect aggregates with non-movable fields. Define to `1` to override Boost.PFR detection logic. ]]
     [[*BOOST_PFR_ENABLE_IMPLICIT_REFLECTION*] [Define to `0` if you are hit by lots of non-effective choices made by implicitly reflection. Define to `1` to override Boost.PFR detection logic. ]]
     [[*BOOST_PFR_ENABLE_GET_NAME_STATIC*] [On platforms where field's names extracting is not supported, the 'boost/pfr/config.hpp' header defines the BOOST_PFR_ENABLE_GET_NAME_STATIC macro equal to 0. Defining this macro as 0 before including the header disables the ability to get a field's name. ]]
-    [[*BOOST_PFR_FUNCTION_SIGNATURE*] [On platforms which are unknown by Boost.PFR library, the 'boost/pfr/config.hpp' header defines the BOOST_PFR_FUNCTION_SIGNATURE macro equal to "". Defining this macro before including the header might help the library to work on your specific platform. See details [link boost_pfr.limitations_of_field_names_reflection [*here]]. ]]
-    [[*BOOST_PFR_CORE_NAME_PARSING*] [On platforms which are unknown by Boost.PFR library, the 'boost/pfr/config.hpp' header defines the BOOST_PFR_CORE_NAME_PARSING macro equal to (0,0,false). Defining this macro before including the header might help the library to work on your specific platform. See details [link boost_pfr.limitations_of_field_names_reflection [*here]]. ]]
+    [[*BOOST_PFR_FUNCTION_SIGNATURE*] [On platforms which are unknown by Boost.PFR library, the 'boost/pfr/config.hpp' header defines the BOOST_PFR_FUNCTION_SIGNATURE macro equal to "". Defining this macro before including the header might help the library to work on your specific platform. See details [link boost_pfr.limitations_of_field_names_refle [*here]]. ]]
+    [[*BOOST_PFR_CORE_NAME_PARSING*] [On platforms which are unknown by Boost.PFR library, the 'boost/pfr/config.hpp' header defines the BOOST_PFR_CORE_NAME_PARSING macro equal to (0,0,false). Defining this macro before including the header might help the library to work on your specific platform. See details [link boost_pfr.limitations_of_field_names_refle [*here]]. ]]
     [[*BOOST_PFR_ENABLED*] [On platforms where Boost.PFR is not supported, the `boost/pfr/config.hpp` header defines the BOOST_PFR_ENABLED macro equal to 0. Defining this macro as 0 before including the header disables the Boost.PFR library. ]]
 ]
 
@@ -563,7 +564,7 @@ If you get the following error during compilation
 ``
 then you are using a compiler that was not tested with this library. 
 
-[macroref BOOST_PFR_FUNCTION_SIGNATURE] must be defined to a compiler specific macro, that outputs the *whole*
+BOOST_PFR_FUNCTION_SIGNATURE must be defined to a compiler specific macro, that outputs the *whole*
 function signature including non-type template parameters.
 
 
@@ -577,12 +578,12 @@ If the output of `boost::pfr::get_name<0, A::A>()`
 returns not just `fn` but also a lot of text around the `fn` 
 or does not return name at all
 then you are using a compiler that was not tested with this library and you need to setup the
-[macroref BOOST_PFR_CORE_NAME_PARSING] macro.
+BOOST_PFR_CORE_NAME_PARSING macro.
 
 Here is a short instruction:
 
 # get the output of `boost::pfr::get_name<0, A::A>()`
-# define [macroref BOOST_PFR_CORE_NAME_PARSING] to 
+# define BOOST_PFR_CORE_NAME_PARSING to 
 `(skip_at_begin, skip_at_end, false, "")`, where
     * `skip_at_begin` is equal to characters count before the first occurrence of `fn` in output 
     * `skip_at_end` is equal to characters count after last occurrence of `fn` in output
