@@ -28,11 +28,11 @@ rule mp-run-simple ( sources + : args * : input-files * : requirements * : targe
    alias $(target-name) : $(target-name).output ;
 }
 
-mp-run-simple cxx20_nontype_template_args_detection.cpp : : : : compiler_supports_cxx20_nontype_template_args ;
-explicit compiler_supports_cxx20_nontype_template_args ;
+mp-run-simple cxx20_address_of_non_static_member_tplarg_detection.cpp : : : : compiler_supports_cxx20_address_of_non_static_member_tplarg ;
+explicit compiler_supports_cxx20_address_of_non_static_member_tplarg ;
 
-mp-run-simple cxx20_clang_workaround_detection.cpp : : : : compiler_supports_cxx20_clang_workaround ;
-explicit compiler_supports_cxx20_clang_workaround ;
+mp-run-simple cxx20_nontype_tplarg_detection.cpp : : : : compiler_supports_cxx20_nontype_tplarg ;
+explicit compiler_supports_cxx20_nontype_tplarg ;
 
 ########## END of helpers to detect C++20 features support
 
@@ -40,7 +40,7 @@ project
     : source-location .
     : requirements
         <define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1
-        [ check-target-builds ../core_name//compiler_supports_cxx20_nontype_template_args : : [ check-target-builds ../core_name//compiler_supports_cxx20_clang_workaround : : <build>no ] ]
+        [ check-target-builds ../core_name//compiler_supports_cxx20_address_of_non_static_member_tplarg : : [ check-target-builds ../core_name//compiler_supports_cxx20_nontype_tplarg : : <build>no ] ]
     ;
 
 local ENABLED_ENGINE = <define>BOOST_PFR_ENABLE_GET_NAME_STATIC=1 ;
