@@ -24,13 +24,14 @@ constexpr auto make_stdarray(const Types&... t) noexcept {
 }
 
 template <class T, std::size_t... I>
-constexpr auto make_stdarray_from_tietuple(const T& t, std::index_sequence<I...>) noexcept {
+constexpr auto make_stdarray_from_tietuple(const T& t, std::index_sequence<I...>, int) noexcept {
     return detail::make_stdarray(
         boost::pfr::detail::sequence_tuple::get<I>(t)...
     );
 }
 
-constexpr auto make_empty_stdarray() noexcept {
+template <class T>
+constexpr auto make_stdarray_from_tietuple(const T& t, std::index_sequence<>, long) noexcept {
     return std::array<std::nullptr_t, 0>{};
 }
 

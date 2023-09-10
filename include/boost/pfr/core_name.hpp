@@ -21,7 +21,6 @@
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 
 #include <cstddef> // for std::size_t
-#include <type_traits> // for std::enable_if_t
 
 #include <boost/pfr/tuple_size.hpp>
 
@@ -75,23 +74,13 @@ std::array<std::string_view, boost::pfr::tuple_size_v<T>>
 #else
 auto
 #endif
-names_as_array(
-#ifndef BOOST_PFR_DOXYGEN_INVOKED
-    std::enable_if_t<!decltype(detail::tie_as_names_tuple<T>())::empty()>* = nullptr
-#endif
-    ) noexcept {
+names_as_array() noexcept {
     return detail::make_stdarray_from_tietuple(
         detail::tie_as_names_tuple<T>(),
-        detail::make_index_sequence< tuple_size_v<T> >()
+        detail::make_index_sequence< tuple_size_v<T> >(),
+        1L
     );
 }
-
-#ifndef BOOST_PFR_DOXYGEN_INVOKED
-template <class T>
-constexpr auto names_as_array(std::enable_if_t<decltype(detail::tie_as_names_tuple<T>())::empty()>* = nullptr) noexcept {
-    return detail::make_empty_stdarray();
-}
-#endif
 
 }} // namespace boost::pfr
 
