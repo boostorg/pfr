@@ -98,6 +98,47 @@
 #   endif
 #endif
 
+#ifndef BOOST_PFR_CORE_NAME_ENABLED
+#   if  (__cplusplus >= 202002L) || (defined(_MSVC_LANG) && (_MSVC_LANG >= 202002L))
+#       if (defined(__cpp_nontype_template_args) && __cpp_nontype_template_args >= 201911) \
+         || (defined(__clang_major__) && __clang_major__ >= 12)
+#           define BOOST_PFR_CORE_NAME_ENABLED 1
+#       else
+#           define BOOST_PFR_CORE_NAME_ENABLED 0
+#       endif
+#   else
+#       define BOOST_PFR_CORE_NAME_ENABLED 0
+#   endif
+#endif
+
+#ifndef BOOST_PFR_FUNCTION_SIGNATURE
+#   if defined(__FUNCSIG__)
+#       define BOOST_PFR_FUNCTION_SIGNATURE __FUNCSIG__
+#   elif defined(__PRETTY_FUNCTION__) \
+                   || defined(__GNUC__) \
+                   || defined(__clang__)
+#       define BOOST_PFR_FUNCTION_SIGNATURE __PRETTY_FUNCTION__
+#   else
+#       define BOOST_PFR_FUNCTION_SIGNATURE ""
+#   endif
+#endif
+
+#ifndef BOOST_PFR_CORE_NAME_PARSING
+#   if defined(_MSC_VER)
+// sizeof("auto __cdecl boost::pfr::detail::name_of_field_impl<") - 1, sizeof(">(void) noexcept") - 1
+#       define BOOST_PFR_CORE_NAME_PARSING (52 /*45 for non boost*/, 16, backward("->"))
+#   elif defined(__clang__)
+// sizeof("auto boost::pfr::detail::name_of_field_impl() [MsvcWorkaround = ") - 1, sizeof("}]") - 1
+#       define BOOST_PFR_CORE_NAME_PARSING (64 /*57 for non boost*/, 2, backward("."))
+#   elif defined(__GNUC__)
+// sizeof("consteval auto boost::pfr::detail::name_of_field_impl() [with MsvcWorkaround = ") - 1, sizeof(")]") - 1
+#       define BOOST_PFR_CORE_NAME_PARSING (79 /*72 for non boost*/, 2, backward("::"))
+#   else
+// Deafult parser for other platforms... Just skip nothing!
+#       define BOOST_PFR_CORE_NAME_PARSING (0, 0, "")
+#   endif
+#endif
+
 #if defined(__has_cpp_attribute)
 #   if __has_cpp_attribute(maybe_unused)
 #       define BOOST_PFR_MAYBE_UNUSED [[maybe_unused]]

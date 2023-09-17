@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - toolset: gcc-12
+          - toolset: gcc-12 # Do not remove! It is the only toolset that tests misc/strip_boost_namespace.sh
             cxxstd: "03,11,14,17,2a"
             os: ubuntu-22.04
             cxxflags: "cxxflags=--coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined"
@@ -94,7 +94,7 @@ jobs:
           dist/bin/inspect libs/$LIBRARY
 
       - name: Test boost namespace stripping
-        if: ${{matrix.toolset == 'gcc-9'}}
+        if: ${{matrix.toolset == 'gcc-12'}}
         run: ../boost-root/libs/$LIBRARY/misc/strip_boost_namespace.sh
 
       - name: Prepare coverage data
