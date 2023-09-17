@@ -3,6 +3,10 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+/* Tesing non-ASCII field names, so we have to add th following suppression:
+boost-no-inspect
+*/
+
 #include <boost/pfr/core_name.hpp>
 
 #include <boost/core/lightweight_test.hpp>
