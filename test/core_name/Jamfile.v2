@@ -8,7 +8,6 @@
 # The way to make it union and UB free by X-Ryl669, https://github.com/X-Ryl669
 #
 
-import python ;
 import testing ;
 import ../../config/checks/config : requires ;
 
@@ -43,13 +42,6 @@ project
         [ check-target-builds ../core_name//compiler_supports_cxx20_address_of_non_static_member_tplarg : : [ check-target-builds ../core_name//compiler_supports_cxx20_nontype_tplarg : : <build>no ] ]
     ;
 
-
-
-actions invoke_python_generator
-{
-        python $(>) > $(<)
-}
-
 test-suite pfr_name_tests
   :
     [ run print_name.cpp : : : <test-info>always_show_run_output ]
@@ -57,14 +49,7 @@ test-suite pfr_name_tests
 
 for local source_file in [ glob ./run/*.cpp ]
 {
-    pfr_name_tests += [ run $(source_file) : : : : ] ;
-}
-
-for local source_file in [ glob ./run/*.py ]
-{
-    local cpp_source_file = $(source_file[1]:B) ;
-    make $(cpp_source_file) : $(source_file) : @invoke_python_generator ;
-    pfr_name_tests += [ run $(cpp_source_file) : : : <toolset>msvc:<cxxflags>"/utf-8" <toolset>msvc:<cxxflags>"/bigobj" : ] ;
+    pfr_name_tests += [ run $(source_file) : : : <toolset>msvc:<cxxflags>"/utf-8" <toolset>msvc:<cxxflags>"/bigobj" : ] ;
 }
 
 for local source_file in [ glob ./compile-fail/*.cpp ]
