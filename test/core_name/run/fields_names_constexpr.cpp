@@ -29,12 +29,12 @@ static_assert(boost::pfr::get_name<1, Aggregate>() == "this_is_a_name");
 static_assert(boost::pfr::get_name<2, Aggregate>() == "c");
 static_assert(boost::pfr::get_name<3, Aggregate>() == "Forth");
 
-static_assert(boost::pfr::names_as_array<Aggregate>() == std::array<std::string_view, 4>{
-        "member1",
-        "this_is_a_name",
-        "c",
-        "Forth"
-});
+constexpr auto names_array = boost::pfr::names_as_array<Aggregate>();
+static_assert(names_array.size() == 4);
+static_assert(names_array[0] == "member1");
+static_assert(names_array[1] == "this_is_a_name");
+static_assert(names_array[2] == "c");
+static_assert(names_array[3] == "Forth");
 
 int main() {}
 

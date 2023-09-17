@@ -22,7 +22,6 @@
 #include <type_traits>
 #include <string_view>
 #include <array>
-#include <algorithm> // for std::ranges::copy
 #include <memory> // for std::addressof
 
 namespace boost { namespace pfr { namespace detail {
@@ -138,7 +137,13 @@ consteval auto name_of_field_impl() noexcept {
         constexpr auto fn = skip.apply(sv);
         auto res = std::array<char, fn.size()+1>{};
         detail::assert_compile_time_legths<!fn.empty()>();
-        std::ranges::copy(fn, res.begin());
+
+        auto* out = res.begin();
+        for (auto x: fn) {
+            *out = x;
+            ++out;
+        }
+
         return res;
     }
 }
