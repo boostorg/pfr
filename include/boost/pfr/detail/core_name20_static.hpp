@@ -138,7 +138,7 @@ consteval auto name_of_field_impl() noexcept {
         auto res = std::array<char, fn.size()+1>{};
         detail::assert_compile_time_legths<!fn.empty()>();
 
-        auto* out = res.begin();
+        auto* out = res.data();
         for (auto x: fn) {
             *out = x;
             ++out;
