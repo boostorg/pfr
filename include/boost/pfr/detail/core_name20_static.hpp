@@ -179,12 +179,16 @@ constexpr const T& make_clang_wrapper(const T& arg) noexcept {
 
 #endif
 
+// Storing part of a string literal into an array minimizes the binary size.
+//
 // Without passing 'T' into 'name_of_field_impl' different fields from different structures might have the same name!
 // See https://developercommunity.visualstudio.com/t/__FUNCSIG__-outputs-wrong-value-with-C/10458554 for details
 template <class T, std::size_t I>
-constexpr auto stored_name_of_field = detail::name_of_field_impl<T, detail::make_clang_wrapper(std::addressof(detail::sequence_tuple::get<I>(
-    detail::tie_as_tuple(fake_object<T>)
-)))>();
+inline constexpr auto stored_name_of_field = detail::name_of_field_impl<T,
+    detail::make_clang_wrapper(std::addressof(detail::sequence_tuple::get<I>(
+        detail::tie_as_tuple(fake_object<T>)
+    )))
+>();
 
 #ifdef __clang__
 #pragma clang diagnostic pop
