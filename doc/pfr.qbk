@@ -1,6 +1,6 @@
 [library Boost.PFR
     [quickbook 1.6]
-    [version 2.1]
+    [version 2.2]
     [copyright 2016-2023 Antony Polukhin]
     [category Language Features Emulation]
     [license
@@ -455,11 +455,11 @@ error: static_assert failed "====================> Boost.PFR: For safety reasons
 [endsect]
 
 
-[section Reflection of field names ]
+[section Reflection of field name ]
 
 [pfr_example_get_name]
 
-See [link boost_pfr.limitations_of_field_names_refle [*Limitations of field names reflection]] and [link boost_pfr.limitations_and_configuration [*Limitations and Configuration]].
+See [link boost_pfr.limitations_and_configuration [*Limitations and Configuration]].
 
 [endsect]
 
@@ -490,27 +490,10 @@ struct aggregate : empty { // not a SimpleAggregate
 ```
 The library may work with aggregates that don't satisfy the requirements of `SimpleAggregate`, but the behavior tends to be non-portable.
 
-Boost.PFRs extraction of field name works with a `SimpleAggregate` which variables are able to be declared in any other translation unit.
-It's better not to use this feature with anonymous structure, local structure or a structure defined inside anonymous namespace.
+Boost.PFRs extraction of field name works with a `SimpleAggregate` with non-internal linkage (with aggregats that could be used as `extern T t;`).
+Do not use this functionality with anonymous structures, local structures
+or a structure defined inside anonymous namespace as the behavior tends to be non-portable.
 
-```
-struct external_simple_aggregate {
-    std::string name;
-    int age;
-    boost::uuids::uuid uuid;
-};
-auto v1 = external_simple_aggregate{};       // can be declared outside via `extern`
-
-struct {
-    std::string name;
-    int age;
-    boost::uuids::uuid uuid;
-} anonymous;                                 // can't be declared outside
-```
-Field's name extraction may work with a `SimpleAggregate` that does't satisfy such requirements, but the behavior tends to be non-portable.
-Try using `-fpermissive` if you have any issue with it.
-
-As you see above extraction of field name feature has requirements of input type, additionally it has some requirements of compiler, see [link boost_pfr.limitations_of_field_names_refle [*Limitations of field names reflection]] for details.
 
 [h2 Configuration Macro]
 
@@ -522,9 +505,9 @@ By default Boost.PFR [*auto-detects your compiler abilities] and automatically d
     [[*BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE*] [Define to `0` if you are hit by the template instantiation depth issues with `std::make_integer_sequence` and wish to use Boost.PFR version of that metafunction. Define to `1` to override Boost.PFR detection logic. ]]
     [[*BOOST_PFR_HAS_GUARANTEED_COPY_ELISION*] [Define to `0` if your compiler does not implement C++17 guaranteed copy elision properly and fails to reflect aggregates with non-movable fields. Define to `1` to override Boost.PFR detection logic. ]]
     [[*BOOST_PFR_ENABLE_IMPLICIT_REFLECTION*] [Define to `0` if you are hit by lots of non-effective choices made by implicitly reflection. Define to `1` to override Boost.PFR detection logic. ]]
-    [[*BOOST_PFR_CORE_NAME_ENABLED*] [On platforms where field's names extracting is not supported, the 'boost/pfr/config.hpp' header defines the BOOST_PFR_CORE_NAME_ENABLED macro equal to 0. Defining this macro as 0 before including the header disables the ability to get a field's name. ]]
-    [[*BOOST_PFR_FUNCTION_SIGNATURE*] [On platforms which are unknown by Boost.PFR library, the 'boost/pfr/config.hpp' header defines the BOOST_PFR_FUNCTION_SIGNATURE macro equal to "". Defining this macro before including the header might help the library to work on your specific platform. See details [link boost_pfr.limitations_of_field_names_refle [*here]]. ]]
-    [[*BOOST_PFR_CORE_NAME_PARSING*] [On platforms which are unknown by Boost.PFR library, the 'boost/pfr/config.hpp' header defines the BOOST_PFR_CORE_NAME_PARSING macro equal to (0,0,false). Defining this macro before including the header might help the library to work on your specific platform. See details [link boost_pfr.limitations_of_field_names_refle [*here]]. ]]
+    [[*BOOST_PFR_CORE_NAME_ENABLED*] [On platforms where field name extraction is not supported, the 'boost/pfr/config.hpp' header defines the BOOST_PFR_CORE_NAME_ENABLED macro equal to 0. Defining this macro as 0 before including the header disables the ability to get a field name. ]]
+    [[*BOOST_PFR_FUNCTION_SIGNATURE*] [For known compilers defined to a compiler specific macro, that outputs the whole function signature including non-type template parameters. ]]
+    [[*BOOST_PFR_CORE_NAME_PARSING*] [Describes extraction of field name from BOOST_PFR_FUNCTION_SIGNATURE macro. See details below. ]]
     [[*BOOST_PFR_ENABLED*] [On platforms where Boost.PFR is not supported, the `boost/pfr/config.hpp` header defines the BOOST_PFR_ENABLED macro equal to 0. Defining this macro as 0 before including the header disables the Boost.PFR library. ]]
 ]
 
@@ -544,83 +527,27 @@ The Boost.PFRs reflection has some limitations that depend on a C++ Standard and
 
 The Boost.PFRs extraction of field name has some limitations that depend on a C++ Standard and compiler capabilities:
 
-* T must be able to be extern.
+* T should be usable like `extern T t;`, i.e. has a non-internal linkage.
 
-[endsect]
+[h2 Adjusting BOOST_PFR_CORE_NAME_PARSING]
 
+`BOOST_PFR_CORE_NAME_PARSING` is already set up for most of the popular compilers. You need to adjust it only
+if some static_assert in the library complained on `BOOST_PFR_CORE_NAME_PARSING`.
 
-[section Limitations of field names reflection]
+To do that:
 
-Boost.PFRs extraction of field name has been tested and successfully work on many compilers.
-
-[section Define the BOOST_PFR_FUNCTION_SIGNATURE macro]
-
-If you get the following error during compilation
-```
-error: static_assert failed "====================> Boost.PFR: Extraction of field name could not detect your compiler.
-        Please make the BOOST_PFR_FUNCTION_SIGNATURE macro use
-        correct compiler macro for getting the whole function name.
-        Define BOOST_PFR_CORE_NAME_PARSING to correct value after that."
-```
-then you are using a compiler that was not tested with this library.
-
-BOOST_PFR_FUNCTION_SIGNATURE must be defined to a compiler specific macro, that outputs the *whole*
-function signature including non-type template parameters.
-
-
-[endsect]
-
-[section Fixing get_name() output]
-
-Let's assume the structure `namespace A { struct A { int fn; }; }`
-
-If the output of `boost::pfr::get_name<0, A::A>()`
-returns not just `fn` but also a lot of text around the `fn`
-or does not return name at all
-then you are using a compiler that was not tested with this library and you need to setup the
-BOOST_PFR_CORE_NAME_PARSING macro.
-
-Here is a short instruction:
-
-# get the output of `boost::pfr::get_name<0, A::A>()`
-# define BOOST_PFR_CORE_NAME_PARSING to
-`(skip_at_begin, skip_at_end, false, "")`, where
-    * `skip_at_begin` is equal to characters count before the first occurrence of `fn` in output
-    * `skip_at_end` is equal to characters count after last occurrence of `fn` in output
-# check that `boost::pfr::get_name<0, A::A>()` returns "fn"
-# if it does not return `fn`, then define BOOST_PFR_CORE_NAME_PARSING to
-`(skip_at_begin, skip_at_end, true, "T = ")`, where
+# Build `test/core_name/print_name.cpp` with your compiler and run it
+# Define BOOST_PFR_CORE_NAME_PARSING to `(skip_at_begin, skip_at_end, "")`, where
+    * `skip_at_begin` is equal to characters count before the first occurrence of `user_defined_field` in output
+    * `skip_at_end` is equal to characters count after last occurrence of `user_defined_field` in output
+# Check that `test/core_name/print_name.cpp` returns "user_defined_field"
+# If it does not return `fn`, then define BOOST_PFR_CORE_NAME_PARSING to `(skip_at_begin, skip_at_end, "T = ")`, where
     * `skip_at_begin` is equal to `skip_at_begin` at step 2
     * `skip_at_end` is equal to `skip_at_end` at step 2
-    * `"T = "` is equal to characters that are right before the `fn` in output
+    * `"T = "` is equal to characters that are right before the `user_defined_field` in output, use `backward("T = ")` to search for the occurange in the string from the right
 # (optional, but highly recommended) [@https://github.com/boostorg/pfr/issues create ticket] with
 feature request to add your compiler to supported compilers list. Include
-parameters provided to `BOOST_PFR_CORE_NAME_PARSING` macro.
-
-
-Consider the following example:
-
-`boost::pfr::get_name<0, A::A>()` returns
-"auto __cdecl boost::pfr::detail::name_of_field_impl<struct A::A,&a->fn>(void) noexcept" while compiled with `-DBOOST_PFR_CORE_NAME_PARSING (0,0,false,"")`. Then you shall set
-`skip_at_begin` to `sizeof("auto __cdecl boost::pfr::detail::name_of_field_impl<") - 1`
-and `skip_at_end` to `sizeof(">(void) noexcept") - 1` and last parameter of macro to `"->"`.
-
-``
-#define BOOST_PFR_CORE_NAME_PARSING (52, 16, true, "->")
-``
-
-Another example:
-
-`boost::pfr::get_name<0, A::A>()` returns
-"consteval auto boost::pfr::detail::name_of_field_impl() [with MsvcWorkaround = A::A; auto ptr = (& a.A::A::fn)]" while compiled with `-DBOOST_PFR_CORE_NAME_PARSING (0,0,false,"")`. Then you shall set
-`skip_at_begin` to `0`
-and `skip_at_end` to `sizeof(")]") - 1` and last parameter of macro to `backward("::")`.
-
-``
-#define BOOST_PFR_CORE_NAME_PARSING (0, 2, true, backward("::"))
-``
-
-[endsect]
+parameters provided to `BOOST_PFR_CORE_NAME_PARSING` macro [*and] the initial output if `test/core_name/print_name.cpp`.
 
 [endsect]
 

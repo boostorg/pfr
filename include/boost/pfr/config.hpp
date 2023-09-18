@@ -111,30 +111,16 @@
 #   endif
 #endif
 
-#ifndef BOOST_PFR_FUNCTION_SIGNATURE
-#   if defined(__FUNCSIG__)
-#       define BOOST_PFR_FUNCTION_SIGNATURE __FUNCSIG__
-#   elif defined(__PRETTY_FUNCTION__) \
-                   || defined(__GNUC__) \
-                   || defined(__clang__)
-#       define BOOST_PFR_FUNCTION_SIGNATURE __PRETTY_FUNCTION__
-#   else
-#       define BOOST_PFR_FUNCTION_SIGNATURE ""
-#   endif
-#endif
 
 #ifndef BOOST_PFR_CORE_NAME_PARSING
 #   if defined(_MSC_VER)
-// sizeof("auto __cdecl boost::pfr::detail::name_of_field_impl<") - 1, sizeof(">(void) noexcept") - 1
-#       define BOOST_PFR_CORE_NAME_PARSING (52 /*45 for non boost*/, 16, backward("->"))
+#       define BOOST_PFR_CORE_NAME_PARSING (sizeof("auto __cdecl boost::pfr::detail::name_of_field_impl<") - 1, sizeof(">(void) noexcept") - 1, backward("->"))
 #   elif defined(__clang__)
-// sizeof("auto boost::pfr::detail::name_of_field_impl() [MsvcWorkaround = ") - 1, sizeof("}]") - 1
-#       define BOOST_PFR_CORE_NAME_PARSING (64 /*57 for non boost*/, 2, backward("."))
+#       define BOOST_PFR_CORE_NAME_PARSING (sizeof("auto boost::pfr::detail::name_of_field_impl() [MsvcWorkaround = ") - 1, sizeof("}]") - 1, backward("."))
 #   elif defined(__GNUC__)
-// sizeof("consteval auto boost::pfr::detail::name_of_field_impl() [with MsvcWorkaround = ") - 1, sizeof(")]") - 1
-#       define BOOST_PFR_CORE_NAME_PARSING (79 /*72 for non boost*/, 2, backward("::"))
+#       define BOOST_PFR_CORE_NAME_PARSING (sizeof("consteval auto boost::pfr::detail::name_of_field_impl() [with MsvcWorkaround = ") - 1, sizeof(")]") - 1, backward("::"))
 #   else
-// Deafult parser for other platforms... Just skip nothing!
+// Default parser for other platforms... Just skip nothing!
 #       define BOOST_PFR_CORE_NAME_PARSING (0, 0, "")
 #   endif
 #endif

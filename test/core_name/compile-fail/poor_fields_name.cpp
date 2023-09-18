@@ -9,7 +9,7 @@
 //
 
 #define BOOST_PFR_FUNCTION_SIGNATURE " *[field] "
-#define BOOST_PFR_CORE_NAME_PARSING (3,2,false,"")
+#define BOOST_PFR_CORE_NAME_PARSING (3,2,"")
 #include <boost/pfr/core_name.hpp>
 
 #include <boost/core/lightweight_test.hpp>
@@ -17,7 +17,7 @@
 struct A { int field; };
 
 int main() {
-    BOOST_TEST_EQ( ((boost::pfr::get_name<0,A>())), "field");
+    BOOST_TEST_EQ( (boost::pfr::get_name<0,A>()), "field");
 
     return boost::report_errors();
 }
