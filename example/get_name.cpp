@@ -13,7 +13,7 @@
 #if BOOST_PFR_CORE_NAME_ENABLED && BOOST_PFR_USE_CPP17
 //[pfr_example_get_name
 /*`
-    Since C++20 it's possible to read name of structure fields by index using Boost.PFR library.
+    Since C++20 it's possible to read name of a structure field by index using Boost.PFR library.
     The following example shows how to do it using [funcref boost::pfr::get_name].
 
     Let's define some structure:
@@ -28,8 +28,8 @@ struct foo {            // defining structure
 /*`
     We can access field's names of that structure by index:
 */
-constexpr auto r1 = boost::pfr::get_name<0, foo>(); // reading name of field with index 0, returns string `some_integer`
-constexpr auto r2 = boost::pfr::get_name<1, foo>(); // reading name of field with index 1, returns string `c`
+constexpr std::string_view r1 = boost::pfr::get_name<0, foo>(); // returns "some_integer"
+constexpr std::string_view r2 = boost::pfr::get_name<1, foo>(); // returns "c"
 //] [/pfr_example_get_name]
 #endif
 
