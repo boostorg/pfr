@@ -9,7 +9,7 @@
 //
 
 #define BOOST_PFR_FUNCTION_SIGNATURE "dummy"
-#define BOOST_PFR_CORE_NAME_PARSING (3,2,false,"")
+#define BOOST_PFR_CORE_NAME_PARSING (3,2,"")
 #include <boost/pfr/core_name.hpp>
 
 struct A { int field; };

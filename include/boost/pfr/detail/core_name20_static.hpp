@@ -29,33 +29,24 @@ namespace boost { namespace pfr { namespace detail {
 struct core_name_skip {
     std::size_t size_at_begin;
     std::size_t size_at_end;
-    bool more_at_runtime;
     bool is_backward;
     std::string_view until_runtime;
 
-    consteval std::string_view fail() const noexcept {
-        return "";
-    }
-
     consteval std::string_view apply(std::string_view sv) const noexcept {
+        // We use std::min here to make the compiler diagnostic shorter and
+        // cleaner in case of misconfigured BOOST_PFR_CORE_NAME_PARSING
         sv.remove_prefix((std::min)(size_at_begin, sv.size()));
         sv.remove_suffix((std::min)(size_at_end, sv.size()));
-        if (!more_at_runtime) {
-            if (!until_runtime.empty())
-                return fail(); ///< useless skip condition
+        if (until_runtime.empty()) {
             return sv;
         }
-        else {
-            // so, we're asked to skip more
-            if (until_runtime.empty())
-                return fail(); ///< condition to skip more wasn't specified
-            const auto found = is_backward ? sv.rfind(until_runtime)
-                                             : sv.find(until_runtime);
-                                             ;
-            const auto cut_until = found + until_runtime.size();
-            const auto safe_cut_until = (std::min)(cut_until, sv.size());
-            return sv.substr(safe_cut_until);
-        }
+
+        const auto found = is_backward ? sv.rfind(until_runtime)
+                                       : sv.find(until_runtime);
+
+        const auto cut_until = found + until_runtime.size();
+        const auto safe_cut_until = (std::min)(cut_until, sv.size());
+        return sv.substr(safe_cut_until);
     }
 };
 
@@ -69,46 +60,16 @@ struct backward {
 
 consteval core_name_skip make_core_name_skip(std::size_t size_at_begin,
                                              std::size_t size_at_end,
-                                             bool more_at_runtime,
                                              std::string_view until_runtime) noexcept
 {
-    return core_name_skip{size_at_begin, size_at_end, more_at_runtime, false, until_runtime};
+    return core_name_skip{size_at_begin, size_at_end, false, until_runtime};
 }
 
 consteval core_name_skip make_core_name_skip(std::size_t size_at_begin,
                                              std::size_t size_at_end,
-                                             bool more_at_runtime,
                                              backward until_runtime) noexcept
 {
-    return core_name_skip{size_at_begin, size_at_end, more_at_runtime, true, until_runtime.value};
-}
-
-consteval core_name_skip make_core_name_skip(std::size_t size_at_begin,
-                                             std::size_t size_at_end,
-                                             auto until_runtime) noexcept
-{
-    return detail::make_core_name_skip(size_at_begin, size_at_end, true, until_runtime);
-}
-
-template <bool Condition>
-consteval void assert_compile_time_legths() noexcept {
-    static_assert(
-        Condition,
-        "====================> Boost.PFR: Extraction of field name is misconfigured for your compiler. "
-        "Please define BOOST_PFR_CORE_NAME_PARSING to correct values. See section "
-        "Limitations of field's names reflection' of the documentation for more information."
-    );
-}
-
-template <class T>
-consteval void failed_to_get_function_name() noexcept {
-    static_assert(
-        sizeof(T) && false,
-        "====================> Boost.PFR: Extraction of field name could not detect your compiler. "
-        "Please make the BOOST_PFR_FUNCTION_SIGNATURE macro use "
-        "correct compiler macro for getting the whole function name. "
-        "Define BOOST_PFR_CORE_NAME_PARSING to correct value after that."
-    );
+    return core_name_skip{size_at_begin, size_at_end, true, until_runtime.value};
 }
 
 // it might be compilation failed without this workaround sometimes
@@ -121,31 +82,50 @@ consteval std::string_view clang_workaround(std::string_view value) noexcept
 
 template <class MsvcWorkaround, auto ptr>
 consteval auto name_of_field_impl() noexcept {
+    // Some of the following compiler specific macro may be defined only
+    // inside the function body:
+
+#ifndef BOOST_PFR_FUNCTION_SIGNATURE
+#   if defined(__FUNCSIG__)
+#       define BOOST_PFR_FUNCTION_SIGNATURE __FUNCSIG__
+#   elif defined(__PRETTY_FUNCTION__) || defined(__GNUC__) || defined(__clang__)
+#       define BOOST_PFR_FUNCTION_SIGNATURE __PRETTY_FUNCTION__
+#   else
+#       define BOOST_PFR_FUNCTION_SIGNATURE ""
+#   endif
+#endif
+
     constexpr std::string_view sv = detail::clang_workaround<MsvcWorkaround>(BOOST_PFR_FUNCTION_SIGNATURE);
-    if constexpr (sv.empty()) {
-        detail::failed_to_get_function_name<MsvcWorkaround>();
-        return detail::make_stdarray<char>(0);
-    } else {
-        constexpr auto skip = detail::make_core_name_skip BOOST_PFR_CORE_NAME_PARSING;
-        static_assert(
-            skip.more_at_runtime || skip.until_runtime.empty(),
-            "====================> Boost.PFR: Parser configured in a wrong way. "
-            "It wasn't requested to skip more, but such skip condition was specified in vain. "
-            "Please read your definition of BOOST_PFR_CORE_NAME_PARSING macro patiently "
-            "and fix it."
-        );
-        constexpr auto fn = skip.apply(sv);
-        auto res = std::array<char, fn.size()+1>{};
-        detail::assert_compile_time_legths<!fn.empty()>();
+    static_assert(!sv.empty(),
+        "====================> Boost.PFR: Field reflection parser configured in a wrong way. "
+        "Please define the BOOST_PFR_FUNCTION_SIGNATURE to a compiler specific macro, "
+        "that outputs the whole function signature including non-type template parameters."  
+    );
 
-        auto* out = res.data();
-        for (auto x: fn) {
-            *out = x;
-            ++out;
-        }
+    constexpr auto skip = detail::make_core_name_skip BOOST_PFR_CORE_NAME_PARSING;
+    static_assert(skip.size_at_begin + skip.size_at_end + skip.until_runtime.size() < sv.size(),
+        "====================> Boost.PFR: Field reflection parser configured in a wrong way. "
+        "It attempts to skip more chars than available. "
+        "Please read your definition of BOOST_PFR_CORE_NAME_PARSING macro patiently "
+        "and fix it."
+    );
+    constexpr auto fn = skip.apply(sv);
+    static_assert(
+        !fn.empty(),
+        "====================> Boost.PFR: Extraction of field name is misconfigured for your compiler. "
+        "It skipped all the input, leaving the field name empty. "
+        "Please define BOOST_PFR_CORE_NAME_PARSING to correct values. See section "
+        "Limitations of field's names reflection' of the documentation for more information."
+    );
+    auto res = std::array<char, fn.size()+1>{};
 
-        return res;
+    auto* out = res.data();
+    for (auto x: fn) {
+        *out = x;
+        ++out;
     }
+
+    return res;
 }
 
 #ifdef __clang__
@@ -179,14 +159,35 @@ constexpr const T& make_clang_wrapper(const T& arg) noexcept {
 
 #endif
 
+template <class MsvcWorkaround, auto ptr>
+consteval auto name_of_field() noexcept {
+    // Sanity check: known field name must match the deduced one
+    static_assert(
+        sizeof(MsvcWorkaround)  // do not trigger if `name_of_field()` is not used
+        && std::string_view{
+            detail::name_of_field_impl<
+                core_name_skip, detail::make_clang_wrapper(std::addressof(
+                    fake_object<core_name_skip>.size_at_begin
+                ))
+            >().data()
+        } == "size_at_begin",
+        "====================> Boost.PFR: Extraction of field name is misconfigured for your compiler. "
+        "It does not return the proper field name. "
+        "Please define BOOST_PFR_CORE_NAME_PARSING to correct values. See section "
+        "Limitations of field's names reflection' of the documentation for more information."
+    );
+
+    return detail::name_of_field_impl<MsvcWorkaround, ptr>();
+}
+
 // Storing part of a string literal into an array minimizes the binary size.
 //
-// Without passing 'T' into 'name_of_field_impl' different fields from different structures might have the same name!
+// Without passing 'T' into 'name_of_field' different fields from different structures might have the same name!
 // See https://developercommunity.visualstudio.com/t/__FUNCSIG__-outputs-wrong-value-with-C/10458554 for details
 template <class T, std::size_t I>
-inline constexpr auto stored_name_of_field = detail::name_of_field_impl<T,
+inline constexpr auto stored_name_of_field = detail::name_of_field<T,
     detail::make_clang_wrapper(std::addressof(detail::sequence_tuple::get<I>(
-        detail::tie_as_tuple(fake_object<T>)
+        detail::tie_as_tuple(detail::fake_object<T>)
     )))
 >();
 

@@ -111,17 +111,6 @@
 #   endif
 #endif
 
-#ifndef BOOST_PFR_FUNCTION_SIGNATURE
-#   if defined(__FUNCSIG__)
-#       define BOOST_PFR_FUNCTION_SIGNATURE __FUNCSIG__
-#   elif defined(__PRETTY_FUNCTION__) \
-                   || defined(__GNUC__) \
-                   || defined(__clang__)
-#       define BOOST_PFR_FUNCTION_SIGNATURE __PRETTY_FUNCTION__
-#   else
-#       define BOOST_PFR_FUNCTION_SIGNATURE ""
-#   endif
-#endif
 
 #ifndef BOOST_PFR_CORE_NAME_PARSING
 #   if defined(_MSC_VER)

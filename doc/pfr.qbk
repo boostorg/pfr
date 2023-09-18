@@ -455,11 +455,11 @@ error: static_assert failed "====================> Boost.PFR: For safety reasons
 [endsect]
 
 
-[section Reflection of field names ]
+[section Reflection of field name ]
 
 [pfr_example_get_name]
 
-See [link boost_pfr.limitations_of_field_names_refle [*Limitations of field names reflection]] and [link boost_pfr.limitations_and_configuration [*Limitations and Configuration]].
+See [link boost_pfr.limitations_of_field_name_refle [*Limitations of field name reflection]] and [link boost_pfr.limitations_and_configuration [*Limitations and Configuration]].
 
 [endsect]
 
@@ -490,27 +490,26 @@ struct aggregate : empty { // not a SimpleAggregate
 ```
 The library may work with aggregates that don't satisfy the requirements of `SimpleAggregate`, but the behavior tends to be non-portable.
 
-Boost.PFRs extraction of field name works with a `SimpleAggregate` which variables are able to be declared in any other translation unit.
-It's better not to use this feature with anonymous structure, local structure or a structure defined inside anonymous namespace.
+Boost.PFRs extraction of field name works with a `SimpleAggregate` that could be declared as `extern T t;`.
+Do not use this functionality with anonymous structures, local structures
+or a structure defined inside anonymous namespace as the behavior tends to be non-portable.
 
 ```
 struct external_simple_aggregate {
     std::string name;
     int age;
     boost::uuids::uuid uuid;
-};
-auto v1 = external_simple_aggregate{};       // can be declared outside via `extern`
+};                                  // can used as `extern external_simple_aggregate v1;`
 
 struct {
     std::string name;
     int age;
     boost::uuids::uuid uuid;
-} anonymous;                                 // can't be declared outside
+} anonymous;                        // can't be used with `extern`
 ```
-Field's name extraction may work with a `SimpleAggregate` that does't satisfy such requirements, but the behavior tends to be non-portable.
-Try using `-fpermissive` if you have any issue with it.
 
-As you see above extraction of field name feature has requirements of input type, additionally it has some requirements of compiler, see [link boost_pfr.limitations_of_field_names_refle [*Limitations of field names reflection]] for details.
+Extraction of the field name has additional requirements on compiler, see [link boost_pfr.limitations_of_field_name_reflec [*Limitations of field name reflection]] for details.
+
 
 [h2 Configuration Macro]
 
@@ -522,9 +521,9 @@ By default Boost.PFR [*auto-detects your compiler abilities] and automatically d
     [[*BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE*] [Define to `0` if you are hit by the template instantiation depth issues with `std::make_integer_sequence` and wish to use Boost.PFR version of that metafunction. Define to `1` to override Boost.PFR detection logic. ]]
     [[*BOOST_PFR_HAS_GUARANTEED_COPY_ELISION*] [Define to `0` if your compiler does not implement C++17 guaranteed copy elision properly and fails to reflect aggregates with non-movable fields. Define to `1` to override Boost.PFR detection logic. ]]
     [[*BOOST_PFR_ENABLE_IMPLICIT_REFLECTION*] [Define to `0` if you are hit by lots of non-effective choices made by implicitly reflection. Define to `1` to override Boost.PFR detection logic. ]]
-    [[*BOOST_PFR_CORE_NAME_ENABLED*] [On platforms where field's names extracting is not supported, the 'boost/pfr/config.hpp' header defines the BOOST_PFR_CORE_NAME_ENABLED macro equal to 0. Defining this macro as 0 before including the header disables the ability to get a field's name. ]]
-    [[*BOOST_PFR_FUNCTION_SIGNATURE*] [On platforms which are unknown by Boost.PFR library, the 'boost/pfr/config.hpp' header defines the BOOST_PFR_FUNCTION_SIGNATURE macro equal to "". Defining this macro before including the header might help the library to work on your specific platform. See details [link boost_pfr.limitations_of_field_names_refle [*here]]. ]]
-    [[*BOOST_PFR_CORE_NAME_PARSING*] [On platforms which are unknown by Boost.PFR library, the 'boost/pfr/config.hpp' header defines the BOOST_PFR_CORE_NAME_PARSING macro equal to (0,0,false). Defining this macro before including the header might help the library to work on your specific platform. See details [link boost_pfr.limitations_of_field_names_refle [*here]]. ]]
+    [[*BOOST_PFR_CORE_NAME_ENABLED*] [On platforms where field name extraction is not supported, the 'boost/pfr/config.hpp' header defines the BOOST_PFR_CORE_NAME_ENABLED macro equal to 0. Defining this macro as 0 before including the header disables the ability to get a field name. ]]
+    [[*BOOST_PFR_FUNCTION_SIGNATURE*] [For known compilers defined to a compiler specific macro, that outputs the whole function signature including non-type template parameters. ]]
+    [[*BOOST_PFR_CORE_NAME_PARSING*] [On platforms which are unknown by Boost.PFR library, the 'boost/pfr/config.hpp' header defines the BOOST_PFR_CORE_NAME_PARSING macro equal to (0,0,""). Defining this macro before including the header might help the library to work on your specific platform. See details [link boost_pfr.limitations_of_field_name_reflec [*here]]. ]]
     [[*BOOST_PFR_ENABLED*] [On platforms where Boost.PFR is not supported, the `boost/pfr/config.hpp` header defines the BOOST_PFR_ENABLED macro equal to 0. Defining this macro as 0 before including the header disables the Boost.PFR library. ]]
 ]
 
@@ -544,40 +543,19 @@ The Boost.PFRs reflection has some limitations that depend on a C++ Standard and
 
 The Boost.PFRs extraction of field name has some limitations that depend on a C++ Standard and compiler capabilities:
 
-* T must be able to be extern.
+* T should be usable like `extern T t;`.
 
 [endsect]
 
 
-[section Limitations of field names reflection]
-
-Boost.PFRs extraction of field name has been tested and successfully work on many compilers.
-
-[section Define the BOOST_PFR_FUNCTION_SIGNATURE macro]
-
-If you get the following error during compilation
-```
-error: static_assert failed "====================> Boost.PFR: Extraction of field name could not detect your compiler.
-        Please make the BOOST_PFR_FUNCTION_SIGNATURE macro use
-        correct compiler macro for getting the whole function name.
-        Define BOOST_PFR_CORE_NAME_PARSING to correct value after that."
-```
-then you are using a compiler that was not tested with this library.
-
-BOOST_PFR_FUNCTION_SIGNATURE must be defined to a compiler specific macro, that outputs the *whole*
-function signature including non-type template parameters.
-
-
-[endsect]
-
-[section Fixing get_name() output]
+[section Adjusting BOOST_PFR_CORE_NAME_PARSING]
 
 Let's assume the structure `namespace A { struct A { int fn; }; }`
 
 If the output of `boost::pfr::get_name<0, A::A>()`
 returns not just `fn` but also a lot of text around the `fn`
 or does not return name at all
-then you are using a compiler that was not tested with this library and you need to setup the
+then you should setup the BOOST_PFR_FUNCTION_SIGNATURE and the
 BOOST_PFR_CORE_NAME_PARSING macro.
 
 Here is a short instruction:
@@ -619,8 +597,6 @@ and `skip_at_end` to `sizeof(")]") - 1` and last parameter of macro to `backward
 ``
 #define BOOST_PFR_CORE_NAME_PARSING (0, 2, true, backward("::"))
 ``
-
-[endsect]
 
 [endsect]
 
