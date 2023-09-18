@@ -13,7 +13,10 @@
 // This cpp file:
 // * tests BOOST_PFR_CORE_NAME_PARSING macro
 // * outputs full name of the function so that PFRs extraction of field name could be adjust to new compiler without requesting regression tester's help
+#ifndef BOOST_PFR_CORE_NAME_PARSING
 #define BOOST_PFR_CORE_NAME_PARSING (0,0,"")
+#endif
+
 #include <boost/pfr/core_name.hpp>
 
 namespace user_defined_namespace {

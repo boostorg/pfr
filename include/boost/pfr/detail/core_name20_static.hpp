@@ -107,15 +107,16 @@ consteval auto name_of_field_impl() noexcept {
         "====================> Boost.PFR: Field reflection parser configured in a wrong way. "
         "It attempts to skip more chars than available. "
         "Please read your definition of BOOST_PFR_CORE_NAME_PARSING macro patiently "
-        "and fix it."
+        "and fix it. See documentation section "
+        "'Limitations and Configuration' for more information."
     );
     constexpr auto fn = skip.apply(sv);
     static_assert(
         !fn.empty(),
         "====================> Boost.PFR: Extraction of field name is misconfigured for your compiler. "
         "It skipped all the input, leaving the field name empty. "
-        "Please define BOOST_PFR_CORE_NAME_PARSING to correct values. See section "
-        "Limitations of field's names reflection' of the documentation for more information."
+        "Please define BOOST_PFR_CORE_NAME_PARSING to correct values. See documentation section "
+        "'Limitations and Configuration' for more information."
     );
     auto res = std::array<char, fn.size()+1>{};
 
@@ -173,8 +174,8 @@ consteval auto name_of_field() noexcept {
         } == "size_at_begin",
         "====================> Boost.PFR: Extraction of field name is misconfigured for your compiler. "
         "It does not return the proper field name. "
-        "Please define BOOST_PFR_CORE_NAME_PARSING to correct values. See section "
-        "Limitations of field's names reflection' of the documentation for more information."
+        "Please define BOOST_PFR_CORE_NAME_PARSING to correct values. See documentation section "
+        "'Limitations and Configuration' for more information."
     );
 
     return detail::name_of_field_impl<MsvcWorkaround, ptr>();
