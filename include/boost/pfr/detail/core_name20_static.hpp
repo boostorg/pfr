@@ -106,8 +106,7 @@ consteval auto name_of_field_impl() noexcept {
     static_assert(skip.size_at_begin + skip.size_at_end + skip.until_runtime.size() < sv.size(),
         "====================> Boost.PFR: Field reflection parser configured in a wrong way. "
         "It attempts to skip more chars than available. "
-        "Please read your definition of BOOST_PFR_CORE_NAME_PARSING macro patiently "
-        "and fix it. See documentation section "
+        "Please define BOOST_PFR_CORE_NAME_PARSING to correct values. See documentation section "
         "'Limitations and Configuration' for more information."
     );
     constexpr auto fn = skip.apply(sv);
