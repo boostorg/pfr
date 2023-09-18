@@ -43,7 +43,13 @@ namespace boost { namespace pfr {
 ///     assert(boost::pfr::get_name<1, my_struct>() == "s");
 /// \endcode
 template <std::size_t I, class T>
-constexpr std::string_view get_name() noexcept {
+constexpr
+#ifdef BOOST_PFR_DOXYGEN_INVOKED
+std::string_view
+#else
+auto
+#endif
+get_name() noexcept {
     return detail::get_name<T, I>();
 }
 
