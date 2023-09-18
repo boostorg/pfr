@@ -549,29 +549,6 @@ To do that:
 feature request to add your compiler to supported compilers list. Include
 parameters provided to `BOOST_PFR_CORE_NAME_PARSING` macro [*and] the initial output if `test/core_name/print_name.cpp`.
 
-
-Consider the following example:
-
-`test/core_name/print_name.cpp` returns
-"auto __cdecl boost::pfr::detail::name_of_field_impl<struct A::A,&a->fn>(void) noexcept" while compiled with `-DBOOST_PFR_CORE_NAME_PARSING (0,0,false,"")`. Then you shall set
-`skip_at_begin` to `sizeof("auto __cdecl boost::pfr::detail::name_of_field_impl<") - 1`
-and `skip_at_end` to `sizeof(">(void) noexcept") - 1` and last parameter of macro to `"->"`.
-
-``
-#define BOOST_PFR_CORE_NAME_PARSING (52, 16, true, "->")
-``
-
-Another example:
-
-`boost::pfr::get_name<0, A::A>()` returns
-"consteval auto boost::pfr::detail::name_of_field_impl() [with MsvcWorkaround = A::A; auto ptr = (& a.A::A::fn)]" while compiled with `-DBOOST_PFR_CORE_NAME_PARSING (0,0,false,"")`. Then you shall set
-`skip_at_begin` to `0`
-and `skip_at_end` to `sizeof(")]") - 1` and last parameter of macro to `backward("::")`.
-
-``
-#define BOOST_PFR_CORE_NAME_PARSING (0, 2, true, backward("::"))
-``
-
 [endsect]
 
 [section How it works]
