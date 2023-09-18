@@ -120,7 +120,7 @@
 #   elif defined(__GNUC__)
 #       define BOOST_PFR_CORE_NAME_PARSING (sizeof("consteval auto boost::pfr::detail::name_of_field_impl() [with MsvcWorkaround = ") - 1, sizeof(")]") - 1, backward("::"))
 #   else
-// Deafult parser for other platforms... Just skip nothing!
+// Default parser for other platforms... Just skip nothing!
 #       define BOOST_PFR_CORE_NAME_PARSING (0, 0, "")
 #   endif
 #endif

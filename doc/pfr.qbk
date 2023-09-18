@@ -531,7 +531,7 @@ The Boost.PFRs extraction of field name has some limitations that depend on a C+
 
 [h2 Adjusting BOOST_PFR_CORE_NAME_PARSING]
 
-`BOOST_PFR_CORE_NAME_PARSING` is already set up for most of the popelar compilers. You need to adjust it only
+`BOOST_PFR_CORE_NAME_PARSING` is already set up for most of the popular compilers. You need to adjust it only
 if some static_assert in the library complained on `BOOST_PFR_CORE_NAME_PARSING`.
 
 To do that:
