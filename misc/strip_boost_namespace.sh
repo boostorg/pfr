@@ -36,8 +36,6 @@ find ${TARGET_PATH} -type f | xargs sed -i 's|boost/pfr|pfr|g'
 find ${TARGET_PATH}/doc -type f | xargs sed -i 's|boost.pfr.|pfr.|g'
 find ${TARGET_PATH}/doc -type f | xargs sed -i 's|Boost.PFR|PFR|g'
 
-sed -i  's/[0-9]* \/\*\([0-9]*\) for non boost\*\/\+/\1/g' ${TARGET_PATH}/include/pfr/config.hpp
-
 sed -i  's|# \[Boost.PFR\](https://boost.org/libs/pfr)|# [PFR](https://apolukhin.github.io/pfr_non_boost/)|g' ${TARGET_PATH}/README.md
 
 echo -n "***** Testing: "
