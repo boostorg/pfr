@@ -64,8 +64,8 @@ get_name() noexcept {
 /// \b Example:
 /// \code
 ///     struct my_struct { int i, short s; };
-///     std::array<std::string_view, 2> t = boost::pfr::names_as_array<my_struct>();
-///     assert(t[0] == "i");
+///     std::array<std::string_view, 2> a = boost::pfr::names_as_array<my_struct>();
+///     assert(a[0] == "i");
 /// \endcode
 template <class T>
 constexpr
