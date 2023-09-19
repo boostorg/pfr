@@ -541,13 +541,13 @@ To do that:
     * `skip_at_begin` is equal to characters count before the first occurrence of `user_defined_field` in output
     * `skip_at_end` is equal to characters count after last occurrence of `user_defined_field` in output
 # Check that `test/core_name/print_name.cpp` returns "user_defined_field"
-# If it does not return `fn`, then define BOOST_PFR_CORE_NAME_PARSING to `(skip_at_begin, skip_at_end, "T = ")`, where
+# If it does not return `user_defined_field`, then define BOOST_PFR_CORE_NAME_PARSING to `(skip_at_begin, skip_at_end, "T = ")`, where
     * `skip_at_begin` is equal to `skip_at_begin` at step 2
     * `skip_at_end` is equal to `skip_at_end` at step 2
     * `"T = "` is equal to characters that are right before the `user_defined_field` in output, use `backward("T = ")` to search for the occurange in the string from the right
 # (optional, but highly recommended) [@https://github.com/boostorg/pfr/issues create ticket] with
 feature request to add your compiler to supported compilers list. Include
-parameters provided to `BOOST_PFR_CORE_NAME_PARSING` macro [*and] the initial output if `test/core_name/print_name.cpp`.
+parameters provided to `BOOST_PFR_CORE_NAME_PARSING` macro [*and] the initial output of `test/core_name/print_name.cpp`.
 
 [endsect]
 

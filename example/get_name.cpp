@@ -28,15 +28,15 @@ struct foo {            // defining structure
 /*`
     We can access field's names of that structure by index:
 */
-constexpr std::string_view r1 = boost::pfr::get_name<0, foo>(); // returns "some_integer"
-constexpr std::string_view r2 = boost::pfr::get_name<1, foo>(); // returns "c"
+constexpr std::string_view n1 = boost::pfr::get_name<0, foo>(); // returns "some_integer"
+constexpr std::string_view n2 = boost::pfr::get_name<1, foo>(); // returns "c"
 //] [/pfr_example_get_name]
 #endif
 
 int main() {
 #if BOOST_PFR_CORE_NAME_ENABLED && BOOST_PFR_USE_CPP17
-    if (r1 != "some_integer") return 1;
-    if (r2 != "c") return 2;
+    if (n1 != "some_integer") return 1;
+    if (n2 != "c") return 2;
 #endif
 
     return 0;
