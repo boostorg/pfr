@@ -1,7 +1,12 @@
-// Copyright (c) 2021 Denis Mikhailov
+// Copyright (c) 2021-2023 Glen Joseph Fernandes, Denis Mikhailov
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+
+// Initial implementation was taken from Boost.Align library by Glen Joseph Fernandes, https://github.com/glenfe
+// See https://github.com/boostorg/align/blob/boost-1.83.0/include/boost/align/detail/align.hpp for more details
+//
 
 #ifndef BOOST_PFR_DETAIL_ALIGN_HPP
 #define BOOST_PFR_DETAIL_ALIGN_HPP
