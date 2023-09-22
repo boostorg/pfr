@@ -207,6 +207,10 @@ constexpr std::string_view get_name() noexcept {
         "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."
     );
     static_assert(
+        !std::is_array<T>::value,
+        "====================> Boost.PFR: It is impossible to extract name from old C array since it doesn't have named members"
+    );
+    static_assert(
         sizeof(T) && BOOST_PFR_USE_CPP17,
         "====================> Boost.PFR: Extraction of field's names is allowed only when the BOOST_PFR_USE_CPP17 macro enabled."
    );
@@ -219,6 +223,10 @@ constexpr auto tie_as_names_tuple() noexcept {
     static_assert(
         !std::is_union<T>::value,
         "====================> Boost.PFR: For safety reasons it is forbidden to reflect unions. See `Reflection of unions` section in the docs for more info."
+    );
+    static_assert(
+        !std::is_array<T>::value,
+        "====================> Boost.PFR: It is impossible to extract name from old C array since it doesn't have named members"
     );
     static_assert(
         sizeof(T) && BOOST_PFR_USE_CPP17,
