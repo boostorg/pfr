@@ -31,7 +31,7 @@ constexpr auto make_stdarray_from_tietuple(const T& t, std::index_sequence<I...>
 }
 
 template <class T>
-constexpr auto make_stdarray_from_tietuple(const T& t, std::index_sequence<>, long) noexcept {
+constexpr auto make_stdarray_from_tietuple(const T&, std::index_sequence<>, long) noexcept {
     return std::array<std::nullptr_t, 0>{};
 }
 
