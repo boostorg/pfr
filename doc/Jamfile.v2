@@ -47,7 +47,7 @@ doxygen autodoc_pfr
         [ glob ../../../boost/pfr/*.hpp ]
     :
         $(doxygen_params)
-        <xsl:param>"boost.doxygen.reftitle=Reference Section"
+        <xsl:param>"boost.doxygen.reftitle=Reference Section of PFR"
     ;
 
 boostbook pfr-doc
