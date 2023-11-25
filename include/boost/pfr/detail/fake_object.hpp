@@ -13,6 +13,7 @@
 #pragma once
 
 #include <boost/pfr/detail/config.hpp>
+
 namespace boost { namespace pfr { namespace detail {
 
 // This variable serves as a compile-time assert. If you see any error here, then

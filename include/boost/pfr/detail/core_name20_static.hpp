@@ -167,7 +167,7 @@ consteval auto name_of_field() noexcept {
         && std::string_view{
             detail::name_of_field_impl<
                 core_name_skip, detail::make_clang_wrapper(std::addressof(
-                    fake_object<core_name_skip>().size_at_begin
+                    detail::fake_object<core_name_skip>().size_at_begin
                 ))
             >().data()
         } == "size_at_begin",

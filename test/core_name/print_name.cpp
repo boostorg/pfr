@@ -29,7 +29,7 @@ using namespace boost::pfr;
 template <class T, std::size_t I>
 inline constexpr auto no_check_stored_name_of_field = detail::name_of_field_impl<T,
     detail::make_clang_wrapper(std::addressof(detail::sequence_tuple::get<I>(
-        detail::tie_as_tuple(detail::fake_object<T>)
+        detail::tie_as_tuple(detail::fake_object<T>())
     )))
 >();
 

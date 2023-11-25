@@ -112,6 +112,8 @@ void test_examples() {
 //[pfr_quick_examples_get_name
     // Get name of field by index
 
+    // Keep in mind that it's unportable code
+    // You should move this structure somewhere outside of function scope
     struct sample {
         int f1;
         long f2;
