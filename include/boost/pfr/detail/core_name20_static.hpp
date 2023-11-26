@@ -167,7 +167,7 @@ consteval auto name_of_field() noexcept {
         && std::string_view{
             detail::name_of_field_impl<
                 core_name_skip, detail::make_clang_wrapper(std::addressof(
-                    fake_object<core_name_skip>.size_at_begin
+                    detail::fake_object<core_name_skip>().size_at_begin
                 ))
             >().data()
         } == "size_at_begin",
@@ -187,7 +187,7 @@ consteval auto name_of_field() noexcept {
 template <class T, std::size_t I>
 inline constexpr auto stored_name_of_field = detail::name_of_field<T,
     detail::make_clang_wrapper(std::addressof(detail::sequence_tuple::get<I>(
-        detail::tie_as_tuple(detail::fake_object<T>)
+        detail::tie_as_tuple(detail::fake_object<T>())
     )))
 >();
 

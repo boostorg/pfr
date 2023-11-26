@@ -16,8 +16,19 @@
 
 namespace boost { namespace pfr { namespace detail {
 
+// This variable serves as a compile-time assert. If you see any error here, then
+// you're probably using `boost::pfr::get_name()` or `boost::pfr::names_as_array()` with a non-external linkage type.
 template <class T>
-extern const T fake_object;
+extern const T passed_type_has_no_external_linkage;
+
+// For returning non default constructible types, it's exclusively used in member name retrieval.
+//
+// Neither std::declval nor boost::pfr::detail::unsafe_declval are usable there.
+// Limitation - T should have external linkage.
+template <class T>
+constexpr const T& fake_object() noexcept {
+    return passed_type_has_no_external_linkage<T>;
+}
 
 }}} // namespace boost::pfr::detail
 
