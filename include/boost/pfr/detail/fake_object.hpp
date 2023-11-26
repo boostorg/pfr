@@ -23,8 +23,8 @@ extern const T passed_type_has_no_external_linkage;
 
 // For returning non default constructible types, it's exclusively used in member name retrieval.
 //
-// Not std::declval nor boost::pfr::detail::unsafe_declval are able to be used there
-// so we introduced it, but it have one limitation - only types with external linkage.
+// Neither std::declval nor boost::pfr::detail::unsafe_declval are usable there.
+// Limitation - T should have external linkage.
 template <class T>
 constexpr const T& fake_object() noexcept {
     return passed_type_has_no_external_linkage<T>;
