@@ -490,6 +490,8 @@ struct aggregate : empty { // not a SimpleAggregate
 ```
 The library may work with aggregates that don't satisfy the requirements of `SimpleAggregate`, but the behavior tends to be non-portable.
 
+Boost.PFRs extraction of field name works with only `SimpleAggregate` types.
+
 
 [h2 Configuration Macro]
 
