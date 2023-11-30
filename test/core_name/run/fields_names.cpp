@@ -42,7 +42,7 @@ namespace {
 
 struct {
     int unnamed_first;
-    float unnamed_second
+    float unnamed_second;
 } unnamed{};
 
 typedef typename std::remove_reference<decltype(unnamed)>::type unnamed_t;
