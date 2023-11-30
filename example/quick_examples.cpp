@@ -106,6 +106,7 @@ void test_examples() {
 //]
   }
 
+#if BOOST_PFR_CORE_NAME_ENABLED
   {
 //[pfr_quick_examples_get_name
     // Get name of field by index
@@ -119,6 +120,7 @@ void test_examples() {
               << boost::pfr::get_name<1, sample>(); // Outputs: f1 f2
 //]
   }
+#endif
 
 #if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
   {
