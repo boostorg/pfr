@@ -106,11 +106,7 @@ void test_examples() {
 //]
   }
 
-  // Disabled from testing since it's unportable
-#if 0
   {
-// Keep in mind that it's unportable code
-// You should move this structure somewhere outside of function scope
 //[pfr_quick_examples_get_name
     // Get name of field by index
 
@@ -123,7 +119,6 @@ void test_examples() {
               << boost::pfr::get_name<1, sample>(); // Outputs: f1 f2
 //]
   }
-#endif
 
 #if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
   {
