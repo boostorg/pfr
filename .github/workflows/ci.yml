@@ -58,6 +58,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Install {fmt}
+        run: sudo apt install libfmt-dev
+
       - name: Install packages
         if: matrix.install
         run: sudo apt install ${{matrix.install}}
