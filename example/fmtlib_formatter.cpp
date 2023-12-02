@@ -17,7 +17,7 @@ template<class T> struct fmt::formatter<T, char, std::enable_if_t<
     constexpr auto parse(format_parse_context& ctx) -> format_parse_context::iterator {
         auto it = ctx.begin(), end = ctx.end();
 
-        if (it != end && *it != '}') throw_format_error("invalid format");
+        if (it != end && *it != '}') ctx.error_handler().on_error( "invalid format" );
 
         return it;
     }
