@@ -490,9 +490,7 @@ struct aggregate : empty { // not a SimpleAggregate
 ```
 The library may work with aggregates that don't satisfy the requirements of `SimpleAggregate`, but the behavior tends to be non-portable.
 
-Boost.PFRs extraction of field name works with a `SimpleAggregate` with non-internal linkage (with aggregats that could be used as `extern T t;`).
-Do not use this functionality with anonymous structures, local structures
-or a structure defined inside anonymous namespace as the behavior tends to be non-portable.
+Boost.PFRs extraction of field name works with only `SimpleAggregate` types.
 
 
 [h2 Configuration Macro]
