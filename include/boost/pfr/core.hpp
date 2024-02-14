@@ -140,7 +140,7 @@ using tuple_element_t = typename tuple_element<I, T>::type;
 ///     assert(get<0>(t) == 10);
 /// \endcode
 template <class T>
-constexpr auto structure_to_tuple(const T& val) noexcept {
+constexpr auto structure_to_tuple(const T& val) {
     return detail::make_stdtuple_from_tietuple(
         detail::tie_as_tuple(val),
         detail::make_index_sequence< tuple_size_v<T> >()
