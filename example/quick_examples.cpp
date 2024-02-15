@@ -107,8 +107,11 @@ void test_examples() {
   }
 
 // Disabling for MSVC as it gives a hard error on using local types:
-// error C7631: 'boost::pfr::detail::report_if_you_see_link_error_with_this_object<test_examples::sample>': variable with internal linkage declared but not defined
-#if BOOST_PFR_CORE_NAME_ENABLED && BOOST_PFR_USE_CPP17
+///
+// error C7631:
+// 'boost::pfr::detail::do_not_use_PFR_with_local_types<test_examples::sample>':
+// variable with internal linkage declared but not defined
+#if BOOST_PFR_CORE_NAME_ENABLED && BOOST_PFR_USE_CPP17 && !defined(_MSC_VER)
   {
 //[pfr_quick_examples_get_name
     // Get name of field by index
