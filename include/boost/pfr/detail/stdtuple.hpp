@@ -17,7 +17,7 @@
 namespace boost { namespace pfr { namespace detail {
 
 template <class T, std::size_t... I>
-constexpr auto make_stdtuple_from_tietuple(const T& t, std::index_sequence<I...>) noexcept {
+constexpr auto make_stdtuple_from_tietuple(const T& t, std::index_sequence<I...>) {
     return std::make_tuple(
         boost::pfr::detail::sequence_tuple::get<I>(t)...
     );

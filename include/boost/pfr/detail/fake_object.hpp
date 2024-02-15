@@ -14,6 +14,15 @@
 
 #include <boost/pfr/detail/config.hpp>
 
+#ifdef __clang__
+#   pragma clang diagnostic push
+#   pragma clang diagnostic ignored "-Wundefined-internal"
+#   pragma clang diagnostic ignored "-Wundefined-var-template"
+#elif defined(__GNUC__)
+#   pragma GCC diagnostic push
+#   pragma GCC diagnostic ignored "-Wundefined-var-template"
+#endif
+
 namespace boost { namespace pfr { namespace detail {
 
 // This class has external linkage while T has not sure.
@@ -39,5 +48,10 @@ constexpr const T& fake_object() noexcept {
 
 }}} // namespace boost::pfr::detail
 
+#ifdef __clang__
+#   pragma clang diagnostic push
+#elif defined(__GNUC__)
+#   pragma GCC diagnostic pop
+#endif
 #endif // BOOST_PFR_DETAIL_FAKE_OBJECT_HPP
 

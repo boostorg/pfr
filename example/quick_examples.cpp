@@ -106,7 +106,7 @@ void test_examples() {
 //]
   }
 
-#if BOOST_PFR_CORE_NAME_ENABLED
+#if BOOST_PFR_CORE_NAME_ENABLED && BOOST_PFR_USE_CPP17
   {
 //[pfr_quick_examples_get_name
     // Get name of field by index
