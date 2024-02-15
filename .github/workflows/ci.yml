@@ -17,6 +17,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - toolset: gcc-13
+            cxxstd: "03,11,14,17,20"
+            os: ubuntu-22.04
           - toolset: gcc-12 # Do not remove! It is the only toolset that tests misc/strip_boost_namespace.sh
             cxxstd: "03,11,14,17,2a"
             os: ubuntu-22.04
@@ -41,10 +44,7 @@ jobs:
             cxxflags: "cxxflags=--coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined"
             linkflags: "linkflags=--coverage -lasan -lubsan"
             gcov_tool: "gcov-9"
-          - toolset: clang-14
-            cxxstd: "03,11,14,17,20"
-            os: ubuntu-22.04
-          - toolset: clang-13
+          - toolset: clang-15
             cxxstd: "03,11,14,17,20"
             os: ubuntu-22.04
           # - toolset: clang
