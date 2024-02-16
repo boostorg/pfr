@@ -34,7 +34,7 @@ struct wrapper {
 // This variable servers as a link-time assert.
 // If linker requires it, then `fake_object()` is used at runtime.
 template <class T>
-extern const wrapper<T> report_if_you_see_link_error_with_this_object;
+extern const wrapper<T> do_not_use_PFR_with_local_types;
 
 // For returning non default constructible types, it's exclusively used in member name retrieval.
 //
@@ -43,7 +43,7 @@ extern const wrapper<T> report_if_you_see_link_error_with_this_object;
 // with the former standards.
 template <class T>
 constexpr const T& fake_object() noexcept {
-    return report_if_you_see_link_error_with_this_object<T>.value;
+    return do_not_use_PFR_with_local_types<T>.value;
 }
 
 }}} // namespace boost::pfr::detail

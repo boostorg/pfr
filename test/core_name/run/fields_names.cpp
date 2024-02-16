@@ -58,6 +58,12 @@ void test_get_name_by_id() {
 }
 
 void test_get_name_by_id_without_linkage() {
+// Disabling for MSVC as it gives a hard error on using local types:
+///
+// error C7631:
+// 'boost::pfr::detail::do_not_use_PFR_with_local_types<testing::unnamed_t>':
+// variable with internal linkage declared but not defined
+#ifndef _MSC_VER
     struct function_local {
         int val;
     };
@@ -68,6 +74,7 @@ void test_get_name_by_id_without_linkage() {
     BOOST_TEST_EQ( ((boost::pfr::get_name<0, inside_unnamed_ns>())), "hidden");
 
     BOOST_TEST_EQ( ((boost::pfr::get_name<0, function_local>())), "val");
+#endif
 }
 
 void test_get_name_by_type() {
@@ -100,6 +107,12 @@ void test_names_as_array() {
 }
 
 void test_names_as_array_without_linkage() {
+// Disabling for MSVC as it gives a hard error on using local types:
+///
+// error C7631:
+// 'boost::pfr::detail::do_not_use_PFR_with_local_types<testing::unnamed_t>':
+// variable with internal linkage declared but not defined
+#ifndef _MSC_VER
     const auto expected = std::array<std::string_view, 2>{
         "unnamed_first",
         "unnamed_second"
@@ -109,6 +122,7 @@ void test_names_as_array_without_linkage() {
     for (std::size_t i=0;i<expected.size();++i) {
         BOOST_TEST_EQ(value[i], expected[i]);
     }
+#endif
 }
 
 void test_names_as_array_for_empty() {

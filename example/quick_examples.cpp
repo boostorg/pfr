@@ -106,18 +106,23 @@ void test_examples() {
 //]
   }
 
-#if BOOST_PFR_CORE_NAME_ENABLED && BOOST_PFR_USE_CPP17
+// Disabling for MSVC as it gives a hard error on using local types:
+//
+// error C7631:
+// 'boost::pfr::detail::do_not_use_PFR_with_local_types<test_examples::sample>':
+// variable with internal linkage declared but not defined
+#if BOOST_PFR_CORE_NAME_ENABLED && BOOST_PFR_USE_CPP17 && !defined(_MSC_VER)
   {
 //[pfr_quick_examples_get_name
     // Get name of field by index
 
     struct sample {
-        int f1;
-        long f2;
+        int f_int;
+        long f_long;
     };
 
     std::cout << boost::pfr::get_name<0, sample>()
-              << boost::pfr::get_name<1, sample>(); // Outputs: f1 f2
+              << boost::pfr::get_name<1, sample>(); // Outputs: f_int f_long
 //]
   }
 #endif
