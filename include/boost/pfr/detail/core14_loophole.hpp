@@ -27,7 +27,6 @@
 #include <type_traits>
 #include <utility>
 
-#include <boost/pfr/detail/cast_to_layout_compatible.hpp> // still needed for enums
 #include <boost/pfr/detail/offset_based_getter.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
 #include <boost/pfr/detail/make_flat_tuple_of_references.hpp>
