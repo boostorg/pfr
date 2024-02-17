@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2023 Antony Polukhin
+// Copyright (c) 2016-2024 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -17,7 +17,7 @@
 namespace boost { namespace pfr { namespace detail {
 
 template <class T, std::size_t... I>
-constexpr auto make_stdtuple_from_tietuple(const T& t, std::index_sequence<I...>) noexcept {
+constexpr auto make_stdtuple_from_tietuple(const T& t, std::index_sequence<I...>) {
     return std::make_tuple(
         boost::pfr::detail::sequence_tuple::get<I>(t)...
     );

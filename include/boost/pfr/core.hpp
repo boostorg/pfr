@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2023 Antony Polukhin
+// Copyright (c) 2016-2024 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -140,7 +140,7 @@ using tuple_element_t = typename tuple_element<I, T>::type;
 ///     assert(get<0>(t) == 10);
 /// \endcode
 template <class T>
-constexpr auto structure_to_tuple(const T& val) noexcept {
+constexpr auto structure_to_tuple(const T& val) {
     return detail::make_stdtuple_from_tietuple(
         detail::tie_as_tuple(val),
         detail::make_index_sequence< tuple_size_v<T> >()

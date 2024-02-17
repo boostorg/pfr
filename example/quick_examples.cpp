@@ -1,4 +1,4 @@
-// Copyright 2016-2023 Antony Polukhin
+// Copyright 2016-2024 Antony Polukhin
 
 // Distributed under the Boost Software License, Version 1.0.
 // (See the accompanying file LICENSE_1_0.txt
@@ -106,21 +106,23 @@ void test_examples() {
 //]
   }
 
-  // Disabled from testing since it's unportable
-#if 0
+// Disabling for MSVC as it gives a hard error on using local types:
+//
+// error C7631:
+// 'boost::pfr::detail::do_not_use_PFR_with_local_types<test_examples::sample>':
+// variable with internal linkage declared but not defined
+#if BOOST_PFR_CORE_NAME_ENABLED && BOOST_PFR_USE_CPP17 && !defined(_MSC_VER)
   {
-// Keep in mind that it's unportable code
-// You should move this structure somewhere outside of function scope
 //[pfr_quick_examples_get_name
     // Get name of field by index
 
     struct sample {
-        int f1;
-        long f2;
+        int f_int;
+        long f_long;
     };
 
     std::cout << boost::pfr::get_name<0, sample>()
-              << boost::pfr::get_name<1, sample>(); // Outputs: f1 f2
+              << boost::pfr::get_name<1, sample>(); // Outputs: f_int f_long
 //]
   }
 #endif
