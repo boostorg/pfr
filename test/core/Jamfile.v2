@@ -5,13 +5,20 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 #
 
+import-search /boost/config/checks ;
+
 import python ;
 import testing ;
-import ../../config/checks/config : requires ;
+import config : requires ;
 
 project
     : source-location .
     : requirements
+        <source>/boost/config//boost_config
+        <source>/boost/core//boost_core
+        <source>/boost/functional//boost_functional
+        <source>/boost/type_index//boost_type_index
+
         <define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1
         [ requires cxx14_constexpr ]
     ;
