@@ -77,6 +77,35 @@ void test_examples() {
   }
 
 
+// Disabling for MSVC as it gives a hard error on using local types:
+//
+// error C7631:
+// 'boost::pfr::detail::do_not_use_PFR_with_local_types<test_examples::sample>':
+// variable with internal linkage declared but not defined
+#if BOOST_PFR_CORE_NAME_ENABLED && BOOST_PFR_USE_CPP17 && !defined(_MSC_VER)
+  {
+//[pfr_quick_examples_for_each_with_name
+    // Print the name and value
+    // of each element of the structure
+
+    struct test {
+        int n;
+        std::string str;
+    };
+
+    test var{42, "Hello, World!"};
+
+    // Outputs:
+    //  n: 42
+    //  str: Hello, World!
+    boost::pfr::for_each_field_with_name(var,
+      [](std::string_view name, const auto& value) {
+        std::cout << name << ": " << value << std::endl;
+    });
+//]
+  }
+#endif
+
   {
 //[pfr_quick_examples_tuple_size
     // Getting fields count of some structure
