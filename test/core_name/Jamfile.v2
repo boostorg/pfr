@@ -40,7 +40,7 @@ explicit compiler_supports_cxx20_nontype_tplarg ;
 project
     : source-location .
     : requirements
-        <source>/boost/core//boost_core
+        <library>/boost/core//boost_core
         <define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1
         [ check-target-builds ../core_name//compiler_supports_cxx20_address_of_non_static_member_tplarg : : [ check-target-builds ../core_name//compiler_supports_cxx20_nontype_tplarg : : <build>no ] ]
     ;
