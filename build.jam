@@ -11,9 +11,10 @@ project /boost/pfr
     ;
 
 explicit
-    [ alias boost_pfr ]
+    [ alias boost_pfr : : : : <library>$(boost_dependencies) ]
     [ alias all : boost_pfr test ]
     ;
 
 call-if : boost-library pfr
     ;
+
