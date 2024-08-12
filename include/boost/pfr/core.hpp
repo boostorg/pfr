@@ -131,8 +131,7 @@ using tuple_element_t = typename tuple_element<I, T>::type;
 
 template <auto ptr>
   requires std::is_member_object_pointer_v<decltype(ptr)>
-constexpr auto index = ::boost::detail::index_impl<decltype(::boost::pfr::detail::class_of(&A::b)),
-                                                   ptr>(::boost::pfr::detail::fake_object<decltype(class_of(&A::b))>);
+constexpr auto index = detail::index_impl<decltype(detail::class_of(ptr)), ptr>::value;
 
 /// \brief Creates a `std::tuple` from fields of an \aggregate `val`.
 ///
