@@ -129,6 +129,10 @@ using tuple_element = detail::sequence_tuple::tuple_element<I, decltype( ::boost
 template <std::size_t I, class T>
 using tuple_element_t = typename tuple_element<I, T>::type;
 
+template <auto ptr>
+  requires std::is_member_object_pointer_v<decltype(ptr)>
+constexpr auto index = ::boost::detail::index_impl<decltype(::boost::pfr::detail::class_of(&A::b)),
+                                                   ptr>(::boost::pfr::detail::fake_object<decltype(class_of(&A::b))>);
 
 /// \brief Creates a `std::tuple` from fields of an \aggregate `val`.
 ///
