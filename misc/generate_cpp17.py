@@ -38,7 +38,12 @@ PROLOGUE = """// Copyright (c) 2016-2024 Antony Polukhin
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/size_t_.hpp>
+
+#ifdef BOOST_PFR_HAS_STD_MODULE
+import std;
+#else
 #include <type_traits> // for std::conditional_t, std::is_reference
+#endif
 
 namespace boost { namespace pfr { namespace detail {
 

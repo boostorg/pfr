@@ -9,7 +9,11 @@
 
 #include <boost/pfr/detail/config.hpp>
 
+#ifdef BOOST_PFR_HAS_STD_MODULE
+import std;
+#else
 #include <type_traits>
+#endif
 
 namespace boost { namespace pfr { namespace detail {
 

@@ -10,6 +10,10 @@
 #include <boost/pfr/detail/config.hpp>
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
+
+#ifdef BOOST_PFR_HAS_STD_MODULE
+import std;
+#else
 #include <iosfwd>       // stream operators
 #include <iomanip>
 
@@ -17,6 +21,8 @@
 #   if __has_include(<string_view>) && BOOST_PFR_USE_CPP17
 #       include <string_view>
 #   endif
+#endif
+
 #endif
 
 namespace boost { namespace pfr { namespace detail {

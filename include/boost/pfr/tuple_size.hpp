@@ -22,6 +22,8 @@
 /// \b Synopsis:
 namespace boost { namespace pfr {
 
+BOOST_PFR_BEGIN_MODULE_EXPORT
+
 /// Has a static const member variable `value` that contains fields count in a T.
 /// Works for any T that satisfies \aggregate.
 ///
@@ -42,6 +44,8 @@ using tuple_size = detail::size_t_< boost::pfr::detail::fields_count<T>() >;
 /// \endcode
 template <class T>
 constexpr std::size_t tuple_size_v = tuple_size<T>::value;
+
+BOOST_PFR_END_MODULE_EXPORT
 
 }} // namespace boost::pfr
 

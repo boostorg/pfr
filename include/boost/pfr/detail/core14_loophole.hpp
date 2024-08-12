@@ -24,8 +24,12 @@
 
 #include <boost/pfr/detail/config.hpp>
 
+#ifdef BOOST_PFR_HAS_STD_MODULE
+import std;
+#else
 #include <type_traits>
 #include <utility>
+#endif
 
 #include <boost/pfr/detail/offset_based_getter.hpp>
 #include <boost/pfr/detail/fields_count.hpp>

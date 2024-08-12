@@ -132,6 +132,8 @@ std::basic_istream<Char, Traits>& operator>>(std::basic_istream<Char, Traits>& i
 
 } // namespace detail
 
+BOOST_PFR_BEGIN_MODULE_EXPORT
+
 /// IO manipulator to read/write \aggregate `value` field-by-field.
 ///
 /// \b Example:
@@ -158,6 +160,8 @@ template <class T>
 auto io_fields(T&& value) noexcept {
     return detail::io_fields_impl<T>{std::forward<T>(value)};
 }
+
+BOOST_PFR_END_MODULE_EXPORT
 
 }} // namespace boost::pfr
 

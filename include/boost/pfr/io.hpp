@@ -89,6 +89,8 @@ enable_istreamable_t<std::basic_istream<Char, Traits>, T> operator>>(std::basic_
 
 } // namespace detail
 
+BOOST_PFR_BEGIN_MODULE_EXPORT
+
 /// IO manipulator to read/write \aggregate `value` using its IO stream operators or using \forcedlink{io_fields} if operators are not available.
 ///
 /// \b Example:
@@ -107,6 +109,8 @@ template <class T>
 auto io(T&& value) noexcept {
     return detail::io_impl<T>{std::forward<T>(value)};
 }
+
+BOOST_PFR_END_MODULE_EXPORT
 
 }} // namespace boost::pfr
 

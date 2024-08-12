@@ -19,10 +19,15 @@
 #include <boost/pfr/detail/fields_count.hpp>
 #include <boost/pfr/detail/stdarray.hpp>
 #include <boost/pfr/detail/fake_object.hpp>
+
+#ifdef BOOST_PFR_HAS_STD_MODULE
+import std;
+#else
 #include <type_traits>
 #include <string_view>
 #include <array>
 #include <memory> // for std::addressof
+#endif
 
 namespace boost { namespace pfr { namespace detail {
 
