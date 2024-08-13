@@ -118,6 +118,8 @@ std::basic_istream<Char, Traits>& operator>>(std::basic_istream<Char, Traits>& i
     return in;
 }
 
+BOOST_PFR_BEGIN_MODULE_EXPORT
+
 template <class Char, class Traits, class T>
 std::basic_istream<Char, Traits>& operator>>(std::basic_istream<Char, Traits>& in, io_fields_impl<const T&>&& ) {
     static_assert(sizeof(T) && false, "====================> Boost.PFR: Attempt to use istream operator on a boost::pfr::io_fields wrapped type T with const qualifier.");
@@ -129,6 +131,8 @@ std::basic_istream<Char, Traits>& operator>>(std::basic_istream<Char, Traits>& i
     static_assert(sizeof(T) && false, "====================> Boost.PFR: Attempt to use istream operator on a boost::pfr::io_fields wrapped temporary of type T.");
     return in;
 }
+
+BOOST_PFR_END_MODULE_EXPORT
 
 } // namespace detail
 

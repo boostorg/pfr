@@ -67,6 +67,8 @@ struct io_impl {
     T value;
 };
 
+BOOST_PFR_BEGIN_MODULE_EXPORT
+
 template <class Char, class Traits, class T>
 enable_not_ostreamable_t<std::basic_ostream<Char, Traits>, T> operator<<(std::basic_ostream<Char, Traits>& out, io_impl<T>&& x) {
     return out << boost::pfr::io_fields(std::forward<T>(x.value));
@@ -86,6 +88,8 @@ template <class Char, class Traits, class T>
 enable_istreamable_t<std::basic_istream<Char, Traits>, T> operator>>(std::basic_istream<Char, Traits>& in, io_impl<T>&& x) {
     return in >> x.value;
 }
+
+BOOST_PFR_END_MODULE_EXPORT
 
 } // namespace detail
 
