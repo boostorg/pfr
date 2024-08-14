@@ -22,7 +22,7 @@ int main() {
 #if BOOST_PFR_HAS_GUARANTEED_COPY_ELISION
 
 // MSVC-14.3 fails this test
-#if !defined(_MSC_VER) || _MSC_VER < 1930 || _MSC_VER > 1939
+#if !defined(_MSC_VER) || _MSC_VER < 1930 || _MSC_VER > 1949
     static_assert(boost::pfr::tuple_size_v<S> == 4, "");
 
     struct S5_0 { int x0; int x1; int x2; int x3; X x4; };
