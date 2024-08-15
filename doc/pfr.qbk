@@ -551,6 +551,8 @@ parameters provided to `BOOST_PFR_CORE_NAME_PARSING` macro [*and] the initial ou
 
 [section PFR as a C++20 module]
 
+[caution C++20 PFR module support is on early stage, targets and flags may change in the future]
+
 If using CMake of version 3.28.0 or higher define CMake option `-DBUILD_MODULE=1`
 to make the `Boost::pfr_module` and `Boost::pfr_module_migration` libraries
 available. With `Boost::pfr_module` C++20 module Boost.PFR could be used:
