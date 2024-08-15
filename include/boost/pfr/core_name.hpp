@@ -33,6 +33,8 @@
 
 namespace boost { namespace pfr {
 
+BOOST_PFR_BEGIN_MODULE_EXPORT
+
 /// \brief Returns name of a field with index `I` in \aggregate `T`.
 ///
 /// \b Example:
@@ -81,6 +83,8 @@ names_as_array() noexcept {
         1L
     );
 }
+
+BOOST_PFR_END_MODULE_EXPORT
 
 }} // namespace boost::pfr
 

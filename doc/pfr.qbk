@@ -549,6 +549,40 @@ parameters provided to `BOOST_PFR_CORE_NAME_PARSING` macro [*and] the initial ou
 
 [endsect]
 
+[section PFR as a C++20 module]
+
+[caution C++20 PFR module support is on early stage, targets and flags may change in the future]
+
+If using CMake of version 3.28.0 or higher define CMake option `-DBUILD_MODULE=1`
+to make the `Boost::pfr_module` and `Boost::pfr_module_migration` libraries
+available. With `Boost::pfr_module` C++20 module Boost.PFR could be used:
+
+[import ../module/usage_sample.cpp]
+[pfr_module_example]
+
+The `Boost::pfr_module_migration` CMake target gives an ability to
+mix includes and imports of the PFR library in different translation units.
+
+If not using CMake, then the module could be build manually from the
+`module/pfr.cppm` file. If mixing of includes in imports is desired, additionally
+define `BOOST_PFR_ATTACH_TO_GLOBAL_MODULE` preprocessor macro to attach all the
+module entities to a global module and avoid ODR issues.
+
+For manual module build the following commands could be used for clang compiler:
+
+```
+cd pfr/module
+clang++ -I ../include -std=c++20 --precompile -x c++-module pfr.cppm
+```
+
+After that, the module could be used in the following way:
+
+```
+clang++ -std=c++20 -fmodule-file=pfr.pcm pfr.pcm usage_sample.cpp
+```
+
+[endsect]
+
 [section How it works]
 
 [h2 Fields count detection and getting references to members]

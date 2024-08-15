@@ -9,8 +9,12 @@
 
 #include <boost/pfr/detail/config.hpp>
 
+#ifdef BOOST_PFR_HAS_STD_MODULE
+import std;
+#else
 #include <utility>      // metaprogramming stuff
 #include <tuple>
+#endif
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 

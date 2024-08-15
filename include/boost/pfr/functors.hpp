@@ -35,6 +35,8 @@
 /// \b Synopsis:
 namespace boost { namespace pfr {
 
+BOOST_PFR_BEGIN_MODULE_EXPORT
+
 ///////////////////// Comparisons
 
 /// \brief std::equal_to like comparator that returns \forcedlink{eq}(x, y)
@@ -215,6 +217,8 @@ template <class T> struct hash {
         return boost::pfr::hash_value(x);
     }
 };
+
+BOOST_PFR_END_MODULE_EXPORT
 
 }} // namespace boost::pfr
 

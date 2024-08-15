@@ -7,8 +7,12 @@
 #define BOOST_PFR_DETAIL_RVALUE_T_HPP
 #pragma once
 
+#ifdef BOOST_PFR_HAS_STD_MODULE
+import std;
+#else
 #include <type_traits>
 #include <utility>      // std::enable_if_t
+#endif
 
 // This header provides aliases rvalue_t and lvalue_t.
 //

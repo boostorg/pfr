@@ -9,8 +9,12 @@
 
 #include <boost/pfr/detail/config.hpp>
 
+#ifdef BOOST_PFR_HAS_STD_MODULE
+import std;
+#else
 #include <functional>
 #include <type_traits>
+#endif
 
 namespace boost { namespace pfr { namespace detail {
 ///////////////////// `value` is true if Detector<Tleft, Tright> does not compile (SFINAE)
