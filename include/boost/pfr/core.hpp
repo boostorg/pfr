@@ -29,6 +29,8 @@
 
 namespace boost { namespace pfr {
 
+BOOST_PFR_BEGIN_MODULE_EXPORT
+
 /// \brief Returns reference or const reference to a field with index `I` in \aggregate `val`.
 /// Overload taking the type `U` returns reference or const reference to a field
 /// with provided type `U` in \aggregate `val` if there's only one field of such type in `val`.
@@ -259,6 +261,8 @@ template <typename... Elements>
 constexpr detail::tie_from_structure_tuple<Elements...> tie_from_structure(Elements&... args) noexcept {
     return detail::tie_from_structure_tuple<Elements...>(args...);
 }
+
+BOOST_PFR_END_MODULE_EXPORT
 
 }} // namespace boost::pfr
 

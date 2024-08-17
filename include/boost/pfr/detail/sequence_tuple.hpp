@@ -10,8 +10,12 @@
 #include <boost/pfr/detail/config.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 
+#ifdef BOOST_PFR_HAS_STD_MODULE
+import std;
+#else
 #include <utility>      // metaprogramming stuff
 #include <cstddef>      // std::size_t
+#endif
 
 ///////////////////// Tuple that holds its values in the supplied order
 namespace boost { namespace pfr { namespace detail { namespace sequence_tuple {

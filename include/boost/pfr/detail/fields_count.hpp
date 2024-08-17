@@ -12,9 +12,13 @@
 #include <boost/pfr/detail/size_t_.hpp>
 #include <boost/pfr/detail/unsafe_declval.hpp>
 
+#ifdef BOOST_PFR_HAS_STD_MODULE
+import std;
+#else
 #include <climits>      // CHAR_BIT
 #include <type_traits>
 #include <utility>      // metaprogramming stuff
+#endif
 
 #ifdef __clang__
 #   pragma clang diagnostic push
