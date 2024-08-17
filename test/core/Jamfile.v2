@@ -16,7 +16,7 @@ project
     : requirements
         <library>/boost/config//boost_config
         <library>/boost/core//boost_core
-        <library>/boost/functional//boost_functional
+        <library>/boost/container_hash//boost_container_hash
         <library>/boost/type_index//boost_type_index
 
         <define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1
