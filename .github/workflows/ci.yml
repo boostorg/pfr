@@ -78,10 +78,11 @@ jobs:
           cd ..
           git clone -b $BOOST_BRANCH --depth 10 https://github.com/boostorg/boost.git boost-root
           cd boost-root
-          git submodule update --init --depth 10 --jobs 2 tools/boostdep libs/filesystem tools/inspect
+          git submodule update --init --depth 10 --jobs 2 tools/boostdep libs/functional libs/filesystem tools/inspect
           rm -rf libs/$LIBRARY/*
           cp -r $GITHUB_WORKSPACE/* libs/$LIBRARY
           python tools/boostdep/depinst/depinst.py --include benchmark --include example --include examples --include tools --include test --git_args "--depth 10 --jobs 3" $LIBRARY
+          python tools/boostdep/depinst/depinst.py --git_args "--depth 10 --jobs 3" functional
           python tools/boostdep/depinst/depinst.py --git_args "--depth 10 --jobs 3" filesystem
           ./bootstrap.sh
           ./b2 -d0 headers
@@ -172,9 +173,9 @@ jobs:
           git clone -b %BOOST_BRANCH% --depth 10 https://github.com/boostorg/boost.git boost-root
           cd boost-root
           xcopy /s /e /q %GITHUB_WORKSPACE% libs\%LIBRARY%\
-          git submodule update --init --depth 10 --jobs 2 tools/boostdep libs/filesystem
+          git submodule update --init --depth 10 --jobs 2 tools/boostdep libs/functional
           python tools/boostdep/depinst/depinst.py --include benchmark --include example --include examples --include tools --include test --git_args "--jobs 3" %LIBRARY%
-          python tools/boostdep/depinst/depinst.py --git_args "--depth 10 --jobs 3" filesystem
+          python tools/boostdep/depinst/depinst.py --git_args "--depth 10 --jobs 3" functional
           cmd /c bootstrap
           b2 -d0 headers
 
