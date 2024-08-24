@@ -8,8 +8,10 @@
 # The way to make it union and UB free by X-Ryl669, https://github.com/X-Ryl669
 #
 
+import-search /boost/config/checks ;
+
 import testing ;
-import ../../config/checks/config : requires ;
+import config : requires ;
 
 ########## BEGIN of helpers to detect C++20 features support
 
@@ -38,6 +40,7 @@ explicit compiler_supports_cxx20_nontype_tplarg ;
 project
     : source-location .
     : requirements
+        <library>/boost/core//boost_core
         <define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1
         [ check-target-builds ../core_name//compiler_supports_cxx20_address_of_non_static_member_tplarg : : [ check-target-builds ../core_name//compiler_supports_cxx20_nontype_tplarg : : <build>no ] ]
     ;

@@ -18,7 +18,7 @@ project pfr/doc ;
 
 #
 # Common params for doxygen
-# 
+#
 
 local doxygen_params =
         <doxygen:param>EXTRACT_ALL=NO
@@ -43,8 +43,8 @@ local doxygen_params =
 
 doxygen autodoc_pfr
     :
-        [ glob ../../../boost/pfr.hpp ]
-        [ glob ../../../boost/pfr/*.hpp ]
+        [ glob ../include/boost/pfr.hpp ]
+        [ glob ../include/boost/pfr/*.hpp ]
     :
         $(doxygen_params)
         <xsl:param>"boost.doxygen.reftitle=Reference Section of PFR"
