@@ -1,9 +1,13 @@
-// Copyright (c) 2016-2022 Antony Polukhin
+// Copyright (c) 2016-2024 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/pfr/config.hpp> // inclusion of an another PFR header may fail when BOOST_PFR_ENABLED=0
+#include <boost/pfr/config.hpp>
+#if BOOST_PFR_ENABLED
+#include <boost/pfr.hpp>
+#endif
+#include <boost/preprocessor/stringize.hpp>
 
 #include <iostream>
 
@@ -14,6 +18,9 @@ int main() {
         << "BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE == " << BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE << '\n'
         << "BOOST_PFR_HAS_GUARANTEED_COPY_ELISION == " << BOOST_PFR_HAS_GUARANTEED_COPY_ELISION << '\n'
         << "BOOST_PFR_ENABLE_IMPLICIT_REFLECTION == " << BOOST_PFR_ENABLE_IMPLICIT_REFLECTION << '\n'
+        << "BOOST_PFR_CORE_NAME_ENABLED == " << BOOST_PFR_CORE_NAME_ENABLED << '\n'
+        << "BOOST_PFR_FUNCTION_SIGNATURE == " << BOOST_PP_STRINGIZE(BOOST_PFR_FUNCTION_SIGNATURE) << '\n'
+        << "BOOST_PFR_CORE_NAME_PARSING == " << BOOST_PP_STRINGIZE(BOOST_PFR_CORE_NAME_PARSING) << '\n'
         << "BOOST_PFR_ENABLED == " << BOOST_PFR_ENABLED << '\n'
         << "__cplusplus == " << __cplusplus << '\n'
 #ifdef __cpp_structured_bindings

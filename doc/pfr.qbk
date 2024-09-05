@@ -1,7 +1,7 @@
 [library Boost.PFR
     [quickbook 1.6]
-    [version 2.0]
-    [copyright 2016-2022 Antony Polukhin]
+    [version 2.2]
+    [copyright 2016-2024 Antony Polukhin]
     [category Language Features Emulation]
     [license
         Distributed under the Boost Software License, Version 1.0.
@@ -17,6 +17,7 @@ Boost.PFR is a C++14 library for a very basic reflection. It gives you access to
 [import ../example/motivating_example0.cpp]
 [pfr_motivating_example]
 
+Experiment with the sample [@https://godbolt.org/z/PfYsWKb7v online].
 See [link boost_pfr.limitations_and_configuration [*limitations]].
 
 
@@ -42,20 +43,20 @@ user_info retrieve_friend(std::string_view name) {
         name
     );
 
-    ////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
     user_info info {
         std::move(std::get<0>(info_tuple)),
         std::move(std::get<1>(info_tuple)),
         std::move(std::get<2>(info_tuple)),
         std::move(std::get<3>(info_tuple)),
     }
-    ////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
 
     auto friend_info = ask_user_for_friend(std::move(info));
 
     db::insert(
         "INSERT INTO user_infos(id, name, email, login) VALUES ($0, $1, $2, $3)",
-        friend_info.id,    /////////////////////////////////////////////////////////
+        friend_info.id,    //////////////////////////////////////////////////////
         friend_info.name,  // Users are forced to enumerate fields because your
         friend_info.email, // library can not iterate over the fields of a user
         friend_info.login  // provided structure
@@ -80,20 +81,20 @@ user_info retrieve_friend(std::string_view name) {
         name
     );
 
-    ////////////////// No boilerplate code to move data around /////////////////////
+    ////////////////// No boilerplate code to move data around //////////////////
 
 
 
 
 
 
-    ////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
 
     auto friend_info = ask_user_for_friend(std::move(info));
 
     db::insert(
         "INSERT INTO user_infos(id, name, email, login) VALUES ($0, $1, $2, $3)",
-        friend_info     ////////////////////////////////////////////////////////////
+        friend_info     /////////////////////////////////////////////////////////
                         // Boost.PFR allows you to iterate over all the fields
                         // of a user provided structure
                         //
@@ -119,7 +120,7 @@ struct user_info {
     std::string name, email, login;
 };
 
-/// Customizations via hand-written code or macro like BOOST_FUSION_ADAPT_STRUCT ///
+/// Customizations via hand-written code ////////////////////////////////////////
 auto db_api_tie(user_info& ui) noexcept {
     return std::tie(ui.id, ui.name, ui.email, ui.login);
 }
@@ -127,7 +128,7 @@ auto db_api_tie(user_info& ui) noexcept {
 auto db_api_tie(const user_info& ui) noexcept {
     return std::tie(ui.id, ui.name, ui.email, ui.login);
 }
-////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
 ```
 ][
 ```
@@ -138,7 +139,7 @@ struct user_info {
     std::string name, email, login;
 };
 
-//////// With Boost.PFR there's no need in hand written customizations /////////////
+//////// With Boost.PFR there's no need in hand written customizations //////////
 
 
 
@@ -146,14 +147,29 @@ struct user_info {
 
 
 
-////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
 ```
 ]]
 ]
 
 
+Imagine that you are writing a serialization library. Serialization of user
+provided structures (and nested structures) with Boost.PFR it is just as simple as:
+
+```
+void Write(Writer& writer, int value);
+void Write(Writer& writer, std::string_view value);
+
+template <typename T>
+std::enable_if_t<boost::pfr::is_implicitly_reflectable_v<T>> Write(Writer& writer, const T& value) {
+  boost::pfr::for_each_field(
+      value, [&writer](const auto& field) { Write(writer, field); });
+}
+```
+
 With Boost.PFR the code is shorter, more readable and more pleasant to write.
 
+[note All the above examples were inspired by the Boost.PFR usage in [@https://github.com/userver-framework/userver 🐙 userver framework].]
 
 
 [h2 Out of the box functionality ]
@@ -164,15 +180,17 @@ Boost.PFR adds the following out-of-the-box functionality for aggregate initiali
 * heterogeneous comparators
 * hash
 * IO streaming
-* access to members by index
+* access to members by index or type
+* access to member's names by index
 * member type retrieval
-* methods for cooperation with `std::tuple`
+* methods for cooperation with `std::tuple` for members
+* methods for cooperation with `std::array` for member's names
 * methods to visit each field of the structure
 * trait to detect potential ability to reflect type, and ability to override trait's decision in user-side code
 
 Boost.PFR is a header only library that does not depend on Boost. You can just copy the content of the "include" folder [@https://github.com/boostorg/pfr from the Boost.PFR github] into your project, and the library will work fine. For a version of the library without `boost::` namespace see [@https://github.com/apolukhin/pfr_non_boost PFR].
 
-[caution Recommended C++ Standards are C++17 and above. Library requires at least C++14! Pre C++14 compilers (C++11, C++03...) are not supported]
+[caution Recommended C++ Standards are C++20 and above. C++17 completely enough for a user who doesn't want accessing name of structure member. Library requires at least C++14! Pre C++14 compilers (C++11, C++03...) are not supported]
 
 [endsect]
 
@@ -187,6 +205,9 @@ Boost.PFR is a header only library that does not depend on Boost. You can just c
 [
     [ [pfr_quick_examples_get] ]
     [ [funcref boost::pfr::get] ]
+][
+    [ [pfr_quick_examples_get_name] ]
+    [ [funcref boost::pfr::get_name] ]
 ][
     [ [pfr_quick_examples_ops] ]
     [
@@ -253,6 +274,7 @@ Boost.PFR is a header only library that does not depend on Boost. You can just c
 
 [import ../example/sample_printing.cpp]
 [import ../example/get.cpp]
+[import ../example/get_name.cpp]
 
 
 [section Why tuples are bad and aggregates are more preferable?]
@@ -432,12 +454,21 @@ error: static_assert failed "====================> Boost.PFR: For safety reasons
 
 [endsect]
 
+
+[section Reflection of field name ]
+
+[pfr_example_get_name]
+
+See [link boost_pfr.limitations_and_configuration [*Limitations and Configuration]].
+
+[endsect]
+
 [endsect]
 
 
 [section Limitations and Configuration]
 
-[caution Recommended C++ Standards are C++17 and above. Library requires at least C++14! Pre C++14 compilers (C++11, C++03...) are not supported. ]
+[caution Recommended C++ Standards are C++20 and above. C++17 completely enough for a user who doesn't want accessing name of structure member. Library requires at least C++14! Pre C++14 compilers (C++11, C++03...) are not supported. ]
 
 Boost.PFR library works with types that satisfy the requirements of `SimpleAggregate`: aggregate types without base classes, `const` fields, references, or C arrays:
 
@@ -459,6 +490,9 @@ struct aggregate : empty { // not a SimpleAggregate
 ```
 The library may work with aggregates that don't satisfy the requirements of `SimpleAggregate`, but the behavior tends to be non-portable.
 
+Boost.PFRs extraction of field name works with only `SimpleAggregate` types.
+
+
 [h2 Configuration Macro]
 
 By default Boost.PFR [*auto-detects your compiler abilities] and automatically defines the configuration macro into appropriate values. If you wish to override that behavior, just define:
@@ -469,6 +503,9 @@ By default Boost.PFR [*auto-detects your compiler abilities] and automatically d
     [[*BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE*] [Define to `0` if you are hit by the template instantiation depth issues with `std::make_integer_sequence` and wish to use Boost.PFR version of that metafunction. Define to `1` to override Boost.PFR detection logic. ]]
     [[*BOOST_PFR_HAS_GUARANTEED_COPY_ELISION*] [Define to `0` if your compiler does not implement C++17 guaranteed copy elision properly and fails to reflect aggregates with non-movable fields. Define to `1` to override Boost.PFR detection logic. ]]
     [[*BOOST_PFR_ENABLE_IMPLICIT_REFLECTION*] [Define to `0` if you are hit by lots of non-effective choices made by implicitly reflection. Define to `1` to override Boost.PFR detection logic. ]]
+    [[*BOOST_PFR_CORE_NAME_ENABLED*] [On platforms where field name extraction is not supported, the 'boost/pfr/config.hpp' header defines the BOOST_PFR_CORE_NAME_ENABLED macro equal to 0. Defining this macro as 0 before including the header disables the ability to get a field name. ]]
+    [[*BOOST_PFR_FUNCTION_SIGNATURE*] [For known compilers defined to a compiler specific macro, that outputs the whole function signature including non-type template parameters. ]]
+    [[*BOOST_PFR_CORE_NAME_PARSING*] [Describes extraction of field name from BOOST_PFR_FUNCTION_SIGNATURE macro. See details below. ]]
     [[*BOOST_PFR_ENABLED*] [On platforms where Boost.PFR is not supported, the `boost/pfr/config.hpp` header defines the BOOST_PFR_ENABLED macro equal to 0. Defining this macro as 0 before including the header disables the Boost.PFR library. ]]
 ]
 
@@ -478,18 +515,77 @@ By default Boost.PFR [*auto-detects your compiler abilities] and automatically d
 The Boost.PFRs reflection has some limitations that depend on a C++ Standard and compiler capabilities:
 
 * Static variables are ignored
-* T must be aggregate initializable without empty base classes
-* if T contains C arrays or it is inherited from non-empty type then the result of reflection may differ depending on the C++ version and library configuration
+* T must be aggregate initializable without base classes
+* if T contains C arrays then the result of reflection may differ depending on the C++ version and library configuration
 * Additional limitations if [*BOOST_PFR_USE_CPP17 == 0]:
     * Non of the member fields should have a template constructor from one parameter.
     * Additional limitations if [*BOOST_PFR_USE_LOOPHOLE == 0]:
         * T must be constexpr aggregate initializable and all its fields must be constexpr default constructible
         * [funcref boost::pfr::get], [funcref boost::pfr::structure_to_tuple], [funcref boost::pfr::structure_tie], [headerref boost/pfr/core.hpp boost::pfr::tuple_element] require T to be a POD type with built-in types only.
 
+The Boost.PFRs extraction of field name has some limitations that depend on a C++ Standard and compiler capabilities:
+
+* T should be usable like `extern T t;`, i.e. has a non-internal linkage.
+
+[h2 Adjusting BOOST_PFR_CORE_NAME_PARSING]
+
+`BOOST_PFR_CORE_NAME_PARSING` is already set up for most of the popular compilers. You need to adjust it only
+if some static_assert in the library complained on `BOOST_PFR_CORE_NAME_PARSING`.
+
+To do that:
+
+# Build `test/core_name/print_name.cpp` with your compiler and run it
+# Define BOOST_PFR_CORE_NAME_PARSING to `(skip_at_begin, skip_at_end, "")`, where
+    * `skip_at_begin` is equal to characters count before the first occurrence of `user_defined_field` in output
+    * `skip_at_end` is equal to characters count after last occurrence of `user_defined_field` in output
+# Check that `test/core_name/print_name.cpp` returns "user_defined_field"
+# If it does not return `user_defined_field`, then define BOOST_PFR_CORE_NAME_PARSING to `(skip_at_begin, skip_at_end, "T = ")`, where
+    * `skip_at_begin` is equal to `skip_at_begin` at step 2
+    * `skip_at_end` is equal to `skip_at_end` at step 2
+    * `"T = "` is equal to characters that are right before the `user_defined_field` in output, use `backward("T = ")` to search for the occurange in the string from the right
+# (optional, but highly recommended) [@https://github.com/boostorg/pfr/issues create ticket] with
+feature request to add your compiler to supported compilers list. Include
+parameters provided to `BOOST_PFR_CORE_NAME_PARSING` macro [*and] the initial output of `test/core_name/print_name.cpp`.
+
+[endsect]
+
+[section PFR as a C++20 module]
+
+[caution C++20 PFR module support is on early stage, targets and flags may change in the future]
+
+If using CMake of version 3.28.0 or higher define CMake option `-DBUILD_MODULE=1`
+to make the `Boost::pfr_module` and `Boost::pfr_module_migration` libraries
+available. With `Boost::pfr_module` C++20 module Boost.PFR could be used:
+
+[import ../module/usage_sample.cpp]
+[pfr_module_example]
+
+The `Boost::pfr_module_migration` CMake target gives an ability to
+mix includes and imports of the PFR library in different translation units.
+
+If not using CMake, then the module could be build manually from the
+`module/pfr.cppm` file. If mixing of includes in imports is desired, additionally
+define `BOOST_PFR_ATTACH_TO_GLOBAL_MODULE` preprocessor macro to attach all the
+module entities to a global module and avoid ODR issues.
+
+For manual module build the following commands could be used for clang compiler:
+
+```
+cd pfr/module
+clang++ -I ../include -std=c++20 --precompile -x c++-module pfr.cppm
+```
+
+After that, the module could be used in the following way:
+
+```
+clang++ -std=c++20 -fmodule-file=pfr.pcm pfr.pcm usage_sample.cpp
+```
 
 [endsect]
 
 [section How it works]
+
+[h2 Fields count detection and getting references to members]
 
 Short description:
 
@@ -517,11 +613,22 @@ Long description of some basics: [@https://youtu.be/UlNUNxLtBI0 Antony Polukhin:
 Long description of some basics of C++14 with [link boost_pfr.limitations_and_configuration [*BOOST_PFR_USE_LOOPHOLE == 0]]: [@https://youtu.be/abdeAew3gmQ Antony Polukhin: C++14 Reflections Without Macros, Markup nor External Tooling].
 Description of the [*BOOST_PFR_USE_LOOPHOLE == 1] technique by its inventor Alexandr Poltavsky [@http://alexpolt.github.io/type-loophole.html in his blog].
 
+[h2 Field name retrieval]
+
+# at compile-time:
+    * Get references to members of an object of type `T` in `constexpr` function
+    * Feed the reference from previous as a template parameter to a `constexpr` function with `template <auto member_ptr>`.
+      That function returns `__PRETTY_FUNCTION__` or some other vendor specific macro that prints the whole name of a function
+      along with the template arguments.
+    * The returned value from previous step contains the member name ([@https://godbolt.org/z/K4aWdcE9G godbolt example]). Do some
+      compiler specific parsing of the value and make a `std::string_view` that contains only the member name.
+# at run-time: return the `std::string_view` with the member name.
+
 [endsect]
 
 [section Acknowledgements]
 
-Many thanks to Bruno Dutra for showing the technique to precisely reflect aggregate initializable type in C++14 [@https://github.com/apolukhin/magic_get/issues/5 Manual type registering/structured bindings might be unnecessary].
+Many thanks to Bruno Dutra for showing the technique to precisely reflect aggregate initializable type in C++14 [@https://github.com/boostorg/pfr/issues/5 Manual type registering/structured bindings might be unnecessary].
 
 Many thanks to Alexandr Poltavsky for initial implementation the [*BOOST_PFR_USE_LOOPHOLE == 1] technique and for describing it [@http://alexpolt.github.io/type-loophole.html in his blog].
 

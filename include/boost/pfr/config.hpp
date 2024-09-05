@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2022 Antony Polukhin
+// Copyright (c) 2016-2024 Antony Polukhin
 // Copyright (c) 2022 Denis Mikhailov
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -98,6 +98,33 @@
 #   endif
 #endif
 
+#ifndef BOOST_PFR_CORE_NAME_ENABLED
+#   if  (__cplusplus >= 202002L) || (defined(_MSVC_LANG) && (_MSVC_LANG >= 202002L))
+#       if (defined(__cpp_nontype_template_args) && __cpp_nontype_template_args >= 201911) \
+         || (defined(__clang_major__) && __clang_major__ >= 12)
+#           define BOOST_PFR_CORE_NAME_ENABLED 1
+#       else
+#           define BOOST_PFR_CORE_NAME_ENABLED 0
+#       endif
+#   else
+#       define BOOST_PFR_CORE_NAME_ENABLED 0
+#   endif
+#endif
+
+
+#ifndef BOOST_PFR_CORE_NAME_PARSING
+#   if defined(_MSC_VER) && !defined(__clang__)
+#       define BOOST_PFR_CORE_NAME_PARSING (sizeof("auto __cdecl boost::pfr::detail::name_of_field_impl<") - 1, sizeof(">(void) noexcept") - 1, backward("->"))
+#   elif defined(__clang__)
+#       define BOOST_PFR_CORE_NAME_PARSING (sizeof("auto boost::pfr::detail::name_of_field_impl() [MsvcWorkaround = ") - 1, sizeof("}]") - 1, backward("."))
+#   elif defined(__GNUC__)
+#       define BOOST_PFR_CORE_NAME_PARSING (sizeof("consteval auto boost::pfr::detail::name_of_field_impl() [with MsvcWorkaround = ") - 1, sizeof(")]") - 1, backward("::"))
+#   else
+// Default parser for other platforms... Just skip nothing!
+#       define BOOST_PFR_CORE_NAME_PARSING (0, 0, "")
+#   endif
+#endif
+
 #if defined(__has_cpp_attribute)
 #   if __has_cpp_attribute(maybe_unused)
 #       define BOOST_PFR_MAYBE_UNUSED [[maybe_unused]]
@@ -117,5 +144,13 @@
 #endif
 
 #undef BOOST_PFR_NOT_SUPPORTED
+
+#ifndef BOOST_PFR_BEGIN_MODULE_EXPORT
+#   define BOOST_PFR_BEGIN_MODULE_EXPORT
+#endif
+
+#ifndef BOOST_PFR_END_MODULE_EXPORT
+#   define BOOST_PFR_END_MODULE_EXPORT
+#endif
 
 #endif // BOOST_PFR_CONFIG_HPP

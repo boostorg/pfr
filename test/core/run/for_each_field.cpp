@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2022 Antony Polukhin
+// Copyright (c) 2016-2024 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -56,6 +56,21 @@ struct simple {
 
 struct empty{};
 
+#if BOOST_PFR_USE_CPP17
+constexpr std::size_t get_field_count_through_for_each_field() {
+    std::size_t counter = 0;
+    boost::pfr::for_each_field(simple{}, [&counter](auto&& /*val*/, std::size_t /*i*/) {
+        ++ counter;
+    });
+    return counter;
+}
+
+// MSVC-14.1 fails to compile the following code
+#if !defined(_MSC_VER) || _MSC_VER > 1916
+static_assert(3 == get_field_count_through_for_each_field());
+#endif
+
+#endif
 
 int main () {
     std::size_t control = 0;

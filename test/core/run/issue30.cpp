@@ -1,9 +1,9 @@
-// Copyright (c) 2018-2022 Antony Polukhin
+// Copyright (c) 2018-2024 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// Test case for https://github.com/apolukhin/magic_get/issues/30
+// Test case for https://github.com/boostorg/pfr/issues/30
 
 #include <memory>
 #include <boost/pfr.hpp>

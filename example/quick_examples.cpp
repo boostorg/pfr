@@ -1,4 +1,4 @@
-// Copyright 2016-2022 Antony Polukhin
+// Copyright 2016-2024 Antony Polukhin
 
 // Distributed under the Boost Software License, Version 1.0.
 // (See the accompanying file LICENSE_1_0.txt
@@ -91,7 +91,7 @@ void test_examples() {
 
   {
 //[pfr_quick_examples_get
-    // Get field by index and assign new value to that field
+    // Get field by index/type and assign new value to that field
 
     struct sample {
         char c;
@@ -100,10 +100,32 @@ void test_examples() {
 
     sample var{};
     boost::pfr::get<1>(var) = 42.01f;
+    boost::pfr::get<char>(var) = 'A';
 
-    std::cout << var.f; // Outputs: 42.01
+    std::cout << var.c << var.f; // Outputs: A 42.01
 //]
   }
+
+// Disabling for MSVC as it gives a hard error on using local types:
+//
+// error C7631:
+// 'boost::pfr::detail::do_not_use_PFR_with_local_types<test_examples::sample>':
+// variable with internal linkage declared but not defined
+#if BOOST_PFR_CORE_NAME_ENABLED && BOOST_PFR_USE_CPP17 && !defined(_MSC_VER)
+  {
+//[pfr_quick_examples_get_name
+    // Get name of field by index
+
+    struct sample {
+        int f_int;
+        long f_long;
+    };
+
+    std::cout << boost::pfr::get_name<0, sample>()
+              << boost::pfr::get_name<1, sample>(); // Outputs: f_int f_long
+//]
+  }
+#endif
 
 #if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE
   {
