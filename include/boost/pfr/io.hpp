@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2022 Antony Polukhin
+// Copyright (c) 2016-2024 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -67,6 +67,8 @@ struct io_impl {
     T value;
 };
 
+BOOST_PFR_BEGIN_MODULE_EXPORT
+
 template <class Char, class Traits, class T>
 enable_not_ostreamable_t<std::basic_ostream<Char, Traits>, T> operator<<(std::basic_ostream<Char, Traits>& out, io_impl<T>&& x) {
     return out << boost::pfr::io_fields(std::forward<T>(x.value));
@@ -87,19 +89,23 @@ enable_istreamable_t<std::basic_istream<Char, Traits>, T> operator>>(std::basic_
     return in >> x.value;
 }
 
+BOOST_PFR_END_MODULE_EXPORT
+
 } // namespace detail
 
-/// IO manupulator to read/write \aggregate `value` using its IO stream operators or using \forcedlink{io_fields} if operators are not awailable.
+BOOST_PFR_BEGIN_MODULE_EXPORT
+
+/// IO manipulator to read/write \aggregate `value` using its IO stream operators or using \forcedlink{io_fields} if operators are not available.
 ///
 /// \b Example:
 /// \code
 ///     struct my_struct { int i; short s; };
-///     my_struct s;
+///     my_struct x;
 ///     std::stringstream ss;
 ///     ss << "{ 12, 13 }";
-///     ss >> boost::pfr::io(s);
-///     assert(s.i == 12);
-///     assert(s.i == 13);
+///     ss >> boost::pfr::io(x);
+///     assert(x.i == 12);
+///     assert(x.s == 13);
 /// \endcode
 ///
 /// \customio
@@ -107,6 +113,8 @@ template <class T>
 auto io(T&& value) noexcept {
     return detail::io_impl<T>{std::forward<T>(value)};
 }
+
+BOOST_PFR_END_MODULE_EXPORT
 
 }} // namespace boost::pfr
 

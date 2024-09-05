@@ -1,5 +1,5 @@
 // Copyright (c) 2017-2018 Alexandr Poltavsky, Antony Polukhin.
-// Copyright (c) 2019-2022 Antony Polukhin.
+// Copyright (c) 2019-2024 Antony Polukhin.
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -8,7 +8,7 @@
 // The Great Type Loophole (C++14)
 // Initial implementation by Alexandr Poltavsky, http://alexpolt.github.io
 //
-// Description: 
+// Description:
 //  The Great Type Loophole is a technique that allows to exchange type information with template
 //  instantiations. Basically you can assign and read type information during compile time.
 //  Here it is used to detect data members of a data type. I described it for the first time in
@@ -20,13 +20,17 @@
 
 #ifndef BOOST_PFR_DETAIL_CORE14_LOOPHOLE_HPP
 #define BOOST_PFR_DETAIL_CORE14_LOOPHOLE_HPP
+#pragma once
 
 #include <boost/pfr/detail/config.hpp>
 
+#ifdef BOOST_PFR_HAS_STD_MODULE
+import std;
+#else
 #include <type_traits>
 #include <utility>
+#endif
 
-#include <boost/pfr/detail/cast_to_layout_compatible.hpp> // still needed for enums
 #include <boost/pfr/detail/offset_based_getter.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
 #include <boost/pfr/detail/make_flat_tuple_of_references.hpp>

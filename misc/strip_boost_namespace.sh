@@ -39,24 +39,44 @@ find ${TARGET_PATH}/doc -type f | xargs sed -i 's|Boost.PFR|PFR|g'
 sed -i  's|# \[Boost.PFR\](https://boost.org/libs/pfr)|# [PFR](https://apolukhin.github.io/pfr_non_boost/)|g' ${TARGET_PATH}/README.md
 
 echo -n "***** Testing: "
-if g++-9 -std=c++17 -DPFR_USE_LOOPHOLE=0 -DPFR_USE_CPP17=1 -I ${TARGET_PATH}/include/ ${TARGET_PATH}/example/motivating_example0.cpp && ./a.out > /dev/null; then
+if g++-12 -std=c++2a -DPFR_ENABLE_GET_NAME_STATIC=1 -I ${TARGET_PATH}/include/ ${TARGET_PATH}/example/motivating_example0.cpp && ./a.out > /dev/null; then
     echo -n "OK"
 else
     echo -n "FAIL"
     exit 2
 fi
-if g++-9 -std=c++17 -DPFR_USE_LOOPHOLE=1 -DPFR_USE_CPP17=0 -I ${TARGET_PATH}/include/ ${TARGET_PATH}/example/motivating_example0.cpp && ./a.out > /dev/null; then
-    echo -n ", OK"
+if g++-12 -std=c++2a -DPFR_ENABLE_GET_NAME_STATIC=0 -I ${TARGET_PATH}/include/ ${TARGET_PATH}/example/motivating_example0.cpp && ./a.out > /dev/null; then
+    echo -n "OK"
 else
-    echo -n ", FAIL"
+    echo -n "FAIL"
     exit 3
 fi
 
-if g++-9 -std=c++17 -DPFR_USE_LOOPHOLE=0 -DPFR_USE_CPP17=0 -I ${TARGET_PATH}/include/ ${TARGET_PATH}/example/get.cpp && ./a.out > /dev/null; then
+if g++-12 -std=c++2a -DPFR_ENABLE_GET_NAME_STATIC=1 -DBOOST_PFR_USE_CPP17=1 -I ${TARGET_PATH}/include/ ${TARGET_PATH}/example/get_name.cpp && ./a.out > /dev/null; then
     echo -e ", OK"
 else
     echo -e ", FAIL"
     exit 4
+fi
+
+if g++-12 -std=c++2a -DPFR_USE_LOOPHOLE=0 -DPFR_USE_CPP17=1 -I ${TARGET_PATH}/include/ ${TARGET_PATH}/example/motivating_example0.cpp && ./a.out > /dev/null; then
+    echo -n "OK"
+else
+    echo -n "FAIL"
+    exit 5
+fi
+if g++-12 -std=c++2a -DPFR_USE_LOOPHOLE=1 -DPFR_USE_CPP17=0 -I ${TARGET_PATH}/include/ ${TARGET_PATH}/example/motivating_example0.cpp && ./a.out > /dev/null; then
+    echo -n ", OK"
+else
+    echo -n ", FAIL"
+    exit 6
+fi
+
+if g++-12 -std=c++2a -DPFR_USE_LOOPHOLE=0 -DPFR_USE_CPP17=0 -I ${TARGET_PATH}/include/ ${TARGET_PATH}/example/get.cpp && ./a.out > /dev/null; then
+    echo -e ", OK"
+else
+    echo -e ", FAIL"
+    exit 7
 fi
 
 rm a.out || :

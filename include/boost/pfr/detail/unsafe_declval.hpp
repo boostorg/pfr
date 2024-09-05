@@ -1,14 +1,19 @@
-// Copyright (c) 2019-2022 Antony Polukhin.
+// Copyright (c) 2019-2024 Antony Polukhin.
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 #ifndef BOOST_PFR_DETAIL_UNSAFE_DECLVAL_HPP
 #define BOOST_PFR_DETAIL_UNSAFE_DECLVAL_HPP
+#pragma once
 
 #include <boost/pfr/detail/config.hpp>
 
+#ifdef BOOST_PFR_HAS_STD_MODULE
+import std;
+#else
 #include <type_traits>
+#endif
 
 namespace boost { namespace pfr { namespace detail {
 

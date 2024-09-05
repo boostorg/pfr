@@ -5,13 +5,17 @@
 # http://www.boost.org/LICENSE_1_0.txt)
 #
 
+import-search /boost/config/checks ;
+
 import python ;
 import testing ;
-import ../../config/checks/config : requires ;
+import config : requires ;
 
 project
     : source-location .
     : requirements
+        <library>/boost/config//boost_config
+        <library>/boost/preprocessor//boost_preprocessor
         <define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1
     ;
 

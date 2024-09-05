@@ -1,0 +1,63 @@
+# Copyright (c) 2023 Bela Schaum, X-Ryl669, Denis Mikhailov.
+#
+# Distributed under the Boost Software License, Version 1.0. (See accompanying
+# file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+
+# Initial implementation by Bela Schaum, https://github.com/schaumb
+# The way to make it union and UB free by X-Ryl669, https://github.com/X-Ryl669
+#
+
+import-search /boost/config/checks ;
+
+import testing ;
+import config : requires ;
+
+########## BEGIN of helpers to detect C++20 features support
+
+actions mp_simple_run_action
+{
+      $(>) > $(<)
+}
+
+rule mp-run-simple ( sources + : args * : input-files * : requirements * : target-name )
+{
+   exe $(target-name)_exe : $(sources) : $(requirements) ;
+   explicit $(target-name)_exe ;
+   make $(target-name).output : $(target-name)_exe : @mp_simple_run_action ;
+   explicit $(target-name).output ;
+   alias $(target-name) : $(target-name).output ;
+}
+
+mp-run-simple cxx20_address_of_non_static_member_tplarg_detection.cpp : : : : compiler_supports_cxx20_address_of_non_static_member_tplarg ;
+explicit compiler_supports_cxx20_address_of_non_static_member_tplarg ;
+
+mp-run-simple cxx20_nontype_tplarg_detection.cpp : : : : compiler_supports_cxx20_nontype_tplarg ;
+explicit compiler_supports_cxx20_nontype_tplarg ;
+
+########## END of helpers to detect C++20 features support
+
+project
+    : source-location .
+    : requirements
+        <library>/boost/core//boost_core
+        <define>BOOST_PFR_DETAIL_STRICT_RVALUE_TESTING=1
+        [ check-target-builds ../core_name//compiler_supports_cxx20_address_of_non_static_member_tplarg : : [ check-target-builds ../core_name//compiler_supports_cxx20_nontype_tplarg : : <build>no ] ]
+    ;
+
+test-suite pfr_name_tests
+  :
+    [ run print_name.cpp : : : <test-info>always_show_run_output ]
+  ;
+
+for local source_file in [ glob ./run/*.cpp ]
+{
+    pfr_name_tests += [ run $(source_file) : : : <toolset>msvc:<cxxflags>"/utf-8" <toolset>msvc:<cxxflags>"/bigobj" : ] ;
+}
+
+for local source_file in [ glob ./compile-fail/*.cpp ]
+{
+    pfr_name_tests += [ compile-fail $(source_file) : : ] ;
+}
+
+

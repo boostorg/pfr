@@ -7,3 +7,4 @@
 
 build-project config ;
 build-project core ;
+build-project core_name ;

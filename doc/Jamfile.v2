@@ -18,7 +18,7 @@ project pfr/doc ;
 
 #
 # Common params for doxygen
-# 
+#
 
 local doxygen_params =
         <doxygen:param>EXTRACT_ALL=NO
@@ -32,19 +32,22 @@ local doxygen_params =
         <doxygen:param>"ALIASES= \\
             \"forcedlink{1}=\\xmlonly<link linkend='boost.pfr.\\1'>\\endxmlonly boost::pfr::\\1\\xmlonly</link>\\endxmlonly\" \\
             \"podops=\\b See \\b Also : \\xmlonly<link linkend='boost_pfr.tutorial.three_ways_of_getting_operators'>\\endxmlonly 'Three ways of getting operators' \\xmlonly</link>\\endxmlonly\" \\
+            \"fnrefl=\\b See \\b Also : \\xmlonly<link linkend='boost_pfr.tutorial.reflection_of_field_name'>\\endxmlonly 'Reflection of field names' \\xmlonly</link>\\endxmlonly\" \\
             \"customio=\\b See \\b Also : \\xmlonly<link linkend='boost_pfr.tutorial.custom_printing_of_aggregates'>\\endxmlonly 'Custom printing of aggregates' \\xmlonly</link>\\endxmlonly for info on how to implement your own manipulator with custom format.\" \\
             \"aggregate=\\xmlonly<link linkend='boost_pfr.limitations_and_configuration'>\\endxmlonly simple aggregate \\xmlonly</link>\\endxmlonly\" \\
-            \"BOOST_PFR_DOXYGEN_INVOKED\" \\
+        "
+        <doxygen:param>"PREDEFINED= \\
+            \"BOOST_PFR_DOXYGEN_INVOKED=1\" \\
         "
     ;
 
 doxygen autodoc_pfr
     :
-        [ glob ../../../boost/pfr.hpp ]
-        [ glob ../../../boost/pfr/*.hpp ]
+        [ glob ../include/boost/pfr.hpp ]
+        [ glob ../include/boost/pfr/*.hpp ]
     :
         $(doxygen_params)
-        <xsl:param>"boost.doxygen.reftitle=Reference Section"
+        <xsl:param>"boost.doxygen.reftitle=Reference Section of PFR"
     ;
 
 boostbook pfr-doc
@@ -52,7 +55,7 @@ boostbook pfr-doc
         pfr.qbk
     :
         <dependency>autodoc_pfr
-        <xsl:param>boost.root=https://www.boost.org/doc/libs/1_72_0
+        <xsl:param>boost.root=https://www.boost.org/doc/libs/1_81_0
         #<xsl:param>boost.root=../../../.
         <xml:param>html.stylesheet=../../../../doc/src/boostbook.css
     ;

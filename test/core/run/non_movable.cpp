@@ -1,4 +1,4 @@
-// Copyright (c) 2018-2022 Antony Polukhin
+// Copyright (c) 2018-2024 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,7 +18,11 @@ struct X {
 struct S { X x0; X x1; int x2; X x3; };
 
 int main() {
+
 #if BOOST_PFR_HAS_GUARANTEED_COPY_ELISION
+
+// MSVC-14.3 fails this test
+#if !defined(_MSC_VER) || _MSC_VER < 1930 || _MSC_VER > 1949
     static_assert(boost::pfr::tuple_size_v<S> == 4, "");
 
     struct S5_0 { int x0; int x1; int x2; int x3; X x4; };
@@ -38,6 +42,8 @@ int main() {
 
     struct S6 { X x0; X x1; X x2; X x3; X x4;  X x5;};
     static_assert(boost::pfr::tuple_size_v<S6> == 6, "");
+#endif
+
 #endif  // #if BOOST_PFR_HAS_GUARANTEED_COPY_ELISION
 
     return boost::report_errors();

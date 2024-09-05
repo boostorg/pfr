@@ -45,6 +45,8 @@ Outputs:
 Edgar Allan Poe was born in 1809
 ```
 
+[Run the above sample](https://godbolt.org/z/PfYsWKb7v)
+
 
 ### Motivating Example #1
 ```c++

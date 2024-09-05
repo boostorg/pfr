@@ -10,7 +10,11 @@
 #include <boost/pfr/detail/config.hpp>
 #include <boost/pfr/traits_fwd.hpp>
 
+#ifdef BOOST_PFR_HAS_STD_MODULE
+import std;
+#else
 #include <type_traits> // for std::is_aggregate
+#endif
 
 namespace boost { namespace pfr { namespace detail {
 
@@ -19,6 +23,8 @@ template <class T, class WhatFor>
 constexpr decltype(is_reflectable<T, WhatFor>::value) possible_reflectable(long) noexcept {
     return is_reflectable<T, WhatFor>::value;
 }
+
+#if BOOST_PFR_ENABLE_IMPLICIT_REFLECTION
 
 template <class T, class WhatFor>
 constexpr bool possible_reflectable(int) noexcept {
@@ -29,6 +35,16 @@ constexpr bool possible_reflectable(int) noexcept {
     return true;
 #   endif
 }
+
+#else
+
+template <class T, class WhatFor>
+constexpr bool possible_reflectable(int) noexcept {
+    // negative answer here won't change behaviour in PFR-dependent libraries(like Fusion)
+    return false;
+}
+
+#endif
 
 }}} // namespace boost::pfr::detail
 
