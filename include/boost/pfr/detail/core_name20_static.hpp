@@ -12,14 +12,15 @@
 #define BOOST_PFR_DETAIL_CORE_NAME20_STATIC_HPP
 #pragma once
 
-#include <boost/pfr/core.hpp>
 #include <boost/pfr/detail/config.hpp>
+
 #include <boost/pfr/detail/core.hpp>
-#include <boost/pfr/detail/sequence_tuple.hpp>
-#include <boost/pfr/detail/make_integer_sequence.hpp>
-#include <boost/pfr/detail/fields_count.hpp>
-#include <boost/pfr/detail/stdarray.hpp>
 #include <boost/pfr/detail/fake_object.hpp>
+#include <boost/pfr/detail/fields_count.hpp>
+#include <boost/pfr/detail/for_each_field.hpp>
+#include <boost/pfr/detail/make_integer_sequence.hpp>
+#include <boost/pfr/detail/sequence_tuple.hpp>
+#include <boost/pfr/detail/stdarray.hpp>
 
 #ifdef BOOST_PFR_HAS_STD_MODULE
 import std;
@@ -244,7 +245,7 @@ constexpr auto tie_as_names_tuple() noexcept {
 
 template <class T, class F>
 constexpr void for_each_field_with_name(T&& value, F&& func) {
-    return boost::pfr::for_each_field(
+    return boost::pfr::detail::for_each_field(
         std::forward<T>(value),
         [f = std::forward<F>(func)](auto&& field, auto index) mutable {
             using IndexType = decltype(index);
