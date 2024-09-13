@@ -3,8 +3,8 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#ifndef BOOST_PFR_DETAIL_FOR_EACH_FIELD_IMPL_HPP
-#define BOOST_PFR_DETAIL_FOR_EACH_FIELD_IMPL_HPP
+#ifndef BOOST_PFR_DETAIL_FOR_EACH_FIELD_HPP
+#define BOOST_PFR_DETAIL_FOR_EACH_FIELD_HPP
 #pragma once
 
 #include <boost/pfr/detail/config.hpp>
@@ -47,4 +47,4 @@ constexpr void for_each_field(T&& value, F&& func) {
 }}} // namespace boost::pfr::detail
 
 
-#endif // BOOST_PFR_DETAIL_FOR_EACH_FIELD_IMPL_HPP
+#endif // BOOST_PFR_DETAIL_FOR_EACH_FIELD_HPP
