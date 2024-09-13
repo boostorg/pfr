@@ -1,4 +1,5 @@
 // Copyright (c) 2023 Bela Schaum, X-Ryl669, Denis Mikhailov.
+// Copyright (c) 2024-2024 Antony Polukhin
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -49,9 +50,10 @@ constexpr const T& fake_object() noexcept {
 }}} // namespace boost::pfr::detail
 
 #ifdef __clang__
-#   pragma clang diagnostic push
+#   pragma clang diagnostic pop
 #elif defined(__GNUC__)
 #   pragma GCC diagnostic pop
 #endif
+
 #endif // BOOST_PFR_DETAIL_FAKE_OBJECT_HPP
 
