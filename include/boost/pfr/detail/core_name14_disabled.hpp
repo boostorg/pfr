@@ -39,7 +39,7 @@ constexpr auto tie_as_names_tuple() noexcept {
 
 
 template <class T, class F>
-constexpr void for_each_field_with_name(T&& value, F&& func) {
+constexpr void for_each_field_with_name(T&& /* value */, F&& /* func */) {
     static_assert(
         sizeof(T) && false,
         "====================> Boost.PFR: Field's names extracting functionality requires C++20."
