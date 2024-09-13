@@ -13,7 +13,7 @@
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/stdtuple.hpp>
-#include <boost/pfr/detail/for_each_field_impl.hpp>
+#include <boost/pfr/detail/for_each_field.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 #include <boost/pfr/detail/tie_from_structure_tuple.hpp>
 
@@ -223,24 +223,7 @@ constexpr auto structure_tie(T&&, std::enable_if_t< std::is_rvalue_reference<T&&
 /// \endcode
 template <class T, class F>
 constexpr void for_each_field(T&& value, F&& func) {
-    constexpr std::size_t fields_count_val = boost::pfr::detail::fields_count<std::remove_reference_t<T>>();
-
-    ::boost::pfr::detail::for_each_field_dispatcher(
-        value,
-        [f = std::forward<F>(func)](auto&& t) mutable {
-            // MSVC related workaround. Its lambdas do not capture constexprs.
-            constexpr std::size_t fields_count_val_in_lambda
-                = boost::pfr::detail::fields_count<std::remove_reference_t<T>>();
-
-            ::boost::pfr::detail::for_each_field_impl(
-                t,
-                std::forward<F>(f),
-                detail::make_index_sequence<fields_count_val_in_lambda>{},
-                std::is_rvalue_reference<T&&>{}
-            );
-        },
-        detail::make_index_sequence<fields_count_val>{}
-    );
+    return ::boost::pfr::detail::for_each_field(std::forward<T>(value), std::forward<F>(func));
 }
 
 /// \brief std::tie-like function that allows assigning to tied values from aggregates.
