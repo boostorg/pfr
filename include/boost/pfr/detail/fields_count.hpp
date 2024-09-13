@@ -306,7 +306,7 @@ constexpr auto fields_count_lower_bound_unbounded(long, size_t_<0> = {}) noexcep
 template <class T, std::size_t Begin = 1>
 constexpr std::size_t fields_count_lower_bound_unbounded(int, size_t_<0> = {}) noexcept
 {
-    constexpr std::size_t last = std::min(Begin * 2, fields_count_upper_bound_loose<T>()) - 1;
+    constexpr std::size_t last = (std::min)(Begin * 2, fields_count_upper_bound_loose<T>()) - 1;
     constexpr std::size_t result_maybe = detail::fields_count_lower_bound<T, Begin, last>(
         detail::is_one_element_range<Begin, last>{}
     );
