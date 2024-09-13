@@ -13,7 +13,7 @@
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/stdtuple.hpp>
-#include <boost/pfr/detail/for_each_field_impl.hpp>
+#include <boost/pfr/detail/for_each_field.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 #include <boost/pfr/detail/tie_from_structure_tuple.hpp>
 
