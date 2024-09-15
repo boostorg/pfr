@@ -19,9 +19,6 @@
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wundefined-internal"
 #   pragma clang diagnostic ignored "-Wundefined-var-template"
-#elif defined(__GNUC__)
-#   pragma GCC diagnostic push
-#   pragma GCC diagnostic ignored "-Wundefined-var-template"
 #endif
 
 namespace boost { namespace pfr { namespace detail {
@@ -51,8 +48,6 @@ constexpr const T& fake_object() noexcept {
 
 #ifdef __clang__
 #   pragma clang diagnostic pop
-#elif defined(__GNUC__)
-#   pragma GCC diagnostic pop
 #endif
 
 #endif // BOOST_PFR_DETAIL_FAKE_OBJECT_HPP
