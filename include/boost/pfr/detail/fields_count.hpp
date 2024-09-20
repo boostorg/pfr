@@ -160,28 +160,29 @@ constexpr void* assert_first_not_base(std::index_sequence<>) noexcept
     return nullptr;
 }
 
-///////////////////// Helpers for constructible detection
+///////////////////// Helpers for initializable detection
 // Note that these take O(N) compile time and memory!
 template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<std::is_copy_constructible<T>::value>::type>
-constexpr auto enable_if_constructible_helper(std::index_sequence<I...>) noexcept
-    -> typename std::add_pointer<decltype(T{ ubiq_lref_constructor{I}... })>::type;
+constexpr auto enable_if_initializable_helper(std::index_sequence<I...>) noexcept
+    -> typename std::add_pointer<decltype(T{ubiq_lref_constructor{I}...})>::type;
 
 template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<!std::is_copy_constructible<T>::value>::type>
-constexpr auto enable_if_constructible_helper(std::index_sequence<I...>) noexcept
-    -> typename std::add_pointer<decltype(T{ ubiq_rref_constructor{I}... })>::type;
+constexpr auto enable_if_initializable_helper(std::index_sequence<I...>) noexcept
+    -> typename std::add_pointer<decltype(T{ubiq_rref_constructor{I}...})>::type;
 
-template <class T, std::size_t N, class U = std::size_t, class /*Enable*/ = decltype( enable_if_constructible_helper<T>(detail::make_index_sequence<N>()) ) >
-using enable_if_constructible_helper_t = U;
+template <class T, std::size_t N, class U = std::size_t, class /*Enable*/ = decltype(enable_if_initializable_helper<T>(detail::make_index_sequence<N>()))>
+using enable_if_initializable_helper_t = U;
 
 template <class T, std::size_t N>
-constexpr auto is_constructible(long) noexcept
-    -> detail::enable_if_constructible_helper_t<T, N, bool>
+constexpr auto is_initializable(long) noexcept
+    -> detail::enable_if_initializable_helper_t<T, N, bool>
 {
     return true;
 }
 
 template <class T, std::size_t N>
-constexpr bool is_constructible(int) noexcept {
+constexpr bool is_initializable(int) noexcept
+{
     return false;
 }
 
@@ -215,7 +216,7 @@ constexpr std::size_t fields_count_binary_search(detail::multi_element_range, in
 
 template <class T, std::size_t Begin, std::size_t Middle>
 constexpr auto fields_count_binary_search(detail::multi_element_range, long) noexcept
-    -> detail::enable_if_constructible_helper_t<T, Middle>
+    -> detail::enable_if_initializable_helper_t<T, Middle>
 {
     constexpr std::size_t next_v = Middle + (Middle - Begin + 1) / 2;
     return detail::fields_count_binary_search<T, Middle, next_v>(detail::is_one_element_range<Middle, next_v>{}, 1L);
@@ -238,15 +239,14 @@ constexpr auto fields_count_upper_bound(long, long) noexcept
     -> std::enable_if_t<(Begin + I > fields_count_upper_bound_loose<T>()), std::size_t>
 {
     static_assert(
-        !detail::is_constructible<T, fields_count_upper_bound_loose<T>() + 1>(1L),
-        "====================> Boost.PFR: Types with user specified constructors (non-aggregate initializable types) are not supported."
-    );
+        !detail::is_initializable<T, fields_count_upper_bound_loose<T>() + 1>(1L),
+        "====================> Boost.PFR: Types with user specified constructors (non-aggregate initializable types) are not supported.");
     return fields_count_upper_bound_loose<T>();
 }
 
 template <class T, std::size_t Begin, std::size_t I>
 constexpr auto fields_count_upper_bound(long, int) noexcept
-    -> detail::enable_if_constructible_helper_t<T, Begin + I>
+    -> detail::enable_if_initializable_helper_t<T, Begin + I>
 {
     return detail::fields_count_upper_bound<T, Begin, I * 2>(1L, 1L);
 }
@@ -272,7 +272,7 @@ constexpr std::size_t fields_count_lower_bound(detail::one_element_range, size_t
         Begin == Last,
         "====================> Boost.PFR: Internal logic error."
     );
-    return detail::is_constructible<T, Begin>(1L) ? Begin : 0;
+    return detail::is_initializable<T, Begin>(1L) ? Begin : 0;
 }
 
 template <class T, std::size_t Begin, std::size_t Last>
@@ -298,9 +298,8 @@ constexpr auto fields_count_lower_bound_unbounded(long, size_t_<0> = {}) noexcep
     -> std::enable_if_t<(Begin >= fields_count_upper_bound_loose<T>()), std::size_t>
 {
     static_assert(
-        detail::is_constructible<T, fields_count_upper_bound_loose<T>()>(1L),
-        "====================> Boost.PFR: Type must be aggregate initializable."
-    );
+        detail::is_initializable<T, fields_count_upper_bound_loose<T>()>(1L),
+        "====================> Boost.PFR: Type must be aggregate initializable.");
     return fields_count_upper_bound_loose<T>();
 }
 
