@@ -61,7 +61,7 @@ struct is_complete<T, decltype(void(sizeof(T)))> : std::integral_constant<bool, 
 {};
 
 #ifndef __cpp_lib_is_aggregate
-///////////////////// Hand-made is_aggregate_initializable_n<T> trait
+///////////////////// Hand-made is_aggregate<T> trait with field count hint N
 
 // Structure that can be converted to reference to anything except reference to T
 template <class T, bool IsCopyConstructible>
@@ -83,12 +83,16 @@ template <class T> struct is_single_field_and_aggregate_initializable<1, T>: std
     bool, !std::is_constructible<T, ubiq_constructor_except<T, std::is_copy_constructible<T>::value>>::value
 > {};
 
-// Hand-made is_aggregate<T> trait:
+// Hand-made is_aggregate<T> trait with field count hint N:
 // Before C++20 aggregates could be constructed from `decltype(ubiq_?ref_constructor{I})...` but type traits report that
 // there's no constructor from `decltype(ubiq_?ref_constructor{I})...`
 // Special case for N == 1: `std::is_constructible<T, ubiq_?ref_constructor>` returns true if N == 1 and T is copy/move constructible.
+template <class T, std::size_t N, class /*Enable*/ = void>
+struct is_aggregate : std::integral_constant<bool, std::is_array<T>::value>
+{};
+
 template <class T, std::size_t N>
-struct is_aggregate_initializable_n {
+struct is_aggregate<T, N, typename std::enable_if<std::is_class<T>::value>::type> {
     template <std::size_t ...I>
     static constexpr bool is_not_constructible_n(std::index_sequence<I...>) noexcept {
         return (!std::is_constructible<T, decltype(ubiq_lref_constructor{I})...>::value && !std::is_constructible<T, decltype(ubiq_rref_constructor{I})...>::value)
@@ -96,12 +100,7 @@ struct is_aggregate_initializable_n {
         ;
     }
 
-    static constexpr bool value =
-           std::is_empty<T>::value
-        || std::is_array<T>::value
-        || std::is_fundamental<T>::value
-        || is_not_constructible_n(detail::make_index_sequence<N>{})
-    ;
+    static constexpr bool value = is_not_constructible_n(detail::make_index_sequence<N>{});
 };
 
 #endif // #ifndef __cpp_lib_is_aggregate
@@ -420,7 +419,8 @@ constexpr std::size_t fields_count() noexcept {
 #else
     constexpr bool postcondition1 =
         !preconditions
-        || is_aggregate_initializable_n<type, result>::value;
+        || detail::is_aggregate<type, result>::value  // Does not return `true` for built-in types.
+        || std::is_scalar<type>::value;
     static_assert(
         postcondition1,
         "====================> Boost.PFR: Types with user specified constructors (non-aggregate initializable types) are not supported."
