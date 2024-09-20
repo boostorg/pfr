@@ -227,12 +227,13 @@ constexpr std::size_t fields_count_binary_search(detail::multi_element_range, in
     return detail::fields_count_binary_search<T, Begin, next_v>(detail::is_one_element_range<Begin, next_v>{}, 1L);
 }
 
-template <class T, std::size_t Begin, std::size_t I = 1>
-constexpr std::size_t fields_count_upper_bound(int, int) noexcept {
+template <class T, std::size_t Begin, std::size_t I>
+constexpr std::size_t fields_count_upper_bound(int, int) noexcept
+{
     return Begin + I - 1;
 }
 
-template <class T, std::size_t Begin, std::size_t I = 1>
+template <class T, std::size_t Begin, std::size_t I>
 constexpr auto fields_count_upper_bound(long, long) noexcept
     -> std::enable_if_t<(Begin + I > fields_count_upper_bound_loose<T>()), std::size_t>
 {
@@ -243,7 +244,7 @@ constexpr auto fields_count_upper_bound(long, long) noexcept
     return fields_count_upper_bound_loose<T>();
 }
 
-template <class T, std::size_t Begin, std::size_t I = 1>
+template <class T, std::size_t Begin, std::size_t I>
 constexpr auto fields_count_upper_bound(long, int) noexcept
     -> detail::enable_if_constructible_helper_t<T, Begin + I>
 {
@@ -253,7 +254,7 @@ constexpr auto fields_count_upper_bound(long, int) noexcept
 template <class T, std::size_t Begin = 0>
 constexpr std::size_t fields_count_binary_search_unbounded() noexcept
 {
-    constexpr std::size_t last = detail::fields_count_upper_bound<T, Begin>(1L, 1L);
+    constexpr std::size_t last = detail::fields_count_upper_bound<T, Begin, 1>(1L, 1L);
     constexpr std::size_t middle = (Begin + last + 1) / 2;
     return detail::fields_count_binary_search<T, Begin, middle>(detail::is_one_element_range<Begin, middle>{}, 1L);
 }
