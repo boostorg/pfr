@@ -399,20 +399,25 @@ constexpr std::size_t fields_count() noexcept {
 
     constexpr bool preconditions = precondition1 && precondition2 && precondition3 && precondition4 && precondition5 && precondition6;
     using type_ = typename std::conditional<preconditions, type, int[1]>::type;
-
     constexpr std::size_t result = detail::fields_count_dispatch<type_>(1L, 1L);
+
     detail::assert_first_not_base<type_>(detail::make_index_sequence<result>{});
 
-#ifndef __cpp_lib_is_aggregate
+#ifdef __cpp_lib_is_aggregate
+    constexpr bool postcondition1 = true;
+#else
+    constexpr bool postcondition1 =
+        !preconditions
+        || is_aggregate_initializable_n<type, result>::value;
     static_assert(
-        !preconditions ||
-        is_aggregate_initializable_n<type, result>::value,
+        postcondition1,
         "====================> Boost.PFR: Types with user specified constructors (non-aggregate initializable types) are not supported."
     );
 #endif
 
+    constexpr bool postconditions = postcondition1;
     static_assert(
-        !preconditions ||
+        !preconditions || !postconditions ||
         result != 0 || std::is_empty<type>::value || std::is_fundamental<type>::value || std::is_reference<type>::value,
         "====================> Boost.PFR: If there's no other failed static asserts then something went wrong. Please report this issue to the github along with the structure you're reflecting."
     );
