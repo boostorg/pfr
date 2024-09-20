@@ -160,6 +160,18 @@ constexpr void* assert_first_not_base(std::index_sequence<>) noexcept
     return nullptr;
 }
 
+template <class T, std::size_t N>
+constexpr void assert_first_not_base(int) noexcept
+{
+}
+
+template <class T, std::size_t N>
+constexpr auto assert_first_not_base(long) noexcept
+    -> typename std::enable_if<std::is_class<T>::value>::type
+{
+    detail::assert_first_not_base<T>(detail::make_index_sequence<N>{});
+}
+
 ///////////////////// Helpers for initializable detection
 // Note that these take O(N) compile time and memory!
 template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<std::is_copy_constructible<T>::value>::type>
@@ -401,7 +413,7 @@ constexpr std::size_t fields_count() noexcept {
     using type_ = typename std::conditional<preconditions, type, int[1]>::type;
     constexpr std::size_t result = detail::fields_count_dispatch<type_>(1L, 1L);
 
-    detail::assert_first_not_base<type_>(detail::make_index_sequence<result>{});
+    detail::assert_first_not_base<type_, result>(1L);
 
 #ifdef __cpp_lib_is_aggregate
     constexpr bool postcondition1 = true;
