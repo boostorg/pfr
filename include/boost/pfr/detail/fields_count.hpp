@@ -88,11 +88,15 @@ template <class T> struct is_single_field_and_aggregate_initializable<1, T>: std
 // there's no constructor from `decltype(ubiq_?ref_constructor{I})...`
 // Special case for N == 1: `std::is_constructible<T, ubiq_?ref_constructor>` returns true if N == 1 and T is copy/move constructible.
 template <class T, std::size_t N, class /*Enable*/ = void>
-struct is_aggregate : std::integral_constant<bool, std::is_array<T>::value>
-{};
+struct is_aggregate {
+    static constexpr bool value =
+           std::is_empty<T>::value
+        || std::is_array<T>::value
+    ;
+};
 
 template <class T, std::size_t N>
-struct is_aggregate<T, N, typename std::enable_if<std::is_class<T>::value>::type> {
+struct is_aggregate<T, N, typename std::enable_if<std::is_class<T>::value && !std::is_empty<T>::value>::type> {
     template <std::size_t ...I>
     static constexpr bool is_not_constructible_n(std::index_sequence<I...>) noexcept {
         return (!std::is_constructible<T, decltype(ubiq_lref_constructor{I})...>::value && !std::is_constructible<T, decltype(ubiq_rref_constructor{I})...>::value)
