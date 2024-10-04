@@ -9,14 +9,21 @@
 #include <cstdint>
 
 #if defined(__clang__)
-#define ARRAY_MAX (SIZE_MAX >> 3)
-#define OBJECT_MAX SIZE_MAX
+#   if SIZE_MAX > (1ULL << 32) - 1
+#       define ARRAY_MAX (SIZE_MAX >> 3)
+#   else
+#       define ARRAY_MAX SIZE_MAX
+#   endif
+#   define OBJECT_MAX SIZE_MAX
 #elif defined(__GNUC__)
-#define ARRAY_MAX INT_MAX
-#define OBJECT_MAX SIZE_MAX
-#else  // defined(_MSC_VER)
-#define ARRAY_MAX INT_MAX
-#define OBJECT_MAX INT_MAX
+#   define ARRAY_MAX INT_MAX
+#   define OBJECT_MAX (SIZE_MAX >> 1)
+#elif defined(_MSC_VER)
+#   define ARRAY_MAX INT_MAX
+#   define OBJECT_MAX UINT_MAX
+#else  // Let's play it safe
+#   define ARRAY_MAX INT_MAX
+#   define OBJECT_MAX INT_MAX
 #endif
 
 #pragma pack(1)
