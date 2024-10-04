@@ -5,8 +5,6 @@
 
 #include <boost/pfr/detail/fields_count.hpp>
 
-struct Foo;
-
 int main() {
     return static_cast<int>(boost::pfr::detail::fields_count<BOOST_PFR_RUN_TEST_ON>());
 }
