@@ -15,7 +15,6 @@
 #ifdef BOOST_PFR_HAS_STD_MODULE
 import std;
 #else
-#include <algorithm>    // min
 #include <climits>      // CHAR_BIT
 #include <type_traits>
 #include <utility>      // metaprogramming stuff
@@ -30,6 +29,13 @@ import std;
 #endif
 
 namespace boost { namespace pfr { namespace detail {
+
+///////////////////// min without including <algorithm>
+template <class T>
+constexpr const T &min(const T &a, const T &b)
+{
+    return b < a ? b : a;
+}
 
 ///////////////////// Structure that can be converted to reference to anything
 struct ubiq_lref_constructor {
@@ -323,7 +329,7 @@ constexpr auto fields_count_lower_bound_unbounded(long, size_t_<0> = {}) noexcep
 template <class T, std::size_t Begin = 1>
 constexpr std::size_t fields_count_lower_bound_unbounded(int, size_t_<0> = {}) noexcept
 {
-    constexpr std::size_t last = (std::min)(Begin * 2, detail::fields_count_upper_bound_loose<T>()) - 1;
+    constexpr std::size_t last = (detail::min)(Begin * 2, detail::fields_count_upper_bound_loose<T>()) - 1;
     constexpr std::size_t result_maybe = detail::fields_count_lower_bound<T, Begin, last>(
         detail::is_one_element_range<Begin, last>{}
     );
