@@ -27,13 +27,11 @@
 #endif
 
 #pragma pack(1)
-struct A
-{
+struct A {
     char x[ARRAY_MAX <= (OBJECT_MAX >> 3) ? ARRAY_MAX : OBJECT_MAX >> 3];
 };
 
-struct B
-{
+struct B {
     A a;
     A b;
     A c;
@@ -44,8 +42,7 @@ struct B
     A h;
 };
 
-struct C
-{
+struct C {
     A& a;
     A b;
     A c;

@@ -33,8 +33,7 @@ namespace boost { namespace pfr { namespace detail {
 
 ///////////////////// min without including <algorithm>
 template <class T>
-constexpr const T &min(const T &a, const T &b)
-{
+constexpr const T &min(const T &a, const T &b) {
     return b < a ? b : a;
 }
 
@@ -95,8 +94,7 @@ template <class T> struct is_single_field_and_aggregate_initializable<1, T>: std
 // there's no constructor from `decltype(ubiq_?ref_constructor{I})...`
 // Special case for N == 1: `std::is_constructible<T, ubiq_?ref_constructor>` returns true if N == 1 and T is copy/move constructible.
 template <class T, std::size_t N, class /*Enable*/ = void>
-struct is_aggregate_initializable_n
-{
+struct is_aggregate_initializable_n {
     static constexpr bool value =
            std::is_empty<T>::value
         || std::is_array<T>::value
@@ -104,8 +102,7 @@ struct is_aggregate_initializable_n
 };
 
 template <class T, std::size_t N>
-struct is_aggregate_initializable_n<T, N, typename std::enable_if<std::is_class<T>::value && !std::is_empty<T>::value>::type>
-{
+struct is_aggregate_initializable_n<T, N, typename std::enable_if<std::is_class<T>::value && !std::is_empty<T>::value>::type> {
     template <std::size_t ...I>
     static constexpr bool is_not_constructible_n(std::index_sequence<I...>) noexcept {
         return (!std::is_constructible<T, decltype(ubiq_lref_constructor{I})...>::value && !std::is_constructible<T, decltype(ubiq_rref_constructor{I})...>::value)
@@ -173,9 +170,7 @@ constexpr void* assert_first_not_base(std::index_sequence<>) noexcept
 }
 
 template <class T, std::size_t N>
-constexpr void assert_first_not_base(int) noexcept
-{
-}
+constexpr void assert_first_not_base(int) noexcept {}
 
 template <class T, std::size_t N>
 constexpr auto assert_first_not_base(long) noexcept
@@ -205,8 +200,7 @@ constexpr auto is_initializable(long) noexcept
 }
 
 template <class T, std::size_t N>
-constexpr bool is_initializable(int) noexcept
-{
+constexpr bool is_initializable(int) noexcept {
     return false;
 }
 
@@ -219,8 +213,7 @@ using one_element_range = std::true_type;
 
 
 ///////////////////// Fields count next expected compiler limitation
-constexpr std::size_t fields_count_compiler_limitation_next(std::size_t n) noexcept
-{
+constexpr std::size_t fields_count_compiler_limitation_next(std::size_t n) noexcept {
 #if defined(_MSC_VER) && (_MSC_VER <= 1920)
     if (n < 1024)
         return 1024;
@@ -263,8 +256,7 @@ constexpr std::size_t fields_count_binary_search(detail::multi_element_range, in
 }
 
 template <class T, std::size_t Begin, std::size_t N>
-constexpr std::size_t fields_count_upper_bound(int, int) noexcept
-{
+constexpr std::size_t fields_count_upper_bound(int, int) noexcept {
     return N - 1;
 }
 
@@ -288,8 +280,7 @@ constexpr auto fields_count_upper_bound(long, int) noexcept
 }
 
 template <class T, std::size_t Begin = 0>
-constexpr std::size_t fields_count_binary_search_unbounded() noexcept
-{
+constexpr std::size_t fields_count_binary_search_unbounded() noexcept {
     constexpr std::size_t last = detail::fields_count_upper_bound<T, Begin, Begin + 1>(1L, 1L);
     constexpr std::size_t middle = (Begin + last + 1) / 2;
     return detail::fields_count_binary_search<T, Begin, middle>(detail::is_one_element_range<Begin, middle>{}, 1L);
@@ -340,8 +331,7 @@ constexpr auto fields_count_lower_bound_unbounded(long, size_t_<0> = {}) noexcep
 }
 
 template <class T, std::size_t Begin = 1>
-constexpr std::size_t fields_count_lower_bound_unbounded(int, size_t_<0> = {}) noexcept
-{
+constexpr std::size_t fields_count_lower_bound_unbounded(int, size_t_<0> = {}) noexcept {
     constexpr std::size_t last = (detail::min)(Begin * 2, detail::fields_count_upper_bound_loose<T>()) - 1;
     constexpr std::size_t result_maybe = detail::fields_count_lower_bound<T, Begin, last>(
         detail::is_one_element_range<Begin, last>{}

@@ -7,8 +7,7 @@
 
 #include <cstdint>
 
-struct bf7
-{
+struct bf7 {
     uint8_t b0 : 1;
     uint8_t b1 : 1;
     uint8_t b2 : 1;
@@ -19,8 +18,7 @@ struct bf7
 };
 static_assert(sizeof(bf7) == 1, "");
 
-struct bf8
-{
+struct bf8 {
     uint8_t b0 : 1;
     uint8_t b1 : 1;
     uint8_t b2 : 1;
@@ -32,8 +30,7 @@ struct bf8
 };
 static_assert(sizeof(bf8) == 1, "");
 
-struct bf16
-{
+struct bf16 {
     uint8_t b0 : 1;
     uint8_t b1 : 1;
     uint8_t b2 : 1;
@@ -53,8 +50,7 @@ struct bf16
 };
 static_assert(sizeof(bf16) == 2, "");
 
-struct bf24
-{
+struct bf24 {
     uint8_t b0 : 1;
     uint8_t b1 : 1;
     uint8_t b2 : 1;
