@@ -275,7 +275,7 @@ constexpr auto fields_count_upper_bound(long, int) noexcept
     -> detail::enable_if_initializable_helper_t<T, N>
 {
     constexpr std::size_t next_optimal = Begin + (N - Begin) * 2;
-    constexpr std::size_t next = (detail::min)(next_optimal, fields_count_compiler_limitation_next(N));
+    constexpr std::size_t next = (detail::min)(next_optimal, detail::fields_count_compiler_limitation_next(N));
     return detail::fields_count_upper_bound<T, Begin, next>(1L, 1L);
 }
 
