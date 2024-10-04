@@ -19,6 +19,7 @@
 #define OBJECT_MAX INT_MAX
 #endif
 
+#pragma pack(1)
 struct A
 {
     char x[ARRAY_MAX <= (OBJECT_MAX >> 3) ? ARRAY_MAX : OBJECT_MAX >> 3];
@@ -47,6 +48,7 @@ struct C
     A g;
     A h;
 };
+#pragma pack()
 
 int main() {
 #ifndef _MSC_VER
