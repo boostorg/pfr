@@ -185,7 +185,7 @@ template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<
 constexpr auto enable_if_initializable_helper(std::index_sequence<I...>) noexcept
     -> typename std::add_pointer<decltype(T{ubiq_rref_constructor{I}...})>::type;
 
-template <class T, std::size_t N, class U = std::size_t, class /*Enable*/ = decltype(enable_if_initializable_helper<T>(detail::make_index_sequence<N>()))>
+template <class T, std::size_t N, class U = std::size_t, class /*Enable*/ = decltype(detail::enable_if_initializable_helper<T>(detail::make_index_sequence<N>()))>
 using enable_if_initializable_helper_t = U;
 
 template <class T, std::size_t N>
@@ -251,12 +251,12 @@ constexpr std::size_t fields_count_upper_bound(int, int) noexcept
 
 template <class T, std::size_t Begin, std::size_t I>
 constexpr auto fields_count_upper_bound(long, long) noexcept
-    -> std::enable_if_t<(Begin + I > fields_count_upper_bound_loose<T>()), std::size_t>
+    -> std::enable_if_t<(Begin + I > detail::fields_count_upper_bound_loose<T>()), std::size_t>
 {
     static_assert(
-        !detail::is_initializable<T, fields_count_upper_bound_loose<T>() + 1>(1L),
+        !detail::is_initializable<T, detail::fields_count_upper_bound_loose<T>() + 1>(1L),
         "====================> Boost.PFR: Types with user specified constructors (non-aggregate initializable types) are not supported.");
-    return fields_count_upper_bound_loose<T>();
+    return detail::fields_count_upper_bound_loose<T>();
 }
 
 template <class T, std::size_t Begin, std::size_t I>
@@ -310,18 +310,18 @@ constexpr std::size_t fields_count_lower_bound_unbounded(int, size_t_<Result>) n
 
 template <class T, std::size_t Begin = 1>
 constexpr auto fields_count_lower_bound_unbounded(long, size_t_<0> = {}) noexcept
-    -> std::enable_if_t<(Begin >= fields_count_upper_bound_loose<T>()), std::size_t>
+    -> std::enable_if_t<(Begin >= detail::fields_count_upper_bound_loose<T>()), std::size_t>
 {
     static_assert(
-        detail::is_initializable<T, fields_count_upper_bound_loose<T>()>(1L),
+        detail::is_initializable<T, detail::fields_count_upper_bound_loose<T>()>(1L),
         "====================> Boost.PFR: Type must be aggregate initializable.");
-    return fields_count_upper_bound_loose<T>();
+    return detail::fields_count_upper_bound_loose<T>();
 }
 
 template <class T, std::size_t Begin = 1>
 constexpr std::size_t fields_count_lower_bound_unbounded(int, size_t_<0> = {}) noexcept
 {
-    constexpr std::size_t last = (std::min)(Begin * 2, fields_count_upper_bound_loose<T>()) - 1;
+    constexpr std::size_t last = (std::min)(Begin * 2, detail::fields_count_upper_bound_loose<T>()) - 1;
     constexpr std::size_t result_maybe = detail::fields_count_lower_bound<T, Begin, last>(
         detail::is_one_element_range<Begin, last>{}
     );
