@@ -58,6 +58,14 @@ struct ubiq_rref_constructor {
     }
 };
 
+///////////////////// Hand-made is_complete<T> trait
+template <typename T, typename = void>
+struct is_complete : std::integral_constant<bool, false>
+{};
+
+template <typename T>
+struct is_complete<T, decltype(void(sizeof(T)))> : std::integral_constant<bool, true>
+{};
 
 #ifndef __cpp_lib_is_aggregate
 ///////////////////// Hand-made is_aggregate_initializable_n<T> trait
@@ -368,6 +376,11 @@ constexpr std::size_t fields_count_dispatch(int, int) noexcept {
 template <class T>
 constexpr std::size_t fields_count() noexcept {
     using type = std::remove_cv_t<T>;
+
+    static_assert(
+        detail::is_complete<type>::value,
+        "====================> Boost.PFR: Type must be complete."
+    );
 
     static_assert(
         !std::is_reference<type>::value,
