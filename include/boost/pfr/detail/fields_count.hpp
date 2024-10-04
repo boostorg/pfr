@@ -58,14 +58,6 @@ struct ubiq_rref_constructor {
     }
 };
 
-///////////////////// Hand-made is_complete<T> trait
-template <typename T, typename = void>
-struct is_complete : std::integral_constant<bool, false>
-{};
-
-template <typename T>
-struct is_complete<T, decltype(void(sizeof(T)))> : std::integral_constant<bool, true>
-{};
 
 #ifndef __cpp_lib_is_aggregate
 ///////////////////// Hand-made is_aggregate_initializable_n<T> trait
@@ -377,71 +369,47 @@ template <class T>
 constexpr std::size_t fields_count() noexcept {
     using type = std::remove_cv_t<T>;
 
-    constexpr bool precondition1 = detail::is_complete<type>::value;
     static_assert(
-        precondition1,
-        "====================> Boost.PFR: Type must be complete."
-    );
-
-    constexpr bool precondition2 = !std::is_reference<type>::value;
-    static_assert(
-        precondition2,
+        !std::is_reference<type>::value,
         "====================> Boost.PFR: Attempt to get fields count on a reference. This is not allowed because that could hide an issue and different library users expect different behavior in that case."
     );
 
-#if BOOST_PFR_HAS_GUARANTEED_COPY_ELISION
-    constexpr bool precondition3 = true;
-#else
-    constexpr bool precondition3 =
+#if !BOOST_PFR_HAS_GUARANTEED_COPY_ELISION
+    static_assert(
         std::is_copy_constructible<std::remove_all_extents_t<type>>::value || (
             std::is_move_constructible<std::remove_all_extents_t<type>>::value
             && std::is_move_assignable<std::remove_all_extents_t<type>>::value
-        );
-    static_assert(
-        precondition3,
+        ),
         "====================> Boost.PFR: Type and each field in the type must be copy constructible (or move constructible and move assignable)."
     );
-#endif  // #if BOOST_PFR_HAS_GUARANTEED_COPY_ELISION
+#endif  // #if !BOOST_PFR_HAS_GUARANTEED_COPY_ELISION
 
-    constexpr bool precondition4 = !std::is_polymorphic<type>::value;
     static_assert(
-        precondition4,
+        !std::is_polymorphic<type>::value,
         "====================> Boost.PFR: Type must have no virtual function, because otherwise it is not aggregate initializable."
     );
 
-#ifndef __cpp_lib_is_aggregate
-    constexpr bool precondition5 = true;
-#else
-    constexpr bool precondition5 =
-        std::is_aggregate<type>::value             // Does not return `true` for built-in types.
-        || std::is_scalar<type>::value;
+#ifdef __cpp_lib_is_aggregate
     static_assert(
-        precondition5,
+        std::is_aggregate<type>::value             // Does not return `true` for built-in types.
+        || std::is_scalar<type>::value,
         "====================> Boost.PFR: Type must be aggregate initializable."
     );
-#endif  // #ifndef __cpp_lib_is_aggregate
+#endif
 
-// Can't use the standard layout check. See the non_std_layout.cpp test.
-#if 1 || BOOST_PFR_USE_CPP17
-    constexpr bool precondition6 = true;
-#else
-    constexpr bool precondition6 =
-        std::is_standard_layout<type>::value,   // Does not return `true` for structs that have non standard layout members.
-    static_assert(
-        precondition6,
-        "====================> Boost.PFR: Type must be standard layout."
-    );
-#endif  // #if BOOST_PFR_USE_CPP17
+// Can't use the following. See the non_std_layout.cpp test.
+//#if !BOOST_PFR_USE_CPP17
+//    static_assert(
+//        std::is_standard_layout<type>::value,   // Does not return `true` for structs that have non standard layout members.
+//        "Type must be aggregate initializable."
+//    );
+//#endif
 
-    constexpr bool preconditions = precondition1 && precondition2 && precondition3 && precondition4 && precondition5 && precondition6;
-    using type_ = typename std::conditional<preconditions, type, int[1]>::type;
-
-    constexpr std::size_t result = detail::fields_count_dispatch<type_>(1L, 1L);
-    detail::assert_first_not_base<type_, result>(1L);
+    constexpr std::size_t result = detail::fields_count_dispatch<type>(1L, 1L);
+    detail::assert_first_not_base<type, result>(1L);
 
 #ifndef __cpp_lib_is_aggregate
     static_assert(
-        !preconditions ||
         detail::is_aggregate_initializable_n<type, result>::value  // Does not return `true` for built-in types.
         || std::is_scalar<type>::value,
         "====================> Boost.PFR: Types with user specified constructors (non-aggregate initializable types) are not supported."
@@ -449,7 +417,6 @@ constexpr std::size_t fields_count() noexcept {
 #endif
 
     static_assert(
-        !preconditions ||
         result != 0 || std::is_empty<type>::value || std::is_fundamental<type>::value || std::is_reference<type>::value,
         "====================> Boost.PFR: If there's no other failed static asserts then something went wrong. Please report this issue to the github along with the structure you're reflecting."
     );
