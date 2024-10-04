@@ -419,6 +419,7 @@ constexpr std::size_t fields_count() noexcept {
 //#endif
 
     constexpr std::size_t result = detail::fields_count_dispatch<type>(1L, 1L);
+
     detail::assert_first_not_base<type, result>(1L);
 
 #ifndef __cpp_lib_is_aggregate
