@@ -16,6 +16,7 @@
 import std;
 #else
 #include <climits>      // CHAR_BIT
+#include <cstdint>      // SIZE_MAX
 #include <type_traits>
 #include <utility>      // metaprogramming stuff
 #endif
@@ -217,6 +218,16 @@ using multi_element_range = std::false_type;
 using one_element_range = std::true_type;
 
 
+///////////////////// Fields count next expected compiler limitation
+constexpr std::size_t fields_count_compiler_limitation_next(std::size_t n) noexcept
+{
+#if defined(_MSC_VER) && (_MSC_VER <= 1920)
+    if (n < 1024)
+        return 1024;
+#endif
+    return SIZE_MAX;
+}
+
 ///////////////////// Fields count upper bound based on sizeof(T)
 template <class T>
 constexpr std::size_t fields_count_upper_bound_loose() noexcept {
@@ -251,15 +262,15 @@ constexpr std::size_t fields_count_binary_search(detail::multi_element_range, in
     return detail::fields_count_binary_search<T, Begin, next_v>(detail::is_one_element_range<Begin, next_v>{}, 1L);
 }
 
-template <class T, std::size_t Begin, std::size_t I>
+template <class T, std::size_t Begin, std::size_t N>
 constexpr std::size_t fields_count_upper_bound(int, int) noexcept
 {
-    return Begin + I - 1;
+    return N - 1;
 }
 
-template <class T, std::size_t Begin, std::size_t I>
+template <class T, std::size_t Begin, std::size_t N>
 constexpr auto fields_count_upper_bound(long, long) noexcept
-    -> std::enable_if_t<(Begin + I > detail::fields_count_upper_bound_loose<T>()), std::size_t>
+    -> std::enable_if_t<(N > detail::fields_count_upper_bound_loose<T>()), std::size_t>
 {
     static_assert(
         !detail::is_initializable<T, detail::fields_count_upper_bound_loose<T>() + 1>(1L),
@@ -267,17 +278,19 @@ constexpr auto fields_count_upper_bound(long, long) noexcept
     return detail::fields_count_upper_bound_loose<T>();
 }
 
-template <class T, std::size_t Begin, std::size_t I>
+template <class T, std::size_t Begin, std::size_t N>
 constexpr auto fields_count_upper_bound(long, int) noexcept
-    -> detail::enable_if_initializable_helper_t<T, Begin + I>
+    -> detail::enable_if_initializable_helper_t<T, N>
 {
-    return detail::fields_count_upper_bound<T, Begin, I * 2>(1L, 1L);
+    constexpr std::size_t next_optimal = Begin + (N - Begin) * 2;
+    constexpr std::size_t next = (detail::min)(next_optimal, fields_count_compiler_limitation_next(N));
+    return detail::fields_count_upper_bound<T, Begin, next>(1L, 1L);
 }
 
 template <class T, std::size_t Begin = 0>
 constexpr std::size_t fields_count_binary_search_unbounded() noexcept
 {
-    constexpr std::size_t last = detail::fields_count_upper_bound<T, Begin, 1>(1L, 1L);
+    constexpr std::size_t last = detail::fields_count_upper_bound<T, Begin, Begin + 1>(1L, 1L);
     constexpr std::size_t middle = (Begin + last + 1) / 2;
     return detail::fields_count_binary_search<T, Begin, middle>(detail::is_one_element_range<Begin, middle>{}, 1L);
 }
