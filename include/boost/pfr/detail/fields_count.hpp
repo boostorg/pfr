@@ -33,7 +33,7 @@ namespace boost { namespace pfr { namespace detail {
 
 ///////////////////// min without including <algorithm>
 template <class T>
-constexpr const T &min(const T &a, const T &b) {
+constexpr const T& min(const T& a, const T& b) {
     return b < a ? b : a;
 }
 
