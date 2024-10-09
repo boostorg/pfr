@@ -45,7 +45,7 @@ int main() {
         "Precise reflection with template constructors sanity check fails"
     );
 
-    boost::pfr::detail::enable_if_constructible_helper_t<aggregate_unconstrained, 2> foo;
+    boost::pfr::detail::enable_if_initializable_helper_t<aggregate_unconstrained, 2> foo;
     (void)foo;
 
     static_assert(
