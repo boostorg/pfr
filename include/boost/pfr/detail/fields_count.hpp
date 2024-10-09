@@ -217,6 +217,8 @@ constexpr std::size_t fields_count_compiler_limitation_next(std::size_t n) noexc
 #if defined(_MSC_VER) && (_MSC_VER <= 1920)
     if (n < 1024)
         return 1024;
+#else
+    static_cast<void>(n);
 #endif
     return SIZE_MAX;
 }
