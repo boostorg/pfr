@@ -213,8 +213,8 @@ using one_element_range = std::true_type;
 template <class T>
 constexpr std::size_t fields_count_upper_bound_loose() noexcept {
 #if defined(_MSC_VER) && (_MSC_VER <= 1920)
-    if (sizeof(T) * CHAR_BIT > 1024) {
-        return 1024;
+    if (sizeof(T) * CHAR_BIT > 1000) {
+        return 1000;
     }
 #endif
 
