@@ -16,7 +16,6 @@
 import std;
 #else
 #include <climits>      // CHAR_BIT
-#include <cstdint>      // SIZE_MAX
 #include <type_traits>
 #include <utility>      // metaprogramming stuff
 #endif
@@ -210,19 +209,14 @@ using is_one_element_range = std::integral_constant<bool, Begin == Last>;
 using multi_element_range = std::false_type;
 using one_element_range = std::true_type;
 
-
-///////////////////// Fields count next expected compiler limitation
-constexpr std::size_t fields_count_compiler_limitation_next(std::size_t n) noexcept {
-#if defined(_MSC_VER) && (_MSC_VER <= 1920)
-    if (n < 1024)
-        return 1024;
-#endif
-    return SIZE_MAX;
-}
-
 ///////////////////// Fields count upper bound based on sizeof(T)
 template <class T>
 constexpr std::size_t fields_count_upper_bound_loose() noexcept {
+#if defined(_MSC_VER) && (_MSC_VER <= 1920)
+    if (sizeof(T) * CHAR_BIT > 1024)
+        return 1024;
+#endif
+
     return sizeof(T) * CHAR_BIT;
 }
 
@@ -273,8 +267,7 @@ template <class T, std::size_t Begin, std::size_t N>
 constexpr auto fields_count_upper_bound(long, int) noexcept
     -> detail::enable_if_initializable_helper_t<T, N>
 {
-    constexpr std::size_t next_optimal = Begin + (N - Begin) * 2;
-    constexpr std::size_t next = detail::min_of_size_t(next_optimal, detail::fields_count_compiler_limitation_next(N));
+    constexpr std::size_t next = Begin + (N - Begin) * 2;
     return detail::fields_count_upper_bound<T, Begin, next>(1L, 1L);
 }
 
@@ -333,14 +326,19 @@ constexpr std::size_t fields_count_lower_bound_unbounded(int, size_t_<0>) noexce
 
 ///////////////////// Choosing between array size, unbounded binary search, and linear search followed by unbounded binary search.
 template <class T>
-constexpr auto fields_count_dispatch(long, long) noexcept
+constexpr auto fields_count_dispatch(long, long, std::integral_constant<bool, false>) noexcept {
+    return 0;
+}
+
+template <class T>
+constexpr auto fields_count_dispatch(long, long, std::integral_constant<bool, true>) noexcept
     -> typename std::enable_if<std::is_array<T>::value, std::size_t>::type
 {
     return sizeof(T) / sizeof(typename std::remove_all_extents<T>::type);
 }
 
 template <class T>
-constexpr auto fields_count_dispatch(long, int) noexcept
+constexpr auto fields_count_dispatch(long, int, std::integral_constant<bool, true>) noexcept
     -> decltype(sizeof(T{}))
 {
     constexpr std::size_t typical_fields_count = 4;
@@ -350,7 +348,7 @@ constexpr auto fields_count_dispatch(long, int) noexcept
 }
 
 template <class T>
-constexpr std::size_t fields_count_dispatch(int, int) noexcept {
+constexpr std::size_t fields_count_dispatch(int, int, std::integral_constant<bool, true>) noexcept {
     // T is not default aggregate initializable. This means that at least one of the members is not default-constructible.
     // Use linear search to find the smallest valid initializer, after which we unbounded binary search for the largest.
     constexpr std::size_t begin = detail::fields_count_lower_bound_unbounded<T, 1>(1L, size_t_<0>{});
@@ -365,37 +363,52 @@ template <class T>
 constexpr std::size_t fields_count() noexcept {
     using type = std::remove_cv_t<T>;
 
+    constexpr bool type_is_complete = detail::is_complete<type>::value;
     static_assert(
-        detail::is_complete<type>::value,
+        type_is_complete,
         "====================> Boost.PFR: Type must be complete."
     );
 
+    constexpr bool type_is_not_a_reference = !std::is_reference<type>::value
+         || !type_is_complete // do not show assert if previous check failed
+    ;
     static_assert(
-        !std::is_reference<type>::value,
+        type_is_not_a_reference,
         "====================> Boost.PFR: Attempt to get fields count on a reference. This is not allowed because that could hide an issue and different library users expect different behavior in that case."
     );
 
-#if !BOOST_PFR_HAS_GUARANTEED_COPY_ELISION
-    static_assert(
+#if BOOST_PFR_HAS_GUARANTEED_COPY_ELISION
+    constexpr bool type_fields_are_move_constructible = true;
+#else
+    constexpr bool type_fields_are_move_constructible =
         std::is_copy_constructible<std::remove_all_extents_t<type>>::value || (
             std::is_move_constructible<std::remove_all_extents_t<type>>::value
             && std::is_move_assignable<std::remove_all_extents_t<type>>::value
-        ),
+        )
+        || !type_is_not_a_reference // do not show assert if previous check failed
+    ;
+    static_assert(
+        type_fields_are_move_constructible,
         "====================> Boost.PFR: Type and each field in the type must be copy constructible (or move constructible and move assignable)."
     );
 #endif  // #if !BOOST_PFR_HAS_GUARANTEED_COPY_ELISION
 
+    constexpr bool type_is_not_polymorphic = !std::is_polymorphic<type>::value;
     static_assert(
-        !std::is_polymorphic<type>::value,
+        type_is_not_polymorphic,
         "====================> Boost.PFR: Type must have no virtual function, because otherwise it is not aggregate initializable."
     );
 
 #ifdef __cpp_lib_is_aggregate
-    static_assert(
+    constexpr bool type_is_aggregate =
         std::is_aggregate<type>::value             // Does not return `true` for built-in types.
-        || std::is_scalar<type>::value,
+        || std::is_scalar<type>::value;
+    static_assert(
+        type_is_aggregate,
         "====================> Boost.PFR: Type must be aggregate initializable."
     );
+#else
+    constexpr bool type_is_aggregate = true;
 #endif
 
 // Can't use the following. See the non_std_layout.cpp test.
@@ -406,20 +419,28 @@ constexpr std::size_t fields_count() noexcept {
 //    );
 //#endif
 
-    constexpr std::size_t result = detail::fields_count_dispatch<type>(1L, 1L);
+    constexpr bool no_errors =
+        type_is_complete && type_is_not_a_reference && type_fields_are_move_constructible
+        && type_is_not_polymorphic && type_is_aggregate;
+
+    constexpr std::size_t result = detail::fields_count_dispatch<type>(1L, 1L, std::integral_constant<bool, no_errors>{});
 
     detail::assert_first_not_base<type, result>(1L);
 
 #ifndef __cpp_lib_is_aggregate
-    static_assert(
+    constexpr bool type_is_aggregate_initializable_n =
         detail::is_aggregate_initializable_n<type, result>::value  // Does not return `true` for built-in types.
-        || std::is_scalar<type>::value,
+        || std::is_scalar<type>::value;
+    static_assert(
+        type_is_aggregate_initializable_n,
         "====================> Boost.PFR: Types with user specified constructors (non-aggregate initializable types) are not supported."
     );
+#else
+    constexpr bool type_is_aggregate_initializable_n = true;
 #endif
 
     static_assert(
-        result != 0 || std::is_empty<type>::value || std::is_fundamental<type>::value || std::is_reference<type>::value,
+        result != 0 || std::is_empty<type>::value || std::is_fundamental<type>::value || std::is_reference<type>::value || !no_errors || !type_is_aggregate_initializable_n,
         "====================> Boost.PFR: If there's no other failed static asserts then something went wrong. Please report this issue to the github along with the structure you're reflecting."
     );
 
