@@ -213,8 +213,9 @@ using one_element_range = std::true_type;
 template <class T>
 constexpr std::size_t fields_count_upper_bound_loose() noexcept {
 #if defined(_MSC_VER) && (_MSC_VER <= 1920)
-    if (sizeof(T) * CHAR_BIT > 1024)
+    if (sizeof(T) * CHAR_BIT > 1024) {
         return 1024;
+    }
 #endif
 
     return sizeof(T) * CHAR_BIT;
@@ -326,19 +327,19 @@ constexpr std::size_t fields_count_lower_bound_unbounded(int, size_t_<0>) noexce
 
 ///////////////////// Choosing between array size, unbounded binary search, and linear search followed by unbounded binary search.
 template <class T>
-constexpr auto fields_count_dispatch(long, long, std::integral_constant<bool, false>) noexcept {
+constexpr auto fields_count_dispatch(long, long, std::integral_constant<bool, false> /*are_preconditions_met*/) noexcept {
     return 0;
 }
 
 template <class T>
-constexpr auto fields_count_dispatch(long, long, std::integral_constant<bool, true>) noexcept
+constexpr auto fields_count_dispatch(long, long, std::integral_constant<bool, true> /*are_preconditions_met*/) noexcept
     -> typename std::enable_if<std::is_array<T>::value, std::size_t>::type
 {
     return sizeof(T) / sizeof(typename std::remove_all_extents<T>::type);
 }
 
 template <class T>
-constexpr auto fields_count_dispatch(long, int, std::integral_constant<bool, true>) noexcept
+constexpr auto fields_count_dispatch(long, int, std::integral_constant<bool, true> /*are_preconditions_met*/) noexcept
     -> decltype(sizeof(T{}))
 {
     constexpr std::size_t typical_fields_count = 4;
@@ -348,7 +349,7 @@ constexpr auto fields_count_dispatch(long, int, std::integral_constant<bool, tru
 }
 
 template <class T>
-constexpr std::size_t fields_count_dispatch(int, int, std::integral_constant<bool, true>) noexcept {
+constexpr std::size_t fields_count_dispatch(int, int, std::integral_constant<bool, true> /*are_preconditions_met*/) noexcept {
     // T is not default aggregate initializable. This means that at least one of the members is not default-constructible.
     // Use linear search to find the smallest valid initializer, after which we unbounded binary search for the largest.
     constexpr std::size_t begin = detail::fields_count_lower_bound_unbounded<T, 1>(1L, size_t_<0>{});
