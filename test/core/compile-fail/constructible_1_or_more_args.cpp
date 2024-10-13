@@ -5,6 +5,7 @@
 
 #include <boost/pfr/tuple_size.hpp>
 
+
 struct A {
     template <typename Arg0, typename... Args>
     explicit A(Arg0&&, Args&&...) {}

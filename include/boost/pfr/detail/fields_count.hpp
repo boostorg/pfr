@@ -32,8 +32,7 @@ import std;
 namespace boost { namespace pfr { namespace detail {
 
 ///////////////////// min without including <algorithm>
-template <class T>
-constexpr const T& (min)(const T& a, const T& b) {
+constexpr std::size_t min_of_size_t(std::size_t a, std::size_t b) noexcept {
     return b < a ? b : a;
 }
 
@@ -275,15 +274,8 @@ constexpr auto fields_count_upper_bound(long, int) noexcept
     -> detail::enable_if_initializable_helper_t<T, N>
 {
     constexpr std::size_t next_optimal = Begin + (N - Begin) * 2;
-    constexpr std::size_t next = (detail::min)(next_optimal, detail::fields_count_compiler_limitation_next(N));
+    constexpr std::size_t next = detail::min_of_size_t(next_optimal, detail::fields_count_compiler_limitation_next(N));
     return detail::fields_count_upper_bound<T, Begin, next>(1L, 1L);
-}
-
-template <class T, std::size_t Begin = 0>
-constexpr std::size_t fields_count_binary_search_unbounded() noexcept {
-    constexpr std::size_t last = detail::fields_count_upper_bound<T, Begin, Begin + 1>(1L, 1L);
-    constexpr std::size_t middle = (Begin + last + 1) / 2;
-    return detail::fields_count_binary_search<T, Begin, middle>(detail::is_one_element_range<Begin, middle>{}, 1L);
 }
 
 ///////////////////// Fields count lower bound linear search.
@@ -315,13 +307,13 @@ constexpr std::size_t fields_count_lower_bound(detail::multi_element_range, size
     );
 }
 
-template <class T, std::size_t Begin = 1, std::size_t Result>
+template <class T, std::size_t Begin, std::size_t Result>
 constexpr std::size_t fields_count_lower_bound_unbounded(int, size_t_<Result>) noexcept {
     return Result;
 }
 
-template <class T, std::size_t Begin = 1>
-constexpr auto fields_count_lower_bound_unbounded(long, size_t_<0> = {}) noexcept
+template <class T, std::size_t Begin, std::size_t Result>
+constexpr auto fields_count_lower_bound_unbounded(long, size_t_<Result>) noexcept
     -> std::enable_if_t<(Begin >= detail::fields_count_upper_bound_loose<T>()), std::size_t>
 {
     static_assert(
@@ -330,9 +322,9 @@ constexpr auto fields_count_lower_bound_unbounded(long, size_t_<0> = {}) noexcep
     return detail::fields_count_upper_bound_loose<T>();
 }
 
-template <class T, std::size_t Begin = 1>
-constexpr std::size_t fields_count_lower_bound_unbounded(int, size_t_<0> = {}) noexcept {
-    constexpr std::size_t last = (detail::min)(Begin * 2, detail::fields_count_upper_bound_loose<T>()) - 1;
+template <class T, std::size_t Begin>
+constexpr std::size_t fields_count_lower_bound_unbounded(int, size_t_<0>) noexcept {
+    constexpr std::size_t last = detail::min_of_size_t(Begin * 2, detail::fields_count_upper_bound_loose<T>()) - 1;
     constexpr std::size_t result_maybe = detail::fields_count_lower_bound<T, Begin, last>(
         detail::is_one_element_range<Begin, last>{}
     );
@@ -351,15 +343,21 @@ template <class T>
 constexpr auto fields_count_dispatch(long, int) noexcept
     -> decltype(sizeof(T{}))
 {
-    return detail::fields_count_binary_search_unbounded<T>();
+    constexpr std::size_t typical_fields_count = 4;
+    constexpr std::size_t last = detail::fields_count_upper_bound<T, typical_fields_count, typical_fields_count * 2>(1L, 1L);
+    constexpr std::size_t middle = (last + 1) / 2;
+    return detail::fields_count_binary_search<T, 0, middle>(detail::is_one_element_range<0, middle>{}, 1L);
 }
 
 template <class T>
 constexpr std::size_t fields_count_dispatch(int, int) noexcept {
     // T is not default aggregate initializable. This means that at least one of the members is not default-constructible.
     // Use linear search to find the smallest valid initializer, after which we unbounded binary search for the largest.
-    constexpr std::size_t begin = detail::fields_count_lower_bound_unbounded<T>(1L);
-    return detail::fields_count_binary_search_unbounded<T, begin>();
+    constexpr std::size_t begin = detail::fields_count_lower_bound_unbounded<T, 1>(1L, size_t_<0>{});
+
+    constexpr std::size_t last = detail::fields_count_upper_bound<T, begin, begin + 1>(1L, 1L);
+    constexpr std::size_t middle = (begin + last + 1) / 2;
+    return detail::fields_count_binary_search<T, begin, middle>(detail::is_one_element_range<begin, middle>{}, 1L);
 }
 
 ///////////////////// Returns fields count
