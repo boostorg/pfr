@@ -16,6 +16,7 @@
 import std;
 #else
 #include <climits>      // CHAR_BIT
+#include <cstdint>      // SIZE_MAX
 #include <type_traits>
 #include <utility>      // metaprogramming stuff
 #endif
@@ -209,15 +210,18 @@ using is_one_element_range = std::integral_constant<bool, Begin == Last>;
 using multi_element_range = std::false_type;
 using one_element_range = std::true_type;
 
+///////////////////// Fields count next expected compiler limitation
+constexpr std::size_t fields_count_compiler_limitation_next(std::size_t n) noexcept {
+#if defined(_MSC_VER) && (_MSC_VER <= 1920)
+    if (n < 1024)
+        return 1024;
+#endif
+    return SIZE_MAX;
+}
+
 ///////////////////// Fields count upper bound based on sizeof(T)
 template <class T>
 constexpr std::size_t fields_count_upper_bound_loose() noexcept {
-#if defined(_MSC_VER) && (_MSC_VER <= 1920)
-    if (sizeof(T) * CHAR_BIT > 1000) {
-        return 1000;
-    }
-#endif
-
     return sizeof(T) * CHAR_BIT;
 }
 
@@ -268,7 +272,8 @@ template <class T, std::size_t Begin, std::size_t N>
 constexpr auto fields_count_upper_bound(long, int) noexcept
     -> detail::enable_if_initializable_helper_t<T, N>
 {
-    constexpr std::size_t next = Begin + (N - Begin) * 2;
+    constexpr std::size_t next_optimal = Begin + (N - Begin) * 2;
+    constexpr std::size_t next = detail::min_of_size_t(next_optimal, detail::fields_count_compiler_limitation_next(N));
     return detail::fields_count_upper_bound<T, Begin, next>(1L, 1L);
 }
 
