@@ -227,29 +227,29 @@ constexpr std::size_t fields_count_upper_bound_loose() noexcept {
 
 ///////////////////// Fields count binary search.
 // Template instantiation: depth is O(log(result)), count is O(log(result)), cost is O(result * log(result)).
-template <class T, std::size_t Begin, std::size_t Middle>
+template <class T, std::size_t Begin, std::size_t Last>
 constexpr std::size_t fields_count_binary_search(detail::one_element_range, long) noexcept {
     static_assert(
-        Begin == Middle,
+        Begin == Last,
         "====================> Boost.PFR: Internal logic error."
     );
     return Begin;
 }
 
-template <class T, std::size_t Begin, std::size_t Middle>
+template <class T, std::size_t Begin, std::size_t Last>
 constexpr std::size_t fields_count_binary_search(detail::multi_element_range, int) noexcept;
 
-template <class T, std::size_t Begin, std::size_t Middle>
+template <class T, std::size_t Begin, std::size_t Last>
 constexpr auto fields_count_binary_search(detail::multi_element_range, long) noexcept
-    -> detail::enable_if_initializable_helper_t<T, Middle>
+    -> detail::enable_if_initializable_helper_t<T, (Begin + Last) / 2 + 1>
 {
-    constexpr std::size_t next_v = Middle + (Middle - Begin + 1) / 2;
-    return detail::fields_count_binary_search<T, Middle, next_v>(detail::is_one_element_range<Middle, next_v>{}, 1L);
+    constexpr std::size_t next_v = (Begin + Last) / 2 + 1;
+    return detail::fields_count_binary_search<T, next_v, Last>(detail::is_one_element_range<next_v, Last>{}, 1L);
 }
 
-template <class T, std::size_t Begin, std::size_t Middle>
+template <class T, std::size_t Begin, std::size_t Last>
 constexpr std::size_t fields_count_binary_search(detail::multi_element_range, int) noexcept {
-    constexpr std::size_t next_v = Begin + (Middle - Begin) / 2;
+    constexpr std::size_t next_v = (Begin + Last) / 2;
     return detail::fields_count_binary_search<T, Begin, next_v>(detail::is_one_element_range<Begin, next_v>{}, 1L);
 }
 
@@ -349,8 +349,7 @@ constexpr auto fields_count_dispatch(long, int, std::true_type /*are_preconditio
 {
     constexpr std::size_t typical_fields_count = 4;
     constexpr std::size_t last = detail::fields_count_upper_bound<T, typical_fields_count / 2, typical_fields_count>(1L, 1L);
-    constexpr std::size_t middle = (last + 1) / 2;
-    return detail::fields_count_binary_search<T, 0, middle>(detail::is_one_element_range<0, middle>{}, 1L);
+    return detail::fields_count_binary_search<T, 0, last>(detail::is_one_element_range<0, last>{}, 1L);
 }
 
 template <class T>
@@ -360,8 +359,7 @@ constexpr std::size_t fields_count_dispatch(int, int, std::true_type /*are_preco
     constexpr std::size_t begin = detail::fields_count_lower_bound_unbounded<T, 1>(1L, size_t_<0>{});
 
     constexpr std::size_t last = detail::fields_count_upper_bound<T, begin, begin + 1>(1L, 1L);
-    constexpr std::size_t middle = (begin + last + 1) / 2;
-    return detail::fields_count_binary_search<T, begin, middle>(detail::is_one_element_range<begin, middle>{}, 1L);
+    return detail::fields_count_binary_search<T, begin, last>(detail::is_one_element_range<begin, last>{}, 1L);
 }
 
 ///////////////////// Returns fields count
