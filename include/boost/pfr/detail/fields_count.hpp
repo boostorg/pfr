@@ -58,7 +58,7 @@ struct ubiq_rref_constructor {
 
 ///////////////////// Hand-made is_complete<T> trait
 template <typename T, typename = void>
-struct is_complete : std::integral_constant<bool, false>
+struct is_complete : std::false_type
 {};
 
 template <typename T>
@@ -101,7 +101,7 @@ struct is_aggregate_initializable_n {
 };
 
 template <class T, std::size_t N>
-struct is_aggregate_initializable_n<T, N, typename std::enable_if<std::is_class<T>::value && !std::is_empty<T>::value>::type> {
+struct is_aggregate_initializable_n<T, N, std::enable_if_t<std::is_class<T>::value && !std::is_empty<T>::value>> {
     template <std::size_t ...I>
     static constexpr bool is_not_constructible_n(std::index_sequence<I...>) noexcept {
         return (!std::is_constructible<T, decltype(ubiq_lref_constructor{I})...>::value && !std::is_constructible<T, decltype(ubiq_rref_constructor{I})...>::value)
@@ -148,16 +148,16 @@ struct ubiq_rref_base_asserting {
     }
 };
 
-template <class T, std::size_t I0, std::size_t... I, class /*Enable*/ = typename std::enable_if<std::is_copy_constructible<T>::value>::type>
+template <class T, std::size_t I0, std::size_t... I, class /*Enable*/ = std::enable_if_t<std::is_copy_constructible<T>::value>>
 constexpr auto assert_first_not_base(std::index_sequence<I0, I...>) noexcept
-    -> typename std::add_pointer<decltype(T{ ubiq_lref_base_asserting<T>{}, ubiq_lref_constructor{I}... })>::type
+    -> std::add_pointer_t<decltype(T{ ubiq_lref_base_asserting<T>{}, ubiq_lref_constructor{I}... })>
 {
     return nullptr;
 }
 
-template <class T, std::size_t I0, std::size_t... I, class /*Enable*/ = typename std::enable_if<!std::is_copy_constructible<T>::value>::type>
+template <class T, std::size_t I0, std::size_t... I, class /*Enable*/ = std::enable_if_t<!std::is_copy_constructible<T>::value>>
 constexpr auto assert_first_not_base(std::index_sequence<I0, I...>) noexcept
-    -> typename std::add_pointer<decltype(T{ ubiq_rref_base_asserting<T>{}, ubiq_rref_constructor{I}... })>::type
+    -> std::add_pointer_t<decltype(T{ ubiq_rref_base_asserting<T>{}, ubiq_rref_constructor{I}... })>
 {
     return nullptr;
 }
@@ -173,20 +173,20 @@ constexpr void assert_first_not_base(int) noexcept {}
 
 template <class T, std::size_t N>
 constexpr auto assert_first_not_base(long) noexcept
-    -> typename std::enable_if<std::is_class<T>::value>::type
+    -> std::enable_if_t<std::is_class<T>::value>
 {
     detail::assert_first_not_base<T>(detail::make_index_sequence<N>{});
 }
 
 ///////////////////// Helpers for initializable detection
 // Note that these take O(N) compile time and memory!
-template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<std::is_copy_constructible<T>::value>::type>
+template <class T, std::size_t... I, class /*Enable*/ = std::enable_if_t<std::is_copy_constructible<T>::value>>
 constexpr auto enable_if_initializable_helper(std::index_sequence<I...>) noexcept
-    -> typename std::add_pointer<decltype(T{ubiq_lref_constructor{I}...})>::type;
+    -> std::add_pointer_t<decltype(T{ubiq_lref_constructor{I}...})>;
 
-template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<!std::is_copy_constructible<T>::value>::type>
+template <class T, std::size_t... I, class /*Enable*/ = std::enable_if_t<!std::is_copy_constructible<T>::value>>
 constexpr auto enable_if_initializable_helper(std::index_sequence<I...>) noexcept
-    -> typename std::add_pointer<decltype(T{ubiq_rref_constructor{I}...})>::type;
+    -> std::add_pointer_t<decltype(T{ubiq_rref_constructor{I}...})>;
 
 template <class T, std::size_t N, class U = std::size_t, class /*Enable*/ = decltype(detail::enable_if_initializable_helper<T>(detail::make_index_sequence<N>()))>
 using enable_if_initializable_helper_t = U;
@@ -311,8 +311,8 @@ constexpr std::size_t fields_count_lower_bound_unbounded(int, size_t_<Result>) n
     return Result;
 }
 
-template <class T, std::size_t Begin, std::size_t Result>
-constexpr auto fields_count_lower_bound_unbounded(long, size_t_<Result>) noexcept
+template <class T, std::size_t Begin>
+constexpr auto fields_count_lower_bound_unbounded(long, size_t_<0>) noexcept
     -> std::enable_if_t<(Begin >= detail::fields_count_upper_bound_loose<T>()), std::size_t>
 {
     static_assert(
@@ -332,29 +332,29 @@ constexpr std::size_t fields_count_lower_bound_unbounded(int, size_t_<0>) noexce
 
 ///////////////////// Choosing between array size, unbounded binary search, and linear search followed by unbounded binary search.
 template <class T>
-constexpr auto fields_count_dispatch(long, long, std::integral_constant<bool, false> /*are_preconditions_met*/) noexcept {
+constexpr auto fields_count_dispatch(long, long, std::false_type /*are_preconditions_met*/) noexcept {
     return 0;
 }
 
 template <class T>
-constexpr auto fields_count_dispatch(long, long, std::integral_constant<bool, true> /*are_preconditions_met*/) noexcept
-    -> typename std::enable_if<std::is_array<T>::value, std::size_t>::type
+constexpr auto fields_count_dispatch(long, long, std::true_type /*are_preconditions_met*/) noexcept
+    -> std::enable_if_t<std::is_array<T>::value, std::size_t>
 {
-    return sizeof(T) / sizeof(typename std::remove_all_extents<T>::type);
+    return sizeof(T) / sizeof(std::remove_all_extents_t<T>);
 }
 
 template <class T>
-constexpr auto fields_count_dispatch(long, int, std::integral_constant<bool, true> /*are_preconditions_met*/) noexcept
+constexpr auto fields_count_dispatch(long, int, std::true_type /*are_preconditions_met*/) noexcept
     -> decltype(sizeof(T{}))
 {
     constexpr std::size_t typical_fields_count = 4;
-    constexpr std::size_t last = detail::fields_count_upper_bound<T, typical_fields_count, typical_fields_count * 2>(1L, 1L);
+    constexpr std::size_t last = detail::fields_count_upper_bound<T, typical_fields_count / 2, typical_fields_count>(1L, 1L);
     constexpr std::size_t middle = (last + 1) / 2;
     return detail::fields_count_binary_search<T, 0, middle>(detail::is_one_element_range<0, middle>{}, 1L);
 }
 
 template <class T>
-constexpr std::size_t fields_count_dispatch(int, int, std::integral_constant<bool, true> /*are_preconditions_met*/) noexcept {
+constexpr std::size_t fields_count_dispatch(int, int, std::true_type /*are_preconditions_met*/) noexcept {
     // T is not default aggregate initializable. This means that at least one of the members is not default-constructible.
     // Use linear search to find the smallest valid initializer, after which we unbounded binary search for the largest.
     constexpr std::size_t begin = detail::fields_count_lower_bound_unbounded<T, 1>(1L, size_t_<0>{});
