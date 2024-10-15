@@ -241,15 +241,15 @@ constexpr std::size_t fields_count_binary_search(detail::multi_element_range, in
 
 template <class T, std::size_t Begin, std::size_t Last>
 constexpr auto fields_count_binary_search(detail::multi_element_range, long) noexcept
-    -> detail::enable_if_initializable_helper_t<T, (Begin + Last) / 2 + 1>
+    -> detail::enable_if_initializable_helper_t<T, (Begin + Last + 1) / 2>
 {
-    constexpr std::size_t next_v = (Begin + Last) / 2 + 1;
+    constexpr std::size_t next_v = (Begin + Last + 1) / 2;
     return detail::fields_count_binary_search<T, next_v, Last>(detail::is_one_element_range<next_v, Last>{}, 1L);
 }
 
 template <class T, std::size_t Begin, std::size_t Last>
 constexpr std::size_t fields_count_binary_search(detail::multi_element_range, int) noexcept {
-    constexpr std::size_t next_v = (Begin + Last) / 2;
+    constexpr std::size_t next_v = (Begin + Last + 1) / 2 - 1;
     return detail::fields_count_binary_search<T, Begin, next_v>(detail::is_one_element_range<Begin, next_v>{}, 1L);
 }
 
