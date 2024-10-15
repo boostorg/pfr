@@ -32,8 +32,7 @@ import std;
 namespace boost { namespace pfr { namespace detail {
 
 ///////////////////// min without including <algorithm>
-template <class T>
-constexpr const T& (min)(const T& a, const T& b) {
+constexpr std::size_t min_of_size_t(std::size_t a, std::size_t b) noexcept {
     return b < a ? b : a;
 }
 
@@ -59,7 +58,7 @@ struct ubiq_rref_constructor {
 
 ///////////////////// Hand-made is_complete<T> trait
 template <typename T, typename = void>
-struct is_complete : std::integral_constant<bool, false>
+struct is_complete : std::false_type
 {};
 
 template <typename T>
@@ -102,7 +101,7 @@ struct is_aggregate_initializable_n {
 };
 
 template <class T, std::size_t N>
-struct is_aggregate_initializable_n<T, N, typename std::enable_if<std::is_class<T>::value && !std::is_empty<T>::value>::type> {
+struct is_aggregate_initializable_n<T, N, std::enable_if_t<std::is_class<T>::value && !std::is_empty<T>::value>> {
     template <std::size_t ...I>
     static constexpr bool is_not_constructible_n(std::index_sequence<I...>) noexcept {
         return (!std::is_constructible<T, decltype(ubiq_lref_constructor{I})...>::value && !std::is_constructible<T, decltype(ubiq_rref_constructor{I})...>::value)
@@ -149,16 +148,16 @@ struct ubiq_rref_base_asserting {
     }
 };
 
-template <class T, std::size_t I0, std::size_t... I, class /*Enable*/ = typename std::enable_if<std::is_copy_constructible<T>::value>::type>
+template <class T, std::size_t I0, std::size_t... I, class /*Enable*/ = std::enable_if_t<std::is_copy_constructible<T>::value>>
 constexpr auto assert_first_not_base(std::index_sequence<I0, I...>) noexcept
-    -> typename std::add_pointer<decltype(T{ ubiq_lref_base_asserting<T>{}, ubiq_lref_constructor{I}... })>::type
+    -> std::add_pointer_t<decltype(T{ ubiq_lref_base_asserting<T>{}, ubiq_lref_constructor{I}... })>
 {
     return nullptr;
 }
 
-template <class T, std::size_t I0, std::size_t... I, class /*Enable*/ = typename std::enable_if<!std::is_copy_constructible<T>::value>::type>
+template <class T, std::size_t I0, std::size_t... I, class /*Enable*/ = std::enable_if_t<!std::is_copy_constructible<T>::value>>
 constexpr auto assert_first_not_base(std::index_sequence<I0, I...>) noexcept
-    -> typename std::add_pointer<decltype(T{ ubiq_rref_base_asserting<T>{}, ubiq_rref_constructor{I}... })>::type
+    -> std::add_pointer_t<decltype(T{ ubiq_rref_base_asserting<T>{}, ubiq_rref_constructor{I}... })>
 {
     return nullptr;
 }
@@ -174,20 +173,20 @@ constexpr void assert_first_not_base(int) noexcept {}
 
 template <class T, std::size_t N>
 constexpr auto assert_first_not_base(long) noexcept
-    -> typename std::enable_if<std::is_class<T>::value>::type
+    -> std::enable_if_t<std::is_class<T>::value>
 {
     detail::assert_first_not_base<T>(detail::make_index_sequence<N>{});
 }
 
 ///////////////////// Helpers for initializable detection
 // Note that these take O(N) compile time and memory!
-template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<std::is_copy_constructible<T>::value>::type>
+template <class T, std::size_t... I, class /*Enable*/ = std::enable_if_t<std::is_copy_constructible<T>::value>>
 constexpr auto enable_if_initializable_helper(std::index_sequence<I...>) noexcept
-    -> typename std::add_pointer<decltype(T{ubiq_lref_constructor{I}...})>::type;
+    -> std::add_pointer_t<decltype(T{ubiq_lref_constructor{I}...})>;
 
-template <class T, std::size_t... I, class /*Enable*/ = typename std::enable_if<!std::is_copy_constructible<T>::value>::type>
+template <class T, std::size_t... I, class /*Enable*/ = std::enable_if_t<!std::is_copy_constructible<T>::value>>
 constexpr auto enable_if_initializable_helper(std::index_sequence<I...>) noexcept
-    -> typename std::add_pointer<decltype(T{ubiq_rref_constructor{I}...})>::type;
+    -> std::add_pointer_t<decltype(T{ubiq_rref_constructor{I}...})>;
 
 template <class T, std::size_t N, class U = std::size_t, class /*Enable*/ = decltype(detail::enable_if_initializable_helper<T>(detail::make_index_sequence<N>()))>
 using enable_if_initializable_helper_t = U;
@@ -211,7 +210,6 @@ using is_one_element_range = std::integral_constant<bool, Begin == Last>;
 using multi_element_range = std::false_type;
 using one_element_range = std::true_type;
 
-
 ///////////////////// Fields count next expected compiler limitation
 constexpr std::size_t fields_count_compiler_limitation_next(std::size_t n) noexcept {
 #if defined(_MSC_VER) && (_MSC_VER <= 1920)
@@ -229,29 +227,29 @@ constexpr std::size_t fields_count_upper_bound_loose() noexcept {
 
 ///////////////////// Fields count binary search.
 // Template instantiation: depth is O(log(result)), count is O(log(result)), cost is O(result * log(result)).
-template <class T, std::size_t Begin, std::size_t Middle>
+template <class T, std::size_t Begin, std::size_t Last>
 constexpr std::size_t fields_count_binary_search(detail::one_element_range, long) noexcept {
     static_assert(
-        Begin == Middle,
+        Begin == Last,
         "====================> Boost.PFR: Internal logic error."
     );
     return Begin;
 }
 
-template <class T, std::size_t Begin, std::size_t Middle>
+template <class T, std::size_t Begin, std::size_t Last>
 constexpr std::size_t fields_count_binary_search(detail::multi_element_range, int) noexcept;
 
-template <class T, std::size_t Begin, std::size_t Middle>
+template <class T, std::size_t Begin, std::size_t Last>
 constexpr auto fields_count_binary_search(detail::multi_element_range, long) noexcept
-    -> detail::enable_if_initializable_helper_t<T, Middle>
+    -> detail::enable_if_initializable_helper_t<T, (Begin + Last + 1) / 2>
 {
-    constexpr std::size_t next_v = Middle + (Middle - Begin + 1) / 2;
-    return detail::fields_count_binary_search<T, Middle, next_v>(detail::is_one_element_range<Middle, next_v>{}, 1L);
+    constexpr std::size_t next_v = (Begin + Last + 1) / 2;
+    return detail::fields_count_binary_search<T, next_v, Last>(detail::is_one_element_range<next_v, Last>{}, 1L);
 }
 
-template <class T, std::size_t Begin, std::size_t Middle>
+template <class T, std::size_t Begin, std::size_t Last>
 constexpr std::size_t fields_count_binary_search(detail::multi_element_range, int) noexcept {
-    constexpr std::size_t next_v = Begin + (Middle - Begin) / 2;
+    constexpr std::size_t next_v = (Begin + Last + 1) / 2 - 1;
     return detail::fields_count_binary_search<T, Begin, next_v>(detail::is_one_element_range<Begin, next_v>{}, 1L);
 }
 
@@ -275,15 +273,8 @@ constexpr auto fields_count_upper_bound(long, int) noexcept
     -> detail::enable_if_initializable_helper_t<T, N>
 {
     constexpr std::size_t next_optimal = Begin + (N - Begin) * 2;
-    constexpr std::size_t next = (detail::min)(next_optimal, detail::fields_count_compiler_limitation_next(N));
+    constexpr std::size_t next = detail::min_of_size_t(next_optimal, detail::fields_count_compiler_limitation_next(N));
     return detail::fields_count_upper_bound<T, Begin, next>(1L, 1L);
-}
-
-template <class T, std::size_t Begin = 0>
-constexpr std::size_t fields_count_binary_search_unbounded() noexcept {
-    constexpr std::size_t last = detail::fields_count_upper_bound<T, Begin, Begin + 1>(1L, 1L);
-    constexpr std::size_t middle = (Begin + last + 1) / 2;
-    return detail::fields_count_binary_search<T, Begin, middle>(detail::is_one_element_range<Begin, middle>{}, 1L);
 }
 
 ///////////////////// Fields count lower bound linear search.
@@ -315,13 +306,13 @@ constexpr std::size_t fields_count_lower_bound(detail::multi_element_range, size
     );
 }
 
-template <class T, std::size_t Begin = 1, std::size_t Result>
+template <class T, std::size_t Begin, std::size_t Result>
 constexpr std::size_t fields_count_lower_bound_unbounded(int, size_t_<Result>) noexcept {
     return Result;
 }
 
-template <class T, std::size_t Begin = 1>
-constexpr auto fields_count_lower_bound_unbounded(long, size_t_<0> = {}) noexcept
+template <class T, std::size_t Begin>
+constexpr auto fields_count_lower_bound_unbounded(long, size_t_<0>) noexcept
     -> std::enable_if_t<(Begin >= detail::fields_count_upper_bound_loose<T>()), std::size_t>
 {
     static_assert(
@@ -330,9 +321,9 @@ constexpr auto fields_count_lower_bound_unbounded(long, size_t_<0> = {}) noexcep
     return detail::fields_count_upper_bound_loose<T>();
 }
 
-template <class T, std::size_t Begin = 1>
-constexpr std::size_t fields_count_lower_bound_unbounded(int, size_t_<0> = {}) noexcept {
-    constexpr std::size_t last = (detail::min)(Begin * 2, detail::fields_count_upper_bound_loose<T>()) - 1;
+template <class T, std::size_t Begin>
+constexpr std::size_t fields_count_lower_bound_unbounded(int, size_t_<0>) noexcept {
+    constexpr std::size_t last = detail::min_of_size_t(Begin * 2, detail::fields_count_upper_bound_loose<T>()) - 1;
     constexpr std::size_t result_maybe = detail::fields_count_lower_bound<T, Begin, last>(
         detail::is_one_element_range<Begin, last>{}
     );
@@ -341,25 +332,34 @@ constexpr std::size_t fields_count_lower_bound_unbounded(int, size_t_<0> = {}) n
 
 ///////////////////// Choosing between array size, unbounded binary search, and linear search followed by unbounded binary search.
 template <class T>
-constexpr auto fields_count_dispatch(long, long) noexcept
-    -> typename std::enable_if<std::is_array<T>::value, std::size_t>::type
-{
-    return sizeof(T) / sizeof(typename std::remove_all_extents<T>::type);
+constexpr auto fields_count_dispatch(long, long, std::false_type /*are_preconditions_met*/) noexcept {
+    return 0;
 }
 
 template <class T>
-constexpr auto fields_count_dispatch(long, int) noexcept
+constexpr auto fields_count_dispatch(long, long, std::true_type /*are_preconditions_met*/) noexcept
+    -> std::enable_if_t<std::is_array<T>::value, std::size_t>
+{
+    return sizeof(T) / sizeof(std::remove_all_extents_t<T>);
+}
+
+template <class T>
+constexpr auto fields_count_dispatch(long, int, std::true_type /*are_preconditions_met*/) noexcept
     -> decltype(sizeof(T{}))
 {
-    return detail::fields_count_binary_search_unbounded<T>();
+    constexpr std::size_t typical_fields_count = 4;
+    constexpr std::size_t last = detail::fields_count_upper_bound<T, typical_fields_count / 2, typical_fields_count>(1L, 1L);
+    return detail::fields_count_binary_search<T, 0, last>(detail::is_one_element_range<0, last>{}, 1L);
 }
 
 template <class T>
-constexpr std::size_t fields_count_dispatch(int, int) noexcept {
+constexpr std::size_t fields_count_dispatch(int, int, std::true_type /*are_preconditions_met*/) noexcept {
     // T is not default aggregate initializable. This means that at least one of the members is not default-constructible.
     // Use linear search to find the smallest valid initializer, after which we unbounded binary search for the largest.
-    constexpr std::size_t begin = detail::fields_count_lower_bound_unbounded<T>(1L);
-    return detail::fields_count_binary_search_unbounded<T, begin>();
+    constexpr std::size_t begin = detail::fields_count_lower_bound_unbounded<T, 1>(1L, size_t_<0>{});
+
+    constexpr std::size_t last = detail::fields_count_upper_bound<T, begin, begin + 1>(1L, 1L);
+    return detail::fields_count_binary_search<T, begin, last>(detail::is_one_element_range<begin, last>{}, 1L);
 }
 
 ///////////////////// Returns fields count
@@ -367,37 +367,52 @@ template <class T>
 constexpr std::size_t fields_count() noexcept {
     using type = std::remove_cv_t<T>;
 
+    constexpr bool type_is_complete = detail::is_complete<type>::value;
     static_assert(
-        detail::is_complete<type>::value,
+        type_is_complete,
         "====================> Boost.PFR: Type must be complete."
     );
 
+    constexpr bool type_is_not_a_reference = !std::is_reference<type>::value
+         || !type_is_complete // do not show assert if previous check failed
+    ;
     static_assert(
-        !std::is_reference<type>::value,
+        type_is_not_a_reference,
         "====================> Boost.PFR: Attempt to get fields count on a reference. This is not allowed because that could hide an issue and different library users expect different behavior in that case."
     );
 
-#if !BOOST_PFR_HAS_GUARANTEED_COPY_ELISION
-    static_assert(
+#if BOOST_PFR_HAS_GUARANTEED_COPY_ELISION
+    constexpr bool type_fields_are_move_constructible = true;
+#else
+    constexpr bool type_fields_are_move_constructible =
         std::is_copy_constructible<std::remove_all_extents_t<type>>::value || (
             std::is_move_constructible<std::remove_all_extents_t<type>>::value
             && std::is_move_assignable<std::remove_all_extents_t<type>>::value
-        ),
+        )
+        || !type_is_not_a_reference // do not show assert if previous check failed
+    ;
+    static_assert(
+        type_fields_are_move_constructible,
         "====================> Boost.PFR: Type and each field in the type must be copy constructible (or move constructible and move assignable)."
     );
 #endif  // #if !BOOST_PFR_HAS_GUARANTEED_COPY_ELISION
 
+    constexpr bool type_is_not_polymorphic = !std::is_polymorphic<type>::value;
     static_assert(
-        !std::is_polymorphic<type>::value,
+        type_is_not_polymorphic,
         "====================> Boost.PFR: Type must have no virtual function, because otherwise it is not aggregate initializable."
     );
 
 #ifdef __cpp_lib_is_aggregate
-    static_assert(
+    constexpr bool type_is_aggregate =
         std::is_aggregate<type>::value             // Does not return `true` for built-in types.
-        || std::is_scalar<type>::value,
+        || std::is_scalar<type>::value;
+    static_assert(
+        type_is_aggregate,
         "====================> Boost.PFR: Type must be aggregate initializable."
     );
+#else
+    constexpr bool type_is_aggregate = true;
 #endif
 
 // Can't use the following. See the non_std_layout.cpp test.
@@ -408,20 +423,28 @@ constexpr std::size_t fields_count() noexcept {
 //    );
 //#endif
 
-    constexpr std::size_t result = detail::fields_count_dispatch<type>(1L, 1L);
+    constexpr bool no_errors =
+        type_is_complete && type_is_not_a_reference && type_fields_are_move_constructible
+        && type_is_not_polymorphic && type_is_aggregate;
+
+    constexpr std::size_t result = detail::fields_count_dispatch<type>(1L, 1L, std::integral_constant<bool, no_errors>{});
 
     detail::assert_first_not_base<type, result>(1L);
 
 #ifndef __cpp_lib_is_aggregate
-    static_assert(
+    constexpr bool type_is_aggregate_initializable_n =
         detail::is_aggregate_initializable_n<type, result>::value  // Does not return `true` for built-in types.
-        || std::is_scalar<type>::value,
+        || std::is_scalar<type>::value;
+    static_assert(
+        type_is_aggregate_initializable_n,
         "====================> Boost.PFR: Types with user specified constructors (non-aggregate initializable types) are not supported."
     );
+#else
+    constexpr bool type_is_aggregate_initializable_n = true;
 #endif
 
     static_assert(
-        result != 0 || std::is_empty<type>::value || std::is_fundamental<type>::value || std::is_reference<type>::value,
+        result != 0 || std::is_empty<type>::value || std::is_fundamental<type>::value || std::is_reference<type>::value || !no_errors || !type_is_aggregate_initializable_n,
         "====================> Boost.PFR: If there's no other failed static asserts then something went wrong. Please report this issue to the github along with the structure you're reflecting."
     );
 
