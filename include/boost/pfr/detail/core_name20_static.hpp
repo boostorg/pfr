@@ -106,7 +106,7 @@ consteval auto name_of_field_impl() noexcept {
     static_assert(!sv.empty(),
         "====================> Boost.PFR: Field reflection parser configured in a wrong way. "
         "Please define the BOOST_PFR_FUNCTION_SIGNATURE to a compiler specific macro, "
-        "that outputs the whole function signature including non-type template parameters."  
+        "that outputs the whole function signature including non-type template parameters."
     );
 
     constexpr auto skip = detail::make_core_name_skip BOOST_PFR_CORE_NAME_PARSING;
