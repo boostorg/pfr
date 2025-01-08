@@ -1,7 +1,7 @@
 [library Boost.PFR
     [quickbook 1.6]
     [version 2.2]
-    [copyright 2016-2024 Antony Polukhin]
+    [copyright 2016-2025 Antony Polukhin]
     [category Language Features Emulation]
     [license
         Distributed under the Boost Software License, Version 1.0.
