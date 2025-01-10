@@ -148,16 +148,30 @@ struct ubiq_rref_base_asserting {
     }
 };
 
-template <class T, std::size_t I0, std::size_t... I, class /*Enable*/ = std::enable_if_t<std::is_copy_constructible<T>::value>>
+template <class T, std::size_t I0, std::size_t... I, class /*Enable*/ = std::enable_if_t<std::is_copy_constructible<T>::value and !std::is_aggregate_v<T>>>
 constexpr auto assert_first_not_base(std::index_sequence<I0, I...>) noexcept
     -> std::add_pointer_t<decltype(T{ ubiq_lref_base_asserting<T>{}, ubiq_lref_constructor{I}... })>
 {
     return nullptr;
 }
 
-template <class T, std::size_t I0, std::size_t... I, class /*Enable*/ = std::enable_if_t<!std::is_copy_constructible<T>::value>>
+template <class T, std::size_t I0, std::size_t... I, class /*Enable*/ = std::enable_if_t<!std::is_copy_constructible<T>::value and !std::is_aggregate_v<T>>>
 constexpr auto assert_first_not_base(std::index_sequence<I0, I...>) noexcept
     -> std::add_pointer_t<decltype(T{ ubiq_rref_base_asserting<T>{}, ubiq_rref_constructor{I}... })>
+{
+    return nullptr;
+}
+
+template <class T, std::size_t I0, std::size_t... I, class /*Enable*/ = std::enable_if_t<std::is_copy_constructible<T>::value and std::is_aggregate_v<T>>>
+constexpr auto assert_first_not_base(std::index_sequence<I0, I...>) noexcept
+    -> std::add_pointer_t<decltype(T{ ubiq_lref_base_asserting<T>{}, {ubiq_lref_constructor{I}}... })>
+{
+    return nullptr;
+}
+
+template <class T, std::size_t I0, std::size_t... I, class /*Enable*/ = std::enable_if_t<!std::is_copy_constructible<T>::value and std::is_aggregate_v<T>>>
+constexpr auto assert_first_not_base(std::index_sequence<I0, I...>) noexcept
+    -> std::add_pointer_t<decltype(T{ ubiq_rref_base_asserting<T>{}, {ubiq_rref_constructor{I}}... })>
 {
     return nullptr;
 }
@@ -180,13 +194,21 @@ constexpr auto assert_first_not_base(long) noexcept
 
 ///////////////////// Helpers for initializable detection
 // Note that these take O(N) compile time and memory!
-template <class T, std::size_t... I, class /*Enable*/ = std::enable_if_t<std::is_copy_constructible<T>::value>>
+template <class T, std::size_t... I, class /*Enable*/ = std::enable_if_t<std::is_copy_constructible<T>::value and !std::is_aggregate_v<T>>>
 constexpr auto enable_if_initializable_helper(std::index_sequence<I...>) noexcept
     -> std::add_pointer_t<decltype(T{ubiq_lref_constructor{I}...})>;
 
-template <class T, std::size_t... I, class /*Enable*/ = std::enable_if_t<!std::is_copy_constructible<T>::value>>
+template <class T, std::size_t... I, class /*Enable*/ = std::enable_if_t<!std::is_copy_constructible<T>::value and !std::is_aggregate_v<T>>>
 constexpr auto enable_if_initializable_helper(std::index_sequence<I...>) noexcept
     -> std::add_pointer_t<decltype(T{ubiq_rref_constructor{I}...})>;
+
+template <class T, std::size_t... I, class /*Enable*/ = std::enable_if_t<std::is_copy_constructible<T>::value and std::is_aggregate_v<T>>>
+constexpr auto enable_if_initializable_helper(std::index_sequence<I...>) noexcept
+    -> std::add_pointer_t<decltype(T{{ubiq_lref_constructor{I}}...})>;
+
+template <class T, std::size_t... I, class /*Enable*/ = std::enable_if_t<!std::is_copy_constructible<T>::value and std::is_aggregate_v<T>>>
+constexpr auto enable_if_initializable_helper(std::index_sequence<I...>) noexcept
+    -> std::add_pointer_t<decltype(T{{ubiq_rref_constructor{I}}...})>;
 
 template <class T, std::size_t N, class U = std::size_t, class /*Enable*/ = decltype(detail::enable_if_initializable_helper<T>(detail::make_index_sequence<N>()))>
 using enable_if_initializable_helper_t = U;
