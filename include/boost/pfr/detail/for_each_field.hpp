@@ -13,6 +13,7 @@
 import std;
 #else
 #include <type_traits>      // metaprogramming stuff
+#include <utility>          // forward_like
 #endif
 
 #include <boost/pfr/detail/core.hpp>
@@ -24,6 +25,20 @@ namespace boost { namespace pfr { namespace detail {
 
 template <class T, class F>
 constexpr void for_each_field(T&& value, F&& func) {
+#if BOOST_PFR_USE_CPP26
+    if constexpr (std::is_aggregate_v<T> || std::is_bounded_array_v<std::remove_reference_t<T>>) {
+        auto &&[... members] = value;
+        ::boost::pfr::detail::for_each_field_impl(value,
+                                                  std::forward<F>(func),
+                                                  std::make_index_sequence<sizeof...(members)>{},
+                                                  std::is_rvalue_reference<T &&>{});
+    } else {
+        ::boost::pfr::detail::for_each_field_impl(value,
+                                                  std::forward<F>(func),
+                                                  std::make_index_sequence<1>{},
+                                                  std::is_rvalue_reference<T &&>{});
+    }
+#else
     constexpr std::size_t fields_count_val = boost::pfr::detail::fields_count<std::remove_reference_t<T>>();
 
     ::boost::pfr::detail::for_each_field_dispatcher(
@@ -42,6 +57,7 @@ constexpr void for_each_field(T&& value, F&& func) {
         },
         detail::make_index_sequence<fields_count_val>{}
     );
+#endif
 }
 
 }}} // namespace boost::pfr::detail

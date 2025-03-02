@@ -24,7 +24,7 @@ struct A {
 };
 
 int main() {
-#if BOOST_PFR_USE_CPP17
+#if BOOST_PFR_USE_CPP17 && !BOOST_PFR_USE_CPP26
     const volatile int cv_value = 0;
     volatile int v_value = 0;
     const int c_value = 0;
