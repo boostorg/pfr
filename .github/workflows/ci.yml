@@ -47,6 +47,9 @@ jobs:
           - toolset: clang-15
             cxxstd: "03,11,14,17,20"
             os: ubuntu-22.04
+          - toolset: clang-19
+            cxxstd: "20,23"
+            os: ubuntu-24.04
           # - toolset: clang
           #   cxxstd: "03,11,14,17,2a"
           #   os: macos-10.15
@@ -86,6 +89,15 @@ jobs:
           ./bootstrap.sh
           ./b2 -d0 headers
           ./b2 variant=debug tools/inspect/build
+
+      - name: Run modules tests
+        if: ${{matrix.toolset == 'clang-19'}}
+        run: |
+          cd ../boost-root/libs/pfr
+          mkdir build_module
+          cd build_module
+          cmake -DBOOST_USE_MODULES=1 -DBUILD_TESTING=1 -GNinja -DCMAKE_CXX_COMPILER=clang++-19 ..
+          cmake --build . && ctest -V
 
       - name: Run tests
         run: |
