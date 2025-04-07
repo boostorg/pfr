@@ -10,18 +10,17 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-#ifdef BOOST_PFR_HAS_STD_MODULE
+#include <boost/pfr/detail/sequence_tuple.hpp>
+#include <boost/pfr/detail/rvalue_t.hpp>
+#include <boost/pfr/detail/size_t_.hpp>
+
+#if defined(BOOST_USE_MODULES)
 import std;
 #else
 #include <type_traits>
 #include <utility>
 #include <memory>  // std::addressof
 #endif
-
-#include <boost/pfr/detail/sequence_tuple.hpp>
-#include <boost/pfr/detail/rvalue_t.hpp>
-#include <boost/pfr/detail/size_t_.hpp>
-
 
 namespace boost { namespace pfr { namespace detail {
 

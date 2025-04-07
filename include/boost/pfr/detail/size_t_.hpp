@@ -7,6 +7,13 @@
 #define BOOST_PFR_DETAIL_SIZE_T_HPP
 #pragma once
 
+#if defined(BOOST_USE_MODULES)
+import std;
+#else
+#include <type_traits>
+#include <cstddef>
+#endif
+
 namespace boost { namespace pfr { namespace detail {
 
 ///////////////////// General utility stuff

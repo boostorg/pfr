@@ -12,7 +12,7 @@
 #include <boost/pfr/detail/size_t_.hpp>
 #include <boost/pfr/detail/unsafe_declval.hpp>
 
-#ifdef BOOST_PFR_HAS_STD_MODULE
+#if defined(BOOST_USE_MODULES)
 import std;
 #else
 #include <climits>      // CHAR_BIT

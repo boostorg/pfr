@@ -9,7 +9,9 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-#ifdef BOOST_PFR_HAS_STD_MODULE
+#include <boost/pfr/detail/sequence_tuple.hpp>
+
+#if defined(BOOST_USE_MODULES)
 import std;
 #else
 #include <utility> // metaprogramming stuff
@@ -17,8 +19,6 @@ import std;
 #include <type_traits> // for std::common_type_t
 #include <cstddef>
 #endif
-
-#include <boost/pfr/detail/sequence_tuple.hpp>
 
 namespace boost { namespace pfr { namespace detail {
 

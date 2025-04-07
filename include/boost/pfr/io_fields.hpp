@@ -10,15 +10,22 @@
 
 #include <boost/pfr/detail/config.hpp>
 
+#if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
+import boost.pfr;
+#else
+
 #include <boost/pfr/detail/core.hpp>
-
-#include <type_traits>
-#include <utility>      // metaprogramming stuff
-
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/io.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 #include <boost/pfr/tuple_size.hpp>
+
+#if defined(BOOST_USE_MODULES)
+import std;
+#else
+#include <type_traits>
+#include <utility>      // metaprogramming stuff
+#endif
 
 /// \file boost/pfr/io_fields.hpp
 /// Contains IO manipulator \forcedlink{io_fields} to read/write any \aggregate field-by-field.
@@ -118,8 +125,6 @@ std::basic_istream<Char, Traits>& operator>>(std::basic_istream<Char, Traits>& i
     return in;
 }
 
-BOOST_PFR_BEGIN_MODULE_EXPORT
-
 template <class Char, class Traits, class T>
 std::basic_istream<Char, Traits>& operator>>(std::basic_istream<Char, Traits>& in, io_fields_impl<const T&>&& ) {
     static_assert(sizeof(T) && false, "====================> Boost.PFR: Attempt to use istream operator on a boost::pfr::io_fields wrapped type T with const qualifier.");
@@ -132,11 +137,7 @@ std::basic_istream<Char, Traits>& operator>>(std::basic_istream<Char, Traits>& i
     return in;
 }
 
-BOOST_PFR_END_MODULE_EXPORT
-
 } // namespace detail
-
-BOOST_PFR_BEGIN_MODULE_EXPORT
 
 /// IO manipulator to read/write \aggregate `value` field-by-field.
 ///
@@ -165,8 +166,8 @@ auto io_fields(T&& value) noexcept {
     return detail::io_fields_impl<T>{std::forward<T>(value)};
 }
 
-BOOST_PFR_END_MODULE_EXPORT
-
 }} // namespace boost::pfr
+
+#endif  // #if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
 
 #endif // BOOST_PFR_IO_FIELDS_HPP

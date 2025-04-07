@@ -9,14 +9,14 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-#ifdef BOOST_PFR_HAS_STD_MODULE
+#include <boost/pfr/detail/sequence_tuple.hpp>
+
+#if defined(BOOST_USE_MODULES)
 import std;
 #else
 #include <functional>
 #include <cstdint>
 #endif
-
-#include <boost/pfr/detail/sequence_tuple.hpp>
 
 namespace boost { namespace pfr { namespace detail {
     template <std::size_t I, std::size_t N>

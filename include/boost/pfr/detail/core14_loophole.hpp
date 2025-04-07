@@ -24,7 +24,7 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-#ifdef BOOST_PFR_HAS_STD_MODULE
+#if defined(BOOST_USE_MODULES)
 import std;
 #else
 #include <type_traits>

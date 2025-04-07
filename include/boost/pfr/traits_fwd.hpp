@@ -9,16 +9,18 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-namespace boost { namespace pfr {
+#if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
+import boost.pfr;
+#else
 
-BOOST_PFR_BEGIN_MODULE_EXPORT
+namespace boost { namespace pfr {
 
 template<class T, class WhatFor>
 struct is_reflectable;
 
-BOOST_PFR_END_MODULE_EXPORT
-
 }} // namespace boost::pfr
+
+#endif  // #if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
 
 #endif // BOOST_PFR_DETAIL_TRAITS_FWD_HPP
 

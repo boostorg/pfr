@@ -7,7 +7,7 @@
 #define BOOST_PFR_DETAIL_RVALUE_T_HPP
 #pragma once
 
-#ifdef BOOST_PFR_HAS_STD_MODULE
+#if defined(BOOST_USE_MODULES)
 import std;
 #else
 #include <type_traits>

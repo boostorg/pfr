@@ -9,8 +9,12 @@
 
 #include <boost/pfr/detail/config.hpp>
 
+#if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
+import boost.pfr;
+#else
 #include <boost/pfr/ops_fields.hpp>
 #include <boost/pfr/io_fields.hpp>
+#endif  // #if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
 
 /// \file boost/pfr/functions_for.hpp
 /// Contains BOOST_PFR_FUNCTIONS_FOR macro that defined comparison and stream operators for T along with hash_value function.

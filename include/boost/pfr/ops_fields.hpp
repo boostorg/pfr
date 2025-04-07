@@ -9,6 +9,10 @@
 
 #include <boost/pfr/detail/config.hpp>
 
+#if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
+import boost.pfr;
+#else
+
 #include <boost/pfr/core.hpp>
 #include <boost/pfr/detail/functional.hpp>
 
@@ -32,8 +36,6 @@
 ///
 /// \b Synopsis:
 namespace boost { namespace pfr {
-
-BOOST_PFR_BEGIN_MODULE_EXPORT
 
     /// Does a field-by-field equality comparison.
     ///
@@ -125,8 +127,8 @@ BOOST_PFR_BEGIN_MODULE_EXPORT
 #endif
     }
 
-BOOST_PFR_END_MODULE_EXPORT
-
 }} // namespace boost::pfr
+
+#endif  // #if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
 
 #endif // BOOST_PFR_OPS_HPP

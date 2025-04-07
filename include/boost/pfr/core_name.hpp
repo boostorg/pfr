@@ -14,15 +14,23 @@
 
 #include <boost/pfr/detail/config.hpp>
 
+#if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
+import boost.pfr;
+#else
+
 #include <boost/pfr/detail/core_name.hpp>
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/stdarray.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 
-#include <cstddef> // for std::size_t
-
 #include <boost/pfr/tuple_size.hpp>
+
+#if defined(BOOST_USE_MODULES)
+import std;
+#else
+#include <cstddef> // for std::size_t
+#endif
 
 /// \file boost/pfr/core_name.hpp
 /// Contains functions \forcedlink{get_name} and \forcedlink{names_as_array} to know which names each field of any \aggregate has.
@@ -32,8 +40,6 @@
 /// \b Synopsis:
 
 namespace boost { namespace pfr {
-
-BOOST_PFR_BEGIN_MODULE_EXPORT
 
 /// \brief Returns name of a field with index `I` in \aggregate `T`.
 ///
@@ -106,8 +112,8 @@ constexpr void for_each_field_with_name(T&& value, F&& func) {
     return boost::pfr::detail::for_each_field_with_name(std::forward<T>(value), std::forward<F>(func));
 }
 
-BOOST_PFR_END_MODULE_EXPORT
-
 }} // namespace boost::pfr
+
+#endif  // #if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
 
 #endif // BOOST_PFR_CORE_NAME_HPP

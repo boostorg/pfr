@@ -9,6 +9,10 @@
 
 #include <boost/pfr/detail/config.hpp>
 
+#if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
+import boost.pfr;
+#else
+
 #include <boost/pfr/detail/core.hpp>
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
@@ -17,10 +21,14 @@
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 #include <boost/pfr/detail/tie_from_structure_tuple.hpp>
 
+#include <boost/pfr/tuple_size.hpp>
+
+#if defined(BOOST_USE_MODULES)
+import std;
+#else
 #include <type_traits>
 #include <utility>      // metaprogramming stuff
-
-#include <boost/pfr/tuple_size.hpp>
+#endif
 
 /// \file boost/pfr/core.hpp
 /// Contains all the basic tuple-like interfaces \forcedlink{get}, \forcedlink{tuple_size}, \forcedlink{tuple_element_t}, and others.
@@ -28,8 +36,6 @@
 /// \b Synopsis:
 
 namespace boost { namespace pfr {
-
-BOOST_PFR_BEGIN_MODULE_EXPORT
 
 /// \brief Returns reference or const reference to a field with index `I` in \aggregate `val`.
 /// Overload taking the type `U` returns reference or const reference to a field
@@ -245,8 +251,8 @@ constexpr detail::tie_from_structure_tuple<Elements...> tie_from_structure(Eleme
     return detail::tie_from_structure_tuple<Elements...>(args...);
 }
 
-BOOST_PFR_END_MODULE_EXPORT
-
 }} // namespace boost::pfr
+
+#endif  // #if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
 
 #endif // BOOST_PFR_CORE_HPP

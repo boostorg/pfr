@@ -9,16 +9,15 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-#ifdef BOOST_PFR_HAS_STD_MODULE
-import std;
-#else
-#include <utility>      // metaprogramming stuff
-#endif
-
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/rvalue_t.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 
+#if defined(BOOST_USE_MODULES)
+import std;
+#else
+#include <utility>      // metaprogramming stuff
+#endif
 
 namespace boost { namespace pfr { namespace detail {
 

@@ -9,6 +9,10 @@
 
 #include <boost/pfr/detail/config.hpp>
 
+#if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
+import boost.pfr;
+#else
+
 #include <boost/pfr/detail/detectors.hpp>
 #include <boost/pfr/io_fields.hpp>
 
@@ -67,8 +71,6 @@ struct io_impl {
     T value;
 };
 
-BOOST_PFR_BEGIN_MODULE_EXPORT
-
 template <class Char, class Traits, class T>
 enable_not_ostreamable_t<std::basic_ostream<Char, Traits>, T> operator<<(std::basic_ostream<Char, Traits>& out, io_impl<T>&& x) {
     return out << boost::pfr::io_fields(std::forward<T>(x.value));
@@ -89,11 +91,7 @@ enable_istreamable_t<std::basic_istream<Char, Traits>, T> operator>>(std::basic_
     return in >> x.value;
 }
 
-BOOST_PFR_END_MODULE_EXPORT
-
 } // namespace detail
-
-BOOST_PFR_BEGIN_MODULE_EXPORT
 
 /// IO manipulator to read/write \aggregate `value` using its IO stream operators or using \forcedlink{io_fields} if operators are not available.
 ///
@@ -114,8 +112,8 @@ auto io(T&& value) noexcept {
     return detail::io_impl<T>{std::forward<T>(value)};
 }
 
-BOOST_PFR_END_MODULE_EXPORT
-
 }} // namespace boost::pfr
+
+#endif  // #if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
 
 #endif // BOOST_PFR_IO_HPP

@@ -10,7 +10,7 @@
 #include <boost/pfr/detail/config.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 
-#ifdef BOOST_PFR_HAS_STD_MODULE
+#if defined(BOOST_USE_MODULES)
 import std;
 #else
 #include <utility>      // metaprogramming stuff
