@@ -17,7 +17,7 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.28.0" AND BOOST_USE_MODULES)
     )
     if (CXX_MODULE_STD)
         target_compile_definitions(boost_pfr PUBLIC BOOST_USE_STD_MODULE)
-    target_compile_features(boost_pfr PUBLIC cxx_std_23)
+        target_compile_features(boost_pfr PUBLIC cxx_std_23)
     endif()
 
     target_compile_definitions(boost_pfr PUBLIC BOOST_USE_MODULES)
@@ -31,7 +31,7 @@ add_library(Boost::pfr ALIAS boost_pfr)
 
 enable_testing()
 if (BUILD_TESTING AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/CMakeLists.txt")
-  add_subdirectory(test)
+    add_subdirectory(test)
 endif()
 
 if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.28.0" AND BOOST_USE_MODULES AND BUILD_TESTING)
