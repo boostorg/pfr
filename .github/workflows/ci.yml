@@ -97,7 +97,7 @@ jobs:
           cd ../boost-root/libs/pfr
           mkdir build_module
           cd build_module
-          cmake -DBOOST_USE_MODULES=1 -DBUILD_TESTING=1 -GNinja -DCMAKE_CXX_COMPILER=clang++-19 ..
+          cmake -DBOOST_USE_MODULES=1 -DBUILD_TESTING=1 -GNinja -DCMAKE_CXX_COMPILER=clang++-19 -DCMAKE_CXX_FLAGS=-I../../../ ..
           cmake --build . && ctest -V
 
       - name: Run tests
