@@ -99,6 +99,8 @@ jobs:
           cd build_module
           cmake -DBOOST_USE_MODULES=1 -DBUILD_TESTING=1 -GNinja -DCMAKE_CXX_COMPILER=clang++-19 -DCMAKE_CXX_FLAGS=-I../../../ ..
           cmake --build . && ctest -V
+          cd ..
+          rm -rf build_module
 
       - name: Run tests
         run: |
