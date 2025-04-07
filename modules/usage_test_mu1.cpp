@@ -6,9 +6,9 @@
 // To compile manually use a command like the folowing:
 // clang++ -std=c++20 -fmodule-file=pfr.pcm pfr.pcm usage_sample.cpp
 
-#include <boost/pfr.hpp>
+#include <iostream>
 
-import std;
+#include <boost/pfr.hpp>
 
 struct some_person {
     std::string name;

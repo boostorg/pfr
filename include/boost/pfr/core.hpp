@@ -23,7 +23,7 @@ import boost.pfr;
 
 #include <boost/pfr/tuple_size.hpp>
 
-#if defined(BOOST_USE_MODULES)
+#if defined(BOOST_USE_STD_MODULE)
 import std;
 #else
 #include <type_traits>

@@ -20,7 +20,7 @@ import boost.pfr;
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 #include <boost/pfr/tuple_size.hpp>
 
-#if defined(BOOST_USE_MODULES)
+#if defined(BOOST_USE_STD_MODULE)
 import std;
 #else
 #include <type_traits>

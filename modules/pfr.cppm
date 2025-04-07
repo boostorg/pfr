@@ -39,7 +39,7 @@ using pfr::less_equal;
 using pfr::hash;
 
 // io.hpp and io_fields.hpp
-export namespace detail {
+namespace detail {
     using detail::operator<<;
     using detail::operator>>;
 }  // namespace detail
@@ -69,15 +69,8 @@ using pfr::is_reflectable;
 using pfr::is_implicitly_reflectable;
 using pfr::is_implicitly_reflectable_v;
 
-using pfr::
-using pfr::
-using pfr::
-using pfr::
-using pfr::
-using pfr::
-using pfr::
-using pfr::
-using pfr::
-
+// tuple_size.hpp
+using pfr::tuple_size;
+using pfr::tuple_size_v;
 
 }

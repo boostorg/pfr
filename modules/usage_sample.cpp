@@ -7,7 +7,10 @@
 // clang++ -std=c++20 -fmodule-file=pfr.pcm pfr.pcm usage_sample.cpp
 
 //[pfr_module_example
-import std;
+#include <iostream>
+#include <iomanip>
+#include <string>
+
 import boost.pfr;
 
 struct some_person {

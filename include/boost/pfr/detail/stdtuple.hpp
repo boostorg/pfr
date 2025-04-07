@@ -11,7 +11,7 @@
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 
-#if defined(BOOST_USE_MODULES)
+#if defined(BOOST_USE_STD_MODULE)
 import std;
 #else
 #include <utility>      // metaprogramming stuff

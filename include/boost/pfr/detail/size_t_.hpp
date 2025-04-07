@@ -7,7 +7,7 @@
 #define BOOST_PFR_DETAIL_SIZE_T_HPP
 #pragma once
 
-#if defined(BOOST_USE_MODULES)
+#if defined(BOOST_USE_STD_MODULE)
 import std;
 #else
 #include <type_traits>
