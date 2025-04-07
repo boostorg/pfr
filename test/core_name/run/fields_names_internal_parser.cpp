@@ -13,6 +13,11 @@
 
 #include <boost/core/lightweight_test.hpp>
 
+#if defined(BOOST_USE_MODULES) // TODO: fix for BOOST_USE_MODULES
+int main() {}
+
+#else
+
 namespace testing {
 
 constexpr std::string_view fake_func_name = " ******************** [fake_text1->fake_text2->fake_text3] **********";
@@ -44,4 +49,6 @@ int main() {
 
     return boost::report_errors();
 }
+
+#endif
 

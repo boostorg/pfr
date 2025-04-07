@@ -8,7 +8,7 @@
 #define BOOST_PFR_CONFIG_HPP
 #pragma once
 
-#if !defined(BOOST_USE_MODULES)
+#if !defined(BOOST_USE_MODULES) && (__cplusplus >= 201402L || (defined(_MSC_VER) && defined(_MSVC_LANG) && _MSC_VER > 1900))
 #include <type_traits> // to get non standard platform macro definitions (__GLIBCXX__ for example)
 #endif
 
