@@ -194,7 +194,9 @@ jobs:
 
       - name: Run modules tests
         if: ${{matrix.toolset == 'msvc-14.3'}}
+        shell: cmd
         run: |
+          choco install --no-progress ninja
           call "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvarsall.bat" x64
           cd ../boost-root/libs/pfr
           mkdir build_module
