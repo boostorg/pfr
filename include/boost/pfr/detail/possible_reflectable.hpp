@@ -11,6 +11,7 @@
 #include <boost/pfr/traits_fwd.hpp>
 
 #if defined(BOOST_USE_STD_MODULE)
+#include <version>
 import std;
 #else
 #include <type_traits> // for std::is_aggregate

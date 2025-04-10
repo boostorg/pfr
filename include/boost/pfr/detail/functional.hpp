@@ -11,11 +11,12 @@
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 
+#include <cstdint>
+
 #if defined(BOOST_USE_STD_MODULE)
 import std;
 #else
 #include <functional>
-#include <cstdint>
 #endif
 
 namespace boost { namespace pfr { namespace detail {

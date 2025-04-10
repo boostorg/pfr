@@ -192,6 +192,18 @@ jobs:
           cmd /c bootstrap
           b2 -d0 headers
 
+      - name: Run modules tests
+        if: ${{matrix.toolset == 'msvc-14.3'}}
+        run: |
+          call "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvarsall.bat" x64
+          cd ../boost-root/libs/pfr
+          mkdir build_module
+          cd build_module
+          cmake -DBOOST_USE_MODULES=1 -DBUILD_TESTING=1 -DCMAKE_CXX_STANDARD=23 -DCMAKE_EXPERIMENTAL_CXX_IMPORT_STD=0e5b6991-d74f-4b3d-a41c-cf096e0b2508 -G Ninja -DCMAKE_CXX_FLAGS=-I../../../ ..
+          cmake --build . && ctest --no-tests=error -V
+          cd ..
+          rm -rf build_module
+
       - name: Run tests
         shell: cmd
         run: |

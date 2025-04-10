@@ -13,10 +13,10 @@
 #include <boost/pfr/detail/unsafe_declval.hpp>
 
 #if defined(BOOST_USE_STD_MODULE)
+#include <version>
 import std;
 #else
-#include <climits>      // CHAR_BIT
-#include <cstdint>      // SIZE_MAX
+#include <limits>
 #include <type_traits>
 #include <utility>      // metaprogramming stuff
 #endif
@@ -218,13 +218,13 @@ constexpr std::size_t fields_count_compiler_limitation_next(std::size_t n) noexc
 #else
     static_cast<void>(n);
 #endif
-    return SIZE_MAX;
+    return (std::numeric_limits<std::size_t>::max)();
 }
 
 ///////////////////// Fields count upper bound based on sizeof(T)
 template <class T>
 constexpr std::size_t fields_count_upper_bound_loose() noexcept {
-    return sizeof(T) * CHAR_BIT;
+    return sizeof(T) * std::numeric_limits<unsigned char>::digits;
 }
 
 ///////////////////// Fields count binary search.

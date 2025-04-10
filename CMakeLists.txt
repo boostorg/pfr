@@ -21,10 +21,10 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.28.0" AND BOOST_USE_MODULES)
     endif()
 
     target_compile_definitions(boost_pfr PUBLIC BOOST_USE_MODULES)
-    target_include_directories(boost_pfr PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include)
+    target_include_directories(boost_pfr PUBLIC include)
 else()
     add_library(boost_pfr INTERFACE)
-    target_include_directories(boost_pfr INTERFACE ${CMAKE_CURRENT_LIST_DIR}/include)
+    target_include_directories(boost_pfr INTERFACE include)
 endif()
 
 add_library(Boost::pfr ALIAS boost_pfr)
