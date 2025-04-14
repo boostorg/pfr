@@ -9,9 +9,7 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-#if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
-import boost.pfr;
-#else
+#if !defined(BOOST_USE_MODULES) || defined(BOOST_PFR_INTERFACE_UNIT)
 
 #include <boost/pfr/detail/detectors.hpp>
 #include <boost/pfr/io_fields.hpp>
@@ -114,6 +112,6 @@ auto io(T&& value) noexcept {
 
 }} // namespace boost::pfr
 
-#endif  // #if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
+#endif  // #if !defined(BOOST_USE_MODULES) || defined(BOOST_PFR_INTERFACE_UNIT)
 
 #endif // BOOST_PFR_IO_HPP

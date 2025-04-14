@@ -10,17 +10,19 @@ project(boost_pfr VERSION "${BOOST_SUPERPROJECT_VERSION}" LANGUAGES CXX)
 
 if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.28.0" AND BOOST_USE_MODULES)
     add_library(boost_pfr)
-    target_compile_features(boost_pfr PUBLIC cxx_std_20)
     target_sources(boost_pfr PUBLIC
         FILE_SET modules_public TYPE CXX_MODULES FILES
             ${CMAKE_CURRENT_LIST_DIR}/modules/pfr.cppm
     )
-    if (CXX_MODULE_STD)
-        target_compile_definitions(boost_pfr PUBLIC BOOST_USE_STD_MODULE)
-        target_compile_features(boost_pfr PUBLIC cxx_std_23)
-    endif()
 
+    target_compile_features(boost_pfr PUBLIC cxx_std_20)
     target_compile_definitions(boost_pfr PUBLIC BOOST_USE_MODULES)
+    if (CMAKE_CXX_COMPILER_IMPORT_STD)
+        target_compile_definitions(boost_pfr PRIVATE BOOST_PFR_USE_STD_MODULE)
+        message(STATUS "Using `import std;`")
+    else()
+        message(STATUS "`import std;` is not awailable")
+    endif()
     target_include_directories(boost_pfr PUBLIC include)
 else()
     add_library(boost_pfr INTERFACE)

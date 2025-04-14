@@ -14,9 +14,7 @@
 #include <boost/pfr/detail/for_each_field_impl.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 
-#if defined(BOOST_USE_STD_MODULE)
-import std;
-#else
+#if !defined(BOOST_PFR_INTERFACE_UNIT)
 #include <type_traits>      // metaprogramming stuff
 #endif
 

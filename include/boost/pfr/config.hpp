@@ -149,4 +149,8 @@
 
 #undef BOOST_PFR_NOT_SUPPORTED
 
+#if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
+import boost.pfr;
+#endif
+
 #endif // BOOST_PFR_CONFIG_HPP

@@ -11,9 +11,7 @@
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 
-#if defined(BOOST_USE_STD_MODULE)
-import std;
-#else
+#if !defined(BOOST_PFR_INTERFACE_UNIT)
 #include <iosfwd>       // stream operators
 #include <iomanip>
 

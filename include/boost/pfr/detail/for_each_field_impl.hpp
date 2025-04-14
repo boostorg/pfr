@@ -12,9 +12,7 @@
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/rvalue_t.hpp>
 
-#if defined(BOOST_USE_STD_MODULE)
-import std;
-#else
+#if !defined(BOOST_PFR_INTERFACE_UNIT)
 #include <utility>      // metaprogramming stuff
 #endif
 

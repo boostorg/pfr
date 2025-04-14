@@ -14,9 +14,7 @@
 #include <boost/pfr/detail/rvalue_t.hpp>
 #include <boost/pfr/detail/size_t_.hpp>
 
-#if defined(BOOST_USE_STD_MODULE)
-import std;
-#else
+#if !defined(BOOST_PFR_INTERFACE_UNIT)
 #include <type_traits>
 #include <utility>
 #include <memory>  // std::addressof

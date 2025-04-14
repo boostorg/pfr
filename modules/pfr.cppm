@@ -8,6 +8,28 @@
 
 module;
 
+#include <version>
+#include <cstddef>
+#include <cstdint>
+
+#ifdef BOOST_PFR_USE_STD_MODULE
+import std;
+#else
+#include <array>
+#include <cstddef>
+#include <functional>
+#include <iomanip>
+#include <iostream>
+#include <limits>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <type_traits>
+#include <utility>
+#include <variant>
+#endif
+
 #define BOOST_PFR_INTERFACE_UNIT
 #include <boost/pfr.hpp>
 

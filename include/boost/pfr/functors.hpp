@@ -9,9 +9,7 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-#if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
-import boost.pfr;
-#else
+#if !defined(BOOST_USE_MODULES) || defined(BOOST_PFR_INTERFACE_UNIT)
 
 #include <boost/pfr/ops.hpp>
 
@@ -222,6 +220,6 @@ template <class T> struct hash {
 
 }} // namespace boost::pfr
 
-#endif  // #if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
+#endif  // #if !defined(BOOST_USE_MODULES) || defined(BOOST_PFR_INTERFACE_UNIT)
 
 #endif // BOOST_PFR_FUNCTORS_HPP

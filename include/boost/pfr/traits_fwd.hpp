@@ -9,9 +9,7 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-#if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
-import boost.pfr;
-#else
+#if !defined(BOOST_USE_MODULES) || defined(BOOST_PFR_INTERFACE_UNIT)
 
 namespace boost { namespace pfr {
 
@@ -20,8 +18,7 @@ struct is_reflectable;
 
 }} // namespace boost::pfr
 
-#endif  // #if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
+#endif  // #if !defined(BOOST_USE_MODULES) || defined(BOOST_PFR_INTERFACE_UNIT)
 
 #endif // BOOST_PFR_DETAIL_TRAITS_FWD_HPP
-
 

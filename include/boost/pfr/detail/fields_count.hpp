@@ -12,10 +12,7 @@
 #include <boost/pfr/detail/size_t_.hpp>
 #include <boost/pfr/detail/unsafe_declval.hpp>
 
-#if defined(BOOST_USE_STD_MODULE)
-#include <version>
-import std;
-#else
+#if !defined(BOOST_PFR_INTERFACE_UNIT)
 #include <limits>
 #include <type_traits>
 #include <utility>      // metaprogramming stuff

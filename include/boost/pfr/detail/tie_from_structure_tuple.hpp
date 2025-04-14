@@ -16,9 +16,7 @@
 #include <boost/pfr/tuple_size.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 
-#if defined(BOOST_USE_STD_MODULE)
-import std;
-#else
+#if !defined(BOOST_PFR_INTERFACE_UNIT)
 #include <tuple>
 #endif
 

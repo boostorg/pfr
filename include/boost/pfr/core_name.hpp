@@ -14,9 +14,7 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-#if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
-import boost.pfr;
-#else
+#if !defined(BOOST_USE_MODULES) || defined(BOOST_PFR_INTERFACE_UNIT)
 
 #include <boost/pfr/detail/core_name.hpp>
 
@@ -26,9 +24,7 @@ import boost.pfr;
 
 #include <boost/pfr/tuple_size.hpp>
 
-#if defined(BOOST_USE_STD_MODULE)
-import std;
-#else
+#if !defined(BOOST_PFR_INTERFACE_UNIT)
 #include <cstddef> // for std::size_t
 #endif
 
@@ -114,6 +110,6 @@ constexpr void for_each_field_with_name(T&& value, F&& func) {
 
 }} // namespace boost::pfr
 
-#endif  // #if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
+#endif  // #if !defined(BOOST_USE_MODULES) || defined(BOOST_PFR_INTERFACE_UNIT)
 
 #endif // BOOST_PFR_CORE_NAME_HPP

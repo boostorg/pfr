@@ -10,16 +10,12 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-#if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
-import boost.pfr;
-#else
+#if !defined(BOOST_USE_MODULES) || defined(BOOST_PFR_INTERFACE_UNIT)
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
 
-#if defined(BOOST_USE_STD_MODULE)
-import std;
-#else
+#if !defined(BOOST_PFR_INTERFACE_UNIT)
 #include <type_traits>
 #include <utility>      // metaprogramming stuff
 #endif

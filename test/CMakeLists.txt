@@ -2,12 +2,6 @@
 # Distributed under the Boost Software License, Version 1.0.
 # See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt
 
-# Does not work
-#include(BoostTest OPTIONAL RESULT_VARIABLE HAVE_BOOST_TEST)
-#if(NOT HAVE_BOOST_TEST)
-#  return()
-#endif()
-
 file(GLOB CORE_RUN_FILES "core/run/*.cpp")
 foreach (testsourcefile ${CORE_RUN_FILES})
     get_filename_component(testname ${testsourcefile} NAME_WLE)

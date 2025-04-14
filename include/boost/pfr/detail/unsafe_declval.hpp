@@ -9,9 +9,7 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-#if defined(BOOST_USE_STD_MODULE)
-import std;
-#else
+#if !defined(BOOST_PFR_INTERFACE_UNIT)
 #include <type_traits>
 #endif
 

@@ -18,10 +18,7 @@
 #include <boost/pfr/detail/size_t_.hpp>
 #include <boost/pfr/detail/rvalue_t.hpp>
 
-#if defined(BOOST_USE_STD_MODULE)
-import std;
-#else
-#include <type_traits>
+#if !defined(BOOST_PFR_INTERFACE_UNIT)#include <type_traits>
 #include <utility>      // metaprogramming stuff
 #endif
 
