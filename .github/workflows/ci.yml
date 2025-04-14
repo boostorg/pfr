@@ -50,7 +50,7 @@ jobs:
           - toolset: clang-19
             cxxstd: "20,23"
             os: ubuntu-24.04
-            install: clang-19 clang-tools-19
+            install: clang-19 llvm-19 libclang-rt-19-dev libc++-19-dev libc++abi-19-dev clang-tools-19
           # - toolset: clang
           #   cxxstd: "03,11,14,17,2a"
           #   os: macos-10.15
