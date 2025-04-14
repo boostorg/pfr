@@ -97,8 +97,9 @@ jobs:
           cd ../boost-root/libs/pfr
           mkdir build_module
           cd build_module
-          cmake -DBUILD_TESTING=1 -DCMAKE_CXX_FLAGS=-I../../../ -DBOOST_USE_MODULES=1 -DCMAKE_CXX_COMPILER=clang++-19 -DCMAKE_CXX_FLAGS=-stdlib=libc++ -DCMAKE_EXE_LINKER_FLAGS=-stdlib=libc++ -DCMAKE_CXX_STANDARD=23 -DCMAKE_EXPERIMENTAL_CXX_IMPORT_STD=0e5b6991-d74f-4b3d-a41c-cf096e0b2508 -G Ninja ..
-          cmake --build . && ctest -V
+          cmake -DBUILD_TESTING=1 -DBOOST_USE_MODULES=1 -DCMAKE_CXX_COMPILER=clang++-19 -DCMAKE_CXX_FLAGS=-stdlib=libc++ -DCMAKE_EXE_LINKER_FLAGS=-stdlib=libc++ -DCMAKE_CXX_STANDARD=23 -DCMAKE_EXPERIMENTAL_CXX_IMPORT_STD=0e5b6991-d74f-4b3d-a41c-cf096e0b2508 -G Ninja ..
+          cmake --build .
+          ctest -V
           cd ..
           rm -rf build_module
 
@@ -108,8 +109,9 @@ jobs:
           cd ../boost-root/libs/pfr
           mkdir build_module
           cd build_module
-          cmake -DBOOST_USE_MODULES=1 -DBUILD_TESTING=1 -GNinja -DCMAKE_CXX_COMPILER=clang++-19 -DCMAKE_CXX_FLAGS=-I../../../ ..
-          cmake --build . && ctest -V
+          cmake -DBOOST_USE_MODULES=1 -DBUILD_TESTING=1 -GNinja -DCMAKE_CXX_COMPILER=clang++-19 ..
+          cmake --build .
+          ctest -V
           cd ..
           rm -rf build_module
 
@@ -212,8 +214,9 @@ jobs:
           cd ../boost-root/libs/pfr
           mkdir build_module
           cd build_module
-          cmake -DBOOST_USE_MODULES=1 -DBUILD_TESTING=1 -DCMAKE_CXX_STANDARD=23 -DCMAKE_EXPERIMENTAL_CXX_IMPORT_STD=0e5b6991-d74f-4b3d-a41c-cf096e0b2508 -G Ninja -DCMAKE_CXX_FLAGS=-I../../../ ..
-          cmake --build . && ctest --no-tests=error -V
+          cmake -DBOOST_USE_MODULES=1 -DBUILD_TESTING=1 -DCMAKE_CXX_STANDARD=23 -DCMAKE_EXPERIMENTAL_CXX_IMPORT_STD=0e5b6991-d74f-4b3d-a41c-cf096e0b2508 -G Ninja ..
+          cmake --build .
+          ctest --no-tests=error -V
           cd ..
           rm -rf build_module
 

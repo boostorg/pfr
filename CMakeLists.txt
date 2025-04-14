@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.5...3.31)
 
 project(boost_pfr VERSION "${BOOST_SUPERPROJECT_VERSION}" LANGUAGES CXX)
 
-if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.28.0" AND BOOST_USE_MODULES)
+if (BOOST_USE_MODULES)
     add_library(boost_pfr)
     target_sources(boost_pfr PUBLIC
         FILE_SET modules_public TYPE CXX_MODULES FILES
@@ -36,7 +36,7 @@ if (BUILD_TESTING AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test/CMakeLists.txt")
     add_subdirectory(test)
 endif()
 
-if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.28.0" AND BOOST_USE_MODULES AND BUILD_TESTING)
+if (BOOST_USE_MODULES AND BUILD_TESTING)
     add_executable(boost_pfr_module_usage modules/usage_sample.cpp)
     target_link_libraries(boost_pfr_module_usage PRIVATE Boost::pfr)
     add_test(NAME boost_pfr_module_usage COMMAND boost_pfr_module_usage)
