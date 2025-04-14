@@ -149,6 +149,14 @@
 
 #undef BOOST_PFR_NOT_SUPPORTED
 
+#ifdef BOOST_PFR_INTERFACE_UNIT
+#   define BOOST_PFR_BEGIN_MODULE_EXPORT export {
+#   define BOOST_PFR_END_MODULE_EXPORT }
+#else
+#   define BOOST_PFR_BEGIN_MODULE_EXPORT
+#   define BOOST_PFR_END_MODULE_EXPORT
+#endif
+
 #if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
 import boost.pfr;
 #endif

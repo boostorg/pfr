@@ -35,6 +35,8 @@
 /// \b Synopsis:
 namespace boost { namespace pfr {
 
+BOOST_PFR_BEGIN_MODULE_EXPORT
+
     /// Does a field-by-field equality comparison.
     ///
     /// \returns `L == R && tuple_size_v<T> == tuple_size_v<U>`, where `L` and
@@ -124,6 +126,8 @@ namespace boost { namespace pfr {
         return result;
 #endif
     }
+
+BOOST_PFR_END_MODULE_EXPORT
 
 }} // namespace boost::pfr
 

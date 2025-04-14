@@ -37,6 +37,8 @@
 
 namespace boost { namespace pfr {
 
+BOOST_PFR_BEGIN_MODULE_EXPORT
+
 /// \brief Returns name of a field with index `I` in \aggregate `T`.
 ///
 /// \b Example:
@@ -107,6 +109,8 @@ template <class T, class F>
 constexpr void for_each_field_with_name(T&& value, F&& func) {
     return boost::pfr::detail::for_each_field_with_name(std::forward<T>(value), std::forward<F>(func));
 }
+
+BOOST_PFR_END_MODULE_EXPORT
 
 }} // namespace boost::pfr
 

@@ -55,6 +55,7 @@ struct io_fields_impl {
     T value;
 };
 
+BOOST_PFR_BEGIN_MODULE_EXPORT
 
 template <class Char, class Traits, class T>
 std::basic_ostream<Char, Traits>& operator<<(std::basic_ostream<Char, Traits>& out, io_fields_impl<const T&>&& x) {
@@ -133,7 +134,11 @@ std::basic_istream<Char, Traits>& operator>>(std::basic_istream<Char, Traits>& i
     return in;
 }
 
+BOOST_PFR_END_MODULE_EXPORT
+
 } // namespace detail
+
+BOOST_PFR_BEGIN_MODULE_EXPORT
 
 /// IO manipulator to read/write \aggregate `value` field-by-field.
 ///
@@ -161,6 +166,8 @@ template <class T>
 auto io_fields(T&& value) noexcept {
     return detail::io_fields_impl<T>{std::forward<T>(value)};
 }
+
+BOOST_PFR_END_MODULE_EXPORT
 
 }} // namespace boost::pfr
 

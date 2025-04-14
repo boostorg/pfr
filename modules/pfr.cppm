@@ -31,68 +31,12 @@ import std;
 #endif
 
 #define BOOST_PFR_INTERFACE_UNIT
-#include <boost/pfr.hpp>
 
 export module boost.pfr;
 
-export namespace boost::pfr {
+#ifdef __clang__
+#   pragma clang diagnostic ignored "-Winclude-angled-in-module-purview"
+#endif
 
-// core.hpp
-using pfr::get;
-using pfr::tuple_element;
-using pfr::tuple_element_t;
-using pfr::structure_to_tuple;
-using pfr::structure_tie;
-using pfr::for_each_field;
-using pfr::tie_from_structure;
+#include <boost/pfr.hpp>
 
-// core_name.hpp
-using pfr::get_name;
-using pfr::names_as_array;
-using pfr::for_each_field_with_name;
-
-// functors.hpp
-using pfr::equal_to;
-using pfr::not_equal;
-using pfr::greater;
-using pfr::less;
-using pfr::greater_equal;
-using pfr::less_equal;
-using pfr::hash;
-
-// io.hpp and io_fields.hpp
-namespace detail {
-    using detail::operator<<;
-    using detail::operator>>;
-}  // namespace detail
-using pfr::io;
-using pfr::io_fields;
-
-// ops.hpp
-using pfr::eq;
-using pfr::ne;
-using pfr::lt;
-using pfr::gt;
-using pfr::le;
-using pfr::ge;
-using pfr::hash_value;
-
-// ops_fields.hpp
-using pfr::eq_fields;
-using pfr::ne_fields;
-using pfr::lt_fields;
-using pfr::gt_fields;
-using pfr::le_fields;
-using pfr::ge_fields;
-using pfr::hash_fields;
-
-// traits.hpp
-using pfr::is_reflectable;
-using pfr::is_implicitly_reflectable;
-using pfr::is_implicitly_reflectable_v;
-
-// tuple_size.hpp
-using pfr::tuple_size;
-using pfr::tuple_size_v;
-
-}

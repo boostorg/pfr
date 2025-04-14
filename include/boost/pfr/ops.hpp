@@ -79,6 +79,8 @@ namespace detail {
     >;
 } // namespace detail
 
+BOOST_PFR_BEGIN_MODULE_EXPORT
+
 /// \brief Compares lhs and rhs for equality using their own comparison and conversion operators; if no operators available returns \forcedlink{eq_fields}(lhs, rhs).
 ///
 /// \returns true if lhs is equal to rhs; false otherwise
@@ -182,6 +184,8 @@ template <class T>
 constexpr detail::enable_hashable_t<T> hash_value(const T& value) {
     return std::hash<T>{}(value);
 }
+
+BOOST_PFR_END_MODULE_EXPORT
 
 }} // namespace boost::pfr
 
