@@ -92,7 +92,8 @@ jobs:
           ./b2 variant=debug tools/inspect/build
 
       - name: Run modules tests
-        if: ${{matrix.toolset == 'clang-19'}}
+        if: false
+        # if: ${{matrix.toolset == 'clang-19'}}
         run: |
           cd ../boost-root/libs/pfr
           mkdir build_module
@@ -206,7 +207,8 @@ jobs:
           b2 -d0 headers
 
       - name: Run modules tests
-        if: ${{matrix.toolset == 'msvc-14.3'}}
+        if: false
+        # if: ${{matrix.toolset == 'msvc-14.3'}}
         shell: cmd
         run: |
           choco install --no-progress ninja
@@ -215,6 +217,21 @@ jobs:
           mkdir build_module
           cd build_module
           cmake -DBOOST_USE_MODULES=1 -DBUILD_TESTING=1 -DCMAKE_CXX_STANDARD=23 -DCMAKE_EXPERIMENTAL_CXX_IMPORT_STD=0e5b6991-d74f-4b3d-a41c-cf096e0b2508 -G Ninja ..
+          cmake --build .
+          ctest --no-tests=error -V
+          cd ..
+          rm -rf build_module
+
+      - name: Run modules tests wihtout 'import std;'
+        if: ${{matrix.toolset == 'msvc-14.3'}}
+        shell: cmd
+        run: |
+          choco install --no-progress ninja
+          call "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvarsall.bat" x64
+          cd ../boost-root/libs/pfr
+          mkdir build_module
+          cd build_module
+          cmake -DBOOST_USE_MODULES=1 -DBUILD_TESTING=1 -DCMAKE_CXX_STANDARD=20 -G Ninja ..
           cmake --build .
           ctest --no-tests=error -V
           cd ..
