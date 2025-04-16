@@ -9,6 +9,8 @@
 
 #include <boost/pfr/detail/config.hpp>
 
+#if !defined(BOOST_USE_MODULES) || defined(BOOST_PFR_INTERFACE_UNIT)
+
 #include <boost/pfr/detail/core.hpp>
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
@@ -17,10 +19,12 @@
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 #include <boost/pfr/detail/tie_from_structure_tuple.hpp>
 
+#include <boost/pfr/tuple_size.hpp>
+
+#if !defined(BOOST_PFR_INTERFACE_UNIT)
 #include <type_traits>
 #include <utility>      // metaprogramming stuff
-
-#include <boost/pfr/tuple_size.hpp>
+#endif
 
 /// \file boost/pfr/core.hpp
 /// Contains all the basic tuple-like interfaces \forcedlink{get}, \forcedlink{tuple_size}, \forcedlink{tuple_element_t}, and others.
@@ -248,5 +252,7 @@ constexpr detail::tie_from_structure_tuple<Elements...> tie_from_structure(Eleme
 BOOST_PFR_END_MODULE_EXPORT
 
 }} // namespace boost::pfr
+
+#endif  // #if !defined(BOOST_USE_MODULES) || defined(BOOST_PFR_INTERFACE_UNIT)
 
 #endif // BOOST_PFR_CORE_HPP

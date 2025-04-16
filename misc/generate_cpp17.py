@@ -39,9 +39,7 @@ PROLOGUE = """// Copyright (c) 2016-2025 Antony Polukhin
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/size_t_.hpp>
 
-#ifdef BOOST_PFR_HAS_STD_MODULE
-import std;
-#else
+#if !defined(BOOST_PFR_INTERFACE_UNIT)
 #include <type_traits> // for std::conditional_t, std::is_reference
 #endif
 

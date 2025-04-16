@@ -10,9 +10,7 @@
 #include <boost/pfr/detail/config.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 
-#ifdef BOOST_PFR_HAS_STD_MODULE
-import std;
-#else
+#if !defined(BOOST_PFR_INTERFACE_UNIT)
 #include <utility>      // metaprogramming stuff
 #include <cstddef>      // std::size_t
 #endif

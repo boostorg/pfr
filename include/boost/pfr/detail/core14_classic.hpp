@@ -9,13 +9,6 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-#ifdef BOOST_PFR_HAS_STD_MODULE
-import std;
-#else
-#include <type_traits>
-#include <utility>      // metaprogramming stuff
-#endif
-
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/offset_based_getter.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
@@ -24,6 +17,11 @@ import std;
 #include <boost/pfr/detail/size_array.hpp>
 #include <boost/pfr/detail/size_t_.hpp>
 #include <boost/pfr/detail/rvalue_t.hpp>
+
+#if !defined(BOOST_PFR_INTERFACE_UNIT)
+#include <type_traits>
+#include <utility>      // metaprogramming stuff
+#endif
 
 #ifdef __clang__
 #   pragma clang diagnostic push

@@ -6,16 +6,21 @@
 // To compile manually use a command like the folowing:
 // clang++ -I ../include -std=c++20 --precompile -x c++-module pfr.cppm
 
-#define BOOST_PFR_BEGIN_MODULE_EXPORT export {
-#define BOOST_PFR_END_MODULE_EXPORT }
-
-#ifndef BOOST_PFR_HAS_STD_MODULE
 module;
+
+#include <version>
+#include <cstddef>
+#include <cstdint>
+
+#ifdef BOOST_PFR_USE_STD_MODULE
+import std;
+#else
 #include <array>
 #include <cstddef>
 #include <functional>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -25,20 +30,13 @@ module;
 #include <variant>
 #endif
 
-export module Boost.PFR;
+#define BOOST_PFR_INTERFACE_UNIT
 
-#ifdef BOOST_PFR_HAS_STD_MODULE
-import std;
-#endif
+export module boost.pfr;
 
 #ifdef __clang__
 #   pragma clang diagnostic ignored "-Winclude-angled-in-module-purview"
 #endif
 
-#ifdef BOOST_PFR_ATTACH_TO_GLOBAL_MODULE
-extern "C++" {
 #include <boost/pfr.hpp>
-}
-#else
-#include <boost/pfr.hpp>
-#endif
+

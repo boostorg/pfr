@@ -9,6 +9,8 @@
 
 #include <boost/pfr/detail/config.hpp>
 
+#if !defined(BOOST_USE_MODULES) || defined(BOOST_PFR_INTERFACE_UNIT)
+
 #include <boost/pfr/detail/detectors.hpp>
 #include <boost/pfr/ops_fields.hpp>
 
@@ -186,5 +188,7 @@ constexpr detail::enable_hashable_t<T> hash_value(const T& value) {
 BOOST_PFR_END_MODULE_EXPORT
 
 }} // namespace boost::pfr
+
+#endif  // #if !defined(BOOST_USE_MODULES) || defined(BOOST_PFR_INTERFACE_UNIT)
 
 #endif // BOOST_PFR_OPS_HPP

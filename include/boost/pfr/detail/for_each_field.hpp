@@ -9,16 +9,14 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-#ifdef BOOST_PFR_HAS_STD_MODULE
-import std;
-#else
-#include <type_traits>      // metaprogramming stuff
-#endif
-
 #include <boost/pfr/detail/core.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
 #include <boost/pfr/detail/for_each_field_impl.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
+
+#if !defined(BOOST_PFR_INTERFACE_UNIT)
+#include <type_traits>      // metaprogramming stuff
+#endif
 
 namespace boost { namespace pfr { namespace detail {
 

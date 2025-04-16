@@ -47,6 +47,10 @@ jobs:
           - toolset: clang-15
             cxxstd: "03,11,14,17,20"
             os: ubuntu-22.04
+          - toolset: clang-19
+            cxxstd: "20,23"
+            os: ubuntu-24.04
+            install: clang-19 llvm-19 libclang-rt-19-dev libc++-19-dev libc++abi-19-dev clang-tools-19
           # - toolset: clang
           #   cxxstd: "03,11,14,17,2a"
           #   os: macos-10.15
@@ -86,6 +90,31 @@ jobs:
           ./bootstrap.sh
           ./b2 -d0 headers
           ./b2 variant=debug tools/inspect/build
+
+      - name: Run modules tests
+        if: false
+        # if: ${{matrix.toolset == 'clang-19'}}
+        run: |
+          cd ../boost-root/libs/pfr
+          mkdir build_module
+          cd build_module
+          cmake -DBUILD_TESTING=1 -DBOOST_USE_MODULES=1 -DCMAKE_CXX_COMPILER=clang++-19 -DCMAKE_CXX_FLAGS=-stdlib=libc++ -DCMAKE_EXE_LINKER_FLAGS=-stdlib=libc++ -DCMAKE_CXX_STANDARD=23 -DCMAKE_EXPERIMENTAL_CXX_IMPORT_STD=0e5b6991-d74f-4b3d-a41c-cf096e0b2508 -G Ninja ..
+          cmake --build .
+          ctest -V
+          cd ..
+          rm -rf build_module
+
+      - name: Run modules tests wihtout 'import std;'
+        if: ${{matrix.toolset == 'clang-19'}}
+        run: |
+          cd ../boost-root/libs/pfr
+          mkdir build_module
+          cd build_module
+          cmake -DBOOST_USE_MODULES=1 -DBUILD_TESTING=1 -GNinja -DCMAKE_CXX_COMPILER=clang++-19 ..
+          cmake --build .
+          ctest -V
+          cd ..
+          rm -rf build_module
 
       - name: Run tests
         run: |
@@ -176,6 +205,37 @@ jobs:
           python tools/boostdep/depinst/depinst.py --include benchmark --include example --include examples --include tools --git_args "--jobs 3" %LIBRARY%
           cmd /c bootstrap
           b2 -d0 headers
+
+      - name: Run modules tests
+        if: false
+        # if: ${{matrix.toolset == 'msvc-14.3'}}
+        shell: cmd
+        run: |
+          choco install --no-progress ninja
+          call "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvarsall.bat" x64
+          cd ../boost-root/libs/pfr
+          mkdir build_module
+          cd build_module
+          cmake -DBOOST_USE_MODULES=1 -DBUILD_TESTING=1 -DCMAKE_CXX_STANDARD=23 -DCMAKE_EXPERIMENTAL_CXX_IMPORT_STD=0e5b6991-d74f-4b3d-a41c-cf096e0b2508 -G Ninja ..
+          cmake --build .
+          ctest --no-tests=error -V
+          cd ..
+          rm -rf build_module
+
+      - name: Run modules tests wihtout 'import std;'
+        if: ${{matrix.toolset == 'msvc-14.3'}}
+        shell: cmd
+        run: |
+          choco install --no-progress ninja
+          call "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvarsall.bat" x64
+          cd ../boost-root/libs/pfr
+          mkdir build_module
+          cd build_module
+          cmake -DBOOST_USE_MODULES=1 -DBUILD_TESTING=1 -DCMAKE_CXX_STANDARD=20 -G Ninja ..
+          cmake --build .
+          ctest --no-tests=error -V
+          cd ..
+          rm -rf build_module
 
       - name: Run tests
         shell: cmd

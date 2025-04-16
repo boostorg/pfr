@@ -24,13 +24,6 @@
 
 #include <boost/pfr/detail/config.hpp>
 
-#ifdef BOOST_PFR_HAS_STD_MODULE
-import std;
-#else
-#include <type_traits>
-#include <utility>
-#endif
-
 #include <boost/pfr/detail/offset_based_getter.hpp>
 #include <boost/pfr/detail/fields_count.hpp>
 #include <boost/pfr/detail/make_flat_tuple_of_references.hpp>
@@ -39,6 +32,9 @@ import std;
 #include <boost/pfr/detail/rvalue_t.hpp>
 #include <boost/pfr/detail/unsafe_declval.hpp>
 
+#if !defined(BOOST_PFR_INTERFACE_UNIT)
+#include <utility>
+#endif
 
 #ifdef __clang__
 #   pragma clang diagnostic push

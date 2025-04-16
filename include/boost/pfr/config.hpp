@@ -8,8 +8,10 @@
 #define BOOST_PFR_CONFIG_HPP
 #pragma once
 
-#if __cplusplus >= 201402L || (defined(_MSC_VER) && defined(_MSVC_LANG) && _MSC_VER > 1900)
+#if !defined(BOOST_USE_MODULES) && (__cplusplus >= 201402L || (defined(_MSC_VER) && defined(_MSVC_LANG) && _MSC_VER > 1900))
 #include <type_traits> // to get non standard platform macro definitions (__GLIBCXX__ for example)
+#elif defined(BOOST_USE_MODULES)
+#include <version>
 #endif
 
 /// \file boost/pfr/config.hpp
@@ -70,8 +72,10 @@
 #endif
 
 #ifndef BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE
+#   if defined(BOOST_USE_MODULES)
+#       define BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE 1
 // Assume that libstdc++ since GCC-7.3 does not have linear instantiation depth in std::make_integral_sequence
-#   if defined( __GLIBCXX__) && __GLIBCXX__ >= 20180101
+#   elif defined( __GLIBCXX__) && __GLIBCXX__ >= 20180101
 #       define BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE 1
 #   elif defined(_MSC_VER)
 #       define BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE 1
@@ -145,12 +149,16 @@
 
 #undef BOOST_PFR_NOT_SUPPORTED
 
-#ifndef BOOST_PFR_BEGIN_MODULE_EXPORT
+#ifdef BOOST_PFR_INTERFACE_UNIT
+#   define BOOST_PFR_BEGIN_MODULE_EXPORT export {
+#   define BOOST_PFR_END_MODULE_EXPORT }
+#else
 #   define BOOST_PFR_BEGIN_MODULE_EXPORT
+#   define BOOST_PFR_END_MODULE_EXPORT
 #endif
 
-#ifndef BOOST_PFR_END_MODULE_EXPORT
-#   define BOOST_PFR_END_MODULE_EXPORT
+#if defined(BOOST_USE_MODULES) && !defined(BOOST_PFR_INTERFACE_UNIT)
+import boost.pfr;
 #endif
 
 #endif // BOOST_PFR_CONFIG_HPP

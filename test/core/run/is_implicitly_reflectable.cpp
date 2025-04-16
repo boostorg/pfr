@@ -7,6 +7,10 @@
 #include <boost/pfr/traits.hpp>
 #include <type_traits>  // for std::true_type, std::false_type and std::is_aggregate
 
+#if defined(BOOST_USE_MODULES) // TODO: fix for BOOST_USE_MODULES
+int main() {}
+
+#else
 namespace boost { namespace pfr {
     struct boost_fusion_tag;
     struct boost_json_tag;
@@ -80,4 +84,6 @@ int main() {
     }
 #endif  // #if BOOST_PFR_ENABLE_IMPLICIT_REFLECTION
 }
+
+#endif
 

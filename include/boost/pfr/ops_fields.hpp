@@ -9,6 +9,8 @@
 
 #include <boost/pfr/detail/config.hpp>
 
+#if !defined(BOOST_USE_MODULES) || defined(BOOST_PFR_INTERFACE_UNIT)
+
 #include <boost/pfr/core.hpp>
 #include <boost/pfr/detail/functional.hpp>
 
@@ -128,5 +130,7 @@ BOOST_PFR_BEGIN_MODULE_EXPORT
 BOOST_PFR_END_MODULE_EXPORT
 
 }} // namespace boost::pfr
+
+#endif  // #if !defined(BOOST_USE_MODULES) || defined(BOOST_PFR_INTERFACE_UNIT)
 
 #endif // BOOST_PFR_OPS_HPP
