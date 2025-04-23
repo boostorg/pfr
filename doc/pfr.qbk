@@ -559,7 +559,7 @@ parameters provided to `BOOST_PFR_CORE_NAME_PARSING` macro [*and] the initial ou
 If using modern CMake define CMake option `-DBOOST_USE_MODULES=1` to build a C++20 module and
 make the `Boost::pfr` CMake target provide it. After that an explicit usage of C++20 module `boost.pfr` is allowed:
 
-[import ../module/usage_sample.cpp]
+[import ../modules/usage_sample.cpp]
 [pfr_module_example]
 
 The `Boost::pfr` CMake target gives an ability to mix includes and imports of the PFR library in different translation units. Moreover,
