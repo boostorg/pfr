@@ -11,8 +11,7 @@ project(boost_pfr VERSION "${BOOST_SUPERPROJECT_VERSION}" LANGUAGES CXX)
 if (BOOST_USE_MODULES)
     add_library(boost_pfr)
     target_sources(boost_pfr PUBLIC
-        FILE_SET modules_public TYPE CXX_MODULES FILES
-            ${CMAKE_CURRENT_LIST_DIR}/modules/pfr.cppm
+        FILE_SET modules_public TYPE CXX_MODULES FILES modules/boost_pfr.cppm
     )
 
     target_compile_features(boost_pfr PUBLIC cxx_std_20)
