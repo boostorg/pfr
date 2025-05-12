@@ -6,14 +6,7 @@
 
 #include <boost/pfr/core.hpp>
 
-#include <boost/type_index.hpp>
-
 #include <boost/core/lightweight_test.hpp>
-
-#if defined(BOOST_USE_MODULES) // TODO: fix for BOOST_USE_MODULES
-int main() {}
-
-#else
 
 namespace testing {
 
@@ -32,18 +25,16 @@ void test_get_in_anon_ns_const_field() {
     anon x{{1}, {2}};
 
     BOOST_TEST_EQ(boost::pfr::get<0>(x).data, 1);
-    auto x0_type = boost::typeindex::type_id_with_cvr<decltype(
-        boost::pfr::get<0>(x)
-    )>();
-    // Use runtime check to make sure that Loophole fails to compile structure_tie
-    BOOST_TEST_EQ(x0_type, boost::typeindex::type_id_with_cvr<other_anon&>());
+    static_assert(std::is_same<
+        decltype(boost::pfr::get<0>(x)),
+        other_anon&
+    >::value, "");
 
     BOOST_TEST_EQ(boost::pfr::get<1>(x).data, 2);
-    auto x1_type = boost::typeindex::type_id_with_cvr<decltype(
-        boost::pfr::get<1>(x)
-    )>();
-    // Use runtime check to make sure that Loophole fails to compile structure_tie
-    BOOST_TEST_EQ(x1_type, boost::typeindex::type_id_with_cvr<const other_anon&>());
+    static_assert(std::is_same<
+        decltype(boost::pfr::get<1>(x)),
+        const other_anon&
+    >::value, "");
 }
 
 } // anonymous namespace
@@ -56,5 +47,3 @@ int main() {
 
     return boost::report_errors();
 }
-
-#endif
