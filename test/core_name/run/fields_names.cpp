@@ -131,6 +131,13 @@ void test_names_as_array_for_empty() {
     BOOST_TEST_EQ(value.empty(), true);
 }
 
+void test_names_as_array_iteration_for_empty() {
+    const auto names = boost::pfr::names_as_array<empty>();
+    for (std::string_view name : names) {
+        BOOST_ERROR("`names` must be empty");
+    }
+}
+
 } // namespace testing
 
 int main() {
@@ -141,6 +148,7 @@ int main() {
     testing::test_names_as_array();
     testing::test_names_as_array_without_linkage();
     testing::test_names_as_array_for_empty();
+    testing::test_names_as_array_iteration_for_empty();
 
     return boost::report_errors();
 }
