@@ -89,7 +89,7 @@ jobs:
           python tools/boostdep/depinst/depinst.py --include benchmark --include example --include examples --include tools --git_args "--depth 10 --jobs 3" $LIBRARY
           ./bootstrap.sh
           ./b2 -d0 headers
-          ./b2 variant=debug tools/inspect/build
+          ./b2 variant=debug tools/inspect
 
       - name: Run modules tests
         if: false
