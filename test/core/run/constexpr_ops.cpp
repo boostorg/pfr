@@ -13,7 +13,6 @@
 #include <set>
 #include <string>
 
-#include <boost/config.hpp>
 #include <boost/core/lightweight_test.hpp>
 
 #ifdef __clang__
