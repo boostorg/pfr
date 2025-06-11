@@ -171,9 +171,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - toolset: msvc-14.4
-            cxxstd: "14,latest"
-            addrmd: 32,64
+          - toolset: msvc-14.3  # tests CMake tests down below
+            cxxstd: "14,17,20,latest"
+            addrmd: 64
             os: windows-2025
             threads: "-j3"
           - toolset: gcc
@@ -181,7 +181,7 @@ jobs:
             addrmd: 64
             os: windows-2025
             threads: "-j3"
-          - toolset: msvc-14.3  # Do not remove! It is the only toolset that tests CMake tests down below
+          - toolset: msvc-14.3  # tests CMake tests down below
             cxxstd: "20,latest"
             addrmd: 64
             os: windows-2022
