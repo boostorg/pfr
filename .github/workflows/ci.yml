@@ -99,7 +99,7 @@ jobs:
           cd __build
           cmake -DBUILD_TESTING=1 -DBOOST_INCLUDE_LIBRARIES=pfr -DCMAKE_CXX_COMPILER=g++-14 -DCMAKE_C_COMPILER=gcc-14 ..
           cmake --build . --target tests
-          ctest --output-on-failure --no-tests=error -V
+          ctest --output-on-failure --no-tests=error
           cd ..
           rm -rf __build
 
@@ -220,6 +220,7 @@ jobs:
 
       - name: Run CMake tests
         if: ${{matrix.toolset == 'msvc-14.3'}}
+        shell: cmd
         run: |
           choco install --no-progress ninja
           call "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvarsall.bat" x64
