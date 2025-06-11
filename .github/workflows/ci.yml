@@ -171,7 +171,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - toolset: msvc-14.3  # tests CMake tests down below
+          - toolset: msvc-14.3        # tests CMake tests down below, does not run b2 tests
             cxxstd: "14,17,20,latest"
             addrmd: 64
             os: windows-2025
@@ -265,6 +265,7 @@ jobs:
           rm -rf build_module
 
       - name: Run tests
+        if: ${{matrix.os != 'windows-2025'}}  # TODO: workaround issues
         shell: cmd
         run: |
           cd ../boost-root
