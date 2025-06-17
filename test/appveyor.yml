@@ -41,16 +41,16 @@ environment:
 #      ADDRMD: 32,64
 #      CXXSTD: 17,latest
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      TOOLSET: msvc # clang-win has problems with structured bindings - it can not correclty use std::tuple_size
+      TOOLSET: msvc # clang-win has problems with structured bindings - it can not correctly use std::tuple_size
       ADDRMD: 32,64
       CXXSTD: 17,latest
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      TOOLSET: msvc # clang-win has problems with structured bindings - it can not correclty use std::tuple_size
+      TOOLSET: msvc # clang-win has problems with structured bindings - it can not correctly use std::tuple_size
       ADDRMD: 32,64
       CXXSTD: 17,latest
       CXXFLAGS: /permissive-
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-      TOOLSET: msvc # clang-win has problems with structured bindings - it can not correclty use std::tuple_size
+      TOOLSET: msvc # clang-win has problems with structured bindings - it can not correctly use std::tuple_size
       ADDRMD: 32,64
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       ADDPATH: C:\cygwin\bin;
