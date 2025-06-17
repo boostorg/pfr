@@ -40,25 +40,25 @@ namespace detail {
 ///////////////////// Helper typedefs
     template <class Stream, class Type>
     using enable_not_ostreamable_t = std::enable_if_t<
-        not_appliable<ostreamable_detector, Stream&, const std::remove_reference_t<Type>&>::value,
+        not_applicable<ostreamable_detector, Stream&, const std::remove_reference_t<Type>&>::value,
         Stream&
     >;
 
     template <class Stream, class Type>
     using enable_not_istreamable_t = std::enable_if_t<
-        not_appliable<istreamable_detector, Stream&, Type&>::value,
+        not_applicable<istreamable_detector, Stream&, Type&>::value,
         Stream&
     >;
 
     template <class Stream, class Type>
     using enable_ostreamable_t = std::enable_if_t<
-        !not_appliable<ostreamable_detector, Stream&, const std::remove_reference_t<Type>&>::value,
+        !not_applicable<ostreamable_detector, Stream&, const std::remove_reference_t<Type>&>::value,
         Stream&
     >;
 
     template <class Stream, class Type>
     using enable_istreamable_t = std::enable_if_t<
-        !not_appliable<istreamable_detector, Stream&, Type&>::value,
+        !not_applicable<istreamable_detector, Stream&, Type&>::value,
         Stream&
     >;
 

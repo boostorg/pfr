@@ -563,7 +563,7 @@ make the `Boost::pfr` CMake target provide it. After that an explicit usage of C
 [pfr_module_example]
 
 The `Boost::pfr` CMake target gives an ability to mix includes and imports of the PFR library in different translation units. Moreover,
-if `BOOST_USE_MODULES` macro is defined then all the `boost/pfr/...` includes implicilty do `import boost.pfr;` to give all the
+if `BOOST_USE_MODULES` macro is defined then all the `boost/pfr/...` includes implicitly do `import boost.pfr;` to give all the
 benifits of modules without changing the existing code.
 
 [note For better compile times make sure that `import std;` is available when building the `boost.pfr` module (in CMake logs there should be

@@ -19,7 +19,7 @@ namespace boost { namespace pfr { namespace detail {
     struct can_not_apply{};
 
     template <template <class, class> class Detector, class Tleft, class Tright>
-    struct not_appliable {
+    struct not_applicable {
         static constexpr bool value = std::is_same<
             Detector<Tleft, Tright>,
             can_not_apply
