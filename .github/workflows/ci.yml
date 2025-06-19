@@ -20,7 +20,7 @@ jobs:
           - toolset: gcc-14  # Do not remove! It is the only toolset that tests CMake tests down below
             cxxstd: "03,11,14,17,20"
             os: ubuntu-24.04
-          - toolset: gcc-12 # Do not remove! It is the only toolset that tests misc/strip_boost_namespace.sh
+          - toolset: gcc-12
             cxxstd: "03,11,14,17,2a"
             os: ubuntu-22.04
             cxxflags: "cxxflags=--coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined"
@@ -47,7 +47,7 @@ jobs:
           - toolset: clang-15
             cxxstd: "03,11,14,17,20"
             os: ubuntu-22.04
-          - toolset: clang-19
+          - toolset: clang-19   # tests misc/strip_boost_namespace.sh and modules
             cxxstd: "20,23"
             os: ubuntu-24.04
             install: clang-19 llvm-19 libclang-rt-19-dev libc++-19-dev libc++abi-19-dev clang-tools-19
@@ -130,7 +130,7 @@ jobs:
           dist/bin/inspect libs/$LIBRARY
 
       - name: Test boost namespace stripping
-        if: ${{matrix.toolset == 'gcc-12'}}
+        if: ${{matrix.toolset == 'clang-19'}}
         run: ../boost-root/libs/$LIBRARY/misc/strip_boost_namespace.sh
 
       - name: Prepare coverage data
