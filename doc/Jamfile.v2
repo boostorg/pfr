@@ -56,8 +56,7 @@ boostbook pfr-doc
     :
         <dependency>autodoc_pfr
         #<xsl:param>boost.root=https://www.boost.org/doc/libs/1_88_0
-        <xsl:param>boost.root=../../../.
-        <xml:param>html.stylesheet=../../../../doc/src/boostbook.css
+        <xsl:param>boost.root=../../../..
     ;
 
 ###############################################################################
