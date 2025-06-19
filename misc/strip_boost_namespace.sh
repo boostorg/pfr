@@ -39,16 +39,13 @@ find ${TARGET_PATH} -type f | xargs sed -i \
         -e 's/boost_pfr)/pfr)/g' \
         -e 's/Boost::pfr/pfr::pfr/g' \
         -e 's/BOOST_USE_MODULES/PFR_USE_MODULES/g' \
+        -e 's|boost\.pfr;|pfr;|g' \
 
 find ${TARGET_PATH}/doc -type f | xargs sed -i \
         -e 's|boost\.pfr\.|pfr.|g' \
         -e 's|boost\.pfr`|pfr`|g' \
-        -e 's|boost\.pfr;|pfr;|g' \
         -e 's/boost_pfr\./pfr./g' \
-        -e 's|Boost\.PFR|PFR|g'
-
-find ${TARGET_PATH}/modules -type f | xargs sed -i \
-    -e 's|boost\.pfr|pfr|g'
+        -e 's|Boost\.PFR|PFR|g' \
 
 sed -i  's|# \[Boost.PFR\](https://boost.org/libs/pfr)|# [PFR](https://apolukhin.github.io/pfr_non_boost/)|g' ${TARGET_PATH}/README.md
 
@@ -93,6 +90,17 @@ else
     exit 7
 fi
 
+mkdir build_module || :
+cd build_module
+if cmake -DPFR_USE_MODULES=1 -DBUILD_TESTING=1 -GNinja -DCMAKE_CXX_COMPILER=clang++-19 ${TARGET_PATH} && cmake --build .; then
+    echo "Modules check OK"
+else
+    echo "Modules check FAIL"
+    exit 8
+fi
+cd ..
+
+rm -rf build_module || :
 rm a.out || :
 
 echo -e "\n***** Done"
