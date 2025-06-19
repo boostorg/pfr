@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2021 Antony Polukhin
+# Copyright (c) 2021-2025 Antony Polukhin
 #
 # Distributed under the Boost Software License, Version 1.0. (See accompanying
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -24,17 +24,31 @@ rm ${TARGET_PATH}/misc/strip_boost_namespace.sh
 rm -rf ${TARGET_PATH}/meta
 
 echo "***** Changing sources"
-find ${TARGET_PATH} -type f | xargs sed -i 's|namespace boost { ||g'
-find ${TARGET_PATH} -type f | xargs sed -i 's|namespace boost {||g'
-find ${TARGET_PATH} -type f | xargs sed -i 's|} // namespace boost::| // namespace |g'
+find ${TARGET_PATH} -type f | xargs sed -i \
+        -e 's|namespace boost { ||g' \
+        -e 's|namespace boost {||g' \
+        -e 's|} // namespace boost::| // namespace |g' \
+        \
+        -e 's/::boost::pfr/::pfr/g' \
+        -e 's/boost::pfr/pfr/g' \
+        -e 's/BOOST_PFR_/PFR_/g' \
+        -e 's|boost/pfr|pfr|g' \
+        \
+        -e 's/boost_pfr /pfr /g' \
+        -e 's/boost_pfr_/pfr_/g' \
+        -e 's/boost_pfr)/pfr)/g' \
+        -e 's/Boost::pfr/pfr::pfr/g' \
+        -e 's/BOOST_USE_MODULES/PFR_USE_MODULES/g' \
 
-find ${TARGET_PATH} -type f | xargs sed -i 's/::boost::pfr/::pfr/g'
-find ${TARGET_PATH} -type f | xargs sed -i 's/boost::pfr/pfr/g'
-find ${TARGET_PATH} -type f | xargs sed -i 's/BOOST_PFR_/PFR_/g'
-find ${TARGET_PATH} -type f | xargs sed -i 's|boost/pfr|pfr|g'
+find ${TARGET_PATH}/doc -type f | xargs sed -i \
+        -e 's|boost\.pfr\.|pfr.|g' \
+        -e 's|boost\.pfr`|pfr`|g' \
+        -e 's|boost\.pfr;|pfr;|g' \
+        -e 's/boost_pfr\./pfr./g' \
+        -e 's|Boost\.PFR|PFR|g'
 
-find ${TARGET_PATH}/doc -type f | xargs sed -i 's|boost.pfr.|pfr.|g'
-find ${TARGET_PATH}/doc -type f | xargs sed -i 's|Boost.PFR|PFR|g'
+find ${TARGET_PATH}/modules -type f | xargs sed -i \
+    -e 's|boost\.pfr|pfr|g'
 
 sed -i  's|# \[Boost.PFR\](https://boost.org/libs/pfr)|# [PFR](https://apolukhin.github.io/pfr_non_boost/)|g' ${TARGET_PATH}/README.md
 
@@ -46,23 +60,23 @@ else
     exit 2
 fi
 if g++-12 -std=c++2a -DPFR_ENABLE_GET_NAME_STATIC=0 -I ${TARGET_PATH}/include/ ${TARGET_PATH}/example/motivating_example0.cpp && ./a.out > /dev/null; then
-    echo -n "OK"
+    echo -n ", OK"
 else
-    echo -n "FAIL"
+    echo -n ", FAIL"
     exit 3
 fi
 
 if g++-12 -std=c++2a -DPFR_ENABLE_GET_NAME_STATIC=1 -DBOOST_PFR_USE_CPP17=1 -I ${TARGET_PATH}/include/ ${TARGET_PATH}/example/get_name.cpp && ./a.out > /dev/null; then
-    echo -e ", OK"
+    echo -n ", OK"
 else
-    echo -e ", FAIL"
+    echo -n ", FAIL"
     exit 4
 fi
 
 if g++-12 -std=c++2a -DPFR_USE_LOOPHOLE=0 -DPFR_USE_CPP17=1 -I ${TARGET_PATH}/include/ ${TARGET_PATH}/example/motivating_example0.cpp && ./a.out > /dev/null; then
-    echo -n "OK"
+    echo -n ", OK"
 else
-    echo -n "FAIL"
+    echo -n ", FAIL"
     exit 5
 fi
 if g++-12 -std=c++2a -DPFR_USE_LOOPHOLE=1 -DPFR_USE_CPP17=0 -I ${TARGET_PATH}/include/ ${TARGET_PATH}/example/motivating_example0.cpp && ./a.out > /dev/null; then
@@ -73,12 +87,12 @@ else
 fi
 
 if g++-12 -std=c++2a -DPFR_USE_LOOPHOLE=0 -DPFR_USE_CPP17=0 -I ${TARGET_PATH}/include/ ${TARGET_PATH}/example/get.cpp && ./a.out > /dev/null; then
-    echo -e ", OK"
+    echo -n ", OK"
 else
-    echo -e ", FAIL"
+    echo -n ", FAIL"
     exit 7
 fi
 
 rm a.out || :
 
-echo "***** Done"
+echo -e "\n***** Done"
