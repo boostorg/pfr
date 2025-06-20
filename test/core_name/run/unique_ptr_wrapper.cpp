@@ -40,14 +40,14 @@ int main() {
 // GCC-9 and GCC-10 are fine
 //
 // GCC-11:
-// ./boost/pfr/detail/fields_count.hpp:351:58:   in ‘constexpr’ expansion of ‘boost::pfr::detail::fields_count_binary_search<CustomFields2, 0, 5>((boost::pfr::detail::is_one_element_range<0, 5>{}, boost::pfr::detail::is_one_element_range<0, 5>()), 1)’
-// libs/pfr/test/core_name/run/unique_ptr_wrapper.cpp:23:32: error: use of deleted function ‘std::atomic<int>::atomic(const std::atomic<int>&)’
+// ./boost/pfr/detail/fields_count.hpp:351:58:   in constexpr expansion of boost::pfr::detail::fields_count_binary_search<CustomFields2, 0, 5>((boost::pfr::detail::is_one_element_range<0, 5>{}, boost::pfr::detail::is_one_element_range<0, 5>()), 1)
+// libs/pfr/test/core_name/run/unique_ptr_wrapper.cpp:23:32: error: use of deleted function std::atomic<int>::atomic(const std::atomic<int>&)
 //    23 |   constexpr Field(Arg&& arg) : value_{std::forward<Arg>(arg)} {}
 //       |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 // GCC-12:
 // libs/pfr/test/core_name/run/unique_ptr_wrapper.cpp:39:39:   required from here
-// libs/pfr/test/core_name/run/unique_ptr_wrapper.cpp:23:32: error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = int]’
+// libs/pfr/test/core_name/run/unique_ptr_wrapper.cpp:23:32: error: use of deleted function std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = int]’
 //    23 |   constexpr Field(Arg&& arg) : value_{std::forward<Arg>(arg)} {}
 //       |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
