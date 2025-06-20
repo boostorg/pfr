@@ -27,6 +27,7 @@ template <class T>
 constexpr T unsafe_declval() noexcept {
     report_if_you_see_link_error_with_this_function();
 
+    // Looks like `static_cast<T>(*ptr)` to prvalue fails on clang in C++26
     using func_ptr_t = T(*)();
     func_ptr_t ptr = nullptr;
     return ptr();
