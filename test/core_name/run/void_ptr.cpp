@@ -9,6 +9,8 @@
 #include <boost/pfr/core_name.hpp>
 #include <boost/pfr/traits.hpp>
 
+#include <string_view>
+
 struct LongPointerTest {
     long* OwningThread;
 };
