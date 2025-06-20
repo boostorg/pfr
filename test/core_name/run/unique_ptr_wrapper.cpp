@@ -35,6 +35,28 @@ struct CustomFields2 {
 };
 
 int main() {
+// Compilers have issues with this test.
+//
+// GCC-9 and GCC-10 are fine
+//
+// GCC-11:
+// ./boost/pfr/detail/fields_count.hpp:351:58:   in ‘constexpr’ expansion of ‘boost::pfr::detail::fields_count_binary_search<CustomFields2, 0, 5>((boost::pfr::detail::is_one_element_range<0, 5>{}, boost::pfr::detail::is_one_element_range<0, 5>()), 1)’
+// libs/pfr/test/core_name/run/unique_ptr_wrapper.cpp:23:32: error: use of deleted function ‘std::atomic<int>::atomic(const std::atomic<int>&)’
+//    23 |   constexpr Field(Arg&& arg) : value_{std::forward<Arg>(arg)} {}
+//       |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+// GCC-12:
+// libs/pfr/test/core_name/run/unique_ptr_wrapper.cpp:39:39:   required from here
+// libs/pfr/test/core_name/run/unique_ptr_wrapper.cpp:23:32: error: use of deleted function ‘std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = int]’
+//    23 |   constexpr Field(Arg&& arg) : value_{std::forward<Arg>(arg)} {}
+//       |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+// GCC-14 is fine
+//
+// MSVC-14.3:
+// .\boost/pfr/detail/core17_generated.hpp(94): error C3448: the number of identifiers must match the number of array elements or members in a structured binding declaration
+#if !defined(_MSVC_LANG) && (!defined(__GNUC__) || (__GNUC__ != 11 && __GNUC__ != 12))
   CustomFields2 cf2;
   boost::pfr::for_each_field_with_name(cf2, [](const auto&, const auto&) {});
+#endif
 }
