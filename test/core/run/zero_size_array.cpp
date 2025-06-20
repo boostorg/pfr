@@ -7,7 +7,9 @@
 
 #include <boost/pfr/core.hpp>
 
-#if defined(__GNUC__)
+#include <tuple>
+
+#if defined(__GNUC__) && (BOOST_PFR_USE_LOOPHOLE || BOOST_PFR_USE_CPP17)
 struct zero_array {
     char data[0];
 };
