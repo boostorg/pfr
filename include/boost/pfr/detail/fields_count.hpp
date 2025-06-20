@@ -221,7 +221,7 @@ constexpr std::size_t fields_count_compiler_limitation_next(std::size_t n) noexc
 ///////////////////// Fields count upper bound based on sizeof(T)
 template <class T>
 constexpr std::size_t fields_count_upper_bound_loose() noexcept {
-    return sizeof(T) * std::numeric_limits<unsigned char>::digits;
+    return sizeof(T) * std::numeric_limits<unsigned char>::digits + 1 /* +1 for "Arrays of Length Zero" extension */;
 }
 
 ///////////////////// Fields count binary search.
