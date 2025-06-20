@@ -31,7 +31,13 @@ struct CustomFields2 {
   Field<std::vector<int>> some_vector;
   Field<std::unique_ptr<int>> some_unique_ptr;
   Field<std::shared_ptr<int>> some_shared_ptr;
+
+  // MSVC-14.3:
+  // boost/pfr/detail/core17_generated.hpp(94): error C3448: the number of identifiers must match the number of array elements or members in a structured binding declaration
+  // libs\pfr\test\core_name\run\unique_ptr_wrapper.cpp(34): note: see declaration of 'CustomFields2::some_atomic'
+#if (defined(_MSC_VER) && _MSC_VER >= 1929)
   Field<std::atomic<int>> some_atomic;
+#endif
 };
 
 int main() {
@@ -52,10 +58,7 @@ int main() {
 //       |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 // GCC-14 is fine
-//
-// MSVC-14.3:
-// .\boost/pfr/detail/core17_generated.hpp(94): error C3448: the number of identifiers must match the number of array elements or members in a structured binding declaration
-#if (defined(_MSVC_LANG) && _MSVC_LANG >= 1929) || !defined(__GNUC__) || (__GNUC__ != 11 && __GNUC__ != 12)
+#if !defined(__GNUC__) || (__GNUC__ != 11 && __GNUC__ != 12)
   CustomFields2 cf2;
   boost::pfr::for_each_field_with_name(cf2, [](const auto&, const auto&) {});
 #endif

@@ -7,6 +7,7 @@
 
 #include <boost/pfr/core.hpp>
 
+#include <memory>
 #include <string>
 #include <type_traits>
 
