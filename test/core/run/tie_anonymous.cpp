@@ -51,8 +51,8 @@ struct other_anon_with_optional {
 
 // from https://github.com/boostorg/pfr/issues/110
 struct optional_linked_list {
-	int value;
-	std::optional<std::unique_ptr<optional_linked_list>> next;
+    int value;
+    std::optional<std::unique_ptr<optional_linked_list>> next;
 };
 
 #endif

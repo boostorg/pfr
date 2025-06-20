@@ -35,7 +35,7 @@ struct CustomFields2 {
   // MSVC-14.3:
   // boost/pfr/detail/core17_generated.hpp(94): error C3448: the number of identifiers must match the number of array elements or members in a structured binding declaration
   // libs\pfr\test\core_name\run\unique_ptr_wrapper.cpp(34): note: see declaration of 'CustomFields2::some_atomic'
-#if (defined(_MSC_VER) && _MSC_VER >= 1929)
+#if !defined(_MSC_VER) || _MSC_VER >= 1939
   Field<std::atomic<int>> some_atomic;
 #endif
 };

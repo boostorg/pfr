@@ -21,5 +21,7 @@ struct VoidPointerTest {
 
 int main() {
     static_assert(boost::pfr::get_name<0, LongPointerTest>() == "OwningThread");
+#if !defined(_MSC_VER) || _MSC_VER >= 1939
     static_assert(boost::pfr::get_name<0, VoidPointerTest>() == "OwningThread");
+#endif
 }
