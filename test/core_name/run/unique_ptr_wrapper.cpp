@@ -47,7 +47,7 @@ int main() {
 //
 // GCC-12:
 // libs/pfr/test/core_name/run/unique_ptr_wrapper.cpp:39:39:   required from here
-// libs/pfr/test/core_name/run/unique_ptr_wrapper.cpp:23:32: error: use of deleted function std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = int]’
+// libs/pfr/test/core_name/run/unique_ptr_wrapper.cpp:23:32: error: use of deleted function std::unique_ptr<_Tp, _Dp>::unique_ptr(const std::unique_ptr<_Tp, _Dp>&) [with _Tp = int]
 //    23 |   constexpr Field(Arg&& arg) : value_{std::forward<Arg>(arg)} {}
 //       |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
