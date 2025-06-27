@@ -260,7 +260,6 @@ jobs:
           rm -rf build_module
 
       - name: Run tests
-        if: ${{matrix.os != 'windows-2025'}}  # TODO: workaround issues
         shell: cmd
         run: |
           cd ../boost-root
