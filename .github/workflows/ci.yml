@@ -83,7 +83,6 @@ jobs:
           cp -r $GITHUB_WORKSPACE/* libs/$LIBRARY
           python tools/boostdep/depinst/depinst.py --include benchmark --include example --include examples --include tools --git_args "--depth 10 --jobs 3" $LIBRARY
           ./bootstrap.sh
-          ./b2 -d0 headers
           ./b2 variant=debug tools/inspect
 
       - name: Run CMake tests
@@ -126,6 +125,7 @@ jobs:
       - name: Run tests
         run: |
           cd ../boost-root
+          ./b2 -d0 headers
           ./b2 libs/$LIBRARY/test toolset=${{matrix.toolset}} cxxstd=${{matrix.cxxstd}} variant=debug,release "${{matrix.cxxflags}}" "${{matrix.linkflags}}" "${{matrix.launcher}}"
           dist/bin/inspect libs/$LIBRARY
 
@@ -181,10 +181,11 @@ jobs:
             addrmd: 64
             os: windows-2022
             threads: "-j1"
-          - toolset: clang-win
-            cxxstd: "14,17,2a,latest"
-            addrmd: 32,64
-            os: windows-2022
+            # Fails with "Unexpected compiler version, expected Clang 19.0.0 or newer."
+            # - toolset: clang-win
+            #   cxxstd: "14,17,2a,latest"
+            #   addrmd: 32,64
+            #   os: windows-2022
 
     runs-on: ${{matrix.os}}
 
@@ -211,7 +212,6 @@ jobs:
           git submodule update --init --depth 10 --jobs 2 tools/boostdep
           python tools/boostdep/depinst/depinst.py --include benchmark --include example --include examples --include tools --git_args "--jobs 3" %LIBRARY%
           cmd /c bootstrap
-          b2 -d0 headers
 
       - name: Run CMake tests
         if: ${{matrix.toolset == 'msvc-14.3'}}
@@ -264,6 +264,7 @@ jobs:
         shell: cmd
         run: |
           cd ../boost-root
+          b2 -d0 headers
           b2 ${{matrix.threads}} libs/%LIBRARY%/test toolset=${{matrix.toolset}} cxxstd=${{matrix.cxxstd}} address-model=${{matrix.addrmd}} variant=debug,release
 
   finish:
