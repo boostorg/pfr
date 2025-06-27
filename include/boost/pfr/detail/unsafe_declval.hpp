@@ -27,9 +27,19 @@ template <class T>
 constexpr T unsafe_declval() noexcept {
     report_if_you_see_link_error_with_this_function();
 
+#ifdef BOOST_PFR_USE_LEGACY_UNSAFE_DECLVAL_IMPLEMENTATION
     typename std::remove_reference<T>::type* ptr = nullptr;
     ptr += 42; // suppresses 'null pointer dereference' warnings
     return static_cast<T>(*ptr);
+#else
+    // Looks like `static_cast<T>(*ptr)` to prvalue fails on clang in C++26.
+    // If this new implementation does not work for some cases, please, fill a
+    // bug report and feel free to
+    // define BOOST_PFR_USE_LEGACY_UNSAFE_DECLVAL_IMPLEMENTATION.
+    using func_ptr_t = T(*)();
+    func_ptr_t ptr = nullptr;
+    return ptr();
+#endif
 }
 
 }}} // namespace boost::pfr::detail
