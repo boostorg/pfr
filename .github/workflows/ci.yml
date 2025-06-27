@@ -181,10 +181,11 @@ jobs:
             addrmd: 64
             os: windows-2022
             threads: "-j1"
-          - toolset: clang-win
-            cxxstd: "14,17,2a,latest"
-            addrmd: 32,64
-            os: windows-2022
+            # Fails with "Unexpected compiler version, expected Clang 19.0.0 or newer."
+            # - toolset: clang-win
+            #   cxxstd: "14,17,2a,latest"
+            #   addrmd: 32,64
+            #   os: windows-2022
 
     runs-on: ${{matrix.os}}
 
