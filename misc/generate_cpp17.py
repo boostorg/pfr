@@ -47,47 +47,66 @@ namespace boost { namespace pfr { namespace detail {
 
 template <class... Args>
 constexpr auto make_tuple_of_references(Args&&... args) noexcept {
-  return sequence_tuple::tuple<Args&...>{ args... };
+  return sequence_tuple::tuple<Args&&...>{ static_cast<Args&&>(args)... };
 }
 
 template<typename T, typename Arg>
 constexpr decltype(auto) add_cv_like(Arg& arg) noexcept {
-    if constexpr (std::is_const<T>::value && std::is_volatile<T>::value) {
-        return const_cast<const volatile Arg&>(arg);
-    }
-    else if constexpr (std::is_const<T>::value) {
-        return const_cast<const Arg&>(arg);
-    }
-    else if constexpr (std::is_volatile<T>::value) {
-        return const_cast<volatile Arg&>(arg);
-    }
-    else {
-        return const_cast<Arg&>(arg);
+    if constexpr (std::is_rvalue_reference<T&&>::value) {
+        if constexpr (std::is_const<T>::value && std::is_volatile<T>::value) {
+            return const_cast<const volatile Arg&&>(arg);
+        }
+        else if constexpr (std::is_const<T>::value) {
+            return const_cast<const Arg&&>(arg);
+        }
+        else if constexpr (std::is_volatile<T>::value) {
+            return const_cast<volatile Arg&&>(arg);
+        }
+        else {
+            return const_cast<Arg&&>(arg);
+        }
+    } else {
+      if constexpr (std::is_const<T>::value && std::is_volatile<T>::value) {
+          return const_cast<const volatile Arg&>(arg);
+      }
+      else if constexpr (std::is_const<T>::value) {
+          return const_cast<const Arg&>(arg);
+      }
+      else if constexpr (std::is_volatile<T>::value) {
+          return const_cast<volatile Arg&>(arg);
+      }
+      else {
+          return const_cast<Arg&>(arg);
+      }
     }
 }
 
 // https://gcc.gnu.org/bugzilla/show_bug.cgi?id=78939
 template<typename T, typename Sb, typename Arg>
 constexpr decltype(auto) workaround_cast(Arg& arg) noexcept {
-    using output_arg_t = std::conditional_t<!std::is_reference<Sb>(), decltype(detail::add_cv_like<T>(arg)), Sb>;
+    using output_arg_t = std::conditional_t<
+        !std::is_reference<Sb>(),
+        decltype(detail::add_cv_like<T>(arg)),
+        std::conditional_t<std::is_rvalue_reference<T&&>::value, Sb&&, Sb&>
+    >;
     return const_cast<output_arg_t>(arg);
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& /*val*/, size_t_<0>) noexcept {
+constexpr auto tie_as_tuple(const T& /*val*/, size_t_<0>) noexcept {
   return sequence_tuple::tuple<>{};
 }
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<std::is_class< std::remove_cv_t<T> >::value>* = nullptr) noexcept {
-  auto& [a] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
+constexpr auto tie_as_tuple(T&& val, size_t_<1>, std::enable_if_t<std::is_class< std::remove_cv_t<T> >::value>* = nullptr) noexcept {
+  auto&& [a] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.
   return ::boost::pfr::detail::make_tuple_of_references(detail::workaround_cast<T, decltype(a)>(a));
 }
 
 
 template <class T>
-constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<!std::is_class< std::remove_cv_t<T> >::value>* = nullptr) noexcept {
-  return ::boost::pfr::detail::make_tuple_of_references( val );
+constexpr auto tie_as_tuple(T&& val, size_t_<1>, std::enable_if_t<!std::is_class< std::remove_cv_t<T> >::value>* = nullptr) noexcept {
+  return ::boost::pfr::detail::make_tuple_of_references( std::forward<T>(val) );
 }
 
 """
@@ -95,7 +114,7 @@ constexpr auto tie_as_tuple(T& val, size_t_<1>, std::enable_if_t<!std::is_class<
 ############################################################################################################################
 EPILOGUE = """
 template <class T, std::size_t I>
-constexpr void tie_as_tuple(T& /*val*/, size_t_<I>) noexcept {
+constexpr void tie_as_tuple(T&& /*val*/, size_t_<I>) noexcept {
   static_assert(sizeof(T) && false,
                 "====================> Boost.PFR: Too many fields in a structure T. Regenerate include/boost/pfr/detail/core17_generated.hpp file for appropriate count of fields. For example: `python ./misc/generate_cpp17.py 300 > include/boost/pfr/detail/core17_generated.hpp`");
 }
@@ -154,11 +173,11 @@ for i in range(1, funcs_count):
     empty_printer = EmptyLinePrinter()
 
     print("template <class T>")
-    print("constexpr auto tie_as_tuple(T& val, size_t_<" + str(i + 1) + ">) noexcept {")
+    print("constexpr auto tie_as_tuple(T&& val, size_t_<" + str(i + 1) + ">) noexcept {")
     if i < max_args_on_a_line:
-        print("  auto& [" + indexes.strip() + "] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.")
+        print("  auto&& [" + indexes.strip() + "] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.")
     else:
-        print("  auto& [")
+        print("  auto&& [")
         print(indexes)
         print("  ] = const_cast<std::remove_cv_t<T>&>(val); // ====================> Boost.PFR: User-provided type is not a SimpleAggregate.")
         empty_printer.print_once()

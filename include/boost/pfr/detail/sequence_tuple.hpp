@@ -41,7 +41,7 @@ struct tuple_base< std::index_sequence<I...>, Tail... >
     constexpr tuple_base(const tuple_base&) = default;
 
     constexpr tuple_base(Tail... v) noexcept
-        : base_from_member<I, Tail>{ v }...
+        : base_from_member<I, Tail>{ static_cast<Tail>(v) }...
     {}
 };
 
@@ -77,6 +77,12 @@ constexpr const volatile T& get_impl(const volatile base_from_member<N, T>& t) n
 template <std::size_t N, class T>
 constexpr T&& get_impl(base_from_member<N, T>&& t) noexcept {
     // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.UndefReturn,clang-analyzer-core.CallAndMessage)
+    return std::forward<T>(t.value);
+}
+
+template <std::size_t N, class T>
+constexpr const T&& get_impl(const base_from_member<N, T>&& t) noexcept {
+    // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.UndefReturn)
     return std::forward<T>(t.value);
 }
 
