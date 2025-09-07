@@ -7,12 +7,17 @@
 
 #include <type_traits>
 
-struct my_pair {
-    int i;
-    short s;
+struct MyPair {
+    int first;
+    int second;
 };
 
+template <class T>
+auto test() {
+    const auto& [...x] = T{};
+    return x...[0];
+}
+
 int main() {
-   const auto& [...elements] = my_pair{1, 2};
-   static_assert( sizeof...(elements) == 2);
+    return ::test<MyPair>();
 }
