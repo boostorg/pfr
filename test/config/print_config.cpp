@@ -14,6 +14,7 @@
 int main() {
     std::cout << "Platform info:" << '\n'
         << "BOOST_PFR_USE_CPP17 == " << BOOST_PFR_USE_CPP17 << '\n'
+        << "BOOST_PFR_USE_CPP26 == " << BOOST_PFR_USE_CPP26 << '\n'
         << "BOOST_PFR_USE_LOOPHOLE == " << BOOST_PFR_USE_LOOPHOLE << '\n'
         << "BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE == " << BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE << '\n'
         << "BOOST_PFR_HAS_GUARANTEED_COPY_ELISION == " << BOOST_PFR_HAS_GUARANTEED_COPY_ELISION << '\n'

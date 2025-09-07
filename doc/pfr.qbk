@@ -501,6 +501,7 @@ Boost.PFRs extraction of field name works with only `SimpleAggregate` types.
 By default Boost.PFR [*auto-detects your compiler abilities] and automatically defines the configuration macro into appropriate values. If you wish to override that behavior, just define:
 [table:linkmacro Macros
     [[Macro name] [Effect]]
+    [[*BOOST_PFR_USE_CPP26*] [Define to `1` if you wish to override Boost.PFR choice and use C++26 variadic structured bindings for reflection. Define to `0` to override Boost.PFR choice and disable C++26 variadic structured bindings usage.]]
     [[*BOOST_PFR_USE_CPP17*] [Define to `1` if you wish to override Boost.PFR choice and use C++17 structured bindings for reflection. Define to `0` to override Boost.PFR choice and disable C++17 structured bindings usage.]]
     [[*BOOST_PFR_USE_LOOPHOLE*] [Define to `1` if you wish to override Boost.PFR choice and exploit [@http://www.open-std.org/jtc1/sc22/wg21/docs/cwg_active.html#2118 CWG 2118] for reflection. Define to `0` to override Boost.PFR choice and disable CWG 2118 usage.]]
     [[*BOOST_PFR_USE_STD_MAKE_INTEGRAL_SEQUENCE*] [Define to `0` if you are hit by the template instantiation depth issues with `std::make_integer_sequence` and wish to use Boost.PFR version of that metafunction. Define to `1` to override Boost.PFR detection logic. ]]
@@ -593,16 +594,18 @@ clang++ -std=c++20 -fmodule-file=boost_pfr.pcm boost_pfr.pcm usage_sample.cpp
 Short description:
 
 # at compile-time: use aggregate initialization to detect fields count in user-provided structure
-    * [*BOOST_PFR_USE_CPP17 == 1]:
+    * [*BOOST_PFR_USE_CPP26 == 1]:
+        # at compile-time: structured bindings are used to decompose a type `T` to known variadic amount of fields
+    * [*BOOST_PFR_USE_CPP26 == 0 && BOOST_PFR_USE_CPP17 == 1]:
         # at compile-time: structured bindings are used to decompose a type `T` to known amount of fields
-    * [*BOOST_PFR_USE_CPP17 == 0 && BOOST_PFR_USE_LOOPHOLE == 1]:
+    * [*BOOST_PFR_USE_CPP26 == 0 && BOOST_PFR_USE_CPP17 == 0 && BOOST_PFR_USE_LOOPHOLE == 1]:
         # at compile-time: use aggregate initialization to detect fields count in user-provided structure
         # at compile-time: make a structure that is convertible to anything and remember types it has been converted to during aggregate initialization of user-provided structure
         # at compile-time: using knowledge from previous steps create a tuple with exactly the same layout as in user-provided structure
         # at compile-time: find offsets for each field in user-provided structure using the tuple from previous step
         # at run-time: get pointer to each field, knowing the structure address and each field offset
         # at run-time: a tuple of references to fields is returned => all the tuple methods are available for the structure
-    * [*BOOST_PFR_USE_CPP17 == 0 && BOOST_PFR_USE_LOOPHOLE == 0]:
+    * [*BOOST_PFR_USE_CPP26 == 0 && BOOST_PFR_USE_CPP17 == 0 && BOOST_PFR_USE_LOOPHOLE == 0]:
         # at compile-time: let `I` be is an index of current field, it equals 0
         # at run-time: `T` is constructed and field `I` is aggregate initialized using a separate instance of structure that is convertible to anything [note Additional care is taken to make sure that all the information about `T` is available to the compiler and that operations on `T` have no side effects, so the compiler can optimize away the unnecessary temporary objects.]
         # at compile-time: `I += 1`

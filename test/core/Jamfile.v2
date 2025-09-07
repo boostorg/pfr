@@ -23,7 +23,7 @@ project
         [ requires cxx14_constexpr ]
     ;
 
-########## BEGIN of helpers to detect Loophole trick support
+########## BEGIN of helpers to detect Loophole and variadic structured binding support
 
 actions mp_simple_run_action
 {
@@ -42,6 +42,9 @@ rule mp-run-simple ( sources + : args * : input-files * : requirements * : targe
 mp-run-simple loophole_detection.cpp : : : : compiler_supports_loophole ;
 explicit compiler_supports_loophole ;
 
+mp-run-simple variadic_structured_binding_detection.cpp : : : : compiler_supports_vsb ;
+explicit compiler_supports_vsb ;
+
 ########## END of helpers to detect Loophole trick support
 
 
@@ -49,10 +52,14 @@ local DISABLE_ON_MSVC = ; #<toolset>msvc:<build>no ;
 local REQUIRE_LOOPHOLE =
     [ check-target-builds ../core//compiler_supports_loophole : : <build>no ]
   ;
+local REQUIRE_VSB =
+    [ check-target-builds ../core//compiler_supports_vsb : : <build>no ]
+;
 
-local STRUCTURED_BINDING_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=1 [ requires cxx17_structured_bindings ] ;
-local LOOPHOLE_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=1 <define>BOOST_PFR_USE_CPP17=0 $(REQUIRE_LOOPHOLE) ;
-local CLASSIC_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=0 $(DISABLE_ON_MSVC) ;
+local VARIADIC_STRUCTURED_BINDING_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=0 <define>BOOST_PFR_USE_CPP26=1 $(REQUIRE_VSB) ;
+local STRUCTURED_BINDING_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=1 <define>BOOST_PFR_USE_CPP26=0 [ requires cxx17_structured_bindings ] ;
+local LOOPHOLE_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=1 <define>BOOST_PFR_USE_CPP17=0 <define>BOOST_PFR_USE_CPP26=0 $(REQUIRE_LOOPHOLE) ;
+local CLASSIC_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=0 <define>BOOST_PFR_USE_CPP26=0 $(DISABLE_ON_MSVC) ;
 
 test-suite pfr_tests
   :
@@ -109,6 +116,7 @@ local BLACKLIST_TESTS_FOR_CLASSIC =
 for local source_file in [ glob ./run/*.cpp ] [ glob ../../example/*.cpp ]
 {
     local target_name = $(source_file[1]:B) ;
+    pfr_tests += [ run $(source_file) : : : $(VARIADIC_STRUCTURED_BINDING_ENGINE) : $(target_name)_vsb ] ;
     pfr_tests += [ run $(source_file) : : : $(STRUCTURED_BINDING_ENGINE) : $(target_name)_sb ] ;
 
     if ! $(target_name) in $(BLACKLIST_TESTS_FOR_LOOPHOLE)

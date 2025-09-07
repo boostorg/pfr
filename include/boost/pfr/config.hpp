@@ -10,7 +10,9 @@
 
 #if !defined(BOOST_USE_MODULES) && (__cplusplus >= 201402L || (defined(_MSC_VER) && defined(_MSVC_LANG) && _MSC_VER > 1900))
 #include <type_traits> // to get non standard platform macro definitions (__GLIBCXX__ for example)
-#elif defined(BOOST_USE_MODULES)
+#endif
+
+#if defined(BOOST_USE_MODULES) || __cplusplus >= 202002L
 #include <version>
 #endif
 
@@ -51,6 +53,14 @@
 #   endif
 #endif
 
+#ifndef BOOST_PFR_USE_CPP26
+#if __cpp_structured_bindings >= 202411L && __cpp_lib_forward_like >= 202207L
+#define BOOST_PFR_USE_CPP26 1
+#else
+#define BOOST_PFR_USE_CPP26 0
+#endif
+#endif
+
 #ifndef BOOST_PFR_USE_CPP17
 #   ifdef __cpp_structured_bindings
 #       define BOOST_PFR_USE_CPP17 1
@@ -65,7 +75,7 @@
 #   endif
 #endif
 
-#if (!BOOST_PFR_USE_CPP17 && !BOOST_PFR_USE_LOOPHOLE)
+#if (!BOOST_PFR_USE_CPP26 && !BOOST_PFR_USE_CPP17 && !BOOST_PFR_USE_LOOPHOLE)
 #   if (defined(_MSC_VER) && _MSC_VER < 1916) ///< in Visual Studio 2017 v15.9 PFR library with classic engine normally works
 #      define BOOST_PFR_NOT_SUPPORTED 1
 #   endif
