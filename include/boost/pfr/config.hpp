@@ -10,7 +10,9 @@
 
 #if !defined(BOOST_USE_MODULES) && (__cplusplus >= 201402L || (defined(_MSC_VER) && defined(_MSVC_LANG) && _MSC_VER > 1900))
 #include <type_traits> // to get non standard platform macro definitions (__GLIBCXX__ for example)
-#elif defined(BOOST_USE_MODULES)
+#endif
+
+#if defined(BOOST_USE_MODULES) || __cplusplus >= 202002L
 #include <version>
 #endif
 
