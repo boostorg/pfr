@@ -4,11 +4,14 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+// boost-no-inspect
+
 #ifndef BOOST_PFR_DETAIL_CORE26_HPP
 #define BOOST_PFR_DETAIL_CORE26_HPP
 #pragma once
 
 #include <boost/pfr/detail/sequence_tuple.hpp>
+
 namespace boost::pfr::detail {
 
 template<class T>
@@ -22,4 +25,5 @@ constexpr auto tie_as_tuple(T &val) noexcept
 }
 
 } // namespace boost::pfr::detail
+
 #endif
