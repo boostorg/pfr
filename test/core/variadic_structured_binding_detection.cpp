@@ -6,6 +6,11 @@
 // Detection of variadic structured binding support
 
 #include <type_traits>
+#include <version>
+
+#if !(__cpp_structured_bindings >= 202411L && __cpp_lib_forward_like >= 202207L)
+#error Compiler does not support the required features
+#endif
 
 struct MyPair {
     int first;
@@ -21,3 +26,4 @@ auto test() {
 int main() {
     return ::test<MyPair>();
 }
+

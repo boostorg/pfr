@@ -332,20 +332,6 @@ constexpr std::size_t fields_count_lower_bound_unbounded(int, size_t_<0>) noexce
 #endif
 
 ///////////////////// Choosing between array size, unbounded binary search, and linear search followed by unbounded binary search.
-#if BOOST_PFR_USE_CPP26
-template<class T>
-constexpr auto fields_count_dispatch_impl(const T &t) noexcept
-{
-    const auto &[... elts] = t;
-    return std::integral_constant<std::size_t, sizeof...(elts)>{};
-}
-
-template<class T>
-constexpr auto fields_count_dispatch() noexcept
-{
-    return decltype(fields_count_dispatch_impl(std::declval<const T &>()))::value;
-}
-#else
 template <class T>
 constexpr auto fields_count_dispatch(long, long, std::false_type /*are_preconditions_met*/) noexcept {
     return 0;
@@ -358,6 +344,27 @@ constexpr auto fields_count_dispatch(long, long, std::true_type /*are_preconditi
     return sizeof(T) / sizeof(std::remove_all_extents_t<T>);
 }
 
+#if BOOST_PFR_USE_CPP26
+template<class T>
+constexpr auto fields_count_dispatch_impl(const T &t) noexcept
+{
+    const auto &[... elts] = t;
+    return std::integral_constant<std::size_t, sizeof...(elts)>{};
+}
+
+template<class T>
+constexpr auto fields_count_dispatch(long, int, std::true_type /*are_preconditions_met*/) noexcept
+    -> std::enable_if_t<std::is_scalar<T>::value, std::size_t>
+{
+    return 1;
+}
+
+template<class T>
+constexpr auto fields_count_dispatch(int, int, std::true_type /*are_preconditions_met*/) noexcept
+{
+    return decltype(detail::fields_count_dispatch_impl(std::declval<const T &>()))::value;
+}
+#else
 template <class T>
 constexpr auto fields_count_dispatch(long, int, std::true_type /*are_preconditions_met*/) noexcept
     -> decltype(sizeof(T{}))
@@ -442,12 +449,8 @@ constexpr std::size_t fields_count() noexcept {
     constexpr bool no_errors =
         type_is_complete && type_is_not_a_reference && type_fields_are_move_constructible
         && type_is_not_polymorphic && type_is_aggregate;
-#if BOOST_PFR_USE_CPP26
-    constexpr std::size_t result = detail::fields_count_dispatch<type>();
-#else
     constexpr std::size_t result
         = detail::fields_count_dispatch<type>(1L, 1L, std::integral_constant<bool, no_errors>{});
-#endif
     detail::assert_first_not_base<type, result>(1L);
 
 #ifndef __cpp_lib_is_aggregate
