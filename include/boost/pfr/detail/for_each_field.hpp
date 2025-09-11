@@ -24,7 +24,8 @@ namespace boost { namespace pfr { namespace detail {
 template <class T, class F>
 constexpr void for_each_field(T&& value, F&& func) {
 #if BOOST_PFR_USE_CPP26
-    if constexpr (std::is_aggregate_v<T> || std::is_bounded_array_v<std::remove_reference_t<T>>) {
+    using no_ref = std::remove_reference_t<T>;
+    if constexpr (std::is_aggregate_v<no_ref> || std::is_bounded_array_v<no_ref>) {
         auto &&[... members] = value;
         ::boost::pfr::detail::for_each_field_impl(value,
                                                   std::forward<F>(func),

@@ -18,8 +18,8 @@ struct aggr {
     zero_array a;
 };
 
-static_assert(sizeof(zero_array) == 0);
-static_assert(sizeof(aggr) == 0);
+static_assert(sizeof(zero_array) == 0, "");
+static_assert(sizeof(aggr) == 0, "");
 
 int main() {
     aggr a;

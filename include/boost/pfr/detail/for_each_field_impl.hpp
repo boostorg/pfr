@@ -21,23 +21,20 @@ namespace boost { namespace pfr { namespace detail {
 template <std::size_t Index>
 using size_t_ = std::integral_constant<std::size_t, Index >;
 
-#if BOOST_PFR_USE_CPP26
-template<class T, class F, class I, class = decltype(std::declval<F>()(std::declval<T>(), I{}))>
-constexpr void for_each_field_impl_apply(T &&v, F &&f, I i, long)
-{
+template <class T, class F, class I, class = decltype(std::declval<F>()(std::declval<T>(), I{}))>
+constexpr void for_each_field_impl_apply(T&& v, F&& f, I i, long) {
     std::forward<F>(f)(std::forward<T>(v), i);
 }
 
-template<class T, class F, class I>
-constexpr void for_each_field_impl_apply(T &&v, F &&f, I /*i*/, int)
-{
+template <class T, class F, class I>
+constexpr void for_each_field_impl_apply(T&& v, F&& f, I /*i*/, int) {
     std::forward<F>(f)(std::forward<T>(v));
 }
 
+#if BOOST_PFR_USE_CPP26
 template<class T, class F, std::size_t... I>
-constexpr void for_each_field_impl(T &t, F &&f, std::index_sequence<I...>, auto move_values)
-{
-    if constexpr (std::is_aggregate_v<T> || std::is_bounded_array_v<std::remove_reference_t<T>>) {
+constexpr void for_each_field_impl(T& t, F&& f, std::index_sequence<I...>, auto move_values) {
+    if constexpr (std::is_aggregate_v<T> || std::is_bounded_array_v<T>) {
         auto &&[... members] = t;
         if constexpr (move_values)
             (detail::for_each_field_impl_apply(std::move(members...[I]),
@@ -57,18 +54,7 @@ constexpr void for_each_field_impl(T &t, F &&f, std::index_sequence<I...>, auto 
             (detail::for_each_field_impl_apply(t, std::forward<F>(f), size_t_<I>{}, 1L), ...);
     }
 }
-#else
-template <class T, class F, class I, class = decltype(std::declval<F>()(std::declval<T>(), I{}))>
-constexpr void for_each_field_impl_apply(T&& v, F&& f, I i, long) {
-    std::forward<F>(f)(std::forward<T>(v), i);
-}
-
-template <class T, class F, class I>
-constexpr void for_each_field_impl_apply(T&& v, F&& f, I /*i*/, int) {
-    std::forward<F>(f)(std::forward<T>(v));
-}
-
-#if !defined(__cpp_fold_expressions) || __cpp_fold_expressions < 201603
+#elif !defined(__cpp_fold_expressions) || __cpp_fold_expressions < 201603
 template <class T, class F, std::size_t... I>
 constexpr void for_each_field_impl(T& t, F&& f, std::index_sequence<I...>, std::false_type /*move_values*/) {
      const int v[] = {0, (
@@ -97,7 +83,6 @@ template <class T, class F, std::size_t... I>
 constexpr void for_each_field_impl(T& t, F&& f, std::index_sequence<I...>, std::true_type /*move_values*/) {
      (detail::for_each_field_impl_apply(sequence_tuple::get<I>(std::move(t)), std::forward<F>(f), size_t_<I>{}, 1L), ...);
 }
-#endif
 #endif
 }}} // namespace boost::pfr::detail
 
