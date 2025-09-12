@@ -20,8 +20,17 @@ void test_get_rvalue() {
         std::make_unique<int>(43),
     };
 
+    // _MSC_VER == 1944 is broken:
+    // boost/pfr/detail/fields_count.hpp(469): error C2338: static_assert failed:
+    // '====================> Boost.PFR: If there's no other failed static
+    // asserts then something went wrong. Please report this issue to the github
+    // along with the structure you're reflecting.'
+    //
+    // No known workaround
+#if !defined(_MSC_VER) || _MSC_VER != 1944
     auto p = boost::pfr::get<0>(std::move(x));
     BOOST_TEST_EQ(*p, 42);
+#endif
 }
 
 int main() {
