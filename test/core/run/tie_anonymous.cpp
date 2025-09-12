@@ -7,6 +7,7 @@
 
 #include <boost/pfr/core.hpp>
 
+#include <memory>
 #include <string>
 #include <type_traits>
 
@@ -46,6 +47,12 @@ struct other_anon_with_optional {
     std::optional<anon_with_optional> c;
     std::optional<some::struct2> d;
 
+};
+
+// from https://github.com/boostorg/pfr/issues/110
+struct optional_linked_list {
+    int value;
+    std::optional<std::unique_ptr<optional_linked_list>> next;
 };
 #endif
 
@@ -93,6 +100,8 @@ void test_in_non_non_ns() {
     other_anon_with_optional opt{"test again", {}, {}, {}};
     auto opt_val = boost::pfr::structure_tie(opt);
     BOOST_TEST_EQ(std::get<0>(opt_val), "test again");
+
+    static_assert(boost::pfr::tuple_size_v<optional_linked_list> == 2, "");
 #endif
 }
 
