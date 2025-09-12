@@ -9,14 +9,14 @@
 #include <boost/pfr.hpp>
 #include <boost/core/lightweight_test.hpp>
 
-// _MSC_VER == 1944 is broken:
+// Some _MSC_VER are broken:
 // boost/pfr/detail/fields_count.hpp(469): error C2338: static_assert failed:
 // '====================> Boost.PFR: If there's no other failed static
 // asserts then something went wrong. Please report this issue to the github
 // along with the structure you're reflecting.'
 //
 // No known workaround
-#if !defined(_MSC_VER) || _MSC_VER != 1944
+#if !defined(_MSC_VER) || _MSC_VER < 1944 || _MSC_VER > 1945
 
 struct Message {
   std::unique_ptr<int> data;
