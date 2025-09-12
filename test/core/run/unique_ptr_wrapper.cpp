@@ -35,7 +35,8 @@ struct CustomFields2 {
 };
 
 int main() {
-// Compilers have issues with this test.
+
+// Compilers have issues with this test in C++17.
 //
 // GCC-9 and GCC-10 are fine
 //
@@ -52,6 +53,9 @@ int main() {
 //       |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 // GCC-14 is fine
+//
+// Because of the above issues we test only in C++26.
+
 #if BOOST_PFR_USE_CPP26
   CustomFields2 cf2;
   boost::pfr::for_each_field_with_name(cf2, [](const auto&, const auto&) {});
