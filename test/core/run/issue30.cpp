@@ -16,7 +16,7 @@
 // along with the structure you're reflecting.'
 //
 // No known workaround
-#if !defined(_MSC_VER) || _MSC_VER != 1944 || !(BOOST_PFR_USE_CPP26 || BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE)
+#if !defined(_MSC_VER) || _MSC_VER != 1944 || !(BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE)
 
 struct Message {
   std::unique_ptr<int> data;
