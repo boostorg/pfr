@@ -27,7 +27,7 @@ void test_get_rvalue() {
     // along with the structure you're reflecting.'
     //
     // No known workaround
-#if !defined(_MSC_VER) || _MSC_VER != 1944 || !(BOOST_PFR_USE_CPP26 || BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE)
+#if !defined(_MSC_VER) || _MSC_VER != 1944 || !(BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_LOOPHOLE)
     auto p = boost::pfr::get<0>(std::move(x));
     BOOST_TEST_EQ(*p, 42);
 #endif
