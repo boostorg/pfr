@@ -54,9 +54,9 @@ int main() {
 //
 // GCC-14 is fine
 //
-// Because of the above issues we test only in C++26.
+// Because of the above issues we test mostly in C++26.
 
-#if BOOST_PFR_USE_CPP26 || !defined(__GNUC__) || (__GNUC__ != 11 && __GNUC__ != 12) || defined(__clang__)
+#if BOOST_PFR_USE_CPP26 || (defined(__GNUC__) && (__GNUC__ != 11 && __GNUC__ != 12)) || defined(__clang__)
   CustomFields2 cf2;
   boost::pfr::for_each_field_with_name(cf2, [](const auto&, const auto&) {});
 #endif
