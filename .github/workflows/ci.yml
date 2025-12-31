@@ -38,15 +38,12 @@ jobs:
             cxxflags: "cxxflags=--coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined"
             linkflags: "linkflags=--coverage -lasan -lubsan"
             gcov_tool: "gcov-10"
-          - toolset: gcc-9
-            cxxstd: "03,11,14,17,2a"
-            os: ubuntu-22.04
-            cxxflags: "cxxflags=--coverage -fsanitize=address,leak,undefined -fno-sanitize-recover=undefined"
-            linkflags: "linkflags=--coverage -lasan -lubsan"
-            gcov_tool: "gcov-9"
           - toolset: clang-15
             cxxstd: "03,11,14,17,20"
             os: ubuntu-22.04
+          - toolset: clang-18
+            cxxstd: "03,11,14,17,20,23"
+            os: ubuntu-24.04
           - toolset: clang-19   # tests misc/strip_boost_namespace.sh and modules
             cxxstd: "20,23"
             os: ubuntu-24.04
