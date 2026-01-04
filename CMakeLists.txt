@@ -25,7 +25,17 @@ if (BOOST_USE_MODULES)
     target_include_directories(boost_pfr PUBLIC include)
 else()
     add_library(boost_pfr INTERFACE)
-    target_include_directories(boost_pfr INTERFACE include)
+
+    if (CMAKE_VERSION VERSION_LESS "3.23.0")
+        target_include_directories(boost_pfr INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+                                                       $<INSTALL_INTERFACE:include>)
+    else()
+        file(GLOB_RECURSE PFR_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
+        target_sources(boost_pfr INTERFACE
+            FILE_SET HEADERS TYPE HEADERS BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include
+                                          FILES ${PFR_HEADERS}
+        )
+    endif()
 endif()
 
 add_library(Boost::pfr ALIAS boost_pfr)
@@ -45,4 +55,3 @@ if (BOOST_USE_MODULES AND BUILD_TESTING)
     target_link_libraries(boost_pfr_module_usage_mu PRIVATE Boost::pfr)
     add_test(NAME boost_pfr_module_usage_mu COMMAND boost_pfr_module_usage_mu)
 endif()
-
