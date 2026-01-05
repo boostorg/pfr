@@ -18,8 +18,10 @@
 #include <boost/pfr/detail/for_each_field.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 #include <boost/pfr/detail/tie_from_structure_tuple.hpp>
+#include <boost/pfr/detail/offset_based_getter.hpp>
 
 #include <boost/pfr/tuple_size.hpp>
+
 
 #if !defined(BOOST_PFR_INTERFACE_UNIT)
 #include <type_traits>
@@ -275,6 +277,60 @@ constexpr void for_each_field(T&& value, F&& func) {
 template <typename... Elements>
 constexpr detail::tie_from_structure_tuple<Elements...> tie_from_structure(Elements&... args) noexcept {
     return detail::tie_from_structure_tuple<Elements...>(args...);
+}
+
+template <typename T, typename M>
+constexpr std::size_t index_of(const T& value, M T::*mem_ptr) {
+    constexpr auto size = boost::pfr::tuple_size_v<T>;
+    std::size_t result = size;
+
+    const void* target_address = std::addressof(value.*mem_ptr);
+
+    boost::pfr::for_each_field(value, [&result, target_address](const auto& field, std::size_t idx) {
+        if (!std::is_same<decltype(field), const M&>::value) {
+            return;
+        }
+
+        if (result != size) {
+            // already found the answer
+            return;
+        }
+
+        const void* filed_address = std::addressof(field);
+        if (target_address == filed_address) {
+            result = idx;
+        }
+    });
+
+    return result;
+}
+
+// TODO: move into detail::
+template <class... Types>
+auto strip_references(detail::sequence_tuple::tuple<Types&...>) -> detail::sequence_tuple::tuple<Types&...>;
+
+template <typename T, typename M>
+std::size_t index_of(M T::*mem_ptr) {
+    using tuple_type = detail::tuple_of_aligned_storage_t<
+        decltype(strip_references(detail::tie_as_tuple(std::declval<T&>())))
+    >;
+    using converted_member_pointer_t = M tuple_type::*;
+
+    constexpr tuple_type t{};
+
+    // TODO: not allowed in constexpr + unspecified behavior
+    auto mem_pointer = reinterpret_cast<converted_member_pointer_t>(mem_ptr);
+
+    const void* pointer = std::addressof(t.*mem_pointer);
+    namespace sequence_tuple = boost::pfr::detail::sequence_tuple;
+    if (&sequence_tuple::get<0>(t) == pointer) {
+        return 0;
+    } else if (&sequence_tuple::get<1>(t) == pointer) {
+        return 1;
+    } else if (&sequence_tuple::get<2>(t) == pointer) {
+        return 2;
+    }
+    return 3;
 }
 
 BOOST_PFR_END_MODULE_EXPORT
