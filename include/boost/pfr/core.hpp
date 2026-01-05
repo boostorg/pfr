@@ -18,7 +18,7 @@
 #include <boost/pfr/detail/for_each_field.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 #include <boost/pfr/detail/tie_from_structure_tuple.hpp>
-#include <boost/pfr/detail/offset_based_getter.hpp>
+#include <boost/pfr/detail/fake_object.hpp>
 
 #include <boost/pfr/tuple_size.hpp>
 
@@ -280,7 +280,8 @@ constexpr detail::tie_from_structure_tuple<Elements...> tie_from_structure(Eleme
 }
 
 template <typename T, typename M>
-constexpr std::size_t index_of(const T& value, M T::*mem_ptr) {
+constexpr std::size_t index_of(M T::*mem_ptr) {
+    constexpr const T& value = boost::pfr::detail::fake_object<T>();
     constexpr auto size = boost::pfr::tuple_size_v<T>;
     std::size_t result = size;
 
@@ -303,34 +304,6 @@ constexpr std::size_t index_of(const T& value, M T::*mem_ptr) {
     });
 
     return result;
-}
-
-// TODO: move into detail::
-template <class... Types>
-auto strip_references(detail::sequence_tuple::tuple<Types&...>) -> detail::sequence_tuple::tuple<Types&...>;
-
-template <typename T, typename M>
-std::size_t index_of(M T::*mem_ptr) {
-    using tuple_type = detail::tuple_of_aligned_storage_t<
-        decltype(strip_references(detail::tie_as_tuple(std::declval<T&>())))
-    >;
-    using converted_member_pointer_t = M tuple_type::*;
-
-    constexpr tuple_type t{};
-
-    // TODO: not allowed in constexpr + unspecified behavior
-    auto mem_pointer = reinterpret_cast<converted_member_pointer_t>(mem_ptr);
-
-    const void* pointer = std::addressof(t.*mem_pointer);
-    namespace sequence_tuple = boost::pfr::detail::sequence_tuple;
-    if (&sequence_tuple::get<0>(t) == pointer) {
-        return 0;
-    } else if (&sequence_tuple::get<1>(t) == pointer) {
-        return 1;
-    } else if (&sequence_tuple::get<2>(t) == pointer) {
-        return 2;
-    }
-    return 3;
 }
 
 BOOST_PFR_END_MODULE_EXPORT

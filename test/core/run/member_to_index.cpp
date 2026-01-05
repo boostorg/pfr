@@ -5,7 +5,6 @@
 
 #include <boost/pfr/core.hpp>
 
-#include <cassert>
 #include <string>
 #include <vector>
 
@@ -16,11 +15,7 @@ struct Sample {
 };
 
 int main() {
-    assert(boost::pfr::index_of(&Sample::x) == 0);
-    assert(boost::pfr::index_of(&Sample::y) == 1);
-    assert(boost::pfr::index_of(&Sample::z) == 2);
-
-    static_assert(boost::pfr::index_of(Sample{}, &Sample::x) == 0);
-    static_assert(boost::pfr::index_of(Sample{}, &Sample::y) == 1);
-    static_assert(boost::pfr::index_of(Sample{}, &Sample::z) == 2);
+    static_assert(boost::pfr::index_of(&Sample::x) == 0);
+    static_assert(boost::pfr::index_of(&Sample::y) == 1);
+    static_assert(boost::pfr::index_of(&Sample::z) == 2);
 }
