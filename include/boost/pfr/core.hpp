@@ -282,39 +282,25 @@ constexpr detail::tie_from_structure_tuple<Elements...> tie_from_structure(Eleme
 template <typename T, typename M>
 constexpr std::size_t index_of(M T::*mem_ptr) {
     constexpr const T& value = boost::pfr::detail::fake_object<T>();
-    constexpr auto size = boost::pfr::tuple_size_v<T>;
-    std::size_t result = size;
-
-    const void* target_address = std::addressof(value.*mem_ptr);
 
     struct visitor {
         template <class T>
-        void operator()(const T&) {}
+        void operator()(const T&, std::size_t) {}
 
-        void operator()(const T& field) {
+        void operator()(const T& field, std::size_t idx) {
             const void* filed_address = std::addressof(field);
             if (target_address == filed_address) {
                 result = idx;
             }
         }
-};
-stdboost::pfr::oost::pfr::for(ea:ch_, [&result,  [&result, tar](const auto& field, std::size_t idx) {
-        if (!std::is_same<decltype(field), const M&>::value) {
-            return;
-        }
 
-        if (result != size) {
-            // already found the answer
-            return;
-        }
-
-        const void* filed_address = std::addressof(field);
-        if (target_address == filed_address) {
-            result = idx;
-        }
-    });
-
-    return result;
+        const void* target_address;
+        std::size_t result;
+    };
+    visitor visit{std::addressof(value.*mem_ptr), boost::pfr::tuple_size_v<T>};
+    
+    boost::pfr::for_each_field(value, visit);
+    return visit.result;
 }
 
 BOOST_PFR_END_MODULE_EXPORT
