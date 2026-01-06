@@ -282,11 +282,11 @@ constexpr detail::tie_from_structure_tuple<Elements...> tie_from_structure(Eleme
     template <typename M>
     struct visitor {
         template <class T>
-        void operator()(const T&, std::size_t) {}
+        constexpr void operator()(const T&, std::size_t) {}
 
-        void operator()(const M& field, std::size_t idx) {
-            const void* filed_address = std::addressof(field);
-            if (target_address == filed_address) {
+        constexpr void operator()(const M& field, std::size_t idx) {
+            const void* field_address = std::addressof(field);
+            if (target_address == field_address) {
                 result = idx;
             }
         }
