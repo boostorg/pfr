@@ -22,7 +22,6 @@ int main() {
     static_assert(boost::pfr::index_of(&Sample::z) == 2);
 #else
     assert(boost::pfr::index_of(&Sample::x) == 0);
-	= 0
     assert(boost::pfr::index_of(&Sample::y) == 1);
     assert(boost::pfr::index_of(&Sample::z) == 2);
 #endif
