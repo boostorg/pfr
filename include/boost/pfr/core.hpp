@@ -287,7 +287,18 @@ constexpr std::size_t index_of(M T::*mem_ptr) {
 
     const void* target_address = std::addressof(value.*mem_ptr);
 
-    boost::pfr::for_each_field(value, [&result, target_address](const auto& field, std::size_t idx) {
+    struct visitor {
+        template <class T>
+        void operator()(const T&) {}
+
+        void operator()(const T& field) {
+            const void* filed_address = std::addressof(field);
+            if (target_address == filed_address) {
+                result = idx;
+            }
+        }
+};
+stdboost::pfr::oost::pfr::for(ea:ch_, [&result,  [&result, tar](const auto& field, std::size_t idx) {
         if (!std::is_same<decltype(field), const M&>::value) {
             return;
         }
