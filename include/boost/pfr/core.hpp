@@ -279,10 +279,7 @@ constexpr detail::tie_from_structure_tuple<Elements...> tie_from_structure(Eleme
     return detail::tie_from_structure_tuple<Elements...>(args...);
 }
 
-template <typename T, typename M>
-constexpr std::size_t index_of(M T::*mem_ptr) {
-    constexpr const T& value = boost::pfr::detail::fake_object<T>();
-
+    template <typename M>
     struct visitor {
         template <class T>
         void operator()(const T&, std::size_t) {}
@@ -297,7 +294,12 @@ constexpr std::size_t index_of(M T::*mem_ptr) {
         const void* target_address;
         std::size_t result;
     };
-    visitor visit{std::addressof(value.*mem_ptr), boost::pfr::tuple_size_v<T>};
+
+template <typename T, typename M>
+constexpr std::size_t index_of(M T::*mem_ptr) {
+    constexpr const T& value = boost::pfr::detail::fake_object<T>();
+
+    visitor<M> visit{std::addressof(value.*mem_ptr), boost::pfr::tuple_size_v<T>};
     
     boost::pfr::for_each_field(value, visit);
     return visit.result;
