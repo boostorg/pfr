@@ -287,7 +287,7 @@ constexpr std::size_t index_of(M T::*mem_ptr) {
         template <class T>
         void operator()(const T&, std::size_t) {}
 
-        void operator()(const T& field, std::size_t idx) {
+        void operator()(const M& field, std::size_t idx) {
             const void* filed_address = std::addressof(field);
             if (target_address == filed_address) {
                 result = idx;
