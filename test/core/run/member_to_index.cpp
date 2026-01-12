@@ -3,9 +3,9 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <boost/pfr/core.hpp>
+#include <boost/pfr/index_of.hpp>
 
-#include <cassert>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -21,8 +21,11 @@ int main() {
     static_assert(boost::pfr::index_of(&Sample::y) == 1);
     static_assert(boost::pfr::index_of(&Sample::z) == 2);
 #else
-    assert(boost::pfr::index_of(&Sample::x) == 0);
-    assert(boost::pfr::index_of(&Sample::y) == 1);
-    assert(boost::pfr::index_of(&Sample::z) == 2);
+    if (boost::pfr::index_of(&Sample::x) != 0) return 1;
+    if (boost::pfr::index_of(&Sample::y) != 1) return 2;
+    if (boost::pfr::index_of(&Sample::z) != 2) return 3;
 #endif
+
+    decltype(&Sample::x) mem_ptr = nullptr;
+    if (boost::pfr::index_of(mem_ptr) != (std::numeric_limits<std::size_t>::max)()) return 4;
 }

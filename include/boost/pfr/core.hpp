@@ -18,10 +18,8 @@
 #include <boost/pfr/detail/for_each_field.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
 #include <boost/pfr/detail/tie_from_structure_tuple.hpp>
-#include <boost/pfr/detail/fake_object.hpp>
 
 #include <boost/pfr/tuple_size.hpp>
-
 
 #if !defined(BOOST_PFR_INTERFACE_UNIT)
 #include <type_traits>
@@ -277,32 +275,6 @@ constexpr void for_each_field(T&& value, F&& func) {
 template <typename... Elements>
 constexpr detail::tie_from_structure_tuple<Elements...> tie_from_structure(Elements&... args) noexcept {
     return detail::tie_from_structure_tuple<Elements...>(args...);
-}
-
-    template <typename M>
-    struct visitor {
-        template <class T>
-        constexpr void operator()(const T&, std::size_t) {}
-
-        constexpr void operator()(const M& field, std::size_t idx) {
-            const void* field_address = std::addressof(field);
-            if (target_address == field_address) {
-                result = idx;
-            }
-        }
-
-        const void* target_address;
-        std::size_t result;
-    };
-
-template <typename T, typename M>
-constexpr std::size_t index_of(M T::*mem_ptr) {
-    constexpr const T& value = boost::pfr::detail::fake_object<T>();
-
-    visitor<M> visit{std::addressof(value.*mem_ptr), boost::pfr::tuple_size_v<T>};
-    
-    boost::pfr::for_each_field(value, visit);
-    return visit.result;
 }
 
 BOOST_PFR_END_MODULE_EXPORT

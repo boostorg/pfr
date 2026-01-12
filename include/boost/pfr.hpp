@@ -14,6 +14,7 @@
 #include <boost/pfr/core_name.hpp>
 #include <boost/pfr/functions_for.hpp>
 #include <boost/pfr/functors.hpp>
+#include <boost/pfr/index_of.hpp>
 #include <boost/pfr/io.hpp>
 #include <boost/pfr/io_fields.hpp>
 #include <boost/pfr/ops.hpp>
