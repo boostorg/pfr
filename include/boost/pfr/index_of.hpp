@@ -48,12 +48,11 @@ struct address_comparing_visitor {
 BOOST_PFR_BEGIN_MODULE_EXPORT
 
 template <typename T, typename M>
-constexpr std::size_t index_of(M T::*mem_ptr) noexcept {
+constexpr std::size_t index_of(const T& value, M T::*mem_ptr) noexcept {
     if (mem_ptr == nullptr) {
         return ~static_cast<std::size_t>(0);
     }
 
-    constexpr const T& value = boost::pfr::detail::fake_object<T>();
     detail::address_comparing_visitor<M> visitor{
         std::addressof(value.*mem_ptr),
         ~static_cast<std::size_t>(0)
@@ -61,6 +60,12 @@ constexpr std::size_t index_of(M T::*mem_ptr) noexcept {
     ::boost::pfr::detail::for_each_field(value, visitor);
 
     return visitor.result;
+}
+
+template <typename T, typename M>
+constexpr std::size_t index_of(M T::*mem_ptr) noexcept {
+    constexpr const T& value = boost::pfr::detail::fake_object<T>();
+    return ::boost::pfr::index_of(value, mem_ptr);
 }
 
 BOOST_PFR_END_MODULE_EXPORT
