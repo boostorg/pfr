@@ -15,17 +15,27 @@ struct Sample {
 	std::string z;
 };
 
+struct TrivialSample {
+	int x;
+	short y;
+	bool z;
+};
+
 int main() {
 #if BOOST_PFR_USE_CPP17 || BOOST_PFR_USE_CPP26
-    static_assert(boost::pfr::index_of(&Sample::x) == 0);
-    static_assert(boost::pfr::index_of(&Sample::y) == 1);
-    static_assert(boost::pfr::index_of(&Sample::z) == 2);
-#else
-    if (boost::pfr::index_of(&Sample::x) != 0) return 1;
-    if (boost::pfr::index_of(&Sample::y) != 1) return 2;
-    if (boost::pfr::index_of(&Sample::z) != 2) return 3;
+    static_assert(boost::pfr::index_of(&TrivialSample::x) == 0);
+    static_assert(boost::pfr::index_of(&TrivialSample::y) == 1);
+    static_assert(boost::pfr::index_of(&TrivialSample::z) == 2);
 #endif
 
+    if (boost::pfr::index_of(&Sample::x, {}) != 0) return 1;
+    if (boost::pfr::index_of(&Sample::y, {}) != 1) return 2;
+    if (boost::pfr::index_of(&Sample::z, {}) != 2) return 3;
+
     decltype(&Sample::x) mem_ptr = nullptr;
-    if (boost::pfr::index_of(mem_ptr) != (std::numeric_limits<std::size_t>::max)()) return 4;
+    if (boost::pfr::index_of(mem_ptr, {}) != (std::numeric_limits<std::size_t>::max)()) return 4;
+
+    if (boost::pfr::index_of(&TrivialSample::x) != 0) return 11;
+    if (boost::pfr::index_of(&TrivialSample::y) != 1) return 12;
+    if (boost::pfr::index_of(&TrivialSample::z) != 2) return 13;
 }
