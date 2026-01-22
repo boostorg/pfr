@@ -12,11 +12,12 @@
 #if !defined(BOOST_USE_MODULES) || defined(BOOST_PFR_INTERFACE_UNIT)
 
 #include <boost/pfr/detail/for_each_field.hpp>
+#include <boost/pfr/is_constexpr_default_constructible.hpp>
 
 
 #if !defined(BOOST_PFR_INTERFACE_UNIT)
 #include <type_traits>
-#include <utility>      // metaprogramming stuff
+#include <memory>      // std::addressof
 #endif
 
 /// \file boost/pfr/index_of.hpp
@@ -63,8 +64,16 @@ constexpr std::size_t index_of(M T::*mem_ptr, const T& value) noexcept {
 
 template <typename T, typename M>
 constexpr std::size_t index_of(M T::*mem_ptr) noexcept {
-    constexpr T value{};
-    return ::boost::pfr::index_of(mem_ptr, value);
+    static_assert(
+        boost::pfr::is_constexpr_default_constructible_v<T>,
+        "====================> Boost.PFR: T should be default constructible in constant evaluations. "
+        "Either add `constexpr` to constructors of member types or use the boost::pfr::index_of() overload "
+        "with explicit `const T& value` parameter."
+    );
+
+    // boost::pfr::is_constexpr_default_constructible_v<T> gives a faint hope that the
+    // compiler would be able to optimize away the temporary `T{}`.
+    return ::boost::pfr::index_of(mem_ptr, T{});
 }
 
 BOOST_PFR_END_MODULE_EXPORT
