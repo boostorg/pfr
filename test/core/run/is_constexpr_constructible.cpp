@@ -35,7 +35,7 @@ struct No {
 };
 
 int main() {
-    static_assert(is_constexpr_default_constructible_v<Yes>);
-    static_assert(is_constexpr_default_constructible_v<Yes2>);
-    static_assert(!is_constexpr_default_constructible_v<No>);
+    static_assert(is_constexpr_default_constructible_v<Yes>, "");
+    static_assert(is_constexpr_default_constructible_v<Yes2>, "");
+    static_assert(!is_constexpr_default_constructible_v<No>, "");
 }
