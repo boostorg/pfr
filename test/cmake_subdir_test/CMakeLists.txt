@@ -14,7 +14,6 @@ add_subdirectory(../../../detail boostorg/detail)
 add_subdirectory(../../../describe boostorg/describe)
 add_subdirectory(../../../integer boostorg/integer)
 add_subdirectory(../../../mp11 boostorg/mp11)
-add_subdirectory(../../../static_assert boostorg/static_assert)
 add_subdirectory(../../../throw_exception boostorg/throw_exception)
 add_subdirectory(../../../type_traits boostorg/type_traits)
 
