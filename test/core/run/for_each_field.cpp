@@ -56,6 +56,13 @@ struct simple {
 
 struct empty{};
 
+struct stateful_counting_visitor {
+    std::size_t count = 0;
+
+    template <class T>
+    void operator()(const T&) { ++count; }
+};
+
 #if BOOST_PFR_USE_CPP17
 constexpr std::size_t get_field_count_through_for_each_field() {
     std::size_t counter = 0;
@@ -132,6 +139,10 @@ int main () {
     });
     BOOST_TEST_EQ("", ss.str());
     ss.str("");
+    
+    stateful_counting_visitor counting_visitor;
+    boost::pfr::for_each_field(simple{}, counting_visitor);
+    BOOST_TEST_EQ(3, counting_visitor.count);
 
     return boost::report_errors();
 }
