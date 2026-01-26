@@ -15,6 +15,12 @@ struct SimpleStruct {
     std::string str;
 };
 
+struct stateful_counting_visitor {
+    std::size_t count = 0;
+
+    template <class T>
+    void operator()(std::string_view /*name*/, const T&) { ++count; }
+};
 
 int main () {
     std::map<std::string, std::string> m;
@@ -26,6 +32,10 @@ int main () {
     BOOST_TEST_EQ(m.size(), 2);
     BOOST_TEST_EQ(m["c"], "e");
     BOOST_TEST_EQ(m["str"], "test");
+
+    stateful_counting_visitor counting_visitor;
+    boost::pfr::for_each_field_with_name(SimpleStruct{}, counting_visitor);
+    BOOST_TEST_EQ(2, counting_visitor.count);
 
     return boost::report_errors();
 }
