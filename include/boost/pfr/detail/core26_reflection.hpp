@@ -20,19 +20,13 @@
 namespace boost::pfr::detail {
 
 template <std::size_t I, typename T>
-consteval decltype(auto) member_ptr_by_index() noexcept {
-    return [:
-        reflect_constant(nonstatic_data_members_of(
+consteval decltype(auto) reference_by_index(T &val) noexcept {
+    return val.[:
+        nonstatic_data_members_of(
             ^^T,
             std::meta::access_context::current()
-        ).at(I))
+        ).at(I)
     :];
-}
-
-template <std::size_t I, typename T>
-constexpr decltype(auto) reference_by_index(T &val) noexcept {
-    auto member_ptr = detail::member_ptr_by_index<I, T>();
-    return val.*member_ptr;
 }
 
 template<class T, std::size_t... I>
