@@ -207,7 +207,7 @@ using is_one_element_range = std::integral_constant<bool, Begin == Last>;
 using multi_element_range = std::false_type;
 using one_element_range = std::true_type;
 
-#if !BOOST_PFR_USE_CPP26
+#if !BOOST_PFR_USE_CPP26 && !BOOST_PFR_USE_CPP26_REFLECTION
 ///////////////////// Fields count next expected compiler limitation
 constexpr std::size_t fields_count_compiler_limitation_next(std::size_t n) noexcept {
 #if defined(_MSC_VER) && (_MSC_VER <= 1920)
@@ -344,7 +344,31 @@ constexpr auto fields_count_dispatch(long, long, std::true_type /*are_preconditi
     return sizeof(T) / sizeof(std::remove_all_extents_t<T>);
 }
 
-#if BOOST_PFR_USE_CPP26
+#if BOOST_PFR_USE_CPP26_REFLECTION
+template<class T>
+constexpr auto fields_count_dispatch_impl(const T &) noexcept
+{
+    return std::integral_constant<std::size_t,
+        nonstatic_data_members_of(
+            ^^T,
+            std::meta::access_context::current()
+        ).size()
+    >{};
+}
+
+template<class T>
+constexpr auto fields_count_dispatch(long, int, std::true_type /*are_preconditions_met*/) noexcept
+    -> std::enable_if_t<std::is_scalar<T>::value, std::size_t>
+{
+    return 1;
+}
+
+template<class T>
+constexpr auto fields_count_dispatch(int, int, std::true_type /*are_preconditions_met*/) noexcept
+{
+    return decltype(detail::fields_count_dispatch_impl(std::declval<const T &>()))::value;
+}
+#elif BOOST_PFR_USE_CPP26
 template<class T>
 constexpr auto fields_count_dispatch_impl(const T &t) noexcept
 {
