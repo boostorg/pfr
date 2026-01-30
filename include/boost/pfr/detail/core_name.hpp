@@ -19,7 +19,9 @@
 //
 // The whole functional of extracting field's names is build on top of those
 // two functions.
-#if BOOST_PFR_CORE_NAME_ENABLED
+#if BOOST_PFR_USE_CPP26_REFLECTION
+#include <boost/pfr/detail/core_name26_reflection.hpp>
+#elif BOOST_PFR_CORE_NAME_ENABLED
 #include <boost/pfr/detail/core_name20_static.hpp>
 #else
 #include <boost/pfr/detail/core_name14_disabled.hpp>
