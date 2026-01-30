@@ -16,6 +16,11 @@
 #include <limits>
 #include <type_traits>
 #include <utility>      // metaprogramming stuff
+
+#if BOOST_PFR_USE_CPP26_REFLECTION
+#include <meta>
+#endif
+
 #endif
 
 #ifdef __clang__

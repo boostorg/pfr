@@ -52,7 +52,9 @@ BOOST_PFR_BEGIN_MODULE_EXPORT
 /// \endcode
 template <std::size_t I, class T>
 constexpr decltype(auto) get(const T& val) noexcept {
-#if BOOST_PFR_USE_CPP26
+#if BOOST_PFR_USE_CPP26_REFLECTION
+    return detail::reference_by_index<I>(val);
+#elif BOOST_PFR_USE_CPP26
     const auto& [... members] = val;
     return std::forward_like<const T &>(members...[I]);
 #else
@@ -67,7 +69,9 @@ constexpr decltype(auto) get(T& val
     , std::enable_if_t<std::is_assignable<T, T>::value>* = nullptr
 #endif
 ) noexcept {
-#if BOOST_PFR_USE_CPP26
+#if BOOST_PFR_USE_CPP26_REFLECTION
+    return detail::reference_by_index<I>(val);
+#elif BOOST_PFR_USE_CPP26
     auto& [... members] = val;
     return std::forward_like<T &>(members...[I]);
 #else
@@ -75,7 +79,7 @@ constexpr decltype(auto) get(T& val
 #endif
 }
 
-#if !BOOST_PFR_USE_CPP17 && !BOOST_PFR_USE_CPP26
+#if !BOOST_PFR_USE_CPP17 && !BOOST_PFR_USE_CPP26 && !BOOST_PFR_USE_CPP26_REFLECTION
 /// \overload get
 template <std::size_t I, class T>
 constexpr auto get(T&, std::enable_if_t<!std::is_assignable<T, T>::value>* = nullptr) noexcept {
@@ -88,7 +92,9 @@ constexpr auto get(T&, std::enable_if_t<!std::is_assignable<T, T>::value>* = nul
 /// \overload get
 template <std::size_t I, class T>
 constexpr auto get(T&& val, std::enable_if_t< std::is_rvalue_reference<T&&>::value>* = nullptr) noexcept {
-#if BOOST_PFR_USE_CPP26
+#if BOOST_PFR_USE_CPP26_REFLECTION
+    return std::move(detail::reference_by_index<I>(val));
+#elif BOOST_PFR_USE_CPP26
     auto&& [... members] = std::forward<T>(val);
     return std::move(members...[I]);
 #else
@@ -107,14 +113,14 @@ constexpr const U& get(const T& val) noexcept {
 /// \overload get
 template <class U, class T>
 constexpr U& get(T& val
-#if !BOOST_PFR_USE_CPP17 && !BOOST_PFR_USE_CPP26
+#if !BOOST_PFR_USE_CPP17 && !BOOST_PFR_USE_CPP26 && !BOOST_PFR_USE_CPP26_REFLECTION
     , std::enable_if_t<std::is_assignable<T, T>::value>* = nullptr
 #endif
 ) noexcept {
     return detail::sequence_tuple::get_by_type_impl<U&>( detail::tie_as_tuple(val) );
 }
 
-#if !BOOST_PFR_USE_CPP17 && !BOOST_PFR_USE_CPP26
+#if !BOOST_PFR_USE_CPP17 && !BOOST_PFR_USE_CPP26 && !BOOST_PFR_USE_CPP26_REFLECTION
 /// \overload get
 template <class U, class T>
 constexpr U& get(T&, std::enable_if_t<!std::is_assignable<T, T>::value>* = nullptr) noexcept {
@@ -207,7 +213,7 @@ constexpr auto structure_tie(const T& val) noexcept {
 /// \overload structure_tie
 template <class T>
 constexpr auto structure_tie(T& val
-#if !BOOST_PFR_USE_CPP17 && !BOOST_PFR_USE_CPP26
+#if !BOOST_PFR_USE_CPP17 && !BOOST_PFR_USE_CPP26 && !BOOST_PFR_USE_CPP26_REFLECTION
     , std::enable_if_t<std::is_assignable<T, T>::value>* = nullptr
 #endif
 ) noexcept {
@@ -220,7 +226,7 @@ constexpr auto structure_tie(T& val
 #endif
 }
 
-#if !BOOST_PFR_USE_CPP17 && !BOOST_PFR_USE_CPP26
+#if !BOOST_PFR_USE_CPP17 && !BOOST_PFR_USE_CPP26 && !BOOST_PFR_USE_CPP26_REFLECTION
 /// \overload structure_tie
 template <class T>
 constexpr auto structure_tie(T&, std::enable_if_t<!std::is_assignable<T, T>::value>* = nullptr) noexcept {
