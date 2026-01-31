@@ -261,7 +261,7 @@ constexpr auto structure_tie(T&&, std::enable_if_t< std::is_rvalue_reference<T&&
 /// \endcode
 template <class T, class F>
 constexpr void for_each_field(T&& value, F&& func) {
-    return ::boost::pfr::detail::for_each_field(std::forward<T>(value), std::forward<F>(func));
+    ::boost::pfr::detail::for_each_field(std::forward<T>(value), std::forward<F>(func));
 }
 
 /// \brief std::tie-like function that allows assigning to tied values from aggregates.
