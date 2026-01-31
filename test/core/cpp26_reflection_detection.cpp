@@ -3,7 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-// Detection of variadic structured binding support
+// Detection of C++26 Reflection
 
 #include <type_traits>
 #include <version>
