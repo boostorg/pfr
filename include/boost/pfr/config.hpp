@@ -63,7 +63,8 @@
 
 #ifndef BOOST_PFR_USE_CPP26_REFLECTION
 #ifdef __cpp_lib_reflection
-#define BOOST_PFR_USE_CPP26_REFLECTION 1
+// TODO: experimental. Not enabled by default for now
+#define BOOST_PFR_USE_CPP26_REFLECTION 0
 #else
 #define BOOST_PFR_USE_CPP26_REFLECTION 0
 #endif
