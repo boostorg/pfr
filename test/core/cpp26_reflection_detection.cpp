@@ -12,6 +12,8 @@
 #error Compiler does not support the required features
 #endif
 
+#include <meta>
+
 struct MyPair {
     int first;
     int second;
