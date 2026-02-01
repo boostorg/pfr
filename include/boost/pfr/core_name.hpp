@@ -107,6 +107,7 @@ names_as_array() noexcept {
 /// \endcode
 template <class T, class F>
 constexpr void for_each_field_with_name(T&& value, F&& func) {
+#if BOOST_PFR_CORE_NAME_ENABLED
     return boost::pfr::detail::for_each_field(
         std::forward<T>(value),
         [&func](auto&& field, auto index) {
@@ -119,6 +120,11 @@ constexpr void for_each_field_with_name(T&& value, F&& func) {
                 std::forward<F>(func)(name, std::forward<FieldType>(field));
             }
         });
+#else
+    boost::pfr::detail::report_name_reflection_mising_requirement<T>();
+    (void)value;
+    (void)func;
+#endif
 }
 
 BOOST_PFR_END_MODULE_EXPORT

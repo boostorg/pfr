@@ -17,23 +17,23 @@
 
 namespace boost { namespace pfr { namespace detail {
 
-template <class T, std::size_t I>
-constexpr auto get_name() noexcept {
+template <class T>
+constexpr void report_name_reflection_mising_requirement() noexcept {
     static_assert(
         sizeof(T) && false,
         "====================> Boost.PFR: Field's names extracting functionality requires C++20."
     );
+}
 
+template <class T, std::size_t I>
+constexpr auto get_name() noexcept {
+    detail::report_name_reflection_mising_requirement<T>();
     return nullptr;
 }
 
 template <class T>
 constexpr auto tie_as_names_tuple() noexcept {
-    static_assert(
-        sizeof(T) && false,
-        "====================> Boost.PFR: Field's names extracting functionality requires C++20."
-    );
-
+    detail::report_name_reflection_mising_requirement<T>();
     return detail::sequence_tuple::make_sequence_tuple();
 }
 
