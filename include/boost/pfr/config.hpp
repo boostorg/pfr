@@ -127,7 +127,7 @@
          || (defined(__clang_major__) && __clang_major__ >= 12)
 #           define BOOST_PFR_CORE_NAME_ENABLED 1
 #       else
-#           define BOOST_PFR_CORE_NAME_ENABLED 0
+#           define BOOST_PFR_CORE_NAME_ENABLED BOOST_PFR_USE_CPP26_REFLECTION
 #       endif
 #   else
 #       define BOOST_PFR_CORE_NAME_ENABLED 0
