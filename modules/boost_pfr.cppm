@@ -28,6 +28,11 @@ import std;
 #include <type_traits>
 #include <utility>
 #include <variant>
+
+#ifdef __cpp_lib_reflection
+#include <meta>
+#endif
+
 #endif
 
 #define BOOST_PFR_INTERFACE_UNIT

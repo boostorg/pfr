@@ -61,6 +61,15 @@
 #endif
 #endif
 
+#ifndef BOOST_PFR_USE_CPP26_REFLECTION
+#ifdef __cpp_lib_reflection
+// TODO: experimental. Not enabled by default for now
+#define BOOST_PFR_USE_CPP26_REFLECTION 0
+#else
+#define BOOST_PFR_USE_CPP26_REFLECTION 0
+#endif
+#endif
+
 #ifndef BOOST_PFR_USE_CPP17
 #   ifdef __cpp_structured_bindings
 #       define BOOST_PFR_USE_CPP17 1
@@ -118,7 +127,7 @@
          || (defined(__clang_major__) && __clang_major__ >= 12)
 #           define BOOST_PFR_CORE_NAME_ENABLED 1
 #       else
-#           define BOOST_PFR_CORE_NAME_ENABLED 0
+#           define BOOST_PFR_CORE_NAME_ENABLED BOOST_PFR_USE_CPP26_REFLECTION
 #       endif
 #   else
 #       define BOOST_PFR_CORE_NAME_ENABLED 0

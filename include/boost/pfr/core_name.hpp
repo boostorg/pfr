@@ -26,6 +26,7 @@
 
 #if !defined(BOOST_PFR_INTERFACE_UNIT)
 #include <cstddef> // for std::size_t
+#include <string_view>
 #endif
 
 /// \file boost/pfr/core_name.hpp
@@ -106,7 +107,24 @@ names_as_array() noexcept {
 /// \endcode
 template <class T, class F>
 constexpr void for_each_field_with_name(T&& value, F&& func) {
-    return boost::pfr::detail::for_each_field_with_name(std::forward<T>(value), std::forward<F>(func));
+#if BOOST_PFR_CORE_NAME_ENABLED
+    return boost::pfr::detail::for_each_field(
+        std::forward<T>(value),
+        [&func](auto&& field, auto index) {
+            using IndexType = decltype(index);
+            using FieldType = decltype(field);
+            constexpr auto name = boost::pfr::detail::get_name<std::remove_reference_t<T>, IndexType::value>();
+            if constexpr (std::is_invocable_v<F, std::string_view, FieldType, IndexType>) {
+                std::forward<F>(func)(name, std::forward<FieldType>(field), index);
+            } else {
+                std::forward<F>(func)(name, std::forward<FieldType>(field));
+            }
+        });
+#else
+    boost::pfr::detail::report_name_reflection_mising_requirement<T>();
+    (void)value;
+    (void)func;
+#endif
 }
 
 BOOST_PFR_END_MODULE_EXPORT
