@@ -26,7 +26,10 @@
 
 #if !defined(BOOST_PFR_INTERFACE_UNIT)
 #include <cstddef> // for std::size_t
+
+#if BOOST_PFR_CORE_NAME_ENABLED
 #include <string_view>
+#endif
 #endif
 
 /// \file boost/pfr/core_name.hpp
