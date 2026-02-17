@@ -54,6 +54,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Install {fmt}
+        run: sudo apt install libfmt-dev
+
       - name: Install packages
         if: matrix.install
         run: sudo apt install ${{matrix.install}}
@@ -188,6 +191,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+
+      - uses: microsoft/setup-msbuild@v1.1
+      - name: Install {fmt}
+        uses: lukka/run-vcpkg@v6
+        with:
+          vcpkgGitCommitId: '88b1071e39f13b632644d9d953738d345a4ac055'
+          vcpkgDirectory: '${{ runner.workspace }}/vcpkg'
+          vcpkgTriplet: x64-windows
+          vcpkgArguments: fmt
 
       - name: Setup Boost
         shell: cmd
