@@ -91,7 +91,7 @@ jobs:
           cmake -S . -B __build \
             -DBUILD_TESTING=1 \
             -DBOOST_INCLUDE_LIBRARIES=pfr \
-            -DCMAKE_CXX_COMPILER=${{matrix.compiler}} \
+            -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
           cmake --build __build --target tests
           ctest --test-dir __build --output-on-failure --no-tests=error
           rm -rf __build
