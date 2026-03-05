@@ -241,22 +241,6 @@ constexpr auto tie_as_names_tuple() noexcept {
     return detail::tie_as_names_tuple_impl<T>(detail::make_index_sequence<detail::fields_count<T>()>{});
 }
 
-template <class T, class F>
-constexpr void for_each_field_with_name(T&& value, F&& func) {
-    return boost::pfr::detail::for_each_field(
-        std::forward<T>(value),
-        [&func](auto&& field, auto index) mutable {
-            using IndexType = decltype(index);
-            using FieldType = decltype(field);
-            constexpr auto name = boost::pfr::detail::get_name<std::remove_reference_t<T>, IndexType::value>();
-            if constexpr (std::is_invocable_v<F, std::string_view, FieldType, IndexType>) {
-                std::forward<F>(func)(name, std::forward<FieldType>(field), index);
-            } else {
-                std::forward<F>(func)(name, std::forward<FieldType>(field));
-            }
-        });
-}
-
 }}} // namespace boost::pfr::detail
 
 #endif // BOOST_PFR_DETAIL_CORE_NAME20_STATIC_HPP

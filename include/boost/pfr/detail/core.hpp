@@ -13,7 +13,9 @@
 // `boost::pfr::detail::for_each_field_dispatcher` functions.
 //
 // The whole PFR library is build on top of those two functions.
-#if BOOST_PFR_USE_CPP26
+#if BOOST_PFR_USE_CPP26_REFLECTION
+#include <boost/pfr/detail/core26_reflection.hpp>
+#elif BOOST_PFR_USE_CPP26
 #include <boost/pfr/detail/core26.hpp>
 #elif BOOST_PFR_USE_CPP17
 #   include <boost/pfr/detail/core17.hpp>

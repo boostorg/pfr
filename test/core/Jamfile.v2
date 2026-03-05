@@ -45,6 +45,9 @@ explicit compiler_supports_loophole ;
 mp-run-simple variadic_structured_binding_detection.cpp : : : : compiler_supports_vsb ;
 explicit compiler_supports_vsb ;
 
+mp-run-simple cpp26_reflection_detection.cpp : : : : compiler_supports_cpp26_reflection ;
+explicit compiler_supports_cpp26_reflection ;
+
 ########## END of helpers to detect Loophole trick support
 
 
@@ -55,11 +58,15 @@ local REQUIRE_LOOPHOLE =
 local REQUIRE_VSB =
     [ check-target-builds ../core//compiler_supports_vsb : : <build>no ]
   ;
+local REQUIRE_CPP26_REFLECTION =
+    [ check-target-builds ../core//compiler_supports_cpp26_reflection : : <build>no ]
+  ;
 
-local VARIADIC_STRUCTURED_BINDING_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=0 <define>BOOST_PFR_USE_CPP26=1 $(REQUIRE_VSB) ;
-local STRUCTURED_BINDING_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=1 <define>BOOST_PFR_USE_CPP26=0 [ requires cxx17_structured_bindings ] ;
-local LOOPHOLE_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=1 <define>BOOST_PFR_USE_CPP17=0 <define>BOOST_PFR_USE_CPP26=0 $(REQUIRE_LOOPHOLE) ;
-local CLASSIC_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=0 <define>BOOST_PFR_USE_CPP26=0 $(DISABLE_ON_MSVC) ;
+local CPP26_REFLECTION_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=0 <define>BOOST_PFR_USE_CPP26=0 <define>BOOST_PFR_USE_CPP26_REFLECTION=1 $(REQUIRE_CPP26_REFLECTION) ;
+local VARIADIC_STRUCTURED_BINDING_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=0 <define>BOOST_PFR_USE_CPP26=1 <define>BOOST_PFR_USE_CPP26_REFLECTION=0 $(REQUIRE_VSB) ;
+local STRUCTURED_BINDING_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=1 <define>BOOST_PFR_USE_CPP26=0 <define>BOOST_PFR_USE_CPP26_REFLECTION=0 [ requires cxx17_structured_bindings ] ;
+local LOOPHOLE_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=1 <define>BOOST_PFR_USE_CPP17=0 <define>BOOST_PFR_USE_CPP26=0 <define>BOOST_PFR_USE_CPP26_REFLECTION=0 $(REQUIRE_LOOPHOLE) ;
+local CLASSIC_ENGINE = <define>BOOST_PFR_USE_LOOPHOLE=0 <define>BOOST_PFR_USE_CPP17=0 <define>BOOST_PFR_USE_CPP26=0 <define>BOOST_PFR_USE_CPP26_REFLECTION=0 $(DISABLE_ON_MSVC) ;
 
 test-suite pfr_tests
   :
@@ -116,6 +123,7 @@ local BLACKLIST_TESTS_FOR_CLASSIC =
 for local source_file in [ glob ./run/*.cpp ] [ glob ../../example/*.cpp ]
 {
     local target_name = $(source_file[1]:B) ;
+    pfr_tests += [ run $(source_file) : : : $(CPP26_REFLECTION_ENGINE) : $(target_name)_refl ] ;
     pfr_tests += [ run $(source_file) : : : $(VARIADIC_STRUCTURED_BINDING_ENGINE) : $(target_name)_vsb ] ;
     pfr_tests += [ run $(source_file) : : : $(STRUCTURED_BINDING_ENGINE) : $(target_name)_sb ] ;
 
