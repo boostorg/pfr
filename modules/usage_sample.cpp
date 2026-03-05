@@ -8,7 +8,6 @@
 
 //[pfr_module_example
 #include <iostream>
-#include <iomanip>
 #include <string>
 
 import boost.pfr;
