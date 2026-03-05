@@ -11,6 +11,7 @@ module;
 #include <version>
 #include <cstddef>
 #include <cstdint>
+#include <compare>
 
 #ifdef BOOST_PFR_USE_STD_MODULE
 import std;

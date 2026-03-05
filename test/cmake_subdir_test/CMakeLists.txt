@@ -17,4 +17,5 @@ add_subdirectory(../../../mp11 boostorg/mp11)
 add_subdirectory(../../../throw_exception boostorg/throw_exception)
 add_subdirectory(../../../type_traits boostorg/type_traits)
 
+enable_testing()
 add_subdirectory(../../ boostorg/pfr)
