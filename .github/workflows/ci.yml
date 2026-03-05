@@ -86,12 +86,13 @@ jobs:
         if: ${{matrix.toolset == 'gcc-14'}}
         run: |
           cd ../boost-root/
-          mkdir __build
-          cd __build
-          cmake -DBUILD_TESTING=1 -DBOOST_INCLUDE_LIBRARIES=pfr -DCMAKE_CXX_COMPILER=g++-14 -DCMAKE_C_COMPILER=gcc-14 ..
-          cmake --build . --target tests
-          ctest --output-on-failure --no-tests=error
-          cd ..
+          cmake -S . -B __build \
+            -DBUILD_TESTING=1 \
+            -DBOOST_INCLUDE_LIBRARIES=pfr \
+            -DCMAKE_CXX_COMPILER=g++-14 \
+            -DCMAKE_C_COMPILER=gcc-14
+          cmake --build __build --target tests
+          ctest --test-dir __build --output-on-failure --no-tests=error
           rm -rf __build
 
       - name: Run modules tests
@@ -108,7 +109,7 @@ jobs:
             -DCMAKE_EXPERIMENTAL_CXX_IMPORT_STD=0e5b6991-d74f-4b3d-a41c-cf096e0b2508 \
             -DCMAKE_CXX_MODULE_STD=ON
           cmake --build build_module
-          ctest --test-dir build_module -VV
+          ctest --test-dir build_module --no-tests=error -VV
           rm -rf build_module
 
       - name: Run modules tests without 'import std;'
