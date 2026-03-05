@@ -20,6 +20,7 @@ jobs:
           - toolset: gcc-14  # Do not remove! It is the only toolset that tests CMake tests down below
             cxxstd: "03,11,14,17,20"
             os: ubuntu-24.04
+            compiler: g++-14
           - toolset: gcc-12
             cxxstd: "03,11,14,17,2a"
             os: ubuntu-22.04
@@ -47,6 +48,7 @@ jobs:
           - toolset: clang-19   # tests misc/strip_boost_namespace.sh and modules
             cxxstd: "20,23"
             os: ubuntu-24.04
+            compiler: clang++-19
             install: clang-19 llvm-19 libclang-rt-19-dev libc++-19-dev libc++abi-19-dev clang-tools-19
 
     runs-on: ${{matrix.os}}
@@ -83,14 +85,13 @@ jobs:
           ./b2 variant=debug tools/inspect
 
       - name: Run CMake tests
-        if: ${{matrix.toolset == 'gcc-14'}}
+        if: ${{matrix.toolset == 'gcc-14' || matrix.toolset == 'clang-19'}}
         run: |
           cd ../boost-root/
           cmake -S . -B __build \
             -DBUILD_TESTING=1 \
             -DBOOST_INCLUDE_LIBRARIES=pfr \
-            -DCMAKE_CXX_COMPILER=g++-14 \
-            -DCMAKE_C_COMPILER=gcc-14
+            -DCMAKE_CXX_COMPILER=${{matrix.compiler}} \
           cmake --build __build --target tests
           ctest --test-dir __build --output-on-failure --no-tests=error
           rm -rf __build
@@ -116,12 +117,12 @@ jobs:
         if: ${{matrix.toolset == 'clang-19'}}
         run: |
           cd ../boost-root/libs/pfr
-          mkdir build_module
-          cd build_module
-          cmake -DBOOST_USE_MODULES=1 -DBUILD_TESTING=1 -GNinja -DCMAKE_CXX_COMPILER=clang++-19 ../test/cmake_subdir_test
-          cmake --build .
-          ctest -V
-          cd ..
+          cmake -S test/cmake_test_subdir -B build_module -GNinja \
+            -DBOOST_USE_MODULES=1
+            -DBUILD_TESTING=1
+            -DCMAKE_CXX_COMPILER=clang++-19
+          cmake --build build_module
+          ctest --test-dir build_module --no-tests=error -VV
           rm -rf build_module
 
       - name: Run tests
