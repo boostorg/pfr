@@ -20,6 +20,7 @@ jobs:
           - toolset: gcc-14  # Do not remove! It is the only toolset that tests CMake tests down below
             cxxstd: "03,11,14,17,20"
             os: ubuntu-24.04
+            compiler: g++-14
           - toolset: gcc-12
             cxxstd: "03,11,14,17,2a"
             os: ubuntu-22.04
@@ -47,6 +48,7 @@ jobs:
           - toolset: clang-19   # tests misc/strip_boost_namespace.sh and modules
             cxxstd: "20,23"
             os: ubuntu-24.04
+            compiler: clang++-19
             install: clang-19 llvm-19 libclang-rt-19-dev libc++-19-dev libc++abi-19-dev clang-tools-19
 
     runs-on: ${{matrix.os}}
@@ -83,40 +85,44 @@ jobs:
           ./b2 variant=debug tools/inspect
 
       - name: Run CMake tests
-        if: ${{matrix.toolset == 'gcc-14'}}
+        if: ${{matrix.toolset == 'gcc-14' || matrix.toolset == 'clang-19'}}
         run: |
           cd ../boost-root/
-          mkdir __build
-          cd __build
-          cmake -DBUILD_TESTING=1 -DBOOST_INCLUDE_LIBRARIES=pfr -DCMAKE_CXX_COMPILER=g++-14 -DCMAKE_C_COMPILER=gcc-14 ..
-          cmake --build . --target tests
-          ctest --output-on-failure --no-tests=error
-          cd ..
+          cmake -S . -B __build \
+            -DBUILD_TESTING=1 \
+            -DBOOST_INCLUDE_LIBRARIES=pfr \
+            -DCMAKE_CXX_COMPILER=${{matrix.compiler}}
+          cmake --build __build --target tests
+          ctest --test-dir __build --output-on-failure --no-tests=error
           rm -rf __build
 
       - name: Run modules tests
-        if: false
-        # if: ${{matrix.toolset == 'clang-19'}}
-        run: |
-          cd ../boost-root/libs/pfr
-          mkdir build_module
-          cd build_module
-          cmake -DBUILD_TESTING=1 -DBOOST_USE_MODULES=1 -DCMAKE_CXX_COMPILER=clang++-19 -DCMAKE_CXX_FLAGS=-stdlib=libc++ -DCMAKE_EXE_LINKER_FLAGS=-stdlib=libc++ -DCMAKE_CXX_STANDARD=23 -DCMAKE_EXPERIMENTAL_CXX_IMPORT_STD=0e5b6991-d74f-4b3d-a41c-cf096e0b2508 -G Ninja ../test/cmake_subdir_test
-          cmake --build .
-          ctest -V
-          cd ..
-          rm -rf build_module
-
-      - name: Run modules tests wihtout 'import std;'
         if: ${{matrix.toolset == 'clang-19'}}
         run: |
           cd ../boost-root/libs/pfr
-          mkdir build_module
-          cd build_module
-          cmake -DBOOST_USE_MODULES=1 -DBUILD_TESTING=1 -GNinja -DCMAKE_CXX_COMPILER=clang++-19 ../test/cmake_subdir_test
-          cmake --build .
-          ctest -V
-          cd ..
+          cmake -S test/cmake_subdir_test -B build_module \
+            -GNinja \
+            -DBUILD_TESTING=1 \
+            -DBOOST_USE_MODULES=1 \
+            -DCMAKE_CXX_COMPILER=clang++-19 \
+            -DCMAKE_CXX_FLAGS=-stdlib=libc++ \
+            -DCMAKE_CXX_STANDARD=23 \
+            -DCMAKE_EXPERIMENTAL_CXX_IMPORT_STD=0e5b6991-d74f-4b3d-a41c-cf096e0b2508 \
+            -DCMAKE_CXX_MODULE_STD=ON
+          cmake --build build_module
+          ctest --test-dir build_module --no-tests=error -VV
+          rm -rf build_module
+
+      - name: Run modules tests without 'import std;'
+        if: ${{matrix.toolset == 'clang-19'}}
+        run: |
+          cd ../boost-root/libs/pfr
+          cmake -S test/cmake_subdir_test -B build_module -GNinja \
+            -DBOOST_USE_MODULES=1 \
+            -DBUILD_TESTING=1 \
+            -DCMAKE_CXX_COMPILER=clang++-19
+          cmake --build build_module
+          ctest --test-dir build_module --no-tests=error -VV
           rm -rf build_module
 
       - name: Run tests
