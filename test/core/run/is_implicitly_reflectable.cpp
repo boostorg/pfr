@@ -3,6 +3,7 @@
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
+#include <array>
 #include <iostream>
 #include <boost/pfr/traits.hpp>
 #include <type_traits>  // for std::true_type, std::false_type and std::is_aggregate
@@ -71,6 +72,12 @@ int main() {
         assert_non_reflectable<Nonrefrectable, tag>();
         assert_reflectable<ReflectableBoostJson, tag>();
         assert_non_reflectable<NonrefrectableBoostJson, tag>();
+
+        // std::array is an aggregate, but it holds a C array member that
+        // Boost.PFR can not reflect correctly, so it must not be considered
+        // implicitly reflectable (https://github.com/boostorg/pfr/issues/169).
+        assert_non_reflectable<std::array<int, 3>, tag>();
+        assert_non_reflectable<std::array<char, 1>, tag>();
     }
 
     {
@@ -81,6 +88,10 @@ int main() {
         assert_non_reflectable<Nonrefrectable, tag>();
         assert_reflectable<ReflectableBoostFusion, tag>();
         assert_non_reflectable<NonrefrectableBoostFusion, tag>();
+
+        // See the comment in the boost_json_tag block above.
+        assert_non_reflectable<std::array<int, 3>, tag>();
+        assert_non_reflectable<std::array<char, 1>, tag>();
     }
 #endif  // #if BOOST_PFR_ENABLE_IMPLICIT_REFLECTION
 }
