@@ -1,6 +1,6 @@
 # [Boost.PFR](https://boost.org/libs/pfr)
 
-This is a C++14 library for very basic reflection that gives you access to structure elements by index and provides other `std::tuple` like methods for user defined types without any macro or boilerplate code.
+This C++14 library provides basic reflection capabilities, allowing access to structure elements by index and offering `std::tuple`-like methods for user-defined types without macros or boilerplate code.
 
 [Boost.PFR](https://boost.org/libs/pfr) is a part of the [Boost C++ Libraries](https://github.com/boostorg). However, Boost.PFR is a header only library that does not depend on Boost. You can just copy the content of the "include" folder from the github into your project, and the library will work fine.
 
@@ -31,8 +31,8 @@ struct some_person {
 int main(int argc, const char* argv[]) {
   some_person val{"Edgar Allan Poe", 1809};
 
-  std::cout << boost::pfr::get<0>(val)                // No macro!
-      << " was born in " << boost::pfr::get<1>(val);  // Works with any aggregate initializables!
+  std::cout << boost::pfr::get<0>(val)                // No macros!
+      << " was born in " << boost::pfr::get<1>(val);  // Works with any aggregate type!
 
   if (argc > 1) {
     std::ofstream ofs(argv[1]);
@@ -40,7 +40,7 @@ int main(int argc, const char* argv[]) {
   }
 }
 ```
-Outputs:
+Output:
 ```
 Edgar Allan Poe was born in 1809
 ```
