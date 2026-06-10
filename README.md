@@ -1,6 +1,6 @@
 # [Boost.PFR](https://boost.org/libs/pfr)
 
-This C++14 library provides basic reflection capabilities, allowing access to structure elements by index and offering `std::tuple`-like methods for user-defined types without macros or boilerplate code.
+This C++14 library provides basic reflection capabilities, allowing access to structure elements by index, retrieval of aggregate field names, and `std::tuple`-like methods for user-defined types — all without macros or boilerplate code.
 
 [Boost.PFR](https://boost.org/libs/pfr) is a part of the [Boost C++ Libraries](https://github.com/boostorg). However, Boost.PFR is a header only library that does not depend on Boost. You can just copy the content of the "include" folder from the github into your project, and the library will work fine.
 
