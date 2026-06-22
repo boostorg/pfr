@@ -69,7 +69,19 @@ environment:
       TOOLSET: gcc
       CXXSTD: 14,1z
 
+cache:
+  - c:\tools\vcpkg\installed\
+
 before_build:
+      # Install {fmt} library in order to run examples
+    # FIXME: To be removed https://help.appveyor.com/discussions/problems/13000-cmake_toolchain_filevcpkgcmake-conflicts-with-cmake-native-findboostcmake"
+    - ps: 'Write-Host "Installing latest vcpkg.cmake module" -ForegroundColor Magenta'
+    - appveyor DownloadFile https://raw.githubusercontent.com/Microsoft/vcpkg/master/scripts/buildsystems/vcpkg.cmake -FileName "c:\tools\vcpkg\scripts\buildsystems\vcpkg.cmake"
+    - set "TRIPLET=x64-windows"
+    - vcpkg --triplet %TRIPLET% install fmt
+    - set PATH=C:\Tools\vcpkg\installed\%TRIPLET%\bin;%PATH%
+    - set VCPKG_I=C:\Tools\vcpkg\installed\%TRIPLET%\include
+    - set VCPKG_L=C:\Tools\vcpkg\installed\%TRIPLET%\lib
     - set BOOST_BRANCH=develop
     - if "%APPVEYOR_REPO_BRANCH%" == "master" set BOOST_BRANCH=master
     - echo "Testing %BOOST_LIBS_FOLDER%"
@@ -85,6 +97,17 @@ before_build:
     - python tools/boostdep/depinst/depinst.py --git_args "--depth 10 --jobs 2" -I example -I examples %BOOST_LIBS_FOLDER%
 
 build_script:
+    - xcopy %APPVEYOR_BUILD_FOLDER%\fmt.jam %USERPROFILE%
+    - ps: |
+        # Creating %USERPROFILE%/user-config.jam file
+        @'
+        import os regex toolset ;
+        local toolset = [ regex.split [ os.environ TOOLSET ] "-" ] ;
+        local vcpkg_i = [ os.environ VCPKG_I ] ;
+        local vcpkg_l = [ os.environ VCPKG_L ] ;
+        using $(toolset[1]) : $(toolset[2-]:J="-") : ;
+        using fmt : : <include>$(vcpkg_i) <search>$(vcpkg_l) ;
+        '@ | sc "$env:USERPROFILE/user-config.jam"
     - cmd /c bootstrap
     - b2.exe headers
     - cd %BOOST%/libs/%BOOST_LIBS_FOLDER%/test
