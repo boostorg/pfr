@@ -234,6 +234,9 @@ Boost.PFR is a header only library that does not depend on Boost. You can just c
     [ [pfr_quick_examples_for_each_with_name] ]
     [ [funcref boost::pfr::for_each_field_with_name] ]
 ][
+    [ [pfr_quick_examples_for_each_name] ]
+    [ [funcref boost::pfr::for_each_name] ]
+][
     [ [pfr_quick_examples_functions_for] ]
     [ [macroref BOOST_PFR_FUNCTIONS_FOR] ]
 ][
