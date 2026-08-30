@@ -51,6 +51,7 @@ template <std::size_t I, std::size_t N>
 struct print_impl {
     template <class Stream, class T>
     static void print (Stream& out, const T& value) {
+        using std::operator<<;
         if (!!I) out << ", ";
         out << detail::quoted_helper(boost::pfr::detail::sequence_tuple::get<I>(value));
         print_impl<I + 1, N>::print(out, value);
@@ -67,6 +68,7 @@ template <std::size_t I, std::size_t N>
 struct read_impl {
     template <class Stream, class T>
     static void read (Stream& in, const T& value) {
+        using std::operator>>;
         char ignore = {};
         if (!!I) {
             in >> ignore;
