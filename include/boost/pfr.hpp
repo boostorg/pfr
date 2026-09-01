@@ -14,8 +14,10 @@
 #include <boost/pfr/core_name.hpp>
 #include <boost/pfr/functions_for.hpp>
 #include <boost/pfr/functors.hpp>
+#include <boost/pfr/index_of.hpp>
 #include <boost/pfr/io.hpp>
 #include <boost/pfr/io_fields.hpp>
+#include <boost/pfr/is_constexpr_default_constructible.hpp>
 #include <boost/pfr/ops.hpp>
 #include <boost/pfr/ops_fields.hpp>
 #include <boost/pfr/tuple_size.hpp>
