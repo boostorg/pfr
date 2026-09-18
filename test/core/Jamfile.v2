@@ -124,7 +124,6 @@ local BLACKLIST_TESTS_FOR_MSVC14_5 =
     get_rvalue
     issue30
     non_movable
-    void_ptr
   ;
 
 for local source_file in [ glob ./run/*.cpp ] [ glob ../../example/*.cpp ]
