@@ -120,16 +120,30 @@ local BLACKLIST_TESTS_FOR_CLASSIC =
     tie_anonymous_const_field
   ;
 
+local BLACKLIST_TESTS_FOR_MSVC14_5 =
+    get_rvalue
+    issue30
+    non_movable
+    void_ptr
+  ;
+
 for local source_file in [ glob ./run/*.cpp ] [ glob ../../example/*.cpp ]
 {
     local target_name = $(source_file[1]:B) ;
-    pfr_tests += [ run $(source_file) : : : $(CPP26_REFLECTION_ENGINE) : $(target_name)_refl ] ;
-    pfr_tests += [ run $(source_file) : : : $(VARIADIC_STRUCTURED_BINDING_ENGINE) : $(target_name)_vsb ] ;
-    pfr_tests += [ run $(source_file) : : : $(STRUCTURED_BINDING_ENGINE) : $(target_name)_sb ] ;
+
+    local msvc_14_5_disable = ;
+    if $(target_name) in $(BLACKLIST_TESTS_FOR_MSVC14_5)
+    {
+        msvc_14_5_disable = <toolset>msvc-14.5:<build>no ;
+    }
+
+    pfr_tests += [ run $(source_file) : : : $(CPP26_REFLECTION_ENGINE) $(msvc_14_5_disable) : $(target_name)_refl ] ;
+    pfr_tests += [ run $(source_file) : : : $(VARIADIC_STRUCTURED_BINDING_ENGINE) $(msvc_14_5_disable) : $(target_name)_vsb ] ;
+    pfr_tests += [ run $(source_file) : : : $(STRUCTURED_BINDING_ENGINE) $(msvc_14_5_disable) : $(target_name)_sb ] ;
 
     if ! $(target_name) in $(BLACKLIST_TESTS_FOR_LOOPHOLE)
     {
-        pfr_tests += [ run $(source_file) : : : $(LOOPHOLE_ENGINE) : $(target_name)_lh ] ;
+        pfr_tests += [ run $(source_file) : : : $(LOOPHOLE_ENGINE) $(msvc_14_5_disable) : $(target_name)_lh ] ;
     }
     else
     {
@@ -138,7 +152,7 @@ for local source_file in [ glob ./run/*.cpp ] [ glob ../../example/*.cpp ]
 
     if ! $(target_name) in $(BLACKLIST_TESTS_FOR_CLASSIC)
     {
-        pfr_tests += [ run $(source_file) : : : $(CLASSIC_ENGINE) : $(target_name)_classic ] ;
+        pfr_tests += [ run $(source_file) : : : $(CLASSIC_ENGINE) $(msvc_14_5_disable) : $(target_name)_classic ] ;
     }
     else
     {
