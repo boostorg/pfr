@@ -23,7 +23,7 @@ int main() {
     static_assert(boost::pfr::get_name<0, LongPointerTest>() == "OwningThread");
 
     // No known workaround for MSVC
-#if !defined(_MSC_VER) || _MSC_VER > 1950
+#if !defined(_MSC_VER) || _MSC_VER > 1952
     static_assert(boost::pfr::get_name<0, VoidPointerTest>() == "OwningThread");
 #endif
 }
