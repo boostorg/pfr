@@ -266,6 +266,7 @@ jobs:
         shell: cmd
         run: |
           cd ../boost-root
+          call "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvarsall.bat" x64
           b2 -d0 headers
           b2 ${{matrix.threads}} libs/%LIBRARY%/test toolset=${{matrix.toolset}} cxxstd=${{matrix.cxxstd}} address-model=${{matrix.addrmd}} variant=debug,release
 
