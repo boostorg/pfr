@@ -88,6 +88,14 @@
 #   endif
 #endif
 
+#ifndef BOOST_PFR_USE_CPP20
+#   if __cpp_concepts >= 201907L || (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)
+#       define BOOST_PFR_USE_CPP20 1
+#   else
+#       define BOOST_PFR_USE_CPP20 0
+#   endif
+#endif
+
 #if (!BOOST_PFR_USE_CPP26 && !BOOST_PFR_USE_CPP17 && !BOOST_PFR_USE_LOOPHOLE)
 #   if (defined(_MSC_VER) && _MSC_VER < 1916) ///< in Visual Studio 2017 v15.9 PFR library with classic engine normally works
 #      define BOOST_PFR_NOT_SUPPORTED 1
