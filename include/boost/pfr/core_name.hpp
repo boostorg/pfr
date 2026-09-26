@@ -18,6 +18,7 @@
 
 #include <boost/pfr/detail/core_name.hpp>
 
+#include <boost/pfr/detail/for_each_name.hpp>
 #include <boost/pfr/detail/sequence_tuple.hpp>
 #include <boost/pfr/detail/stdarray.hpp>
 #include <boost/pfr/detail/make_integer_sequence.hpp>
@@ -126,6 +127,32 @@ constexpr void for_each_field_with_name(T&& value, F&& func) {
 #else
     boost::pfr::detail::report_name_reflection_mising_requirement<T>();
     (void)value;
+    (void)func;
+#endif
+}
+
+/// Calls `func` for each field name of the \aggregate `T`.
+/// \param func must have one of the following signatures:
+///     * any_return_type func(std::string_view name)
+///     * any_return_type func(std::string_view name, I i)  // Here I is an `std::integral_constant<size_t, field_index>`
+///
+/// \b Example:
+/// \code
+///     struct my_struct { int i; short s; };
+///
+///     boost::pfr::for_each_name<my_struct>([](std::string_view name, auto index) {
+///         std::cout << index() << ": " << name << '\n';  // Outputs: 0: i 1: s
+///     });
+/// \endcode
+template <class T, class F>
+constexpr void for_each_name(F&& func) {
+#if BOOST_PFR_CORE_NAME_ENABLED
+    detail::for_each_name_impl<T>(
+        func,
+        detail::make_index_sequence< tuple_size_v<T> >()
+    );
+#else
+    boost::pfr::detail::report_name_reflection_mising_requirement<T>();
     (void)func;
 #endif
 }

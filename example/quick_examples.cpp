@@ -104,6 +104,26 @@ void test_examples() {
     });
 //]
   }
+
+  {
+//[pfr_quick_examples_for_each_name
+    // Iterate over field names and indices of a structure
+    // without constructing an instance of it.
+
+    struct sample {
+        int f_int;
+        long f_long;
+    };
+
+    // Outputs:
+    //  0: f_int
+    //  1: f_long
+    boost::pfr::for_each_name<sample>(
+      [](std::string_view name, auto index) {
+        std::cout << '\n' << index() << ": " << name;
+    });
+//]
+  }
 #endif
 
   {
