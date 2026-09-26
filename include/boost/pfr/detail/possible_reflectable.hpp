@@ -11,10 +11,22 @@
 #include <boost/pfr/traits_fwd.hpp>
 
 #if !defined(BOOST_PFR_INTERFACE_UNIT)
+#include <array>       // for std::array
+#include <cstddef>     // for std::size_t
 #include <type_traits> // for std::is_aggregate
 #endif
 
 namespace boost { namespace pfr { namespace detail {
+
+// std::array<T, N> is an aggregate, but it stores its elements in a C array
+// data member. Boost.PFR can not reflect types with C array members yet (see
+// https://github.com/boostorg/pfr/issues/20), so std::array must not be
+// treated as implicitly reflectable.
+template <class T>
+struct is_stdarray : std::false_type {};
+
+template <class T, std::size_t N>
+struct is_stdarray<std::array<T, N>> : std::true_type {};
 
 ///////////////////// Returns false when the type exactly wasn't be reflectable
 template <class T, class WhatFor>
@@ -26,11 +38,11 @@ constexpr decltype(is_reflectable<T, WhatFor>::value) possible_reflectable(long)
 
 template <class T, class WhatFor>
 constexpr bool possible_reflectable(int) noexcept {
-#   if  defined(__cpp_lib_is_aggregate)
     using type = std::remove_cv_t<T>;
-    return std::is_aggregate<type>();
+#   if  defined(__cpp_lib_is_aggregate)
+    return std::is_aggregate<type>() && !detail::is_stdarray<type>::value;
 #   else
-    return true;
+    return !detail::is_stdarray<type>::value;
 #   endif
 }
 
