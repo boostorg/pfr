@@ -56,6 +56,7 @@ void test_some_comparable_struct() {
     ss >> s4;
     std::cout << s4 << std::endl;
     BOOST_TEST_EQ(s1, s4);
+    BOOST_TEST_EQ(hash_value(s1), hash_value(s4));
     int i = 1, j = 2;
     BOOST_TEST_NE(i, j);
 }

@@ -66,6 +66,7 @@ void test_comparable_struct() {
 
 void test_empty_struct() {
     struct empty {};
+    BOOST_TEST_EQ(boost::pfr::hash_value(empty{}), boost::pfr::hash_value(empty{}));
     std::cout << boost::pfr::io(empty{});
     BOOST_TEST(boost::pfr::eq(empty{}, empty{}));
 }
@@ -85,11 +86,19 @@ struct comparable_struct {
 
 int main() {
     test_comparable_struct<foo::comparable_struct>();
+    BOOST_TEST_EQ(
+        boost::pfr::hash_value(foo::comparable_struct{}),
+        boost::pfr::hash_value(foo::comparable_struct{})
+    );
 
     struct local_comparable_struct {
         int i; short s; bool bl; int a,b,c,d,e,f;
     };
     test_comparable_struct<local_comparable_struct>();
+    BOOST_TEST_EQ(
+        boost::pfr::hash_value(local_comparable_struct{}),
+        boost::pfr::hash_value(local_comparable_struct{})
+    );
 
     struct local_comparable_struct_with_union {
         int i; short s; bool bl; int a,b,c,d,e; test_union u;
