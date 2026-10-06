@@ -54,7 +54,7 @@ namespace boost { namespace pfr { namespace detail {
 
     template <class S> auto hash_detector_msvc_helper(long) -> decltype(std::hash<S>{}(std::declval<S>()));
     template <class S> can_not_apply hash_detector_msvc_helper(int);
-    template <class T1, class T2> using hash_detector = decltype(hash_detector_msvc_helper<T1,T2>(1L));
+    template <class T1, class> using hash_detector = decltype(hash_detector_msvc_helper<T1>(1L));
 
 
     template <class S, class T> auto ostreamable_detector_msvc_helper(long) -> decltype(std::declval<S>() << std::declval<T>());
