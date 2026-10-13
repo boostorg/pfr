@@ -182,6 +182,28 @@ constexpr auto assert_first_not_base(long) noexcept
 
 ///////////////////// Helpers for initializable detection
 // Note that these take O(N) compile time and memory!
+// In C++20+, the N=1 probe uses braces (same as C++17: correct for empty aggregates
+// and non-default-constructible trailing members; T{ubiq} is aggregate-init, not
+// copy-construction).  N>=2 probes use parenthesized aggregate init T(ubiq...)
+// (P0960R3), which does not perform brace elision, so structs with C-style array
+// members are counted correctly (1 field, not sizeof(array)/sizeof(element)).
+#if BOOST_PFR_USE_CPP20 && !BOOST_PFR_USE_CPP26 && !BOOST_PFR_USE_CPP26_REFLECTION
+template <class T, std::size_t... I, class /*Enable*/ = std::enable_if_t<std::is_copy_constructible<T>::value && (sizeof...(I) <= 1)>>
+constexpr auto enable_if_initializable_helper(std::index_sequence<I...>) noexcept
+    -> std::add_pointer_t<decltype(T{ubiq_lref_constructor{I}...})>;
+
+template <class T, std::size_t... I, class /*Enable*/ = std::enable_if_t<!std::is_copy_constructible<T>::value && (sizeof...(I) <= 1)>>
+constexpr auto enable_if_initializable_helper(std::index_sequence<I...>) noexcept
+    -> std::add_pointer_t<decltype(T{ubiq_rref_constructor{I}...})>;
+
+template <class T, std::size_t... I, class /*Enable*/ = std::enable_if_t<std::is_copy_constructible<T>::value && (sizeof...(I) >= 2)>>
+constexpr auto enable_if_initializable_helper(std::index_sequence<I...>) noexcept
+    -> std::add_pointer_t<decltype(T(ubiq_lref_constructor{I}...))>;
+
+template <class T, std::size_t... I, class /*Enable*/ = std::enable_if_t<!std::is_copy_constructible<T>::value && (sizeof...(I) >= 2)>>
+constexpr auto enable_if_initializable_helper(std::index_sequence<I...>) noexcept
+    -> std::add_pointer_t<decltype(T(ubiq_rref_constructor{I}...))>;
+#else
 template <class T, std::size_t... I, class /*Enable*/ = std::enable_if_t<std::is_copy_constructible<T>::value>>
 constexpr auto enable_if_initializable_helper(std::index_sequence<I...>) noexcept
     -> std::add_pointer_t<decltype(T{ubiq_lref_constructor{I}...})>;
@@ -189,6 +211,7 @@ constexpr auto enable_if_initializable_helper(std::index_sequence<I...>) noexcep
 template <class T, std::size_t... I, class /*Enable*/ = std::enable_if_t<!std::is_copy_constructible<T>::value>>
 constexpr auto enable_if_initializable_helper(std::index_sequence<I...>) noexcept
     -> std::add_pointer_t<decltype(T{ubiq_rref_constructor{I}...})>;
+#endif
 
 template <class T, std::size_t N, class U = std::size_t, class /*Enable*/ = decltype(detail::enable_if_initializable_helper<T>(detail::make_index_sequence<N>()))>
 using enable_if_initializable_helper_t = U;
