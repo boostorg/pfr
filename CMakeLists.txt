@@ -4,11 +4,15 @@
 # Distributed under the Boost Software License, Version 1.0.
 # https://www.boost.org/LICENSE_1_0.txt
 
-cmake_minimum_required(VERSION 3.28...4.4)
+cmake_minimum_required(VERSION 3.8...4.4)
 
 project(boost_pfr VERSION "${BOOST_SUPERPROJECT_VERSION}" LANGUAGES CXX)
 
 if(BOOST_USE_MODULES)
+    if(CMAKE_VERSION VERSION_LESS 3.28)
+        message(FATAL_ERROR "BOOST_USE_MODULES requires CMake 3.28 or newer, using ${CMAKE_VERSION}")
+    endif()
+
     add_library(boost_pfr STATIC)
     target_sources(boost_pfr PUBLIC
         FILE_SET CXX_MODULES
